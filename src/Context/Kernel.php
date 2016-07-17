@@ -3,6 +3,7 @@
 namespace Codeages\Biz\Framework\Context;
 
 use Pimple\Container;
+use Pimple\ServiceProviderInterface;
 use Doctrine\DBAL\DriverManager;
 use Codeages\Biz\Framework\Dao\DaoProxy;
 
@@ -73,6 +74,15 @@ abstract class Kernel extends Container
     public function getUser()
     {
         return $this->user;
+    }
+
+    public function register(ServiceProviderInterface $provider, array $values = array())
+    {
+        $this->providers[] = $provider;
+
+        parent::register($provider, $values);
+
+        return $this;
     }
 
     abstract public function getNamespace();
