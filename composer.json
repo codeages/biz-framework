@@ -12,6 +12,10 @@
     "require": {
         "php": ">=5.3.3",
         "pimple/pimple": "~3.0.2",
-        "doctrine/dbal": "~2.5.4"
+        "doctrine/dbal": "~2.4",
+        "davedevelopment/phpmig": "~1.2"
+    },
+    "config" : {
+        "bin-dir" : "bin"
     }
 }
