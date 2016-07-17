@@ -10,10 +10,10 @@
         }
     },
     "require": {
-        "php": ">=5.3.3",
-        "pimple/pimple": "~3.0.2",
-        "doctrine/dbal": "~2.4",
-        "davedevelopment/phpmig": "~1.2"
+        "php": "^5.3.3 || ^7.0",
+        "pimple/pimple": "^3.0.2",
+        "doctrine/dbal": "^2.4.5",
+        "davedevelopment/phpmig": "^1.2.0"
     },
     "config" : {
         "bin-dir" : "bin"
