@@ -60,24 +60,15 @@ abstract class Kernel extends Container
         return $this->config[$name];
     }
 
-    public function service($name)
+    public function dao($callable)
     {
-        if (!isset($this->container[$name])) {
-            $class = "{$this->getNamespace()}\\Service\\Impl\\{$name}Impl";
-            $this->container[$name] = new $class($this);
+        if (!method_exists($callable, '__invoke')) {
+            throw new \InvalidArgumentException('Dao definition is not a Closure or invokable object.');
         }
 
-        return $this->container[$name];
-    }
-
-    public function dao($name)
-    {
-        if (!isset($this->container[$name])) {
-            $class = "{$this->getNamespace()}\\Dao\\Impl\\{$name}Impl";
-            $this->container[$name] = new DaoProxy(new $class($this));
-        }
-
-        return $this->container[$name];
+        return function() use ($callable) {
+            return new DaoProxy($this, $callable);
+        };
     }
 
     public function setUser(CurrentUserInterface $user)

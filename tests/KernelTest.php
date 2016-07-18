@@ -4,6 +4,7 @@ namespace Codeages\Biz\Framework\Tests;
 
 use Codeages\Biz\Framework\Tests\Example\ExampleKernel;
 use Codeages\Biz\Framework\Tests\Example\ExampleServiceProvider;
+use Codeages\Biz\Framework\Tests\Example\Dao\Impl\ExampleDaoImpl;
 
 class KernelTest extends \PHPUnit_Framework_TestCase
 {
@@ -39,5 +40,19 @@ class KernelTest extends \PHPUnit_Framework_TestCase
         $kernel->boot();
 
         $this->assertTrue(is_array($kernel['migration_directories']));
+    }
+
+    public function testDao()
+    {
+        $kernel = new ExampleKernel();
+        $kernel->boot();
+
+        $kernel['example.example_dao'] = $kernel->dao(function($container) {
+            return new ExampleDaoImpl($container);
+        });
+
+        $declares = $kernel['example.example_dao']->declares();
+
+        $this->assertTrue(is_array($declares));
     }
 }

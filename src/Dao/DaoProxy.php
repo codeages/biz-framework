@@ -5,15 +5,18 @@ namespace Codeages\Biz\Framework\Dao;
 class DaoProxy
 {
     protected $dao;
+    protected $container;
+    protected $callable;
 
-    public function __construct(DaoInterface $dao)
+    public function __construct($container, $callable)
     {
-        $this->dao = $dao;
+        $this->container = $container;
+        $this->callable = $callable;
     }
 
     public function __call($method, $arguments)
     {
-        $declares = $this->dao->declares();
+        $declares = $this->_getRealDao()->declares();
 
         if (strpos($method, 'get') === 0) {
             $row = $this->_callRealDao($method, $arguments);
@@ -67,7 +70,7 @@ class DaoProxy
             return $row;
         }
 
-        $declares = $this->dao->declares();
+        $declares = $this->_getRealDao()->declares();
         $serializes = empty($declares['serializes']) ? array() : $declares['serializes'];
 
         foreach ($serializes as $key => $method) {
@@ -92,7 +95,7 @@ class DaoProxy
 
     private function _serialize(&$row)
     {
-        $declares = $this->dao->declares();
+        $declares = $this->_getRealDao()->declares();
         $serializes = empty($declares['serializes']) ? array() : $declares['serializes'];
 
         foreach ($serializes as $key => $method) {
@@ -140,5 +143,14 @@ class DaoProxy
         }
 
         return explode('|', trim($value, '|'));
+    }
+
+    private function _getRealDao()
+    {
+        if (!isset($this->dao)) {
+            $callable = $this->callable;
+            $this->dao = $callable($this->container);
+        }
+        return $this->dao;
     }
 }
