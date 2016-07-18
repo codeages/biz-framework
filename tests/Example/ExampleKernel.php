@@ -8,9 +8,7 @@ class ExampleKernel extends Kernel
 {
     public function __construct()
     {
-        $this->config = include __DIR__.'/parameters.php';
-        $this->boot();
-        $this->recreateDatabase();
+        parent::__construct(include __DIR__.'/parameters.php');
     }
 
     public function getNamespace()
@@ -18,7 +16,7 @@ class ExampleKernel extends Kernel
         return __NAMESPACE__;
     }
 
-    private function recreateDatabase()
+    public function recreateDatabase()
     {
         $this['db']->exec('DROP TABLE IF EXISTS example;');
         $this['db']->exec("

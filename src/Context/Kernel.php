@@ -9,13 +9,16 @@ use Codeages\Biz\Framework\Dao\DaoProxy;
 
 abstract class Kernel extends Container
 {
-    protected $config;
+    private $config;
 
-    protected $user;
+    private $user;
+
+    private $putted;
 
     public function __construct($config)
     {
         $this->config = $config;
+        $this->putted = array();
     }
 
     public function boot()
@@ -33,8 +36,11 @@ abstract class Kernel extends Container
                 'driver' => $cfg['driver'],
                 'charset' => $cfg['charset'],
             ));
-
         };
+
+        foreach ($this->putted as $key => $value) {
+            $this[$key] = $value;
+        }
     }
 
     public function config($name, $default = null)
@@ -74,6 +80,21 @@ abstract class Kernel extends Container
     public function getUser()
     {
         return $this->user;
+    }
+
+    public function put($key, $value)
+    {
+        if (!is_array($value)) {
+            $value = array($value);
+        }
+
+        if (!isset($this->putted[$key])) {
+            $this->putted[$key] = $value;
+        } else {
+            $this->putted[$key] = array_merge($this->putted[$key], $value);
+        }
+
+        return $this;
     }
 
     public function register(ServiceProviderInterface $provider, array $values = array())

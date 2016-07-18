@@ -11,6 +11,10 @@ class GeneralDaoImplTest extends \PHPUnit_Framework_TestCase
     public function __construct()
     {
         $this->kernel = new ExampleKernel();
+        $this->kernel->boot();
+
+        $this->kernel->recreateDatabase();
+
         $this->dao = $this->kernel->dao('ExampleDao');
     }
 
