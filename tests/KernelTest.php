@@ -5,7 +5,6 @@ namespace Codeages\Biz\Framework\Tests;
 use Codeages\Biz\Framework\Tests\Example\ExampleKernel;
 use Codeages\Biz\Framework\Tests\Example\ExampleServiceProvider;
 
-
 class KernelTest extends \PHPUnit_Framework_TestCase
 {
     public function testRegister()
@@ -32,6 +31,5 @@ class KernelTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(2, count($kernel['test1']));
 
         $this->assertEquals(4, count($kernel['test2']));
-
     }
 }

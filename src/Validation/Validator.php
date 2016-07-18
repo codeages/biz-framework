@@ -247,11 +247,11 @@ class Validator
         $sublist = $data[$keyArr[0]];
         if ($keyArr[1] == '[]' && sizeof($sublist) > 0) {
             for ($i = 0; $i < sizeof($sublist); ++$i) {
-		if(array_key_exists($keyArr[2], $sublist[$i])){
-		    array_push($vals, $sublist[$i][$keyArr[2]]);	
-		}
+                if (array_key_exists($keyArr[2], $sublist[$i])) {
+                    array_push($vals, $sublist[$i][$keyArr[2]]);
+                }
             }
-        } else if(array_key_exists($keyArr[1], $sublist)){
+        } elseif (array_key_exists($keyArr[1], $sublist)) {
             array_push($vals, $sublist[$keyArr[1]]);
         }
 
