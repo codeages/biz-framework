@@ -10,19 +10,27 @@ use Codeages\Biz\Framework\Dao\DaoProxy;
 abstract class Kernel extends Container
 {
     private $config;
-
     private $user;
-
     private $putted;
+    private $providers;
 
     public function __construct($config)
     {
         $this->config = $config;
         $this->putted = array();
+        $this->providers = array();
     }
 
-    public function boot()
+    public function boot($options = array())
     {
+        foreach ($this->registerProviders() as $provider) {
+            $this->register($provider);
+
+            if ($provider instanceof MigrationProviderInterface) {
+                $provider->registerMigrationDirectory($this);
+            }
+        }
+
         $this['db'] = function ($container) {
 
             $cfg = $this->config('database');
@@ -107,4 +115,6 @@ abstract class Kernel extends Container
     }
 
     abstract public function getNamespace();
+
+    abstract public function registerProviders();
 }

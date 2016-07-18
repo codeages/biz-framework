@@ -4,8 +4,10 @@ namespace Codeages\Biz\Framework\Tests\Example;
 
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
+use Codeages\Biz\Framework\Context\MigrationProviderInterface;
+use Codeages\Biz\Framework\Context\Kernel;
 
-class ExampleServiceProvider implements ServiceProviderInterface
+class ExampleServiceProvider implements ServiceProviderInterface, MigrationProviderInterface
 {
     public function register(Container $container)
     {
@@ -13,6 +15,11 @@ class ExampleServiceProvider implements ServiceProviderInterface
             return new Example();
         };
 
+    }
+
+    public function registerMigrationDirectory(Kernel $contaier)
+    {
+        $contaier->put('migration_directories', __DIR__ . '/database');
     }
 }
 

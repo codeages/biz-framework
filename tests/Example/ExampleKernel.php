@@ -16,6 +16,13 @@ class ExampleKernel extends Kernel
         return __NAMESPACE__;
     }
 
+    public function registerProviders()
+    {
+        return array(
+            new ExampleServiceProvider(),
+        );
+    }
+
     public function recreateDatabase()
     {
         $this['db']->exec('DROP TABLE IF EXISTS example;');

@@ -32,4 +32,12 @@ class KernelTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(4, count($kernel['test2']));
     }
+
+    public function testRegisterMigrationProvider()
+    {
+        $kernel = new ExampleKernel();
+        $kernel->boot();
+
+        $this->assertTrue(is_array($kernel['migration_directories']));
+    }
 }
