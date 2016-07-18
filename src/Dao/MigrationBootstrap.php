@@ -5,24 +5,21 @@ namespace Codeages\Biz\Framework\Dao;
 use Phpmig\Adapter;
 use Dotenv\Dotenv;
 use Pimple\Container;
+use Doctrine\DBAL\DriverManager;
 
 class MigrationBootstrap
 {
-    public function __construct($kernel, $rootDirectory)
+    public function __construct($kernel)
     {
         $this->kernel = $kernel;
-        $this->rootDirectory = $rootDirectory;
     }
 
     public function run()
     {
-        $dotenv = new Dotenv($this->rootDirectory);
-        $dotenv->load();
-
         $container = new Container();
 
         $container['db'] = function() {
-            return Doctrine\DBAL\DriverManager::getConnection(array(
+            return DriverManager::getConnection(array(
                 'driver' => getenv('DB_DRIVER'),
                 'dbname' => getenv('DB_DATABASE'),
                 'charset' => getenv('DB_CHARSET'),
