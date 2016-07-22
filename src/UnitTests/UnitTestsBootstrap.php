@@ -20,20 +20,23 @@ class UnitTestsBootstrap
     {
         $this->kernel->boot();
 
+        $config = $this->kernel->config('database');
+
         $this->kernel['db'] = DriverManager::getConnection(array(
             'wrapperClass' => 'Codeages\Biz\Framework\Dao\TestCaseConnection',
-            'driver' => getenv('DB_DRIVER'),
-            'dbname' => getenv('DB_DATABASE'),
-            'charset' => getenv('DB_CHARSET'),
-            'host' => getenv('DB_HOST'),
-            'user' =>  getenv('DB_USERNAME'),
-            'password' => getenv('DB_PASSWORD'),
+            'driver' => $config['driver'],
+            'host' => $config['host'],
+            'port' => $config['port'],
+            'dbname' => $config['dbname'],
+            'charset' => $config['charset'],
+            'user' => $config['user'],
+            'password' => $config['password'],
         ));
 
         BaseTestCase::setKernel($this->kernel);
 
-        $migration = new MigrationBootstrap($this->kernel, __DIR__);
-        $container = $migration->run();
+        $migration = new MigrationBootstrap($this->kernel);
+        $container = $migration->boot();
 
         $adapter = $container['phpmig.adapter'];
         if (!$adapter->hasSchema()) {

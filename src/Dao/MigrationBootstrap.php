@@ -14,18 +14,21 @@ class MigrationBootstrap
         $this->kernel = $kernel;
     }
 
-    public function run()
+    public function boot()
     {
         $container = new Container();
 
-        $container['db'] = function() {
+        $config = $this->kernel->config('database');
+
+        $container['db'] = function() use ($config) {
             return DriverManager::getConnection(array(
-                'driver' => getenv('DB_DRIVER'),
-                'dbname' => getenv('DB_DATABASE'),
-                'charset' => getenv('DB_CHARSET'),
-                'host' => getenv('DB_HOST'),
-                'user' =>  getenv('DB_USERNAME'),
-                'password' => getenv('DB_PASSWORD'),
+                'driver' => $config['driver'],
+                'host' => $config['host'],
+                'port' => $config['port'],
+                'dbname' => $config['dbname'],
+                'charset' => $config['charset'],
+                'user' => $config['user'],
+                'password' => $config['password'],
             ));
         };
 
