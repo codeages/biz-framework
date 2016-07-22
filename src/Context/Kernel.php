@@ -105,7 +105,5 @@ abstract class Kernel extends Container
         return $this;
     }
 
-    abstract public function getNamespace();
-
     abstract public function registerProviders();
 }
