@@ -20,7 +20,7 @@ class UnitTestsBootstrap
     {
         $this->kernel->boot();
 
-        $kernel['db'] = DriverManager::getConnection(array(
+        $this->kernel['db'] = DriverManager::getConnection(array(
             'wrapperClass' => 'Codeages\Biz\Framework\Dao\TestCaseConnection',
             'driver' => getenv('DB_DRIVER'),
             'dbname' => getenv('DB_DATABASE'),
@@ -30,9 +30,9 @@ class UnitTestsBootstrap
             'password' => getenv('DB_PASSWORD'),
         ));
 
-        BaseTestCase::setKernel($kernel);
+        BaseTestCase::setKernel($this->kernel);
 
-        $migration = new MigrationBootstrap($kernel, __DIR__);
+        $migration = new MigrationBootstrap($this->kernel, __DIR__);
         $container = $migration->run();
 
         $adapter = $container['phpmig.adapter'];
