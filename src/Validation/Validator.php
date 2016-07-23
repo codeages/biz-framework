@@ -33,6 +33,11 @@ class Validator
      * @var array
      */
     private $errors = array();
+
+    /**
+     * rule needed to check when val is null
+     */
+    private $requiredRules = array();
     /**
      * filter $data with keys defined in $ruleConfigs if $config["filter"] = true.
      *
@@ -43,6 +48,7 @@ class Validator
     public function __construct(array $cfg = null)
     {
         $this->extValidators = array();
+        $this->requiredRules = array('required', 'sameWith', 'diffWith', 'requiredWith');
         //default validation config
         $this->defaultConfig = array(
             'blocked' => true,
@@ -149,7 +155,7 @@ class Validator
                 for ($i = 0; $i < sizeof($vals); ++$i) {
                     $msg = $this->validateByRule($data, $key, $vals[$i], trim($rulesArr[$j]));
                     if (!empty($msg)) {
-                        array_push($this->errors, $vals[$i].' '.$msg);
+                        array_push($this->errors, '[' . $this->shorten($vals[$i]) . ']' . $msg);
                         if ($this->defaultConfig['throwException']) {
                             throw new ValidationException($key, $vals[$i], $msg);
                         }
@@ -181,8 +187,8 @@ class Validator
         $left_bracket_pos = stripos($rule, '(');
         if (!is_bool($left_bracket_pos)) { //有参数
             $right_bracket_pos = stripos($rule, ')');
-            $ruleName = substr($rule, 0, $left_bracket_pos);
-            $tmp = substr($rule, $left_bracket_pos + 1, $right_bracket_pos - $left_bracket_pos - 1);
+            $ruleName = mb_substr($rule, 0, $left_bracket_pos);
+            $tmp = mb_substr($rule, $left_bracket_pos + 1, $right_bracket_pos - $left_bracket_pos - 1);
             if ($tmp != '') {
                 $params = explode(',', $tmp);
             }
@@ -191,15 +197,19 @@ class Validator
         for ($i = 0; $i < sizeof($params); ++$i) {
             $ele = trim($params[$i]);
             //check per parameter type
-            $first = substr($ele, 0, 1);
+            $first = mb_substr($ele, 0, 1);
             if ($first == '\'' || $first == '"') {
-                $params[$i] = substr($ele, 1, strlen($ele) - 2);
+                $params[$i] = mb_substr($ele, 1, mb_strlen($ele) - 2);
             } elseif ($this->is_variable($ele)) {
                 //only the first, unsupport multi values from subarray
                 $params[$i] = $this->getValuesFromData($data, $params[$i])[0];
             } else {
                 //numeric , ignore
             }
+        }
+        //如果值为空且不是校验required这样的rule，则不必继续，比如 email,如果$val=null/'',则没必要校验rule email。
+        if((is_null($val) || $val === '') && !array_key_exists($ruleName, $this->requiredRules)){
+            return '';
         }
 
         if (array_key_exists($ruleName, $this->extValidators)) {
@@ -233,7 +243,7 @@ class Validator
     {
         return strcasecmp($var, 'true') !== 0
             && strcasecmp($var, 'false') !== 0
-            && $this->match('/[a-zA-Z_]/', substr($var, 0, 1));
+            && $this->match('/[a-zA-Z_]/', mb_substr($var, 0, 1));
     }
 
     private function getValuesFromData(array $data, $key)
@@ -247,11 +257,11 @@ class Validator
         $sublist = $data[$keyArr[0]];
         if ($keyArr[1] == '[]' && sizeof($sublist) > 0) {
             for ($i = 0; $i < sizeof($sublist); ++$i) {
-                if (array_key_exists($keyArr[2], $sublist[$i])) {
-                    array_push($vals, $sublist[$i][$keyArr[2]]);
-                }
+        if(array_key_exists($keyArr[2], $sublist[$i])){
+            array_push($vals, $sublist[$i][$keyArr[2]]);    
+        }
             }
-        } elseif (array_key_exists($keyArr[1], $sublist)) {
+        } else if(array_key_exists($keyArr[1], $sublist)){
             array_push($vals, $sublist[$keyArr[1]]);
         }
 
@@ -343,7 +353,7 @@ class Validator
      */
     private function rule_date($value, array $params)
     {
-        $fmt = sizeof($params) > 0 && strlen($params[0]) > 0 ? $params[0] : 'Y-m-d';
+        $fmt = sizeof($params) > 0 && mb_strlen($params[0]) > 0 ? $params[0] : 'Y-m-d';
         $d = \DateTime::createFromFormat($fmt, $value);
         if ($d && $d->format($fmt) === $value) {
             return '';
@@ -433,7 +443,7 @@ class Validator
         if (!is_string($value)) {
             return '不是有效字符串';
         }
-        if (strlen($value) < $min || strlen($value) > $max) {
+        if (mb_strlen($value) < $min || mb_strlen($value) > $max) {
             return "不在指定长度范围($min, $max)内";
         }
 
@@ -475,7 +485,7 @@ class Validator
         if (!is_string($value)) {
             return '不是有效字符串';
         }
-        if (strlen($value) < $min) {
+        if (mb_strlen($value) < $min) {
             return "小于约定的最小长度($min)";
         }
 
@@ -489,7 +499,7 @@ class Validator
         if (!is_string($value)) {
             return '不是有效字符串';
         }
-        if (strlen($value) > $max) {
+        if (mb_strlen($value) > $max) {
             return "大于约定的最大长度($max)";
         }
 
@@ -767,6 +777,14 @@ class Validator
             return $this->match("/^\d+(\.?)\d+$/", $value);
         }
     }
+
+    private function shorten($val){
+        if(!empty($val) && is_string($val) && mb_strlen($val) > 20){
+            return mb_substr($val, 0, 20) . '...';
+        }
+        return $val;
+    }
+
 
     public function quickTest($ruleFunc, $value, array $params = array())
     {
