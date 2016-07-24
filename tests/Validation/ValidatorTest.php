@@ -5,7 +5,6 @@ namespace Codeages\Biz\Framework\Validation;
 class ValidatorTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @group current1
      *
      * @return 
      */
@@ -20,7 +19,7 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
         // });
 
         $valid->addRule('basicRule', function ($tmp) {
-            var_dump($tmp);
+            // var_dump($tmp);
         });
 
         call_user_func($valid->getExtRule('basicRule'), "\nparam!!!");
@@ -34,17 +33,17 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
 
         $valid = new Validator();
         $valid->validate($data, array(
-            'name' => 'required | lenrange(6,2)',
+            'name' => 'required | lenrange(6,8)',
         ));
 
-        $this->assertEquals(1, sizeof($valid->errors()));
+        $this->assertEquals(1, count($valid->errors()));
 
         $valid = new Validator();
         $valid->validate($data, array(
             'name' => 'required | lenrange(6,20)',
         ));
 
-        $this->assertEquals(0, sizeof($valid->errors()));
+        $this->assertEquals(0, count($valid->errors()));
     }
 
     public function testValidate4SimpleBean()
@@ -59,8 +58,8 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
 
         $valid = new Validator();
         $valid->validate($data, array(
-            'name' => 'required | lenrange(6,2)',
-            'age' => 'required | int | range(10, 2)',
+            'name' => 'required|lenrange(6,2)',
+            'age' => 'required|int|range(10, 2)',
             'pass' => 'required | lenrange(6,2)',
             'pass_repeat' => 'required | sameWith(pass)',
             'remark' => 'maxlen(200)',
@@ -440,7 +439,6 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse(strlen($valid->quickTest('rule_ip', '267.11.11.11')) <= 0);
     }
     /**
-     * @group current
      *
      * @return  
      */
