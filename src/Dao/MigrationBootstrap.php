@@ -25,7 +25,7 @@ class MigrationBootstrap
                 'driver' => $config['driver'],
                 'host' => $config['host'],
                 'port' => $config['port'],
-                'dbname' => $config['dbname'],
+                'dbname' => $config['name'],
                 'charset' => $config['charset'],
                 'user' => $config['user'],
                 'password' => $config['password'],
