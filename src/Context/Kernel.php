@@ -19,6 +19,8 @@ abstract class Kernel extends Container
         $this->config = $config;
         $this->putted = array();
         $this->providers = array();
+
+        parent::__construct();
     }
 
     public function boot($options = array())
