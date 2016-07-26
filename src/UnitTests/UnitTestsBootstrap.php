@@ -34,6 +34,7 @@ class UnitTestsBootstrap
         ));
 
         BaseTestCase::setKernel($this->kernel);
+        BaseTestCase::emptyDatabase(true);
 
         $migration = new MigrationBootstrap($this->kernel);
         $container = $migration->boot();
