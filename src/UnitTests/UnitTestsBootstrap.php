@@ -27,13 +27,14 @@ class UnitTestsBootstrap
             'driver' => $config['driver'],
             'host' => $config['host'],
             'port' => $config['port'],
-            'dbname' => $config['dbname'],
+            'dbname' => $config['name'],
             'charset' => $config['charset'],
             'user' => $config['user'],
             'password' => $config['password'],
         ));
 
         BaseTestCase::setKernel($this->kernel);
+        BaseTestCase::emptyDatabase(true);
 
         $migration = new MigrationBootstrap($this->kernel);
         $container = $migration->boot();
