@@ -2,7 +2,7 @@
 
 namespace Codeages\Biz\Framework\Queue;
 
-interface QueueInterface
+interface Queue
 {
     public function push($queue, array $body, array $options = array());
 
@@ -10,4 +10,3 @@ interface QueueInterface
 
     public function pop($queue = null, $timeout = 0);
 }
-

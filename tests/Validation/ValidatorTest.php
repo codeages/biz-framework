@@ -4,6 +4,10 @@ namespace Codeages\Biz\Framework\Validation;
 
 class ValidatorTest extends \PHPUnit_Framework_TestCase
 {
+    public function testArray()
+    {
+    }
+
     /**
      *
      * @return 

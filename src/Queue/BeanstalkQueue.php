@@ -4,7 +4,7 @@ namespace Codeages\Biz\Framework\Queue;
 
 use Codeages\Beanstalk\Client;
 
-class BeanstalkQueue implements QueueInterface
+class BeanstalkQueue implements Queue
 {
     protected $client;
 
