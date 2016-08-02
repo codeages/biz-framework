@@ -10,7 +10,7 @@ class BeanstalkQueue implements Queue
 
     const DEFAULT_PRI = 1000;
     const DEFAULT_DELAY = 0;
-    const DEFAULT_TTR = 60;
+    const DEFAULT_TTR = 86400;
 
     public function __construct($options = array())
     {
