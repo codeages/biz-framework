@@ -2,7 +2,7 @@
 
 简单、易用、优雅。
 
-[![Build Status](https://travis-ci.org/brick-js/brick.js.svg?branch=master)](https://travis-ci.org/brick-js/brick.js)
+[![Build Status](https://travis-ci.org/retamia/biz-framework?branch=master)](https://github.com/codeages/biz-framework)
 
 ## 1.0 Roadmap
 
