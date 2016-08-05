@@ -119,7 +119,7 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
     protected function findInField($field, $values)
     {
         if (empty($values)) {
-            return [];
+            return array();
         }
 
         $marks = str_repeat('?,', count($values) - 1).'?';
