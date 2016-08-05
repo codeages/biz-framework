@@ -76,6 +76,7 @@ abstract class Kernel extends Container
     public function setUser(CurrentUserInterface $user)
     {
         $this->user = $user;
+        return $this;
     }
 
     public function getUser()
@@ -102,9 +103,7 @@ abstract class Kernel extends Container
     {
         $this->providers[] = $provider;
 
-        parent::register($provider, $values);
-
-        return $this;
+        return parent::register($provider, $values);
     }
 
     abstract public function registerProviders();

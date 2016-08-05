@@ -19,7 +19,7 @@ class MigrationBootstrapTest extends \PHPUnit_Framework_TestCase
         $kernel->boot();
 
         $bootstrap = new MigrationBootstrap($kernel, dirname(__DIR__));
-        $booted = $bootstrap->run();
+        $booted = $bootstrap->boot();
 
         $this->assertNotNull($booted);
     }
