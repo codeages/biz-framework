@@ -12,24 +12,22 @@ class DaoProxy
     {
         $this->container = $container;
         $this->callable = $callable;
+        $this->dao = call_user_func($callable, $this->container);
     }
 
     public function __call($method, $arguments)
     {
-        $declares = $this->_getRealDao()->declares();
-
         if (strpos($method, 'get') === 0) {
             $row = $this->_callRealDao($method, $arguments);
-
             return $this->_unserialize($row);
         }
 
         if ((strpos($method, 'find') === 0) or (strpos($method, 'search') === 0)) {
             $rows = $this->_callRealDao($method, $arguments);
-
             return $this->_unserializes($rows);
         }
 
+        $declares = $this->dao->declares();
         if (strpos($method, 'create') === 0) {
             if (isset($declares['timestamps'][0])) {
                 $arguments[0][$declares['timestamps'][0]] = time();
@@ -61,7 +59,7 @@ class DaoProxy
 
     private function _callRealDao($method, $arguments)
     {
-        return call_user_func_array([$this->dao, $method], $arguments);
+        return call_user_func_array(array($this->dao, $method), $arguments);
     }
 
     private function _unserialize(&$row)
@@ -70,7 +68,7 @@ class DaoProxy
             return $row;
         }
 
-        $declares = $this->_getRealDao()->declares();
+        $declares = $this->dao->declares();
         $serializes = empty($declares['serializes']) ? array() : $declares['serializes'];
 
         foreach ($serializes as $key => $method) {
@@ -95,7 +93,7 @@ class DaoProxy
 
     private function _serialize(&$row)
     {
-        $declares = $this->_getRealDao()->declares();
+        $declares = $this->dao->declares();
         $serializes = empty($declares['serializes']) ? array() : $declares['serializes'];
 
         foreach ($serializes as $key => $method) {
@@ -143,14 +141,5 @@ class DaoProxy
         }
 
         return explode('|', trim($value, '|'));
-    }
-
-    private function _getRealDao()
-    {
-        if (!isset($this->dao)) {
-            $callable = $this->callable;
-            $this->dao = $callable($this->container);
-        }
-        return $this->dao;
     }
 }

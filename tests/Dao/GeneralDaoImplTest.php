@@ -2,6 +2,7 @@
 
 namespace Codeages\Biz\Framework\Tests\Dao;
 
+use Codeages\Biz\Framework\Tests\Example\Dao\Impl\ExampleDaoImpl;
 use Codeages\Biz\Framework\Tests\Example\ExampleKernel;
 
 class GeneralDaoImplTest extends \PHPUnit_Framework_TestCase
@@ -15,7 +16,11 @@ class GeneralDaoImplTest extends \PHPUnit_Framework_TestCase
 
         $this->kernel->recreateDatabase();
 
-        $this->dao = $this->kernel->dao('ExampleDao');
+        $this->kernel['example_dao'] = $this->kernel->dao(function ($kernel){
+            return new ExampleDaoImpl($kernel);
+        });
+
+        $this->dao = $this->kernel['example_dao'];
     }
 
     public function setUp()
