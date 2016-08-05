@@ -8,7 +8,7 @@ env:
   - DB=mysql
 
 before_script:
-
+  - mysql -e 'CREATE DATABASE `biz_framework_test` DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci'
   - composer install
 cache:
   directories:

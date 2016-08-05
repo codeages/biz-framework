@@ -2,7 +2,7 @@
 
 简单、易用、优雅。
 
-[![Build Status](https://travis-ci.org/retamia/biz-framework?branch=master)](https://github.com/codeages/biz-framework)
+[![Build Status](https://travis-ci.org/codeages/biz-framework.svg?branch=master)](https://github.com/codeages/biz-framework)
 
 ## 1.0 Roadmap
 
