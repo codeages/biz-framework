@@ -306,9 +306,9 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
         //true
         $this->assertTrue(strlen($valid->quickTest('rule_date', '2016-09-09')) <= 0);
         $this->assertTrue(strlen($valid->quickTest('rule_date', '2116-09-09')) <= 0);
-        $this->assertTrue(strlen($valid->quickTest('rule_date', '2116/09/09', ['Y/m/d'])) <= 0);
-        $this->assertTrue(strlen($valid->quickTest('rule_date', '2116/09', ['Y/m'])) <= 0);
-        $this->assertTrue(strlen($valid->quickTest('rule_date', '2116', ['Y'])) <= 0);
+        $this->assertTrue(strlen($valid->quickTest('rule_date', '2116/09/09', array('Y/m/d'))) <= 0);
+        $this->assertTrue(strlen($valid->quickTest('rule_date', '2116/09', array('Y/m'))) <= 0);
+        $this->assertTrue(strlen($valid->quickTest('rule_date', '2116', array('Y'))) <= 0);
 
         $this->assertFalse(strlen($valid->quickTest('rule_date', 'fadsfafw')) <= 0);
         $this->assertFalse(strlen($valid->quickTest('rule_date', '19900816')) <= 0);
