@@ -1,9 +1,9 @@
 <?php
 
-return [
+return array(
     'env' => 'dev',
     'debug' => true,
-    'database' => [
+    'database' => array(
         'driver' => 'pdo_mysql',
         'host' => '127.0.0.1',
         'port' => 3306,
@@ -11,5 +11,5 @@ return [
         'user' => 'root',
         'password' => '',
         'charset' => 'utf8',
-    ],
-];
+    ),
+);
