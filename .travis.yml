@@ -1,7 +1,8 @@
 language: php
 
 php:
-  - '5.3.x'
+  - '5.3'
+  - '7.0'
 
 env:
   - DB=mysql
