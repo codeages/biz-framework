@@ -33,9 +33,9 @@ abstract class Kernel extends Container
             }
         }
 
-        $this['db'] = function ($container) {
+        $this['db'] = function ($kernel) {
 
-            $cfg = $this->config('database');
+            $cfg = $kernel->config('database');
 
             return DriverManager::getConnection(array(
                 'wrapperClass' => 'Codeages\Biz\Framework\Dao\Connection',
@@ -68,14 +68,15 @@ abstract class Kernel extends Container
             throw new \InvalidArgumentException('Dao definition is not a Closure or invokable object.');
         }
 
-        return function() use ($callable) {
-            return new DaoProxy($this, $callable);
+        return function($kernel) use ($callable) {
+            return new DaoProxy($kernel, $callable);
         };
     }
 
     public function setUser(CurrentUserInterface $user)
     {
         $this->user = $user;
+        return $this;
     }
 
     public function getUser()
@@ -102,9 +103,7 @@ abstract class Kernel extends Container
     {
         $this->providers[] = $provider;
 
-        parent::register($provider, $values);
-
-        return $this;
+        return parent::register($provider, $values);
     }
 
     abstract public function registerProviders();
