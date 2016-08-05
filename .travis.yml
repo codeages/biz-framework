@@ -1,0 +1,15 @@
+language: php
+
+php:
+  - '5.3'
+  - '7.0'
+
+env:
+  - DB=mysql
+
+before_script:
+
+  - composer install
+cache:
+  directories:
+    - $HOME/.composer/cache
