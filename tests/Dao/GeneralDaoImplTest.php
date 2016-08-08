@@ -141,4 +141,13 @@ class GeneralDaoImplTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(1, $count);
     }
+
+    public function testTransactional()
+    {
+        $result = $this->dao->db()->transactional(function ($connection){
+            return 1;
+        });
+
+        $this->assertEquals(1, $result);
+    }
 }
