@@ -3,8 +3,8 @@
 namespace Codeages\Biz\Framework\Context;
 
 use Pimple\Container;
-use Pimple\ServiceProviderInterface;
 use Doctrine\DBAL\DriverManager;
+use Pimple\ServiceProviderInterface;
 use Codeages\Biz\Framework\Dao\DaoProxy;
 
 abstract class Kernel extends Container
@@ -16,8 +16,8 @@ abstract class Kernel extends Container
 
     public function __construct($config)
     {
-        $this->config = $config;
-        $this->putted = array();
+        $this->config    = $config;
+        $this->putted    = array();
         $this->providers = array();
 
         parent::__construct();
@@ -34,17 +34,16 @@ abstract class Kernel extends Container
         }
 
         $this['db'] = function ($kernel) {
-
             $cfg = $kernel->config('database');
 
             return DriverManager::getConnection(array(
                 'wrapperClass' => 'Codeages\Biz\Framework\Dao\Connection',
-                'dbname' => $cfg['name'],
-                'user' => $cfg['user'],
-                'password' => $cfg['password'],
-                'host' => $cfg['host'],
-                'driver' => $cfg['driver'],
-                'charset' => $cfg['charset'],
+                'dbname'       => $cfg['name'],
+                'user'         => $cfg['user'],
+                'password'     => $cfg['password'],
+                'host'         => $cfg['host'],
+                'driver'       => $cfg['driver'],
+                'charset'      => $cfg['charset']
             ));
         };
 
@@ -68,7 +67,7 @@ abstract class Kernel extends Container
             throw new \InvalidArgumentException('Dao definition is not a Closure or invokable object.');
         }
 
-        return function($kernel) use ($callable) {
+        return function ($kernel) use ($callable) {
             return new DaoProxy($kernel, $callable);
         };
     }
@@ -97,6 +96,11 @@ abstract class Kernel extends Container
         }
 
         return $this;
+    }
+
+    public function get($key)
+    {
+        return $this->offsetGet($key);
     }
 
     public function register(ServiceProviderInterface $provider, array $values = array())
