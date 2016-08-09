@@ -4,7 +4,6 @@ namespace Codeages\Biz\Framework\UnitTests;
 use Phpmig\Api\PhpmigApplication;
 use Symfony\Component\Console\Output\NullOutput;
 use Codeages\Biz\Framework\Dao\MigrationBootstrap;
-use Codeages\Biz\Targetlog\TargetlogKernel;
 use Doctrine\DBAL\DriverManager;
 
 class UnitTestsBootstrap
