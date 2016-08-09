@@ -2,10 +2,8 @@
 
 namespace Codeages\Biz\Framework\Tests\Dao;
 
-use Codeages\Biz\Framework\Tests\Example\ExampleKernel;
-use Codeages\Biz\Framework\UnitTests\UnitTestsBootstrap;
-
 use Codeages\Biz\Framework\Dao\MigrationBootstrap;
+use Codeages\Biz\Framework\Tests\Example\ExampleKernel;
 
 class MigrationBootstrapTest extends \PHPUnit_Framework_TestCase
 {
@@ -19,19 +17,9 @@ class MigrationBootstrapTest extends \PHPUnit_Framework_TestCase
         $kernel->boot();
 
         $bootstrap = new MigrationBootstrap($kernel, dirname(__DIR__));
-        $booted = $bootstrap->boot();
+        $booted    = $bootstrap->boot();
 
         $this->assertNotNull($booted);
 
-
-    }
-
-    public function testUnitTestsBootstrap()
-    {
-        $kernel = new ExampleKernel();
-        $kernel->boot();
-
-        $unitTestsBootstrap = new UnitTestsBootstrap($kernel);
-        $unitTestsBootstrap->boot();
     }
 }
