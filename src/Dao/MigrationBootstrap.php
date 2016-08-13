@@ -32,6 +32,9 @@ class MigrationBootstrap
             ));
         };
 
+        // see: http://docs.doctrine-project.org/projects/doctrine-orm/en/latest/cookbook/mysql-enums.html
+        $container['db']->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
+
         $container['phpmig.adapter'] = function($container) {
             return new Adapter\Doctrine\DBAL($container['db'], 'migrations');
         };
