@@ -22,7 +22,7 @@ class UniquePriorityQueueTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(7, count($queue));
 
-        $items = [];
+        $items = array();
         foreach ($queue as $item) {
             $items[] = $item;
         }
