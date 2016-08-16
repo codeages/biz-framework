@@ -4,7 +4,7 @@ namespace Codeages\Biz\Framework\DataStructure;
 
 class UniquePriorityQueue extends \SplPriorityQueue
 {
-    protected $values = [];
+    protected $values = array();
 
     protected $serial = PHP_INT_MAX;
 
