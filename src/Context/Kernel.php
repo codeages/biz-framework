@@ -2,10 +2,13 @@
 
 namespace Codeages\Biz\Framework\Context;
 
+use Codeages\Biz\Framework\Event\Event;
 use Pimple\Container;
 use Doctrine\DBAL\DriverManager;
 use Pimple\ServiceProviderInterface;
 use Codeages\Biz\Framework\Dao\DaoProxy;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 abstract class Kernel extends Container
 {
@@ -45,6 +48,10 @@ abstract class Kernel extends Container
                 'driver'       => $cfg['driver'],
                 'charset'      => $cfg['charset']
             ));
+        };
+
+        $this['EventDispatcher'] = function ($kernel) {
+            return new EventDispatcher();
         };
 
         foreach ($this->putted as $key => $value) {
@@ -101,6 +108,40 @@ abstract class Kernel extends Container
     public function get($key)
     {
         return $this->offsetGet($key);
+    }
+
+    /**
+     * @return EventDispatcher
+     */
+    public function getEventDispatcher()
+    {
+        return $this['EventDispatcher'];
+    }
+
+    public function dispatch($eventName, $event, array $arguments = array())
+    {
+        if(!$event instanceof Event){
+            $event = new Event($this, $event, $arguments);
+        }
+
+        return $this->getEventDispatcher()->dispatch($eventName, $event);
+    }
+
+    public function addEventSubscriber(EventSubscriberInterface $subscriber)
+    {
+        $this->getEventDispatcher()->addSubscriber($subscriber);
+    }
+
+    public function addEventSubscribers(array $subscribers)
+    {
+        foreach ($subscribers as $subscriber){
+
+            if(!$subscriber instanceof EventSubscriberInterface){
+                throw new \RuntimeException('subscriber type error');
+            }
+
+            $this->getEventDispatcher()->addSubscriber($subscriber);
+        }
     }
 
     public function register(ServiceProviderInterface $provider, array $values = array())
