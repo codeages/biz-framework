@@ -2,6 +2,8 @@
 
 namespace Codeages\Biz\Framework\Context;
 
+
+use Codeages\Biz\Framework\Event\EventDispatcher;
 use Pimple\Container;
 use Doctrine\DBAL\DriverManager;
 use Pimple\ServiceProviderInterface;
@@ -45,6 +47,12 @@ abstract class Kernel extends Container
                 'driver'       => $cfg['driver'],
                 'charset'      => $cfg['charset']
             ));
+        };
+
+        $this['EventDispatcher'] = function ($kernel){
+            $dispatcher = EventDispatcher::getInstance();
+            $dispatcher->setKernel($kernel);
+            return $dispatcher;
         };
 
         foreach ($this->putted as $key => $value) {
