@@ -3,12 +3,12 @@
 namespace Codeages\Biz\Framework\Context;
 
 use Codeages\Biz\Framework\Event\Event;
+use Codeages\Biz\Framework\Event\EventSubscriber;
 use Pimple\Container;
 use Doctrine\DBAL\DriverManager;
 use Pimple\ServiceProviderInterface;
 use Codeages\Biz\Framework\Dao\DaoProxy;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 abstract class Kernel extends Container
 {
@@ -50,7 +50,7 @@ abstract class Kernel extends Container
             ));
         };
 
-        $this['EventDispatcher'] = function ($kernel) {
+        $this['event_dispatcher'] = function ($kernel) {
             return new EventDispatcher();
         };
 
@@ -115,33 +115,43 @@ abstract class Kernel extends Container
      */
     public function getEventDispatcher()
     {
-        return $this['EventDispatcher'];
+        return $this['event_dispatcher'];
     }
 
+    /**
+     * @param string       $eventName
+     * @param string|Event $event
+     * @param array        $arguments
+     *
+     * @return Event
+     */
     public function dispatch($eventName, $event, array $arguments = array())
     {
-        if(!$event instanceof Event){
-            $event = new Event($this, $event, $arguments);
+        if (!$event instanceof Event) {
+            $event = new Event($event, $arguments);
         }
 
         return $this->getEventDispatcher()->dispatch($eventName, $event);
     }
 
-    public function addEventSubscriber(EventSubscriberInterface $subscriber)
+    public function addEventSubscriber(EventSubscriber $subscriber)
     {
         $this->getEventDispatcher()->addSubscriber($subscriber);
+        return $this;
     }
 
     public function addEventSubscribers(array $subscribers)
     {
-        foreach ($subscribers as $subscriber){
+        foreach ($subscribers as $subscriber) {
 
-            if(!$subscriber instanceof EventSubscriberInterface){
+            if (!$subscriber instanceof EventSubscriber) {
                 throw new \RuntimeException('subscriber type error');
             }
 
             $this->getEventDispatcher()->addSubscriber($subscriber);
         }
+
+        return $this;
     }
 
     public function register(ServiceProviderInterface $provider, array $values = array())
