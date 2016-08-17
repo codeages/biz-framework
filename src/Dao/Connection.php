@@ -31,7 +31,7 @@ class Connection extends DoctrineConnection
         return true;
     }
 
-    public function transactional(\Closure $func)
+    public function transactional(\Closure $func, \Closure $exceptionFunc = null)
     {
         $this->beginTransaction();
         try{
@@ -40,6 +40,7 @@ class Connection extends DoctrineConnection
             return $result;
         } catch (\Exception $e){
             $this->rollBack();
+            !is_null($exceptionFunc) && $exceptionFunc($this);
             throw $e;
         }
     }
