@@ -3,12 +3,12 @@
 namespace Codeages\Biz\Framework\Context;
 
 use Codeages\Biz\Framework\Event\Event;
-use Codeages\Biz\Framework\Event\EventSubscriber;
 use Pimple\Container;
 use Doctrine\DBAL\DriverManager;
 use Pimple\ServiceProviderInterface;
 use Codeages\Biz\Framework\Dao\DaoProxy;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 abstract class Kernel extends Container
 {
@@ -134,7 +134,7 @@ abstract class Kernel extends Container
         return $this->getEventDispatcher()->dispatch($eventName, $event);
     }
 
-    public function addEventSubscriber(EventSubscriber $subscriber)
+    public function addEventSubscriber(EventSubscriberInterface $subscriber)
     {
         $this->getEventDispatcher()->addSubscriber($subscriber);
         return $this;
@@ -144,7 +144,7 @@ abstract class Kernel extends Container
     {
         foreach ($subscribers as $subscriber) {
 
-            if (!$subscriber instanceof EventSubscriber) {
+            if (!$subscriber instanceof EventSubscriberInterface) {
                 throw new \RuntimeException('subscriber type error');
             }
 
