@@ -12,16 +12,17 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 abstract class Kernel extends Container
 {
-    private $config;
-    private $user;
-    private $putted;
-    private $providers;
+    protected $config;
+    protected $user;
+    protected $putted;
+    protected $providers;
 
     public function __construct($config)
     {
         $this->config    = $config;
         $this->putted    = array();
         $this->providers = array();
+        $this->user = null;
 
         parent::__construct();
     }
@@ -85,7 +86,7 @@ abstract class Kernel extends Container
         return $this;
     }
 
-    public function getUser()
+    public function user()
     {
         return $this->user;
     }
