@@ -202,8 +202,7 @@ class Validator
                 $params[$i] = mb_substr($ele, 1, mb_strlen($ele) - 2);
             } elseif ($this->is_variable($ele)) {
                 //only the first, unsupport multi values from subarray
-                $values = $this->getValuesFromData($data, $params[$i]);
-                $params[$i] = $values[0];
+                $params[$i] = $this->getValuesFromData($data, $params[$i])[0];
             } else {
                 //numeric , ignore
             }
