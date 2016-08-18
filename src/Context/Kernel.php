@@ -7,7 +7,6 @@ use Doctrine\DBAL\DriverManager;
 use Pimple\ServiceProviderInterface;
 use Codeages\Biz\Framework\Event\Event;
 use Codeages\Biz\Framework\Dao\DaoProxy;
-use Symfony\Component\EventDispatcher\GenericEvent;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -129,8 +128,6 @@ abstract class Kernel extends Container
     {
         if (!$event instanceof Event) {
             $event = new Event($event, $arguments);
-        } else {
-            $event = new GenericEvent($event, $arguments);
         }
 
         return $this->getEventDispatcher()->dispatch($eventName, $event);
