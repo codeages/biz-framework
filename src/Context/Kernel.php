@@ -29,6 +29,10 @@ abstract class Kernel extends Container
 
     public function boot($options = array())
     {
+        $this['event_dispatcher'] = function ($kernel) {
+            return new EventDispatcher();
+        };
+
         foreach ($this->registerProviders() as $provider) {
             $this->register($provider);
 
@@ -49,10 +53,6 @@ abstract class Kernel extends Container
                 'driver'       => $cfg['driver'],
                 'charset'      => $cfg['charset']
             ));
-        };
-
-        $this['event_dispatcher'] = function ($kernel) {
-            return new EventDispatcher();
         };
 
         foreach ($this->putted as $key => $value) {
