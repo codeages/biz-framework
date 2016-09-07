@@ -125,7 +125,7 @@ class GeneralDaoImplTest extends \PHPUnit_Framework_TestCase
         $this->dao->create(array('name' => 'test2'));
         $this->dao->create(array('name' => 'test3'));
 
-        $found = $this->dao->search(array('name' => 'test2'), array('created', 'desc'), 0, 100);
+        $found = $this->dao->search(array('name' => 'test2'), array('created' => 'desc'), 0, 100);
 
         $this->assertEquals(1, count($found));
         $this->assertEquals('test2', $found[0]['name']);

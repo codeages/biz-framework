@@ -76,13 +76,23 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
         return $this->db()->fetchAssoc($sql, array($id)) ?: null;
     }
 
-    public function search($conditions, $orderBy, $start, $limit)
+    public function search($conditions, $orderbys, $start, $limit)
     {
         $builder = $this->_createQueryBuilder($conditions)
             ->select('*')
             ->setFirstResult($start)
-            ->setMaxResults($limit)
-            ->addOrderBy($orderBy[0], $orderBy[1]);
+            ->setMaxResults($limit);
+
+        $declares = $this->declares();
+        foreach ($orderbys ? : array() as $field => $direction) {
+            if (!in_array($field, $declares['orderbys'])) {
+                throw $this->createDaoException(sprintf("SQL order by field is only allowed '%s', but you give `{$field}`.", implode(',', $declares['orderbys'])));
+            }
+            if (!in_array(strtoupper($direction), ['ASC', 'DESC'])) {
+                throw $this->createDaoException("SQL order by direction is only allowed `ASC`, `DESC`, but you give `{$direction}`.");
+            }
+            $builder->addOrderBy($field, $direction);
+        }
 
         return $builder->execute()->fetchAll();
     }
@@ -164,5 +174,10 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
         } else {
             throw $this->createDaoException('mode error.');
         }
+    }
+
+    private function createDaoException($message = '', $code = 0)
+    {
+        return new DaoException($message, $code);
     }
 }
