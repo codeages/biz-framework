@@ -10,9 +10,9 @@ interface GeneralDaoInterface extends DaoInterface
 
     public function delete($id);
 
-    public function get($id);
+    public function get($id, $lock = false);
 
-    public function search($conditions, $orderBy, $start, $limit);
+    public function search($conditions, $orderbys, $start, $limit);
 
     public function count($conditions);
 

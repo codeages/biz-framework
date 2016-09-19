@@ -2,32 +2,37 @@
 
 namespace Codeages\Biz\Framework\Context;
 
-use Codeages\Biz\Framework\Event\Event;
 use Pimple\Container;
 use Doctrine\DBAL\DriverManager;
 use Pimple\ServiceProviderInterface;
+use Codeages\Biz\Framework\Event\Event;
 use Codeages\Biz\Framework\Dao\DaoProxy;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 abstract class Kernel extends Container
 {
-    private $config;
-    private $user;
-    private $putted;
-    private $providers;
+    protected $config;
+    protected $user;
+    protected $putted;
+    protected $providers;
 
     public function __construct($config)
     {
         $this->config    = $config;
         $this->putted    = array();
         $this->providers = array();
+        $this->user = null;
 
         parent::__construct();
     }
 
     public function boot($options = array())
     {
+        $this['event_dispatcher'] = function ($kernel) {
+            return new EventDispatcher();
+        };
+
         foreach ($this->registerProviders() as $provider) {
             $this->register($provider);
 
@@ -48,10 +53,6 @@ abstract class Kernel extends Container
                 'driver'       => $cfg['driver'],
                 'charset'      => $cfg['charset']
             ));
-        };
-
-        $this['event_dispatcher'] = function ($kernel) {
-            return new EventDispatcher();
         };
 
         foreach ($this->putted as $key => $value) {
@@ -85,7 +86,7 @@ abstract class Kernel extends Container
         return $this;
     }
 
-    public function getUser()
+    public function user()
     {
         return $this->user;
     }
@@ -119,10 +120,9 @@ abstract class Kernel extends Container
     }
 
     /**
-     * @param string       $eventName
-     * @param string|Event $event
-     * @param array        $arguments
-     *
+     * @param  string       $eventName
+     * @param  string|Event $event
+     * @param  array        $arguments
      * @return Event
      */
     public function dispatch($eventName, $event, array $arguments = array())
@@ -143,7 +143,6 @@ abstract class Kernel extends Container
     public function addEventSubscribers(array $subscribers)
     {
         foreach ($subscribers as $subscriber) {
-
             if (!$subscriber instanceof EventSubscriberInterface) {
                 throw new \RuntimeException('subscriber type error');
             }
