@@ -1,14 +1,14 @@
 <?php
 namespace Codeages\Biz\Framework\UnitTests;
 
+use Doctrine\DBAL\DriverManager;
 use Phpmig\Api\PhpmigApplication;
 use Symfony\Component\Console\Output\NullOutput;
 use Codeages\Biz\Framework\Dao\MigrationBootstrap;
-use Doctrine\DBAL\DriverManager;
 
 class UnitTestsBootstrap
 {
-    protected $kernle;
+    protected $kernel;
 
     public function __construct($kernel)
     {
@@ -23,13 +23,13 @@ class UnitTestsBootstrap
 
         $this->kernel['db'] = DriverManager::getConnection(array(
             'wrapperClass' => 'Codeages\Biz\Framework\Dao\TestCaseConnection',
-            'driver' => $config['driver'],
-            'host' => $config['host'],
-            'port' => $config['port'],
-            'dbname' => $config['name'],
-            'charset' => $config['charset'],
-            'user' => $config['user'],
-            'password' => $config['password'],
+            'driver'       => $config['driver'],
+            'host'         => $config['host'],
+            'port'         => $config['port'],
+            'dbname'       => $config['name'],
+            'charset'      => $config['charset'],
+            'user'         => $config['user'],
+            'password'     => $config['password']
         ));
 
         BaseTestCase::setKernel($this->kernel);
@@ -47,5 +47,4 @@ class UnitTestsBootstrap
 
         $app->up();
     }
-
 }
