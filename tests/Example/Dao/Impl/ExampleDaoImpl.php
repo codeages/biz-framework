@@ -2,8 +2,8 @@
 
 namespace Codeages\Biz\Framework\Tests\Example\Dao\Impl;
 
-use Codeages\Biz\Framework\Tests\Example\Dao\ExampleDao;
 use Codeages\Biz\Framework\Dao\GeneralDaoImpl;
+use Codeages\Biz\Framework\Tests\Example\Dao\ExampleDao;
 
 class ExampleDaoImpl extends GeneralDaoImpl implements ExampleDao
 {
@@ -19,10 +19,11 @@ class ExampleDaoImpl extends GeneralDaoImpl implements ExampleDao
         return array(
             'timestamps' => array('created', 'updated'),
             'serializes' => array('ids1' => 'json', 'ids2' => 'delimiter'),
-            'orderbys' => array('name', 'created'),
+            'orderbys'   => array('name', 'created'),
             'conditions' => array(
-                'name = :name',
+                'name = :name'
             ),
+            'cache'      => 'table'
         );
     }
 }

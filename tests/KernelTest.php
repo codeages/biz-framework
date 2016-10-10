@@ -48,8 +48,7 @@ class KernelTest extends \PHPUnit_Framework_TestCase
             return new ExampleDaoImpl($container);
         });
 
-        $declares = $kernel->get('example.example_dao')->declares();
-
+        $declares = $kernel['example.example_dao']->declares();
         $this->assertTrue(is_array($declares));
     }
 }

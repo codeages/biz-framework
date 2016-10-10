@@ -30,7 +30,6 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
         if ($timestampField) {
             $fields[$timestampField] = time();
         }
-
         $affected = $this->db()->insert($this->table(), $fields);
         if ($affected <= 0) {
             throw $this->createDaoException('Insert error.');
@@ -71,7 +70,7 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
 
     public function get($id, $lock = false)
     {
-        $sql = "SELECT * FROM {$this->table()} WHERE id = ?" . ($lock ? ' FOR UPDATE' : '');
+        $sql = "SELECT * FROM {$this->table()} WHERE id = ?".($lock ? ' FOR UPDATE' : '');
         return $this->db()->fetchAssoc($sql, array($id)) ?: null;
     }
 
@@ -83,7 +82,7 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
             ->setMaxResults($limit);
 
         $declares = $this->declares();
-        foreach ($orderbys ? : array() as $field => $direction) {
+        foreach ($orderbys ?: array() as $field => $direction) {
             if (!in_array($field, $declares['orderbys'])) {
                 throw $this->createDaoException(sprintf("SQL order by field is only allowed '%s', but you give `{$field}`.", implode(',', $declares['orderbys'])));
             }
@@ -132,7 +131,7 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
         }
 
         $marks = str_repeat('?,', count($values) - 1).'?';
-        $sql = "SELECT * FROM {$this->table} WHERE {$field} IN ({$marks});";
+        $sql   = "SELECT * FROM {$this->table} WHERE {$field} IN ({$marks});";
 
         return $this->db()->fetchAll($sql, $values);
     }
@@ -150,7 +149,7 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
         $builder = new DynamicQueryBuilder($this->db(), $conditions);
         $builder->from($this->table(), $this->table());
 
-        $declares = $this->declares();
+        $declares               = $this->declares();
         $declares['conditions'] = isset($declares['conditions']) ? $declares['conditions'] : array();
 
         foreach ($declares['conditions'] as $condition) {

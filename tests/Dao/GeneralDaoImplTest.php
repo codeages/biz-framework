@@ -2,8 +2,8 @@
 
 namespace Codeages\Biz\Framework\Tests\Dao;
 
-use Codeages\Biz\Framework\Tests\Example\Dao\Impl\ExampleDaoImpl;
 use Codeages\Biz\Framework\Tests\Example\ExampleKernel;
+use Codeages\Biz\Framework\Tests\Example\Dao\Impl\ExampleDaoImpl;
 
 class GeneralDaoImplTest extends \PHPUnit_Framework_TestCase
 {
@@ -16,7 +16,7 @@ class GeneralDaoImplTest extends \PHPUnit_Framework_TestCase
 
         $this->kernel->recreateDatabase();
 
-        $this->kernel['example_dao'] = $this->kernel->dao(function ($kernel){
+        $this->kernel['example_dao'] = $this->kernel->dao(function ($kernel) {
             return new ExampleDaoImpl($kernel);
         });
 
@@ -31,7 +31,7 @@ class GeneralDaoImplTest extends \PHPUnit_Framework_TestCase
     public function testGet()
     {
         $row = $this->dao->create(array(
-            'name' => 'test1',
+            'name' => 'test1'
         ));
 
         $found = $this->dao->get($row['id']);
@@ -46,7 +46,7 @@ class GeneralDaoImplTest extends \PHPUnit_Framework_TestCase
         $fields = array(
             'name' => 'test1',
             'ids1' => array(1, 2, 3),
-            'ids2' => array(1, 2, 3),
+            'ids2' => array(1, 2, 3)
         );
 
         $before = time();
@@ -65,17 +65,17 @@ class GeneralDaoImplTest extends \PHPUnit_Framework_TestCase
     public function testUpdate()
     {
         $row = $this->dao->create(array(
-            'name' => 'test1',
+            'name' => 'test1'
         ));
 
         $fields = array(
             'name' => 'test2',
             'ids1' => array(1, 2),
-            'ids2' => array(1, 2),
+            'ids2' => array(1, 2)
         );
 
         $before = time();
-        $saved = $this->dao->update($row['id'], $fields);
+        $saved  = $this->dao->update($row['id'], $fields);
 
         $this->assertEquals($fields['name'], $saved['name']);
         $this->assertTrue(is_array($saved['ids1']));
@@ -88,7 +88,7 @@ class GeneralDaoImplTest extends \PHPUnit_Framework_TestCase
     public function testDelete()
     {
         $row = $this->dao->create(array(
-            'name' => 'test1',
+            'name' => 'test1'
         ));
 
         $deleted = $this->dao->delete($row['id']);
@@ -99,20 +99,20 @@ class GeneralDaoImplTest extends \PHPUnit_Framework_TestCase
     public function testWave()
     {
         $row = $this->dao->create(array(
-            'name' => 'test1',
+            'name' => 'test1'
         ));
 
-        $diff = array('counter1' => 1, 'counter2' => 2);
+        $diff  = array('counter1' => 1, 'counter2' => 2);
         $waved = $this->dao->wave(array($row['id']), $diff);
-        $row = $this->dao->get($row['id']);
+        $row   = $this->dao->get($row['id']);
 
         $this->assertEquals(1, $waved);
         $this->assertEquals(1, $row['counter1']);
         $this->assertEquals(2, $row['counter2']);
 
-        $diff = array('counter1' => -1, 'counter2' => -1);
+        $diff  = array('counter1' => -1, 'counter2' => -1);
         $waved = $this->dao->wave(array($row['id']), $diff);
-        $row = $this->dao->get($row['id']);
+        $row   = $this->dao->get($row['id']);
 
         $this->assertEquals(1, $waved);
         $this->assertEquals(0, $row['counter1']);
@@ -144,7 +144,7 @@ class GeneralDaoImplTest extends \PHPUnit_Framework_TestCase
 
     public function testTransactional()
     {
-        $result = $this->dao->db()->transactional(function ($connection){
+        $result = $this->dao->db()->transactional(function ($connection) {
             return 1;
         });
 
