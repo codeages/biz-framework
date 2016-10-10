@@ -9,9 +9,12 @@ abstract class CacheStrategy
     protected $config;
     const MAX_LIFE_TIME = 86400;
 
-    abstract public function fetchCache($rootNameSpace, $args, $callback);
-
-    abstract public function deleteCache($rootNameSpace, $args);
+    abstract public function get($rootNameSpace, $args);
+    abstract public function find($rootNameSpace, $args);
+    abstract public function create($rootNameSpace, $args);
+    abstract public function update($rootNameSpace, $args);
+    abstract public function delete($rootNameSpace, $args);
+    abstract public function wave($rootNameSpace, $args);
 
     public function __construct($config)
     {
@@ -50,10 +53,31 @@ abstract class CacheStrategy
         return $_prefix;
     }
 
+    protected function fetchCache($rootNameSpace, $args)
+    {
+        $callback       = array_pop($args);
+        $orginArgs      = $args;
+        $proxyDaoMethod = array_shift($args);
+        $method         = array_shift($args);
+        $key            = $this->generateKey($rootNameSpace, $method, $args[0]);
+
+        $data = $this->_getCacheCluster()->get($key);
+
+        if ($data !== false) {
+            return $data;
+        }
+
+        $data = call_user_func_array($callback, $orginArgs);
+
+        $this->_getCacheCluster()->setex($key, self::MAX_LIFE_TIME, $data);
+
+        return $data;
+    }
+
     protected function generateKey($rootNameSpace, $method, $args)
     {
         if ($method == 'get') {
-            return "{$rootNameSpace}:{$this->getVersionByNamespace($rootNameSpace)}:{$args[0]}";
+            return "{$rootNameSpace}:{$this->getVersionByNamespace($rootNameSpace)}:id:{$args[0]}";
         }
 
         $fileds = $this->parseFileds($method);

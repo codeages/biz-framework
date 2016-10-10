@@ -23,7 +23,7 @@ class ExampleDaoImpl extends GeneralDaoImpl implements ExampleDao
             'conditions' => array(
                 'name = :name'
             ),
-            'cache'      => 'table'
+            'cache'      => 'promise'
         );
     }
 }

@@ -17,21 +17,17 @@ class CacheDelegate
 
     public function proccess()
     {
-        $args     = func_get_args();
-        $method   = $args[1];
-        $callback = array_pop($args);
-
-        $prefix = $this->getPrefix($method, array('get', 'find'));
-        if ($prefix) {
-            return $this->strategy->fetchCache($this->rootNameSpace, $args, $callback);
+        $args = func_get_args();
+        if (empty($args[1])) {
+            throw new \InvalidArgumentException('args is invalid. ');
         }
 
-        $prefix = $this->getPrefix($method, array('create', 'update', 'delete', 'wave'));
-        if ($prefix) {
-            $data = call_user_func_array($callback, $args);
-            $this->strategy->deleteCache($this->rootNameSpace, $args);
-            return $data;
+        $prefix = $this->getPrefix($args[1], array('get', 'find', 'create', 'update', 'delete', 'wave'));
+        if (empty($prefix)) {
+            throw new \InvalidArgumentException('args is invalid. ');
         }
+
+        return $this->strategy->$prefix($this->rootNameSpace, $args);
     }
 
     protected function getPrefix($str, $prefixs)
