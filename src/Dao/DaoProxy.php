@@ -18,23 +18,17 @@ class DaoProxy
         $declares = $this->dao->declares();
         if (!empty($declares['cache'])) {
             $config              = $this->container->config('cache', array());
-            $this->cacheDelegate = new CacheDelegate($config, $declares['cache'], $this->dao->table());
+            $this->cacheDelegate = new CacheDelegate($this->dao, $config);
         }
     }
 
     public function __call($method, $arguments)
     {
-        $that = $this;
-
+        $that       = $this;
         $selfMethod = $this->getCacheMethod($method);
-
         if (!empty($this->cacheDelegate) && $selfMethod) {
             return $this->cacheDelegate->proccess($selfMethod, $method, $arguments, function ($selfMethod, $method, $arguments) use ($that) {
                 return $that->$selfMethod($method, $arguments);
-            });
-        } elseif (!empty($this->cacheDelegate) && $this->getPrefix($method, array('wave'))) {
-            return $this->cacheDelegate->proccess($selfMethod, $method, $arguments, function ($selfMethod, $method, $arguments) use ($that) {
-                return $that->_callRealDao($method, $arguments);
             });
         } elseif ($this->getPrefix($method, array('search'))) {
             return $this->_search($method, $arguments);

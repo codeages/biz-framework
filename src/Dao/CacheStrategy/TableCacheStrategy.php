@@ -4,41 +4,48 @@ namespace Codeages\Biz\Framework\Dao\CacheStrategy;
 
 class TableCacheStrategy extends CacheStrategy
 {
-    public function get($rootNameSpace, $args)
+    public function set($daoMethod, $arguments, $data)
     {
-        return $this->fetchCache($rootNameSpace, $args);
+        $prefix = $this->getPrefix($daoMethod, array('get', 'find'));
+
+        if (!empty($prefix)) {
+            $key = $this->generateKey($daoMethod, $arguments);
+            $this->_getCacheCluster()->setex($key, self::MAX_LIFE_TIME, $data);
+        }
     }
 
-    public function find($rootNameSpace, $args)
+    public function get($daoMethod, $arguments)
     {
-        return $this->fetchCache($rootNameSpace, $args);
+        $prefix = $this->getPrefix($daoMethod, array('get', 'find'));
+
+        if (!empty($prefix)) {
+            $key = $this->generateKey($daoMethod, $arguments);
+            return $this->_getCacheCluster()->get($key);
+        }
     }
 
-    public function create($rootNameSpace, $args)
+    public function wave($daoProxyMethod, $daoMethod, $arguments, $callback)
     {
-        return $this->deleteCache($rootNameSpace, $args);
-    }
-
-    public function update($rootNameSpace, $args)
-    {
-        return $this->deleteCache($rootNameSpace, $args);
-    }
-
-    public function delete($rootNameSpace, $args)
-    {
-        return $this->deleteCache($rootNameSpace, $args);
-    }
-
-    public function wave($rootNameSpace, $args)
-    {
-        return $this->deleteCache($rootNameSpace, $args);
-    }
-
-    protected function deleteCache($rootNameSpace, $args)
-    {
-        $callback = array_pop($args);
-        $data     = call_user_func_array($callback, $args);
-        $this->incrNamespaceVersion($rootNameSpace);
+        $data = call_user_func_array($callback, array($daoProxyMethod, $daoMethod, $arguments));
+        $this->incrNamespaceVersion($this->rootNameSpace);
         return $data;
+    }
+
+    protected function generateKey($method, $args)
+    {
+        if ($method == 'get') {
+            return "{$this->rootNameSpace}:{$this->getVersionByNamespace($this->rootNameSpace)}:id:{$args[0]}";
+        }
+
+        $fileds = $this->parseFileds($method);
+        $keys   = '';
+        foreach ($fileds as $key => $value) {
+            if (!empty($keys)) {
+                $keys = "{$keys}:";
+            }
+            $keys = $keys.$value.':'.$args[$key];
+        }
+
+        return "{$this->rootNameSpace}:{$this->getVersionByNamespace($this->rootNameSpace)}:{$keys}";
     }
 }
