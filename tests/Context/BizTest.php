@@ -13,7 +13,7 @@ class BizTest extends \PHPUnit_Framework_TestCase
 
         $config = array(
             'debug' => true,
-            'migration.directories' => ['migrations'],
+            'migration.directories' => array('migrations'),
         );
         $biz = new Biz($config);
         $this->assertEquals($config['debug'], $biz['debug']);
