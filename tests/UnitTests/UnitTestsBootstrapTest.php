@@ -1,10 +1,10 @@
 <?php
 
 use Codeages\Biz\Framework\Context\Biz;
-use Codeages\Biz\Framework\Dao\MigrationBootstrap;
+use Codeages\Biz\Framework\UnitTests\UnitTestsBootstrap;
 use Codeages\Biz\Framework\Provider\DoctrineServiceProvider;
 
-class MigrationBootstrapTest extends \PHPUnit_Framework_TestCase
+class UnitTestsBootstrapTest extends \PHPUnit_Framework_TestCase
 {
 
     public function testBoot()
@@ -18,6 +18,7 @@ class MigrationBootstrapTest extends \PHPUnit_Framework_TestCase
                 'password' => getenv('DB_PASSWORD'),
                 'charset' => getenv('DB_CHARSET'),
                 'port' => getenv('DB_PORT'),
+                'wrapperClass' => 'Codeages\Biz\Framework\Dao\TestCaseConnection',
             ),
         );
         $biz = new Biz($config);
@@ -25,9 +26,7 @@ class MigrationBootstrapTest extends \PHPUnit_Framework_TestCase
         $biz->register(new DoctrineServiceProvider());
         $biz->boot();
 
-        $bootstrap = new MigrationBootstrap($biz['db'], $biz['migration.directories']);
-        $container    = $bootstrap->boot();
-
-        $this->assertInstanceOf('Pimple\Container', $container);
+        $bootstrap = new UnitTestsBootstrap($biz);
+        $bootstrap->boot();
     }
 }

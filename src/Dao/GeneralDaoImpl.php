@@ -2,11 +2,11 @@
 
 namespace Codeages\Biz\Framework\Dao;
 
-use Codeages\Biz\Framework\Context\Kernel;
+use Codeages\Biz\Framework\Context\Biz;
 
 abstract class GeneralDaoImpl implements GeneralDaoInterface
 {
-    protected $kernel;
+    protected $biz;
 
     protected $table = null;
 
@@ -14,9 +14,9 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
 
     protected $serializes = array();
 
-    public function __construct(Kernel $kernel)
+    public function __construct(Biz $biz)
     {
-        $this->kernel = $kernel;
+        $this->biz = $biz;
     }
 
     public function create($fields)
@@ -111,7 +111,7 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
 
     public function db()
     {
-        return $this->kernel['db'];
+        return $this->biz['db'];
     }
 
     protected function getByFields($fields)

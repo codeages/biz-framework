@@ -1,8 +1,8 @@
 <?php
 
-namespace Codeages\Biz\Framework\Tests\Example\Dao\Impl;
+namespace TestProject\Biz\Example\Dao\Impl;
 
-use Codeages\Biz\Framework\Tests\Example\Dao\ExampleDao;
+use TestProject\Biz\Example\Dao\ExampleDao;
 use Codeages\Biz\Framework\Dao\GeneralDaoImpl;
 
 class ExampleDaoImpl extends GeneralDaoImpl implements ExampleDao
@@ -17,9 +17,9 @@ class ExampleDaoImpl extends GeneralDaoImpl implements ExampleDao
     public function declares()
     {
         return array(
-            'timestamps' => array('created', 'updated'),
+            'timestamps' => array('created_time', 'updated_time'),
             'serializes' => array('ids1' => 'json', 'ids2' => 'delimiter'),
-            'orderbys' => array('name', 'created'),
+            'orderbys' => array('name', 'created_time'),
             'conditions' => array(
                 'name = :name',
             ),

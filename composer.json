@@ -5,8 +5,12 @@
     "license": "MIT",
     "autoload": {
         "psr-4": { 
-            "Codeages\\Biz\\Framework\\": "src/",
-            "Codeages\\Biz\\Framework\\Tests\\": "tests/"
+            "Codeages\\Biz\\Framework\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": { 
+            "TestProject\\": "tests/TestProject/src/"
         }
     },
     "require": {
