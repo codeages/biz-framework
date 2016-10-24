@@ -18,7 +18,6 @@ class UnitTestsBootstrapTest extends \PHPUnit_Framework_TestCase
                 'password' => getenv('DB_PASSWORD'),
                 'charset' => getenv('DB_CHARSET'),
                 'port' => getenv('DB_PORT'),
-                'wrapperClass' => 'Codeages\Biz\Framework\Dao\TestCaseConnection',
             ),
         );
         $biz = new Biz($config);

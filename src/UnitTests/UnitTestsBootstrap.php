@@ -16,6 +16,12 @@ class UnitTestsBootstrap
 
     public function boot()
     {
+        if (isset($this->biz['db.options'])) {
+            $options = $this->biz['db.options'];
+            $options['wrapperClass'] = 'Codeages\Biz\Framework\Dao\TestCaseConnection';
+            $this->biz['db.options'] = $options;
+        }
+
         BaseTestCase::setBiz($this->biz);
         BaseTestCase::emptyDatabase(true);
 
