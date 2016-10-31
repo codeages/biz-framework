@@ -4,18 +4,16 @@ namespace Codeages\Biz\Framework\Dao;
 
 class DaoProxy
 {
-    protected $dao;
     protected $container;
-    protected $callable;
     protected $cacheDelegate;
+    protected $dao;
 
-    public function __construct($container, $callable)
+    public function __construct($container, $dao)
     {
         $this->container = $container;
-        $this->callable  = $callable;
-        $this->dao       = call_user_func($callable, $this->container);
-
+        $this->dao = $dao;
         $declares = $this->dao->declares();
+
         if (!empty($declares['cache'])) {
             $config              = $this->container->config('cache', array());
             $this->cacheDelegate = new CacheDelegate($this->dao, $config);

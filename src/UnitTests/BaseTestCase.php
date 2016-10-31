@@ -4,7 +4,7 @@ namespace Codeages\Biz\Framework\UnitTests;
 
 abstract class BaseTestCase extends \PHPUnit_Framework_TestCase
 {
-    protected static $kernel;
+    protected static $biz;
 
     public static function setUpBeforeClass()
     {
@@ -16,14 +16,14 @@ abstract class BaseTestCase extends \PHPUnit_Framework_TestCase
         self::emptyDatabase();
     }
 
-    public static function setKernel($kernel)
+    public static function setBiz($biz)
     {
-        self::$kernel = $kernel;
+        self::$biz = $biz;
     }
 
     public static function emptyDatabase($all=false)
     {
-        $db = self::$kernel['db'];
+        $db = self::$biz['db'];
 
         if ($all) {
             $tableNames = $db->getSchemaManager()->listTableNames();

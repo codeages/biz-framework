@@ -4,38 +4,28 @@ namespace Codeages\Biz\Framework\UnitTests;
 use Phpmig\Api\PhpmigApplication;
 use Symfony\Component\Console\Output\NullOutput;
 use Codeages\Biz\Framework\Dao\MigrationBootstrap;
-use Doctrine\DBAL\DriverManager;
 
 class UnitTestsBootstrap
 {
-    protected $kernle;
+    protected $biz;
 
-    public function __construct($kernel)
+    public function __construct($biz)
     {
-        $this->kernel = $kernel;
+        $this->biz = $biz;
     }
 
     public function boot()
     {
-        $this->kernel->boot();
+        if (isset($this->biz['db.options'])) {
+            $options = $this->biz['db.options'];
+            $options['wrapperClass'] = 'Codeages\Biz\Framework\Dao\TestCaseConnection';
+            $this->biz['db.options'] = $options;
+        }
 
-        $config = $this->kernel->config('database');
-
-        $this->kernel['db'] = DriverManager::getConnection(array(
-            'wrapperClass' => 'Codeages\Biz\Framework\Dao\TestCaseConnection',
-            'driver' => $config['driver'],
-            'host' => $config['host'],
-            'port' => $config['port'],
-            'dbname' => $config['name'],
-            'charset' => $config['charset'],
-            'user' => $config['user'],
-            'password' => $config['password'],
-        ));
-
-        BaseTestCase::setKernel($this->kernel);
+        BaseTestCase::setBiz($this->biz);
         BaseTestCase::emptyDatabase(true);
 
-        $migration = new MigrationBootstrap($this->kernel);
+        $migration = new MigrationBootstrap($this->biz['db'], $this->biz['migration.directories']);
         $container = $migration->boot();
 
         $adapter = $container['phpmig.adapter'];
@@ -47,5 +37,4 @@ class UnitTestsBootstrap
 
         $app->up();
     }
-
 }
