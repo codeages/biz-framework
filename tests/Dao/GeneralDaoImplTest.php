@@ -3,9 +3,10 @@
 namespace Codeages\Biz\Framework\Tests\Dao;
 
 use Codeages\Biz\Framework\Tests\Example\ExampleKernel;
-use Codeages\Biz\Framework\Tests\Example\Dao\Impl\ExampleDaoImpl;
+use TestProject\Biz\Example\Dao\Impl\ExampleDaoImpl;
 use Codeages\Biz\Framework\Context\Biz;
 use Codeages\Biz\Framework\Provider\DoctrineServiceProvider;
+use Codeages\Biz\Framework\Provider\CacheServiceProvider;
 use Pimple\Container;
 
 class GeneralDaoImplTest extends \PHPUnit_Framework_TestCase
@@ -28,6 +29,7 @@ class GeneralDaoImplTest extends \PHPUnit_Framework_TestCase
         $biz = new Biz($config);
         $biz['autoload.aliases']['TestProject'] = 'TestProject\Biz';
         $biz->register(new DoctrineServiceProvider());
+        $biz->register(new CacheServiceProvider());
         $biz->boot();
 
         $this->biz = $biz;
@@ -53,6 +55,7 @@ class GeneralDaoImplTest extends \PHPUnit_Framework_TestCase
 
     public function testGet()
     {
+        $dao = $this->biz->dao('TestProject:Example:ExampleDao');
         $row = $dao->create(array(
             'name' => 'test1',
         ));

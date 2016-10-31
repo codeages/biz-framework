@@ -22,18 +22,18 @@ abstract class CacheStrategy
         $this->rootNameSpace = $dao->table();
     }
 
-    protected function parseFileds($method)
+    protected function parseFileds($daoMethod)
     {
         $prefixs = array('get', 'find');
-        $prefix  = $this->getPrefix($method, $prefixs);
+        $prefix  = $this->getPrefix($daoMethod, $prefixs);
 
         if (empty($prefix)) {
             return array();
         }
 
-        $method = str_replace($prefix.'By', '', $method);
+        $daoMethod = str_replace($prefix.'By', '', $daoMethod);
 
-        $fileds = explode("And", $method);
+        $fileds = explode("And", $daoMethod);
         foreach ($fileds as $key => $filed) {
             $fileds[$key] = lcfirst($filed);
         }

@@ -15,7 +15,7 @@ class DaoProxy
         $declares = $this->dao->declares();
 
         if (!empty($declares['cache'])) {
-            $config              = $this->container->config('cache', array());
+            $config              = $container['cache.config'];
             $this->cacheDelegate = new CacheDelegate($this->dao, $config);
         }
     }
@@ -23,10 +23,10 @@ class DaoProxy
     public function __call($method, $arguments)
     {
         $that       = $this;
-        $selfMethod = $this->getCacheMethod($method);
-        if (!empty($this->cacheDelegate) && $selfMethod) {
-            return $this->cacheDelegate->proccess($selfMethod, $method, $arguments, function ($selfMethod, $method, $arguments) use ($that) {
-                return $that->$selfMethod($method, $arguments);
+        $daoProxyMethod = $this->getDaoProxyMethod($method);
+        if (!empty($this->cacheDelegate) && $daoProxyMethod) {
+            return $this->cacheDelegate->proccess($daoProxyMethod, $method, $arguments, function ($daoProxyMethod, $method, $arguments) use ($that) {
+                return $that->$daoProxyMethod($method, $arguments);
             });
         } elseif ($this->getPrefix($method, array('search'))) {
             return $this->_search($method, $arguments);
@@ -35,7 +35,7 @@ class DaoProxy
         }
     }
 
-    protected function getCacheMethod($method)
+    protected function getDaoProxyMethod($method)
     {
         $prefix = $this->getPrefix($method, array('get', 'find', 'create', 'update', 'delete'));
         if ($prefix) {
