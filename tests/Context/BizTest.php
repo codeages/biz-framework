@@ -3,6 +3,7 @@
 use Codeages\Biz\Framework\Context\Biz;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
+use Codeages\Biz\Framework\Provider\MonologServiceProvider;
 
 class BizTest extends \PHPUnit_Framework_TestCase
 {
@@ -32,6 +33,8 @@ class BizTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('test_1', $biz['test_1']);
         $this->assertEquals('option1_value', $biz['test_1.options']['option1']);
+
+        $biz->register(new MonologServiceProvider());
     }
 
     public function testBoot()

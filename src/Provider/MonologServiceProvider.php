@@ -8,8 +8,8 @@
 
 namespace Codeages\Biz\Framework\Provider;
 
-use Codeages\Biz\Context\Biz;
-use Codeages\Biz\Context\BootableProviderInterface;
+use Codeages\Biz\Framework\Context\Biz;
+use Codeages\Biz\Framework\Context\BootableProviderInterface;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
 use Monolog\Formatter\LineFormatter;
