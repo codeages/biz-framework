@@ -6,7 +6,7 @@
  * 版权信息请看 LICENSE.SILEX
  */
 
-namespace Codeages\Biz\Framework;
+namespace Codeages\Biz\Framework\Provider;
 
 use Codeages\Biz\Context\Biz;
 use Codeages\Biz\Context\BootableProviderInterface;
