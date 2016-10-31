@@ -4,90 +4,21 @@ namespace Codeages\Biz\Framework\Dao\CacheStrategy;
 
 class PromiseCacheStrategy extends CacheStrategy
 {
-    protected $fieldsMap;
-    protected $methodMap;
-    protected $dao;
+    private $methodMap = array();
+    private $fieldsMap = array();
 
-    public function __construct($dao, $config)
+    public function wave($dao, $daoMethod, $arguments, $callback)
     {
-        parent::__construct($dao, $config);
-        $this->parseFieldsMap($dao);
-        $this->dao = $dao;
-    }
-
-    protected function parseFieldsMap($dao)
-    {
-        $class   = new \ReflectionClass(get_class($dao));
-        $methods = $class->getMethods();
-        foreach ($methods as $key => $method) {
-            if ($method->isPublic()) {
-                $methodName = $method->getName();
-                $whiteList  = array('__construct', 'declares', 'db', 'table');
-                if (in_array($methodName, $whiteList)) {
-                    continue;
-                }
-                $this->parseMethod($methodName);
-            }
-        }
-    }
-
-    protected function parseMethod($methodName)
-    {
-        if ($methodName == 'get') {
-            $this->push('id', $methodName);
-        }
-
-        $prefix = $this->getPrefix($methodName, array('get', 'find'));
-        if ($prefix && $prefix != $methodName) {
-            $truncateMethodName = str_replace("{$prefix}By", '', $methodName);
-            $fields             = explode('And', $truncateMethodName);
-
-            if (empty($this->methodMap[$methodName])) {
-                $this->methodMap[$methodName] = $fields;
-            }
-
-            foreach ($fields as $field) {
-                $this->push($field, $methodName);
-            }
-        }
-    }
-
-    protected function push($field, $methodName)
-    {
-        $field = strtolower($field);
-        if (empty($this->fieldsMap[$field])) {
-            $this->fieldsMap[$field] = array($methodName);
-        } else {
-            array_push($this->fieldsMap[$field], $methodName);
-        }
-    }
-
-    public function set($daoMethod, $arguments, $data)
-    {
-        $prefix = $this->getPrefix($daoMethod, array('get', 'find'));
-
-        if (!empty($prefix)) {
-            $key = $this->generateKey($daoMethod, $arguments);
-            $this->_getCacheCluster()->setex($key, self::MAX_LIFE_TIME, $data);
-        }
-    }
-
-    public function get($daoMethod, $arguments)
-    {
-        $prefix = $this->getPrefix($daoMethod, array('get', 'find'));
-
-        if (!empty($prefix)) {
-            $key = $this->generateKey($daoMethod, $arguments);
-            return $this->_getCacheCluster()->get($key);
-        }
-    }
-
-    public function wave($daoProxyMethod, $daoMethod, $arguments, $callback)
-    {
+        $rootNameSpace = $dao->table();
+        $className = get_class($dao);
         if (in_array($daoMethod, array('update', 'delete'))) {
-            $originData = $this->dao->get($arguments[0]);
-            $data       = call_user_func_array($callback, array($daoProxyMethod, $daoMethod, $arguments));
-            foreach ($this->methodMap as $method => $fields) {
+            $originData = $dao->get($arguments[0]);
+            $data       = call_user_func_array($callback, array($daoMethod, $arguments));
+            if(empty($this->methodMap[$className])) {
+                return;
+            }
+
+            foreach ($this->methodMap[$className] as $method => $fields) {
                 $shouldIncrNamespace = false;
                 foreach ($fields as $key => $field) {
                     $field = lcfirst($field);
@@ -104,26 +35,85 @@ class PromiseCacheStrategy extends CacheStrategy
                     }
 
                     $keys = $this->getKeys($method, $args);
-                    $this->incrNamespaceVersion("{$this->rootNameSpace}:{$keys}");
+                    $this->incrNamespaceVersion("{$rootNameSpace}:{$keys}");
                 }
             }
         } else {
-            $data = call_user_func_array($callback, array($daoProxyMethod, $daoMethod, $arguments));
-            $this->incrNamespaceVersion($this->rootNameSpace);
+            $data = call_user_func_array($callback, array($daoMethod, $arguments));
+            $this->incrNamespaceVersion($rootNameSpace);
         }
         return $data;
     }
 
-    protected function generateKey($method, $args)
+    public function parseDao($dao)
     {
+        $className = get_class($dao);
+        $class   = new \ReflectionClass($className);
+        $methods = $class->getMethods();
+        foreach ($methods as $key => $method) {
+            if ($method->isPublic()) {
+                $methodName = $method->getName();
+                $whiteList  = array('__construct', 'declares', 'db', 'table');
+                if (in_array($methodName, $whiteList)) {
+                    continue;
+                }
+                $this->parseMethod($className, $methodName);
+            }
+        }
+    }
+
+    protected function parseMethod($className, $methodName)
+    {
+        if ($methodName == 'get') {
+            $this->push('id', $methodName, $className);
+        }
+
+        $prefix = $this->getPrefix($methodName, array('get', 'find'));
+        if ($prefix && $prefix != $methodName) {
+            $truncateMethodName = str_replace("{$prefix}By", '', $methodName);
+            $fields             = explode('And', $truncateMethodName);
+
+            if (!isset($this->methodMap[$className])) {
+                $this->methodMap[$methodName] = array();
+            }
+
+            if(empty($this->methodMap[$className][$methodName])){
+                $this->methodMap[$className][$methodName] = $fields;
+            }
+
+            foreach ($fields as $field) {
+                $this->push($field, $methodName, $className);
+            }
+        }
+    }
+
+    protected function push($field, $methodName, $className)
+    {
+        $field = strtolower($field);
+        if (!isset($this->fieldsMap[$className])) {
+            $this->fieldsMap[$methodName] = array();
+        }
+
+        if (empty($this->fieldsMap[$methodName][$field])) {
+            $this->fieldsMap[$methodName][$field] = array($methodName);
+        } else {
+            array_push($this->fieldsMap[$methodName][$field], $methodName);
+        }
+    }
+
+    
+    protected function generateKey($dao, $method, $args)
+    {
+        $rootNameSpace = $dao->table();
         if ($method == 'get') {
-            return "{$this->rootNameSpace}:{$this->getVersionByNamespace($this->rootNameSpace)}:id:{$args[0]}";
+
+            return "{$rootNameSpace}:{$this->getVersionByNamespace($rootNameSpace)}:id:{$args[0]}";
         }
 
         $keys    = $this->getKeys($method, $args);
-        $version = $this->getVersionByNamespace("{$this->rootNameSpace}:{$keys}");
+        $version = $this->getVersionByNamespace("{$rootNameSpace}:{$keys}");
 
-        return "{$this->rootNameSpace}:version:{$this->getVersionByNamespace($this->rootNameSpace)}:{$keys}:version:{$version}";
+        return "{$rootNameSpace}:version:{$this->getVersionByNamespace($rootNameSpace)}:{$keys}:version:{$version}";
     }
 
     protected function getKeys($method, $args)

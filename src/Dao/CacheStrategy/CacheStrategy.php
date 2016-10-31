@@ -6,34 +6,33 @@ use Codeages\Biz\Framework\Redis\RedisClusterFactory;
 
 abstract class CacheStrategy
 {
-    protected $config;
-    protected $dao;
-    protected $rootNameSpace;
+    protected $container;
     const MAX_LIFE_TIME = 86400;
 
-    abstract public function set($daoMethod, $arguments, $data);
-    abstract public function get($daoMethod, $arguments);
-    abstract public function wave($daoProxyMethod, $daoMethod, $arguments, $callback);
+    abstract public function wave($dao, $method, $arguments, $callback);
+    abstract protected function generateKey($dao, $method, $arguments);
 
-    public function __construct($dao, $config)
+    public function __construct($container)
     {
-        $this->config        = $config;
-        $this->dao           = $dao;
-        $this->rootNameSpace = $dao->table();
+        $this->container = $container;
     }
 
-    protected function parseFileds($daoMethod)
+    public function parseDao($dao)
+    {
+    }
+
+    protected function parseFileds($method)
     {
         $prefixs = array('get', 'find');
-        $prefix  = $this->getPrefix($daoMethod, $prefixs);
+        $prefix  = $this->getPrefix($method, $prefixs);
 
         if (empty($prefix)) {
             return array();
         }
 
-        $daoMethod = str_replace($prefix.'By', '', $daoMethod);
+        $method = str_replace($prefix.'By', '', $method);
 
-        $fileds = explode("And", $daoMethod);
+        $fileds = explode("And", $method);
         foreach ($fileds as $key => $filed) {
             $fileds[$key] = lcfirst($filed);
         }
@@ -54,6 +53,26 @@ abstract class CacheStrategy
         return $_prefix;
     }
 
+    public function set($dao, $method, $arguments, $data)
+    {
+        $prefix = $this->getPrefix($method, array('get', 'find'));
+
+        if (!empty($prefix)) {
+            $key = $this->generateKey($dao, $method, $arguments);
+            $this->_getCacheCluster()->setex($key, self::MAX_LIFE_TIME, $data);
+        }
+    }
+
+    public function get($dao, $method, $arguments)
+    {
+        $prefix = $this->getPrefix($method, array('get', 'find'));
+
+        if (!empty($prefix)) {
+            $key = $this->generateKey($dao, $method, $arguments);
+            return $this->_getCacheCluster()->get($key);
+        }
+    }
+
     protected function incrNamespaceVersion($namespace)
     {
         $this->_getCacheCluster()->incr("version:{$namespace}");
@@ -66,6 +85,6 @@ abstract class CacheStrategy
 
     protected function _getCacheCluster()
     {
-        return RedisClusterFactory::instance($this->config)->getCluster();
+        return RedisClusterFactory::instance($this->container['cache.config'])->getCluster();
     }
 }

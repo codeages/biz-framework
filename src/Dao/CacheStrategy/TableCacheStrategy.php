@@ -4,37 +4,19 @@ namespace Codeages\Biz\Framework\Dao\CacheStrategy;
 
 class TableCacheStrategy extends CacheStrategy
 {
-    public function set($daoMethod, $arguments, $data)
+    public function wave($dao, $method, $arguments, $callback)
     {
-        $prefix = $this->getPrefix($daoMethod, array('get', 'find'));
-
-        if (!empty($prefix)) {
-            $key = $this->generateKey($daoMethod, $arguments);
-            $this->_getCacheCluster()->setex($key, self::MAX_LIFE_TIME, $data);
-        }
-    }
-
-    public function get($daoMethod, $arguments)
-    {
-        $prefix = $this->getPrefix($daoMethod, array('get', 'find'));
-
-        if (!empty($prefix)) {
-            $key = $this->generateKey($daoMethod, $arguments);
-            return $this->_getCacheCluster()->get($key);
-        }
-    }
-
-    public function wave($daoProxyMethod, $daoMethod, $arguments, $callback)
-    {
-        $data = call_user_func_array($callback, array($daoProxyMethod, $daoMethod, $arguments));
-        $this->incrNamespaceVersion($this->rootNameSpace);
+        $data = call_user_func_array($callback, array($method, $arguments));
+        $rootNameSpace = $dao->table();
+        $this->incrNamespaceVersion($rootNameSpace);
         return $data;
     }
 
-    protected function generateKey($method, $args)
-    {
+    protected function generateKey($dao, $method, $args)
+    {   
+        $rootNameSpace = $dao->table();
         if ($method == 'get') {
-            return "{$this->rootNameSpace}:{$this->getVersionByNamespace($this->rootNameSpace)}:id:{$args[0]}";
+            return "{$rootNameSpace}:{$this->getVersionByNamespace($rootNameSpace)}:id:{$args[0]}";
         }
 
         $fileds = $this->parseFileds($method);
@@ -46,6 +28,6 @@ class TableCacheStrategy extends CacheStrategy
             $keys = $keys.$value.':'.$args[$key];
         }
 
-        return "{$this->rootNameSpace}:{$this->getVersionByNamespace($this->rootNameSpace)}:{$keys}";
+        return "{$rootNameSpace}:{$this->getVersionByNamespace($rootNameSpace)}:{$keys}";
     }
 }

@@ -5,27 +5,36 @@ namespace Codeages\Biz\Framework\Dao;
 class DaoProxy
 {
     protected $container;
-    protected $cacheDelegate;
+    protected static $cacheDelegate;
     protected $dao;
 
     public function __construct($container, $dao)
     {
         $this->container = $container;
         $this->dao = $dao;
-        $declares = $this->dao->declares();
 
-        if (!empty($declares['cache'])) {
-            $config              = $container['cache.config'];
-            $this->cacheDelegate = new CacheDelegate($this->dao, $config);
+        if ($this->cacheDeclare($this->dao)) {
+            if(empty(self::$cacheDelegate)) {
+                self::$cacheDelegate = $container['cache.dao.delegate'];
+            }
+            self::$cacheDelegate->parseDao($dao);
         }
+
+    }
+
+    protected function cacheDeclare()
+    {
+        $declares = $this->dao->declares();
+        return !empty($declares['cache']);
     }
 
     public function __call($method, $arguments)
     {
         $that       = $this;
         $daoProxyMethod = $this->getDaoProxyMethod($method);
-        if (!empty($this->cacheDelegate) && $daoProxyMethod) {
-            return $this->cacheDelegate->proccess($daoProxyMethod, $method, $arguments, function ($daoProxyMethod, $method, $arguments) use ($that) {
+
+        if ($this->cacheDeclare($this->dao) && $daoProxyMethod) {
+            return self::$cacheDelegate->proccess($this->dao, $method, $arguments, function ($method, $arguments) use ($that, $daoProxyMethod) {
                 return $that->$daoProxyMethod($method, $arguments);
             });
         } elseif ($this->getPrefix($method, array('search'))) {

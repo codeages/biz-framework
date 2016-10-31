@@ -2,18 +2,33 @@
 
 namespace Codeages\Biz\Framework\Dao;
 
-use Codeages\Biz\Framework\Dao\CacheStrategy\CacheStrategyFactory;
-
 class CacheDelegate
 {
-    private $strategy; // table, promise
+    private $daoStrategyMap = array();
+    private $container;
 
-    public function __construct($dao, $cacheConfig)
+    public function __construct($container)
     {
-        $this->strategy = CacheStrategyFactory::getCacheStrategy($dao, $cacheConfig);
+        $this->container = $container;
     }
 
-    public function proccess($daoProxyMethod, $daoMethod, $arguments, $callback)
+    public function parseDao($dao)
+    {
+        $daoClass = get_class($dao);
+        if(empty($this->daoStrategyMap[$daoClass])) {
+            $strategy = $this->getCacheStrategy($dao);
+            $strategy->parseDao($dao);
+            $this->daoStrategyMap[$daoClass] = $strategy;
+        }
+    }
+
+    private function getCacheStrategy($dao)
+    {
+        $declares = $dao->declares();
+        return $this->container["cache.dao.strategy.{$declares['cache']}"];
+    }
+
+    public function proccess($dao, $daoMethod, $arguments, $callback)
     {
         $prefix = $this->getPrefix($daoMethod, array('get', 'find', 'create', 'update', 'delete', 'wave'));
         if (empty($prefix)) {
@@ -21,23 +36,25 @@ class CacheDelegate
         }
 
         if (in_array($prefix, array('get', 'find'))) {
-            return $this->fetchCache($daoProxyMethod, $daoMethod, $arguments, $callback);
+            return $this->fetchCache($dao, $daoMethod, $arguments, $callback);
         } else {
-            return $this->strategy->wave($daoProxyMethod, $daoMethod, $arguments, $callback);
+            $strategy = $this->daoStrategyMap[get_class($dao)];
+            return $strategy->wave($dao, $daoMethod, $arguments, $callback);
         }
     }
 
-    protected function fetchCache($daoProxyMethod, $daoMethod, $arguments, $callback)
+    protected function fetchCache($dao, $daoMethod, $arguments, $callback)
     {
-        $data = $this->strategy->get($daoMethod, $arguments);
+        $strategy = $this->daoStrategyMap[get_class($dao)];
+        $data = $strategy->get($dao, $daoMethod, $arguments);
 
         if ($data !== false) {
             return $data;
         }
 
-        $data = call_user_func_array($callback, array($daoProxyMethod, $daoMethod, $arguments));
+        $data = call_user_func_array($callback, array($daoMethod, $arguments));
 
-        $this->strategy->set($daoMethod, $arguments, $data);
+        $strategy->set($dao, $daoMethod, $arguments, $data);
 
         return $data;
     }
