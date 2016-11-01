@@ -18,11 +18,13 @@ class DaoProxy
     {
         if (strpos($method, 'get') === 0) {
             $row = $this->_callRealDao($method, $arguments);
+
             return $this->_unserialize($row);
         }
 
         if ((strpos($method, 'find') === 0) or (strpos($method, 'search') === 0)) {
             $rows = $this->_callRealDao($method, $arguments);
+
             return $this->_unserializes($rows);
         }
 

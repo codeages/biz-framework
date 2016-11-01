@@ -1,4 +1,5 @@
 <?php
+
 namespace Codeages\Biz\Framework\UnitTests;
 
 use Phpmig\Api\PhpmigApplication;

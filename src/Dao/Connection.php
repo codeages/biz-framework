@@ -34,11 +34,12 @@ class Connection extends DoctrineConnection
     public function transactional(\Closure $func, \Closure $exceptionFunc = null)
     {
         $this->beginTransaction();
-        try{
+        try {
             $result = $func($this);
             $this->commit();
+
             return $result;
-        } catch (\Exception $e){
+        } catch (\Exception $e) {
             $this->rollBack();
             !is_null($exceptionFunc) && $exceptionFunc($this);
             throw $e;

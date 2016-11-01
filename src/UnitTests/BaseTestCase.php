@@ -8,7 +8,6 @@ abstract class BaseTestCase extends \PHPUnit_Framework_TestCase
 
     public static function setUpBeforeClass()
     {
-        
     }
 
     public function setUp()
@@ -21,7 +20,7 @@ abstract class BaseTestCase extends \PHPUnit_Framework_TestCase
         self::$biz = $biz;
     }
 
-    public static function emptyDatabase($all=false)
+    public static function emptyDatabase($all = false)
     {
         $db = self::$biz['db'];
 
@@ -46,7 +45,5 @@ abstract class BaseTestCase extends \PHPUnit_Framework_TestCase
             $db->exec($sql);
             $db->resetInsertedTables();
         }
-
     }
-
 }

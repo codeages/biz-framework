@@ -44,11 +44,11 @@ class ContainerAutoloader
             $middle = array_merge(array($prefix), $middle);
             $prefix = '';
         }
-        $namespace = rtrim($this->aliases[$prefix], "\\");
+        $namespace = rtrim($this->aliases[$prefix], '\\');
 
-        $middle = implode("\\", $middle);
+        $middle = implode('\\', $middle);
         if ($middle) {
-            $namespace .= "\\" . $middle;
+            $namespace .= '\\'.$middle;
         }
 
         $maker = $this->makers[$makerName];

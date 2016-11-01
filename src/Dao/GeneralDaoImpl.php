@@ -71,7 +71,8 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
 
     public function get($id, $lock = false)
     {
-        $sql = "SELECT * FROM {$this->table()} WHERE id = ?" . ($lock ? ' FOR UPDATE' : '');
+        $sql = "SELECT * FROM {$this->table()} WHERE id = ?".($lock ? ' FOR UPDATE' : '');
+
         return $this->db()->fetchAssoc($sql, array($id)) ?: null;
     }
 
@@ -83,7 +84,7 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
             ->setMaxResults($limit);
 
         $declares = $this->declares();
-        foreach ($orderbys ? : array() as $field => $direction) {
+        foreach ($orderbys ?: array() as $field => $direction) {
             if (!in_array($field, $declares['orderbys'])) {
                 throw $this->createDaoException(sprintf("SQL order by field is only allowed '%s', but you give `{$field}`.", implode(',', $declares['orderbys'])));
             }

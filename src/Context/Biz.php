@@ -2,11 +2,9 @@
 
 namespace Codeages\Biz\Framework\Context;
 
-use Codeages\Biz\Framework\Event\Event;
 use Codeages\Biz\Framework\Dao\DaoProxy;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
-use Doctrine\DBAL\DriverManager;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class Biz extends Container
@@ -24,16 +22,18 @@ class Biz extends Container
 
         $this['autoload.aliases'] = new \ArrayObject(array('' => 'Biz'));
 
-        $this['autoload.object_maker.service'] = function($biz) {
-            return function($namespace, $name) use ($biz) {
+        $this['autoload.object_maker.service'] = function ($biz) {
+            return function ($namespace, $name) use ($biz) {
                 $class = "{$namespace}\\Service\\Impl\\{$name}Impl";
+
                 return new $class($biz);
             };
         };
 
-        $this['autoload.object_maker.dao'] = function($biz) {
-            return function($namespace, $name) use ($biz) {
+        $this['autoload.object_maker.dao'] = function ($biz) {
+            return function ($namespace, $name) use ($biz) {
                 $class = "{$namespace}\\Dao\\Impl\\{$name}Impl";
+
                 return new DaoProxy($biz, new $class($biz));
             };
         };
@@ -62,6 +62,7 @@ class Biz extends Container
     {
         $this->providers[] = $provider;
         parent::register($provider, $values);
+
         return $this;
     }
 

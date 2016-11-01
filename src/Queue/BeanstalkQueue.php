@@ -27,6 +27,7 @@ class BeanstalkQueue implements Queue
         $client = new Client(array_merge($this->options, ['persistent' => $persistent]));
         $client->connect();
         $this->client = $client;
+
         return $this;
     }
 
@@ -36,6 +37,7 @@ class BeanstalkQueue implements Queue
             $this->client->disconnect();
             $this->client = null;
         }
+
         return $this;
     }
 
@@ -46,6 +48,7 @@ class BeanstalkQueue implements Queue
         }
         $options = $this->fillOptions($options);
         $this->client->useTube($queue);
+
         return $this->client->put($options['pri'], self::DEFAULT_DELAY, $options['ttr'], json_encode($body));
     }
 
@@ -65,7 +68,6 @@ class BeanstalkQueue implements Queue
         if (empty($this->client)) {
             throw new \RuntimeException('Queue is not connected, please connect first.');
         }
-
     }
 
     protected function fillOptions($options)
