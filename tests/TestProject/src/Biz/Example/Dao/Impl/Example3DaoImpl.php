@@ -5,9 +5,9 @@ namespace TestProject\Biz\Example\Dao\Impl;
 use TestProject\Biz\Example\Dao\ExampleDao;
 use Codeages\Biz\Framework\Dao\GeneralDaoImpl;
 
-class Example2DaoImpl extends GeneralDaoImpl implements ExampleDao
+class Example3DaoImpl extends GeneralDaoImpl implements ExampleDao
 {
-    protected $table = 'example2';
+    protected $table = 'example3';
 
     public function findByName($name, $start, $limit)
     {
@@ -22,8 +22,7 @@ class Example2DaoImpl extends GeneralDaoImpl implements ExampleDao
             'orderbys' => array('name', 'created_time'),
             'conditions' => array(
                 'name = :name'
-            ),
-            'cache'      => 'promise'
+            )
         );
     }
 }

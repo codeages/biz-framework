@@ -66,12 +66,37 @@ class GeneralDaoImplTest extends \PHPUnit_Framework_TestCase
               PRIMARY KEY (`id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
         ");
+
+        $this->biz['db']->exec('DROP TABLE IF EXISTS `example3`');
+        $this->biz['db']->exec("
+            CREATE TABLE `example3` (
+              `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+              `name` varchar(32) NOT NULL,
+              `counter1` int(10) unsigned NOT NULL DEFAULT 0,
+              `counter2` int(10) unsigned NOT NULL DEFAULT 0,
+              `ids1` varchar(32) NOT NULL DEFAULT '',
+              `ids2` varchar(32) NOT NULL DEFAULT '',
+              `created_time` int(10) unsigned NOT NULL DEFAULT 0,
+              `updated_time` int(10) unsigned NOT NULL DEFAULT 0,
+              PRIMARY KEY (`id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+        ");
     }
 
     public function testGet()
     {
-        $this->get('TestProject:Example:ExampleDao');
-        $this->get('TestProject:Example:Example2Dao');
+        foreach ($this->getTestDao() as $dao) {
+            $this->get($dao);
+        }
+    }
+
+    private function getTestDao()
+    {
+        return array(
+            'TestProject:Example:ExampleDao',
+            'TestProject:Example:Example2Dao',
+            'TestProject:Example:Example3Dao',
+        );
     }
 
     private function get($dao)
@@ -90,8 +115,9 @@ class GeneralDaoImplTest extends \PHPUnit_Framework_TestCase
 
     public function testCreate()
     {
-        $this->create('TestProject:Example:ExampleDao');
-        $this->create('TestProject:Example:Example2Dao');
+        foreach ($this->getTestDao() as $dao) {
+            $this->create($dao);
+        }
     }
 
     private function create($dao)
@@ -119,8 +145,9 @@ class GeneralDaoImplTest extends \PHPUnit_Framework_TestCase
 
     public function testUpdate()
     {
-        $this->update('TestProject:Example:ExampleDao');
-        $this->update('TestProject:Example:Example2Dao');
+        foreach ($this->getTestDao() as $dao) {
+            $this->update($dao);
+        }
     }
 
     private function update($dao)
@@ -150,8 +177,9 @@ class GeneralDaoImplTest extends \PHPUnit_Framework_TestCase
 
     public function testDelete()
     {
-        $this->delete('TestProject:Example:ExampleDao');
-        $this->delete('TestProject:Example:Example2Dao');
+        foreach ($this->getTestDao() as $dao) {
+            $this->delete($dao);
+        }
     }
 
     private function delete($dao)
@@ -169,8 +197,9 @@ class GeneralDaoImplTest extends \PHPUnit_Framework_TestCase
 
     public function testWave()
     {
-        $this->wave('TestProject:Example:ExampleDao');
-        $this->wave('TestProject:Example:Example2Dao');
+        foreach ($this->getTestDao() as $dao) {
+            $this->wave($dao);
+        }
     }
 
     public function wave($dao)
@@ -200,8 +229,9 @@ class GeneralDaoImplTest extends \PHPUnit_Framework_TestCase
 
     public function testSearch()
     {
-        $this->search('TestProject:Example:ExampleDao');
-        $this->search('TestProject:Example:Example2Dao');
+        foreach ($this->getTestDao() as $dao) {
+            $this->search($dao);
+        }
     }
 
     private function search($dao)
@@ -220,8 +250,9 @@ class GeneralDaoImplTest extends \PHPUnit_Framework_TestCase
 
     public function testCount()
     {
-        $this->daoCount('TestProject:Example:ExampleDao');
-        $this->daoCount('TestProject:Example:Example2Dao');
+        foreach ($this->getTestDao() as $dao) {
+            $this->daoCount($dao);
+        }
     }
 
     private function daoCount($dao)
@@ -239,8 +270,9 @@ class GeneralDaoImplTest extends \PHPUnit_Framework_TestCase
 
     public function testTransactional()
     {
-        $this->transactional('TestProject:Example:ExampleDao');
-        $this->transactional('TestProject:Example:Example2Dao');
+        foreach ($this->getTestDao() as $dao) {
+            $this->transactional($dao);
+        }
     }
 
     public function transactional($dao)

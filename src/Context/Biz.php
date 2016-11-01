@@ -3,7 +3,7 @@
 namespace Codeages\Biz\Framework\Context;
 
 use Codeages\Biz\Framework\Event\Event;
-use Codeages\Biz\Framework\Dao\DaoProxy;
+use Codeages\Biz\Framework\Dao\DaoProxy\DaoProxy;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
 use Doctrine\DBAL\DriverManager;
@@ -31,10 +31,24 @@ class Biz extends Container
             };
         };
 
+        $this['dao.proxy'] = $this->factory(function($biz) {
+            return new DaoProxy($biz);
+        });
+
         $this['autoload.object_maker.dao'] = function($biz) {
             return function($namespace, $name) use ($biz) {
                 $class = "{$namespace}\\Dao\\Impl\\{$name}Impl";
-                return new DaoProxy($biz, new $class($biz));
+                $dao = new $class($biz);
+                $declares = $dao->declares();
+                if(isset($this['cache.dao.proxy']) && !empty($declares['cache'])) {
+                    $daoProxy = $this['cache.dao.proxy'];
+                } else {
+                    $daoProxy = $this['dao.proxy'];
+                }
+
+                $daoProxy->setDao($dao);
+                return $daoProxy;
+
             };
         };
 

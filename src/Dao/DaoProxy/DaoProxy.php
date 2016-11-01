@@ -1,44 +1,28 @@
 <?php
 
-namespace Codeages\Biz\Framework\Dao;
+namespace Codeages\Biz\Framework\Dao\DaoProxy;
 
 class DaoProxy
 {
     protected $container;
-    protected static $cacheDelegate;
     protected $dao;
 
-    public function __construct($container, $dao)
+    public function __construct($container)
     {
         $this->container = $container;
-        $this->dao = $dao;
-
-        if ($this->cacheDeclare($this->dao)) {
-            if(empty(self::$cacheDelegate)) {
-                self::$cacheDelegate = $container['cache.dao.delegate'];
-            }
-            self::$cacheDelegate->parseDao($dao);
-        }
-
     }
 
-    protected function cacheDeclare()
+    public function setDao($dao)
     {
-        $declares = $this->dao->declares();
-        return !empty($declares['cache']);
+        $this->dao = $dao;
     }
 
     public function __call($method, $arguments)
     {
-        $that       = $this;
         $daoProxyMethod = $this->getDaoProxyMethod($method);
 
-        if ($this->cacheDeclare($this->dao) && $daoProxyMethod) {
-            return self::$cacheDelegate->proccess($this->dao, $method, $arguments, function ($method, $arguments) use ($that, $daoProxyMethod) {
-                return $that->$daoProxyMethod($method, $arguments);
-            });
-        } elseif ($this->getPrefix($method, array('search'))) {
-            return $this->_search($method, $arguments);
+        if ($daoProxyMethod) {
+            return $this->$daoProxyMethod($method, $arguments);
         } else {
             return $this->_callRealDao($method, $arguments);
         }
@@ -46,13 +30,9 @@ class DaoProxy
 
     protected function getDaoProxyMethod($method)
     {
-        $prefix = $this->getPrefix($method, array('get', 'find', 'create', 'update', 'delete'));
+        $prefix = $this->getPrefix($method, array('get', 'find', 'create', 'update', 'delete', 'search'));
         if ($prefix) {
             return "_{$prefix}";
-        }
-
-        if ($this->getPrefix($method, array('wave'))) {
-            return "_callRealDao";
         }
     }
 

@@ -7,7 +7,7 @@ use Codeages\Biz\Framework\Redis\RedisClusterFactory;
 abstract class CacheStrategy
 {
     protected $container;
-    const MAX_LIFE_TIME = 86400;
+    protected $maxLifeTime = 86400;
 
     abstract public function wave($dao, $method, $arguments, $callback);
     abstract protected function generateKey($dao, $method, $arguments);
@@ -15,6 +15,7 @@ abstract class CacheStrategy
     public function __construct($container)
     {
         $this->container = $container;
+        $this->maxLifeTime = empty($container['cache.config']['maxLifeTime']) ? 86400: $container['cache.config']['maxLifeTime'];
     }
 
     public function parseDao($dao)
@@ -59,7 +60,7 @@ abstract class CacheStrategy
 
         if (!empty($prefix)) {
             $key = $this->generateKey($dao, $method, $arguments);
-            $this->_getCacheCluster()->setex($key, self::MAX_LIFE_TIME, $data);
+            $this->_getCacheCluster()->setex($key, $this->maxLifeTime, $data);
         }
     }
 

@@ -32,7 +32,7 @@ class CacheDelegate
     {
         $prefix = $this->getPrefix($daoMethod, array('get', 'find', 'create', 'update', 'delete', 'wave'));
         if (empty($prefix)) {
-            throw new \InvalidArgumentException('args is invalid. ');
+            throw new \InvalidArgumentException('daoMethod is invalid. ');
         }
 
         if (in_array($prefix, array('get', 'find'))) {
