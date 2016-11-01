@@ -26,12 +26,12 @@ class PromiseCacheStrategy extends CacheStrategy
                     }
 
                     $keys = $this->getKeys($method, $args);
-                    $this->incrNamespaceVersion("{$table}:{$keys}");
+                    $this->incrNamespaceVersion($dao, "{$table}:{$keys}");
                 }
             }
         } else {
             $data = call_user_func_array($callback, array($daoMethod, $arguments));
-            $this->incrNamespaceVersion($table);
+            $this->incrNamespaceVersion($dao, $table);
         }
         return $data;
     }
@@ -86,13 +86,13 @@ class PromiseCacheStrategy extends CacheStrategy
         $table = $dao->table();
         if ($method == 'get') {
 
-            return "{$table}:{$this->getVersionByNamespace($table)}:id:{$args[0]}";
+            return "{$table}:{$this->getVersionByNamespace($dao, $table)}:id:{$args[0]}";
         }
 
         $keys    = $this->getKeys($method, $args);
-        $version = $this->getVersionByNamespace("{$table}:{$keys}");
+        $version = $this->getVersionByNamespace($dao, "{$table}:{$keys}");
 
-        return "{$table}:version:{$this->getVersionByNamespace($table)}:{$keys}:version:{$version}";
+        return "{$table}:version:{$this->getVersionByNamespace($dao, $table)}:{$keys}:version:{$version}";
     }
 
     protected function getKeys($method, $args)

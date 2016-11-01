@@ -8,7 +8,7 @@ class TableCacheStrategy extends CacheStrategy
     {
         $data = call_user_func_array($callback, array($method, $arguments));
         $table = $dao->table();
-        $this->incrNamespaceVersion($table);
+        $this->incrNamespaceVersion($dao, $table);
         return $data;
     }
 
@@ -16,7 +16,7 @@ class TableCacheStrategy extends CacheStrategy
     {   
         $table = $dao->table();
         if ($method == 'get') {
-            return "{$table}:{$this->getVersionByNamespace($table)}:id:{$args[0]}";
+            return "{$table}:{$this->getVersionByNamespace($dao, $table)}:id:{$args[0]}";
         }
 
         $fileds = $this->parseFields($method);
@@ -28,6 +28,6 @@ class TableCacheStrategy extends CacheStrategy
             $keys = $keys.$value.':'.$args[$key];
         }
 
-        return "{$table}:{$this->getVersionByNamespace($table)}:{$keys}";
+        return "{$table}:{$this->getVersionByNamespace($dao, $table)}:{$keys}";
     }
 }

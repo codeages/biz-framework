@@ -4,26 +4,15 @@ namespace Codeages\Biz\Framework\Redis;
 
 use Redis;
 
-class RedisClusterFactory
+class RedisCluster
 {
     private $config;
-
     private $pool;
 
-    private static $instance;
-
-    private function __construct($config)
+    public function __construct($biz)
     {
-        $this->config = $config;
-    }
-
-    public static function instance($config)
-    {
-        if (!self::$instance) {
-            self::$instance = new self($config);
-        }
-
-        return self::$instance;
+        $this->biz = $biz;
+        $this->config = $biz['cache.config'];
     }
 
     private function isSingle($config)
@@ -33,17 +22,16 @@ class RedisClusterFactory
 
     public function getCluster($group = 'default')
     {
-        $poolKey = "{$group}:master";
-
-        if (isset($this->pool[$poolKey])) {
-            return $this->pool[$poolKey];
+        if (isset($this->pool[$group])) {
+            return $this->pool[$group];
         }
 
-        if (!isset($this->config[$group])) {
-            throw new \InvalidArgumentException("Group '{$group}' is not exist.");
+        if (empty($this->config[$group])) {
+            $cnf = $this->config['default'];
+        } else {
+            $cnf = $this->config[$group];
         }
 
-        $cnf = $this->config[$group];
 
         if ($this->isSingle($cnf)) {
             $redis = new Redis();
@@ -53,7 +41,7 @@ class RedisClusterFactory
             $redis = new MultipleRedis($cnf);
         }
 
-        $this->pool[$poolKey] = $redis;
+        $this->pool[$group] = $redis;
 
         return $redis;
     }

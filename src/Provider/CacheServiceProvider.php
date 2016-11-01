@@ -14,6 +14,7 @@ use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Configuration;
 use Doctrine\Common\EventManager;
 use Symfony\Bridge\Doctrine\Logger\DbalLogger;
+use Codeages\Biz\Framework\Redis\RedisCluster;
 use Codeages\Biz\Framework\Dao\DaoProxy\CacheDaoProxy;
 use Codeages\Biz\Framework\Dao\CacheDelegate;
 use Codeages\Biz\Framework\Dao\CacheStrategy\TableCacheStrategy;
@@ -36,6 +37,10 @@ class CacheServiceProvider implements ServiceProviderInterface
                 "retry_interval" => 100
             )
         );
+
+        $app['cache.cluster'] = $app->factory(function($app) {
+            return new RedisCluster($app);
+        });
 
         $app['cache.dao.proxy'] = $app->factory(function($app) {
             return new CacheDaoProxy($app);

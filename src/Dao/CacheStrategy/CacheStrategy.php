@@ -2,8 +2,6 @@
 
 namespace Codeages\Biz\Framework\Dao\CacheStrategy;
 
-use Codeages\Biz\Framework\Redis\RedisClusterFactory;
-
 abstract class CacheStrategy
 {
     protected $container;
@@ -60,7 +58,7 @@ abstract class CacheStrategy
 
         if (!empty($prefix)) {
             $key = $this->generateKey($dao, $method, $arguments);
-            $this->_getCacheCluster()->setex($key, $this->maxLifeTime, $data);
+            $this->_getCacheCluster($dao->table())->setex($key, $this->maxLifeTime, $data);
         }
     }
 
@@ -70,22 +68,22 @@ abstract class CacheStrategy
 
         if (!empty($prefix)) {
             $key = $this->generateKey($dao, $method, $arguments);
-            return $this->_getCacheCluster()->get($key);
+            return $this->_getCacheCluster($dao->table())->get($key);
         }
     }
 
-    protected function incrNamespaceVersion($namespace)
+    protected function incrNamespaceVersion($dao, $namespace)
     {
-        $this->_getCacheCluster()->incr("version:{$namespace}");
+        $this->_getCacheCluster($dao->table())->incr("version:{$namespace}");
     }
 
-    protected function getVersionByNamespace($namespace)
+    protected function getVersionByNamespace($dao, $namespace)
     {
-        return $this->_getCacheCluster()->get("version:{$namespace}");
+        return $this->_getCacheCluster($dao->table())->get("version:{$namespace}");
     }
 
-    protected function _getCacheCluster()
+    protected function _getCacheCluster($group = 'default')
     {
-        return RedisClusterFactory::instance($this->container['cache.config'])->getCluster();
+        return $this->container['cache.cluster']->getCluster($group);
     }
 }
