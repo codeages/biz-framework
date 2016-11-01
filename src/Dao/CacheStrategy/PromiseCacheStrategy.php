@@ -72,7 +72,7 @@ class PromiseCacheStrategy extends CacheStrategy
             $fields = explode('And', $fields);
 
             if (!isset($this->methodMap[$className])) {
-                $this->methodMap[$methodName] = array();
+                $this->methodMap[$className] = array();
             }
 
             if(empty($this->methodMap[$className][$methodName])){
