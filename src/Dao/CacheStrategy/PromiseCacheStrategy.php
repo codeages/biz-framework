@@ -5,33 +5,24 @@ namespace Codeages\Biz\Framework\Dao\CacheStrategy;
 class PromiseCacheStrategy extends CacheStrategy
 {
     private $methodMap = array();
-    private $fieldsMap = array();
 
     public function wave($dao, $daoMethod, $arguments, $callback)
     {
         $table = $dao->table();
         $className = get_class($dao);
         if (in_array($daoMethod, array('update', 'delete'))) {
-            $originData = $dao->get($arguments[0]);
             $data       = call_user_func_array($callback, array($daoMethod, $arguments));
             if(empty($this->methodMap[$className])) {
                 return;
             }
 
+            $originData = $dao->get($arguments[0]);
             foreach ($this->methodMap[$className] as $method => $fields) {
-                $shouldIncrNamespace = false;
-                foreach ($fields as $key => $field) {
-                    $field = lcfirst($field);
-                    if ($originData[$field] != $data[$field]) {
-                        $shouldIncrNamespace = true;
-                    }
-                }
-
-                if ($shouldIncrNamespace) {
+                if ($this->isDataUpdated($fields, $originData, $data)) {
                     $args = array();
-                    foreach ($fields as $fieldKey) {
-                        $fieldKey = lcfirst($fieldKey);
-                        $args[]   = $originData[$fieldKey];
+                    foreach ($fields as $field) {
+                        $field = lcfirst($field);
+                        $args[]   = $originData[$field];
                     }
 
                     $keys = $this->getKeys($method, $args);
@@ -43,6 +34,17 @@ class PromiseCacheStrategy extends CacheStrategy
             $this->incrNamespaceVersion($table);
         }
         return $data;
+    }
+
+    protected function isDataUpdated($fields, $originData, $data)
+    {
+        foreach ($fields as $key => $field) {
+            $field = lcfirst($field);
+            if ($originData[$field] != $data[$field]) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public function parseDao($dao)
@@ -64,10 +66,6 @@ class PromiseCacheStrategy extends CacheStrategy
 
     protected function parseMethod($className, $methodName)
     {
-        if ($methodName == 'get') {
-            $this->push('id', $methodName, $className);
-        }
-
         $prefix = $this->getPrefix($methodName, array('get', 'find'));
         if ($prefix && $prefix != $methodName) {
             $fields = str_replace("{$prefix}By", '', $methodName);
@@ -80,27 +78,8 @@ class PromiseCacheStrategy extends CacheStrategy
             if(empty($this->methodMap[$className][$methodName])){
                 $this->methodMap[$className][$methodName] = $fields;
             }
-
-            foreach ($fields as $field) {
-                $this->push($field, $methodName, $className);
-            }
         }
     }
-
-    protected function push($field, $methodName, $className)
-    {
-        $field = strtolower($field);
-        if (!isset($this->fieldsMap[$className])) {
-            $this->fieldsMap[$methodName] = array();
-        }
-
-        if (empty($this->fieldsMap[$methodName][$field])) {
-            $this->fieldsMap[$methodName][$field] = array($methodName);
-        } else {
-            array_push($this->fieldsMap[$methodName][$field], $methodName);
-        }
-    }
-
     
     protected function generateKey($dao, $method, $args)
     {
