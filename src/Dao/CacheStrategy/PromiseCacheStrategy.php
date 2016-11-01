@@ -9,7 +9,7 @@ class PromiseCacheStrategy extends CacheStrategy
 
     public function wave($dao, $daoMethod, $arguments, $callback)
     {
-        $rootNameSpace = $dao->table();
+        $table = $dao->table();
         $className = get_class($dao);
         if (in_array($daoMethod, array('update', 'delete'))) {
             $originData = $dao->get($arguments[0]);
@@ -35,12 +35,12 @@ class PromiseCacheStrategy extends CacheStrategy
                     }
 
                     $keys = $this->getKeys($method, $args);
-                    $this->incrNamespaceVersion("{$rootNameSpace}:{$keys}");
+                    $this->incrNamespaceVersion("{$table}:{$keys}");
                 }
             }
         } else {
             $data = call_user_func_array($callback, array($daoMethod, $arguments));
-            $this->incrNamespaceVersion($rootNameSpace);
+            $this->incrNamespaceVersion($table);
         }
         return $data;
     }
@@ -70,8 +70,8 @@ class PromiseCacheStrategy extends CacheStrategy
 
         $prefix = $this->getPrefix($methodName, array('get', 'find'));
         if ($prefix && $prefix != $methodName) {
-            $truncateMethodName = str_replace("{$prefix}By", '', $methodName);
-            $fields             = explode('And', $truncateMethodName);
+            $fields = str_replace("{$prefix}By", '', $methodName);
+            $fields = explode('And', $fields);
 
             if (!isset($this->methodMap[$className])) {
                 $this->methodMap[$methodName] = array();
@@ -104,21 +104,21 @@ class PromiseCacheStrategy extends CacheStrategy
     
     protected function generateKey($dao, $method, $args)
     {
-        $rootNameSpace = $dao->table();
+        $table = $dao->table();
         if ($method == 'get') {
 
-            return "{$rootNameSpace}:{$this->getVersionByNamespace($rootNameSpace)}:id:{$args[0]}";
+            return "{$table}:{$this->getVersionByNamespace($table)}:id:{$args[0]}";
         }
 
         $keys    = $this->getKeys($method, $args);
-        $version = $this->getVersionByNamespace("{$rootNameSpace}:{$keys}");
+        $version = $this->getVersionByNamespace("{$table}:{$keys}");
 
-        return "{$rootNameSpace}:version:{$this->getVersionByNamespace($rootNameSpace)}:{$keys}:version:{$version}";
+        return "{$table}:version:{$this->getVersionByNamespace($table)}:{$keys}:version:{$version}";
     }
 
     protected function getKeys($method, $args)
     {
-        $fileds = $this->parseFileds($method);
+        $fileds = $this->parseFields($method);
         $keys   = '';
         foreach ($fileds as $key => $value) {
             if (!empty($keys)) {

@@ -21,7 +21,7 @@ abstract class CacheStrategy
     {
     }
 
-    protected function parseFileds($method)
+    protected function parseFields($method)
     {
         $prefixs = array('get', 'find');
         $prefix  = $this->getPrefix($method, $prefixs);
