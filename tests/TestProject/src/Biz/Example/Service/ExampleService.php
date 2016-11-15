@@ -1,6 +1,6 @@
 <?php
 
-namespace Codeages\Biz\Framework\Tests\Example\Service;
+namespace TestProject\Biz\Example\Service;
 
 interface ExampleService
 {

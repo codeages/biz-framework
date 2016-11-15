@@ -2,11 +2,11 @@
 
 namespace Codeages\Biz\Framework\Dao;
 
-use Codeages\Biz\Framework\Context\Kernel;
+use Codeages\Biz\Framework\Context\Biz;
 
 abstract class GeneralDaoImpl implements GeneralDaoInterface
 {
-    protected $kernel;
+    protected $biz;
 
     protected $table = null;
 
@@ -14,9 +14,9 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
 
     protected $serializes = array();
 
-    public function __construct(Kernel $kernel)
+    public function __construct(Biz $biz)
     {
-        $this->kernel = $kernel;
+        $this->biz = $biz;
     }
 
     public function create($fields)
@@ -71,7 +71,8 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
 
     public function get($id, $lock = false)
     {
-        $sql = "SELECT * FROM {$this->table()} WHERE id = ?" . ($lock ? ' FOR UPDATE' : '');
+        $sql = "SELECT * FROM {$this->table()} WHERE id = ?".($lock ? ' FOR UPDATE' : '');
+
         return $this->db()->fetchAssoc($sql, array($id)) ?: null;
     }
 
@@ -83,11 +84,11 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
             ->setMaxResults($limit);
 
         $declares = $this->declares();
-        foreach ($orderbys ? : array() as $field => $direction) {
+        foreach ($orderbys ?: array() as $field => $direction) {
             if (!in_array($field, $declares['orderbys'])) {
                 throw $this->createDaoException(sprintf("SQL order by field is only allowed '%s', but you give `{$field}`.", implode(',', $declares['orderbys'])));
             }
-            if (!in_array(strtoupper($direction), ['ASC', 'DESC'])) {
+            if (!in_array(strtoupper($direction), array('ASC', 'DESC'))) {
                 throw $this->createDaoException("SQL order by direction is only allowed `ASC`, `DESC`, but you give `{$direction}`.");
             }
             $builder->addOrderBy($field, $direction);
@@ -111,7 +112,7 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
 
     public function db()
     {
-        return $this->kernel['db'];
+        return $this->biz['db'];
     }
 
     protected function getByFields($fields)

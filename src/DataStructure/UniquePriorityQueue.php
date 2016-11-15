@@ -11,7 +11,7 @@ class UniquePriorityQueue extends \SplPriorityQueue
     public function insert($value, $priority)
     {
         if (isset($this->values[$value])) {
-            return ;
+            return;
         }
         parent::insert($value, array($priority, $this->serial--));
         $this->values[$value] = true;

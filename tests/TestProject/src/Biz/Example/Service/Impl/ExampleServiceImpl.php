@@ -1,7 +1,7 @@
 <?php
-namespace Codeages\Biz\Framework\Tests\Example\Service\Impl;
+namespace TestProject\Biz\Example\Service\Impl;
 
-use Codeages\Biz\Framework\Tests\Example\Service\ExampleService;
+use TestProject\Biz\Example\Service\ExampleService;
 
 class ExampleServiceImpl implements ExampleService
 {

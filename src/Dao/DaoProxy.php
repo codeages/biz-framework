@@ -4,26 +4,27 @@ namespace Codeages\Biz\Framework\Dao;
 
 class DaoProxy
 {
-    protected $dao;
     protected $container;
-    protected $callable;
 
-    public function __construct($container, $callable)
+    protected $dao;
+
+    public function __construct($container, $dao)
     {
         $this->container = $container;
-        $this->callable = $callable;
-        $this->dao = call_user_func($callable, $this->container);
+        $this->dao = $dao;
     }
 
     public function __call($method, $arguments)
     {
         if (strpos($method, 'get') === 0) {
             $row = $this->_callRealDao($method, $arguments);
+
             return $this->_unserialize($row);
         }
 
         if ((strpos($method, 'find') === 0) or (strpos($method, 'search') === 0)) {
             $rows = $this->_callRealDao($method, $arguments);
+
             return $this->_unserializes($rows);
         }
 
