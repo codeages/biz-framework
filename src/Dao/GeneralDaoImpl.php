@@ -138,7 +138,7 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
         return $this->db()->fetchAll($sql, $values);
     }
 
-    protected function findInFields($fields)
+    protected function findByFields($fields)
     {
         $placeholders = array_map(function ($name) {
             return "{$name} = ?";
