@@ -178,9 +178,9 @@ class GeneralDaoImplTest extends \PHPUnit_Framework_TestCase
     {
         $dao = $this->biz->dao('TestProject:Example:ExampleDao');
 
-        $dao->create(array('name' => 'test1', 'ids1' => ['1111'], 'ids2' => ['1111']));
-        $dao->create(array('name' => 'test1', 'ids1' => ['1111'], 'ids2' => ['2222']));
-        $dao->create(array('name' => 'test2', 'ids1' => ['1111'], 'ids2' => ['3333']));
+        $dao->create(array('name' => 'test1', 'ids1' => array('1111'), 'ids2' => array('1111')));
+        $dao->create(array('name' => 'test1', 'ids1' => array('1111'), 'ids2' => array('2222')));
+        $dao->create(array('name' => 'test2', 'ids1' => array('1111'), 'ids2' => array('3333')));
         $result = $dao->findByNameAndId('test1', '["1111"]');
 
         $this->assertEquals(sizeof($result), 2);
