@@ -143,4 +143,15 @@ class DaoProxy
 
         return explode('|', trim($value, '|'));
     }
+
+
+    private function _phpSerialize($value)
+    {
+        return serialize($value);
+    }
+
+    private function _phpUnserialize($value)
+    {
+        return unserialize($value);
+    }
 }
