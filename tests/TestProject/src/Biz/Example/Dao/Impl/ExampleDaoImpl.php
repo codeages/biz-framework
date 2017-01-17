@@ -27,6 +27,10 @@ class ExampleDaoImpl extends GeneralDaoImpl implements ExampleDao
             'orderbys'   => array('name', 'created_time'),
             'conditions' => array(
                 'name = :name',
+                'name pre_LIKE :pre_like',
+                'name suF_like :suf_name',
+                'name LIKE :like_name',
+                'id iN (:ids)',
                 'ids1 = :ids1'
             )
         );
