@@ -29,13 +29,12 @@ class DynamicQueryBuilder extends QueryBuilder
             return $this;
         }
 
-        if ($this->isInCondition($where)) {
+        if ($this->matchInCondition($where)) {
             return $this->addWhereIn($where);
         }
 
-        $likeMatchs = $this->getLikeCondtion($where);
-        if ($likeMatchs && in_array($likeMatchs[1], $likeMatchs)) {
-            return $this->andWhereLike($where, $likeMatchs[1]);
+        if ($likeType = $this->matchLikeCondition($where)) {
+            return $this->andWhereLike($where, $likeType);
         }
 
         return parent::andWhere($where);
@@ -64,7 +63,7 @@ class DynamicQueryBuilder extends QueryBuilder
         return parent::andWhere($where);
     }
 
-    private function andWhereLike($where, $like)
+    private function andWhereLike($where, $likeType)
     {
         $conditionName = $this->getConditionName($where);
         if (empty($this->conditions[$conditionName]) || !is_string($this->conditions[$conditionName])) {
@@ -72,11 +71,11 @@ class DynamicQueryBuilder extends QueryBuilder
         }
 
         //PRE_LIKE
-        if ($like == 'PRE_LIKE') {
-            $where = preg_replace('/PRE_LIKE/', "LIKE", $where);
+        if ($likeType == 'PRE_LIKE') {
+            $where = str_replace('PRE_LIKE', "LIKE", $where);
             $this->conditions[$conditionName] = "%{$this->conditions[$conditionName]}";
-        } else if ($like == 'SUF_LIKE') {
-            $where = preg_replace('/SUF_LIKE/', "LIKE", $where);
+        } else if ($likeType == 'SUF_LIKE') {
+            $where = str_replace('SUF_LIKE', "LIKE", $where);
             $this->conditions[$conditionName] = "{$this->conditions[$conditionName]}%";
         } else {
             $this->conditions[$conditionName] = "%{$this->conditions[$conditionName]}%";
@@ -94,21 +93,16 @@ class DynamicQueryBuilder extends QueryBuilder
         return parent::execute();
     }
 
-    private function getLikeCondtion($where)
+    private function matchLikeCondition($where)
     {
         preg_match('/\s+((PRE_|SUF_)?LIKE)\s+/', $where, $matches);
 
-        return $matches;
+        return $matches ? $matches[1] : false;
     }
 
-    private function isInCondition($where)
+    private function matchInCondition($where)
     {
-        $matched = preg_match('/\s+(IN)\s+/', $where, $matches);
-        if (empty($matched)) {
-            return false;
-        } else {
-            return true;
-        }
+        return preg_match('/\s+(IN)\s+/', $where);
     }
 
     private function getConditionName($where)
