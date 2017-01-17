@@ -147,18 +147,28 @@ class GeneralDaoImplTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(1, $row['counter2']);
     }
 
-    public function testSearch()
+    public function testLikeSearch()
     {
         $dao = $this->biz->dao('TestProject:Example:ExampleDao');
 
-        $dao->create(array('name' => 'test1'));
-        $dao->create(array('name' => 'test2'));
-        $dao->create(array('name' => 'test3'));
+        $dao->create(array('name' => 'pre_test1'));
+        $dao->create(array('name' => 'pre_test2'));
+        $dao->create(array('name' => 'test3_suf'));
+        $dao->create(array('name' => 'test4_suf'));
+        $dao->create(array('name' => 'test5'));
 
-        $found = $dao->search(array('name' => 'test2'), array('created_time' => 'desc'), 0, 100);
+        $preNames = $dao->search(array('pre_name' => '_suf'), array('created_time' => 'desc'), 0, 100);
 
-        $this->assertEquals(1, count($found));
-        $this->assertEquals('test2', $found[0]['name']);
+        $sufNames = $dao->search(array('suf_name' => 'pre_'), array('created_time' => 'desc'), 0, 100);
+
+        $likeNames = $dao->search(array('like_name' => 'test'), array('created_time' => 'desc'), 0, 100);
+
+        $this->assertCount(2, $preNames);
+        $this->assertCount(2, $sufNames);
+        $this->assertCount(5, $likeNames);
+        $this->assertEquals('test3_suf', $preNames[0]['name']);
+        $this->assertEquals('pre_test2', $sufNames[1]['name']);
+        $this->assertEquals('test5', $likeNames[4]['name']);
     }
 
     public function testCount()

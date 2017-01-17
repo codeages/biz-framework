@@ -33,6 +33,10 @@ class DynamicQueryBuilder extends QueryBuilder
             return $this->addWhereIn($where);
         }
 
+        if ($this->isLikeCondtion($where)) {
+            return $this->andWhereLike($where);
+        }
+
         return parent::andWhere($where);
     }
 
@@ -59,6 +63,27 @@ class DynamicQueryBuilder extends QueryBuilder
         return parent::andWhere($where);
     }
 
+    private function andWhereLike($where)
+    {
+        $conditionName = $this->getConditionName($where);
+        if (empty($this->conditions[$conditionName]) || !is_string($this->conditions[$conditionName])) {
+            return $this;
+        }
+
+        //PRE_LIKE
+        if (preg_match('/\s+PRE_LIKE\s+/', $where)) {
+            $where = preg_replace('/PRE_LIKE/', "LIKE", $where);
+            $this->conditions[$conditionName] = "%{$this->conditions[$conditionName]}";
+        } else if (preg_match('/\s+SUF_LIKE\s+/', $where)) {
+            $where = preg_replace('/SUF_LIKE/', "LIKE", $where);
+            $this->conditions[$conditionName] = "{$this->conditions[$conditionName]}%";
+        } else {
+            $this->conditions[$conditionName] = "%{$this->conditions[$conditionName]}%";
+        }
+
+        return parent::andWhere($where);
+    }
+
     public function execute()
     {
         foreach ($this->conditions as $field => $value) {
@@ -66,6 +91,11 @@ class DynamicQueryBuilder extends QueryBuilder
         }
 
         return parent::execute();
+    }
+
+    private function isLikeCondtion($where)
+    {
+        return preg_match('/\s+(PRE_|SUF_)?LIKE\s+/', $where);
     }
 
     private function isInCondition($where)
