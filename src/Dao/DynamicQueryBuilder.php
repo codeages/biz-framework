@@ -34,7 +34,7 @@ class DynamicQueryBuilder extends QueryBuilder
         }
 
         if ($likeType = $this->matchLikeCondition($where)) {
-            return $this->andWhereLike($where, $likeType);
+            return $this->addWhereLike($where, $likeType);
         }
 
         return parent::andWhere($where);
@@ -63,7 +63,7 @@ class DynamicQueryBuilder extends QueryBuilder
         return parent::andWhere($where);
     }
 
-    private function andWhereLike($where, $likeType)
+    private function addWhereLike($where, $likeType)
     {
         $conditionName = $this->getConditionName($where);
         if (empty($this->conditions[$conditionName]) || !is_string($this->conditions[$conditionName])) {
