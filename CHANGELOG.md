@@ -1,4 +1,9 @@
 # CHANGELOG
+## v0.1.9
+
+ * `declares`方法的`LIKE`关键字默认是模糊全匹配，即'%xxx%';
+ * `declares`方法的增加`PRE_LIKE`关键字,前缀字符串匹配，即'xxx%';
+ * `declares`方法的增加`SUF_LIKE`关键字,后缀字符串匹配，即'%xxx';
 
 ## v0.0.5
 
