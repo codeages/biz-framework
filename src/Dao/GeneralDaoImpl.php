@@ -136,7 +136,7 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
         }
 
         $marks = str_repeat('?,', count($values) - 1).'?';
-        $sql   = "SELECT * FROM {$this->table} WHERE {$field} IN ({$marks});";
+        $sql = "SELECT * FROM {$this->table} WHERE {$field} IN ({$marks});";
 
         return $this->db()->fetchAll($sql, $values);
     }
@@ -165,7 +165,7 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
         $builder = $this->_getQueryBuilder($conditions);
         $builder->from($this->table(), $this->table());
 
-        $declares               = $this->declares();
+        $declares = $this->declares();
         $declares['conditions'] = isset($declares['conditions']) ? $declares['conditions'] : array();
 
         foreach ($declares['conditions'] as $condition) {
