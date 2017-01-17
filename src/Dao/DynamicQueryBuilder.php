@@ -71,12 +71,12 @@ class DynamicQueryBuilder extends QueryBuilder
         }
 
         //PRE_LIKE
-        if ($likeType == 'PRE_LIKE') {
-            $where = str_replace('PRE_LIKE', "LIKE", $where);
-            $this->conditions[$conditionName] = "%{$this->conditions[$conditionName]}";
-        } else if ($likeType == 'SUF_LIKE') {
-            $where = str_replace('SUF_LIKE', "LIKE", $where);
+        if ($likeType == 'pre_like') {
+            $where = preg_replace('/pre_like/i', 'LIKE', $where, 1);
             $this->conditions[$conditionName] = "{$this->conditions[$conditionName]}%";
+        } else if ($likeType == 'suf_like') {
+            $where = preg_replace('/suf_like/i', 'LIKE', $where, 1);
+            $this->conditions[$conditionName] = "%{$this->conditions[$conditionName]}";
         } else {
             $this->conditions[$conditionName] = "%{$this->conditions[$conditionName]}%";
         }
@@ -95,14 +95,14 @@ class DynamicQueryBuilder extends QueryBuilder
 
     private function matchLikeCondition($where)
     {
-        preg_match('/\s+((PRE_|SUF_)?LIKE)\s+/', $where, $matches);
+        preg_match('/\s+((PRE_|SUF_)?LIKE)\s+/i', $where, $matches);
 
-        return $matches ? $matches[1] : false;
+        return $matches ? strtolower($matches[1]) : false;
     }
 
     private function matchInCondition($where)
     {
-        return preg_match('/\s+(IN)\s+/', $where);
+        return preg_match('/\s+(IN)\s+/i', $where);
     }
 
     private function getConditionName($where)
