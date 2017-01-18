@@ -51,7 +51,7 @@ class DynamicQueryBuilder extends QueryBuilder
         $conditionName = $this->getConditionName($where);
 
         if (!is_array($this->conditions[$conditionName])) {
-            throw new DaoException('Parameter must be an Array type');
+            throw new DaoException('IN search parameter must be an Array type');
         }
 
         if (empty($this->conditions[$conditionName])) {
@@ -74,7 +74,7 @@ class DynamicQueryBuilder extends QueryBuilder
         $conditionName = $this->getConditionName($where);
 
         if (!is_string($this->conditions[$conditionName])) {
-            throw new DaoException('Parameter must be a String type');
+            throw new DaoException('LIKE search parameter must be a String type');
         }
 
         if (empty($this->conditions[$conditionName])) {
