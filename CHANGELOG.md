@@ -1,7 +1,7 @@
 # CHANGELOG
 
 ## v0.2.0
-  * DAO `declares`方法`IN`关键字,如果传入的参数是空数组或者非数组,会返回空记录
+  * DAO `declares`方法`IN`关键字,如果传入的参数是空数组会返回空记录
 ## v0.1.9
 
  * DAO `declares`方法的`LIKE`关键字默认是模糊全匹配，即'%xxx%';
