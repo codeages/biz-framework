@@ -3,7 +3,6 @@
 namespace Codeages\Biz\Framework\Dao;
 
 use Doctrine\DBAL\Query\QueryBuilder;
-use Codeages\Biz\Framework\Dao\DaoException;
 
 class DynamicQueryBuilder extends QueryBuilder
 {
