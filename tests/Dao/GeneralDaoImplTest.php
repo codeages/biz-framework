@@ -198,15 +198,6 @@ class GeneralDaoImplTest extends \PHPUnit_Framework_TestCase
         $dao->search(array('ids' => 1), array(), 0, 100);
     }
 
-    /**
-     * @expectedException Codeages\Biz\Framework\Dao\DaoException
-     */
-    public function testLikeSearchWithException()
-    {
-        $dao = $this->biz->dao('TestProject:Example:ExampleDao');
-        $dao->search(array('like_name' => array()), array(), 0, 100);
-    }
-
     public function testCount()
     {
         $dao = $this->biz->dao('TestProject:Example:ExampleDao');

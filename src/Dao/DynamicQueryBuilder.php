@@ -72,10 +72,6 @@ class DynamicQueryBuilder extends QueryBuilder
     {
         $conditionName = $this->getConditionName($where);
 
-        if (!is_string($this->conditions[$conditionName])) {
-            throw new DaoException('LIKE search parameter must be a String type');
-        }
-
         if (empty($this->conditions[$conditionName])) {
             return $this;
         }
