@@ -48,8 +48,9 @@ class DynamicQueryBuilder extends QueryBuilder
     private function addWhereIn($where)
     {
         $conditionName = $this->getConditionName($where);
-        if (empty($this->conditions[$conditionName]) or !is_array($this->conditions[$conditionName])) {
-            return $this;
+
+        if (empty($this->conditions[$conditionName]) || !is_array($this->conditions[$conditionName])) {
+            return parent::andWhere('1 = 0');
         }
 
         $marks = array();

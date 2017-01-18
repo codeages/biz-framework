@@ -183,6 +183,10 @@ class GeneralDaoImplTest extends \PHPUnit_Framework_TestCase
         $results = $dao->search(array('ids' => array($tmp1['id'], $tmp2['id'])), array('created_time' => 'desc'), 0, 100);
 
         $this->assertCount(2, $results);
+
+        $results = $dao->search(array('ids' => array()), array('created_time' => 'desc'), 0, 100);
+
+        $this->assertCount(0, $results);
     }
 
     public function testCount()
