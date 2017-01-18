@@ -3,6 +3,7 @@
 namespace Codeages\Biz\Framework\Dao;
 
 use Doctrine\DBAL\Query\QueryBuilder;
+use Codeages\Biz\Framework\Dao\DaoException;
 
 class DynamicQueryBuilder extends QueryBuilder
 {
@@ -49,7 +50,11 @@ class DynamicQueryBuilder extends QueryBuilder
     {
         $conditionName = $this->getConditionName($where);
 
-        if (empty($this->conditions[$conditionName]) || !is_array($this->conditions[$conditionName])) {
+        if (!is_array($this->conditions[$conditionName])) {
+            throw new DaoException('Parameter must be an Array type');
+        }
+
+        if (empty($this->conditions[$conditionName])) {
             return parent::andWhere('1 = 0');
         }
 
@@ -67,7 +72,12 @@ class DynamicQueryBuilder extends QueryBuilder
     private function addWhereLike($where, $likeType)
     {
         $conditionName = $this->getConditionName($where);
-        if (empty($this->conditions[$conditionName]) || !is_string($this->conditions[$conditionName])) {
+
+        if (!is_string($this->conditions[$conditionName])) {
+            throw new DaoException('Parameter must be a String type');
+        }
+
+        if (empty($this->conditions[$conditionName])) {
             return $this;
         }
 
