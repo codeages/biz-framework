@@ -190,7 +190,7 @@ class GeneralDaoImplTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Codeages\Biz\Framework\Dao\DaoException
+     * @expectedException \Codeages\Biz\Framework\Dao\DaoException
      */
     public function testInSearchWithException()
     {
