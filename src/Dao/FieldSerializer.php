@@ -9,7 +9,7 @@ class FieldSerializer implements SerializerInterface
      */
     public function serialize($name, $value)
     {
-        $methods = [
+        $methods = array(
             'json' => function ($value) {
                 if (empty($value)) {
                     return '';
@@ -27,7 +27,7 @@ class FieldSerializer implements SerializerInterface
             'php' => function ($value) {
                 return serialize($value);
             },
-        ];
+        );
 
         return $methods[$name]($value);
     }
@@ -37,7 +37,7 @@ class FieldSerializer implements SerializerInterface
      */
     public function unserialize($name, $value)
     {
-        $methods = [
+        $methods = array(
             'json' => function ($value) {
                 if (empty($value)) {
                     return array();
@@ -55,7 +55,7 @@ class FieldSerializer implements SerializerInterface
             'php' => function ($value) {
                 return unserialize($value);
             },
-        ];
+        );
 
         return $methods[$name]($value);
     }
