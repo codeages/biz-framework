@@ -76,7 +76,7 @@ class DoctrineServiceProvider implements ServiceProviderInterface
                     $manager = $app['dbs.event_manager'][$name];
                 }
 
-                $dbs[$name] = function ($dbs) use ($options, $config, $manager) {
+                $dbs[$name] = function () use ($options, $config, $manager) {
                     return DriverManager::getConnection($options, $config, $manager);
                 };
             }

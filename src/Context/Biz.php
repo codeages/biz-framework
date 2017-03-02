@@ -40,13 +40,17 @@ class Biz extends Container
         };
 
         $this['autoloader'] = function ($biz) {
-            return new ContainerAutoloader($biz, $biz['autoload.aliases'], array(
-                'service' => $biz['autoload.object_maker.service'],
-                'dao' => $biz['autoload.object_maker.dao'],
-            ));
+            return new ContainerAutoloader(
+                $biz,
+                $biz['autoload.aliases'],
+                array(
+                    'service' => $biz['autoload.object_maker.service'],
+                    'dao' => $biz['autoload.object_maker.dao'],
+                )
+            );
         };
 
-        $this['dispatcher'] = function ($biz) {
+        $this['dispatcher'] = function () {
             return new EventDispatcher();
         };
 
