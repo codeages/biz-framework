@@ -6,6 +6,7 @@ use Codeages\Biz\Framework\Dao\DaoProxy;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class Biz extends Container
 {

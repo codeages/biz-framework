@@ -22,7 +22,7 @@ class DaoProxy
             return $this->unserialize($row);
         }
 
-        if ((strpos($method, 'find') === 0) or (strpos($method, 'search') === 0)) {
+        if ((strpos($method, 'find') === 0) || (strpos($method, 'search') === 0)) {
             $rows = $this->callRealDao($method, $arguments);
 
             return $this->unserializes($rows);
