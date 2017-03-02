@@ -2,13 +2,13 @@
 
 namespace Codeages\Biz\Framework\Dao;
 
-class DaoProxy
+class DaoProxy implements DaoProxyInterface
 {
     protected $dao;
 
     protected $serializer;
 
-    public function __construct($dao, $serializer)
+    public function __construct(DaoInterface $dao, SerializerInterface $serializer)
     {
         $this->dao = $dao;
         $this->serializer = $serializer;

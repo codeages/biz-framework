@@ -3,7 +3,7 @@
 namespace Codeages\Biz\Framework\Context;
 
 use Codeages\Biz\Framework\Dao\DaoProxy;
-use Codeages\Biz\Framework\Dao\GeneralFieldSerializer;
+use Codeages\Biz\Framework\Dao\FieldSerializer;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -25,7 +25,7 @@ class Biz extends Container
         $this['autoload.aliases'] = new \ArrayObject(array('' => 'Biz'));
 
         $this['dao.serializer'] = function () {
-            return new GeneralFieldSerializer();
+            return new FieldSerializer();
         };
 
         $this['autoload.object_maker.service'] = function ($biz) {
