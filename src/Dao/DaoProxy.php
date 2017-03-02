@@ -4,14 +4,14 @@ namespace Codeages\Biz\Framework\Dao;
 
 class DaoProxy
 {
-    protected $container;
-
     protected $dao;
 
-    public function __construct($container, $dao)
+    protected $serializer;
+
+    public function __construct($dao, $serializer)
     {
-        $this->container = $container;
         $this->dao = $dao;
+        $this->serializer = $serializer;
     }
 
     public function __call($method, $arguments)
@@ -76,8 +76,7 @@ class DaoProxy
             if (!isset($row[$key])) {
                 continue;
             }
-            $method = "{$method}Unserialize";
-            $row[$key] = $this->$method($row[$key]);
+            $row[$key] = $this->serializer->unserialize($method, $row[$key]);
         }
 
         return $row;
@@ -105,74 +104,10 @@ class DaoProxy
             if (!isset($row[$key])) {
                 continue;
             }
-            $method = "{$method}Serialize";
-            $row[$key] = $this->$method($row[$key]);
+
+            $row[$key] = $this->serializer->serialize($method, $row[$key]);
         }
 
         return $row;
-    }
-
-    /**
-     * @SuppressWarnings(PHPMD.UnusedPrivateMethod)
-     */
-    private function jsonSerialize($value)
-    {
-        if (empty($value)) {
-            return '';
-        }
-
-        return json_encode($value);
-    }
-
-    /**
-     * @SuppressWarnings(PHPMD.UnusedPrivateMethod)
-     */
-    private function jsonUnserialize($value)
-    {
-        if (empty($value)) {
-            return array();
-        }
-
-        return json_decode($value, true);
-    }
-
-    /**
-     * @SuppressWarnings(PHPMD.UnusedPrivateMethod)
-     */
-    private function delimiterSerialize($value)
-    {
-        if (empty($value)) {
-            return '';
-        }
-
-        return '|'.implode('|', $value).'|';
-    }
-
-    /**
-     * @SuppressWarnings(PHPMD.UnusedPrivateMethod)
-     */
-    private function delimiterUnserialize($value)
-    {
-        if (empty($value)) {
-            return array();
-        }
-
-        return explode('|', trim($value, '|'));
-    }
-
-    /**
-     * @SuppressWarnings(PHPMD.UnusedPrivateMethod)
-     */
-    private function phpSerialize($value)
-    {
-        return serialize($value);
-    }
-
-    /**
-     * @SuppressWarnings(PHPMD.UnusedPrivateMethod)
-     */
-    private function phpUnserialize($value)
-    {
-        return unserialize($value);
     }
 }
