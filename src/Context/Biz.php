@@ -66,7 +66,7 @@ class Biz extends Container
         return $this;
     }
 
-    public function boot($options = array())
+    public function boot()
     {
         if (true === $this->booted) {
             return;

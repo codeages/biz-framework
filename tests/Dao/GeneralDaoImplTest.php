@@ -1,9 +1,11 @@
 <?php
+namespace Tests;
 
 use Codeages\Biz\Framework\Context\Biz;
 use Codeages\Biz\Framework\Provider\DoctrineServiceProvider;
+use PHPUnit\Framework\TestCase;
 
-class GeneralDaoImplTest extends \PHPUnit_Framework_TestCase
+class GeneralDaoImplTest extends TestCase
 {
     const NOT_EXIST_ID = 9999;
 
@@ -227,7 +229,7 @@ class GeneralDaoImplTest extends \PHPUnit_Framework_TestCase
     {
         $dao = $this->biz->dao('TestProject:Example:ExampleDao');
 
-        $result = $dao->db()->transactional(function ($connection) {
+        $result = $dao->db()->transactional(function () {
             return 1;
         });
 
