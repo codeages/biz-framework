@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.2.2
+
+  * 新增BizAware Class 和 BizAware Trait
+
 ## v0.2.1
 
   * 修复Bad Smells。
