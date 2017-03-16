@@ -159,7 +159,7 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
                 return false;
             }
 
-            if (is_array($conditions) && empty($conditions)) {
+            if (is_array($value) && empty($value)) {
                 return false;
             }
 
