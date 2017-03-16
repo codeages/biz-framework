@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.2.4
+
+  * 修复`getByFields`方法,返回NULL的情况。
+
 ## v0.2.3
 
   * 修复单元测试 PHPUnit\Framework\TestCase Not Found
