@@ -42,6 +42,7 @@ class GeneralDaoImplTest extends TestCase
               `counter2` int(10) unsigned NOT NULL DEFAULT 0,
               `ids1` varchar(32) NOT NULL DEFAULT '',
               `ids2` varchar(32) NOT NULL DEFAULT '',
+              `null_value` VARCHAR(32) DEFAULT NULL,
               `created_time` int(10) unsigned NOT NULL DEFAULT 0,
               `updated_time` int(10) unsigned NOT NULL DEFAULT 0,
               PRIMARY KEY (`id`)
@@ -235,5 +236,16 @@ class GeneralDaoImplTest extends TestCase
         });
 
         $this->assertEquals(1, $result);
+    }
+
+    public function testNullValueUnserializer()
+    {
+        $dao = $this->biz->dao('TestProject:Example:ExampleDao');
+
+        $row = $dao->create(array('name' => 'test1'));
+
+        $result = $dao->get($row['id']);
+
+        $this->assertInternalType('array', $result['null_value']);
     }
 }
