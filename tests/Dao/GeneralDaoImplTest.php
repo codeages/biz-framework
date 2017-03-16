@@ -1,4 +1,5 @@
 <?php
+
 namespace Tests;
 
 use Codeages\Biz\Framework\Context\Biz;
@@ -188,7 +189,7 @@ class GeneralDaoImplTest extends TestCase
 
         $results = $dao->search(array('ids' => array()), array('created_time' => 'desc'), 0, 100);
 
-        $this->assertCount(0, $results);
+        $this->assertCount(4, $results);
     }
 
     /**
