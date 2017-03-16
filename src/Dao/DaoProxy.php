@@ -82,7 +82,7 @@ class DaoProxy implements DaoProxyInterface
         return $row;
     }
 
-    private function unserializes(array &$rows)
+    private function unserializes(&$rows)
     {
         if (empty($rows)) {
             return $rows;
