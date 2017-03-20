@@ -1,7 +1,12 @@
 <?php
 
+namespace Codeages\Biz\Framework\Tests\Dao;
+
+use Codeages\Biz\Framework\Tests\Example\ExampleKernel;
+use TestProject\Biz\Example\Dao\Impl\ExampleDaoImpl;
 use Codeages\Biz\Framework\Context\Biz;
 use Codeages\Biz\Framework\Provider\DoctrineServiceProvider;
+use Codeages\Biz\Framework\Provider\CacheServiceProvider;
 
 class GeneralDaoImplTest extends \PHPUnit_Framework_TestCase
 {
@@ -23,6 +28,7 @@ class GeneralDaoImplTest extends \PHPUnit_Framework_TestCase
         $biz                                    = new Biz($config);
         $biz['autoload.aliases']['TestProject'] = 'TestProject\Biz';
         $biz->register(new DoctrineServiceProvider());
+        $biz->register(new CacheServiceProvider());
         $biz->boot();
 
         $this->biz = $biz;
@@ -44,12 +50,57 @@ class GeneralDaoImplTest extends \PHPUnit_Framework_TestCase
               PRIMARY KEY (`id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
         ");
+
+        $this->biz['db']->exec('DROP TABLE IF EXISTS `example2`');
+        $this->biz['db']->exec("
+            CREATE TABLE `example2` (
+              `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+              `name` varchar(32) NOT NULL,
+              `counter1` int(10) unsigned NOT NULL DEFAULT 0,
+              `counter2` int(10) unsigned NOT NULL DEFAULT 0,
+              `ids1` varchar(32) NOT NULL DEFAULT '',
+              `ids2` varchar(32) NOT NULL DEFAULT '',
+              `created_time` int(10) unsigned NOT NULL DEFAULT 0,
+              `updated_time` int(10) unsigned NOT NULL DEFAULT 0,
+              PRIMARY KEY (`id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+        ");
+
+        $this->biz['db']->exec('DROP TABLE IF EXISTS `example3`');
+        $this->biz['db']->exec("
+            CREATE TABLE `example3` (
+              `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+              `name` varchar(32) NOT NULL,
+              `counter1` int(10) unsigned NOT NULL DEFAULT 0,
+              `counter2` int(10) unsigned NOT NULL DEFAULT 0,
+              `ids1` varchar(32) NOT NULL DEFAULT '',
+              `ids2` varchar(32) NOT NULL DEFAULT '',
+              `created_time` int(10) unsigned NOT NULL DEFAULT 0,
+              `updated_time` int(10) unsigned NOT NULL DEFAULT 0,
+              PRIMARY KEY (`id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+        ");
     }
 
     public function testGet()
     {
-        $dao = $this->biz->dao('TestProject:Example:ExampleDao');
+        foreach ($this->getTestDao() as $dao) {
+            $this->get($dao);
+        }
+    }
 
+    private function getTestDao()
+    {
+        return array(
+            'TestProject:Example:ExampleDao',
+            'TestProject:Example:Example2Dao',
+            'TestProject:Example:Example3Dao',
+        );
+    }
+
+    private function get($dao)
+    {
+        $dao = $this->biz->dao($dao);
         $row = $dao->create(array(
             'name' => 'test1'
         ));
@@ -63,7 +114,14 @@ class GeneralDaoImplTest extends \PHPUnit_Framework_TestCase
 
     public function testCreate()
     {
-        $dao = $this->biz->dao('TestProject:Example:ExampleDao');
+        foreach ($this->getTestDao() as $dao) {
+            $this->create($dao);
+        }
+    }
+
+    private function create($dao)
+    {
+        $dao = $this->biz->dao($dao);
 
         $fields = array(
             'name' => 'test1',
@@ -86,7 +144,14 @@ class GeneralDaoImplTest extends \PHPUnit_Framework_TestCase
 
     public function testUpdate()
     {
-        $dao = $this->biz->dao('TestProject:Example:ExampleDao');
+        foreach ($this->getTestDao() as $dao) {
+            $this->update($dao);
+        }
+    }
+
+    private function update($dao)
+    {
+        $dao = $this->biz->dao($dao);
 
         $row = $dao->create(array(
             'name' => 'test1'
@@ -111,7 +176,14 @@ class GeneralDaoImplTest extends \PHPUnit_Framework_TestCase
 
     public function testDelete()
     {
-        $dao = $this->biz->dao('TestProject:Example:ExampleDao');
+        foreach ($this->getTestDao() as $dao) {
+            $this->delete($dao);
+        }
+    }
+
+    private function delete($dao)
+    {
+        $dao = $this->biz->dao($dao);
 
         $row = $dao->create(array(
             'name' => 'test1'
@@ -124,7 +196,14 @@ class GeneralDaoImplTest extends \PHPUnit_Framework_TestCase
 
     public function testWave()
     {
-        $dao = $this->biz->dao('TestProject:Example:ExampleDao');
+        foreach ($this->getTestDao() as $dao) {
+            $this->wave($dao);
+        }
+    }
+
+    public function wave($dao)
+    {
+        $dao = $this->biz->dao($dao);
 
         $row = $dao->create(array(
             'name' => 'test1'
@@ -149,7 +228,14 @@ class GeneralDaoImplTest extends \PHPUnit_Framework_TestCase
 
     public function testSearch()
     {
-        $dao = $this->biz->dao('TestProject:Example:ExampleDao');
+        foreach ($this->getTestDao() as $dao) {
+            $this->search($dao);
+        }
+    }
+
+    private function search($dao)
+    {
+        $dao = $this->biz->dao($dao);
 
         $dao->create(array('name' => 'test1'));
         $dao->create(array('name' => 'test2'));
@@ -163,7 +249,14 @@ class GeneralDaoImplTest extends \PHPUnit_Framework_TestCase
 
     public function testCount()
     {
-        $dao = $this->biz->dao('TestProject:Example:ExampleDao');
+        foreach ($this->getTestDao() as $dao) {
+            $this->daoCount($dao);
+        }
+    }
+
+    private function daoCount($dao)
+    {
+        $dao = $this->biz->dao($dao);
 
         $dao->create(array('name' => 'test1'));
         $dao->create(array('name' => 'test2'));
@@ -188,7 +281,14 @@ class GeneralDaoImplTest extends \PHPUnit_Framework_TestCase
 
     public function testTransactional()
     {
-        $dao = $this->biz->dao('TestProject:Example:ExampleDao');
+        foreach ($this->getTestDao() as $dao) {
+            $this->transactional($dao);
+        }
+    }
+
+    public function transactional($dao)
+    {
+        $dao = $this->biz->dao($dao);
 
         $result = $dao->db()->transactional(function ($connection) {
             return 1;
