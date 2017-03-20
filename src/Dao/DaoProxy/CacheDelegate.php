@@ -1,6 +1,6 @@
 <?php
 
-namespace Codeages\Biz\Framework\Dao;
+namespace Codeages\Biz\Framework\Dao\DaoProxy;
 
 class CacheDelegate
 {

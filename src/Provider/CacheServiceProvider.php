@@ -16,7 +16,7 @@ use Doctrine\Common\EventManager;
 use Symfony\Bridge\Doctrine\Logger\DbalLogger;
 use Codeages\Biz\Framework\Redis\RedisCluster;
 use Codeages\Biz\Framework\Dao\DaoProxy\CacheDaoProxy;
-use Codeages\Biz\Framework\Dao\CacheDelegate;
+use Codeages\Biz\Framework\Dao\DaoProxy\CacheDelegate;
 use Codeages\Biz\Framework\Dao\CacheStrategy\TableCacheStrategy;
 use Codeages\Biz\Framework\Dao\CacheStrategy\PromiseCacheStrategy;
 
@@ -31,7 +31,7 @@ class CacheServiceProvider implements ServiceProviderInterface
             'maxLifeTime' => 86400,
             'default' => array(
                 "host"           => "127.0.0.1",
-                "port"           => 6378,
+                "port"           => 6379,
                 "timeout"        => 1,
                 "reserved"       => null,
                 "retry_interval" => 100
