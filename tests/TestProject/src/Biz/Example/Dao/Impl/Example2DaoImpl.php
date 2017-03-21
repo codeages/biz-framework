@@ -9,6 +9,11 @@ class Example2DaoImpl extends GeneralDaoImpl implements ExampleDao
 {
     protected $table = 'example2';
 
+    public function findByNameAndId($name, $id)
+    {
+        return $this->findByFields(array('name' => $name, 'id' => $id));
+    }
+
     public function findByName($name, $start, $limit)
     {
         return $this->search(array('name' => $name), array('created' => 'DESC'), $start, $limit);

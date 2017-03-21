@@ -14,6 +14,11 @@ class Example3DaoImpl extends GeneralDaoImpl implements ExampleDao
         return $this->search(array('name' => $name), array('created' => 'DESC'), $start, $limit);
     }
 
+    public function findByNameAndId($name, $id)
+    {
+        return $this->findByFields(array('name' => $name, 'id' => $id));
+    }
+
     public function declares()
     {
         return array(
