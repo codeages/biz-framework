@@ -163,12 +163,19 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
             $sql .= $orderByStr;
         }
 
-        if (null !== $start && ($limit === null || !is_numeric($start))) {
+        if (null !== $start && !is_numeric($start)) {
             throw $this->createDaoException('SQL Limit must can be cast to integer');
         }
 
-        if (null !== $limit && ($start === null || !is_numeric($limit))) {
+        if (null !== $limit && !is_numeric($limit)) {
             throw $this->createDaoException('SQL Limit must can be cast to integer');
+        }
+
+        $onlySetStart = $start !== null && $limit === null;
+        $onlySetLimit = $limit !== null && $start === null;
+
+        if ($onlySetStart || $onlySetLimit) {
+            throw $this->createDaoException('start and limit need to be assigned');
         }
 
         if (is_numeric($start) && is_numeric($limit)) {
