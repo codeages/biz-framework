@@ -53,18 +53,18 @@ class DaoProxy implements DaoProxyInterface
         $declares = $this->dao->declares();
 
         end($arguments);
-        $key = key($arguments);
+        $lastKey = key($arguments);
         reset($arguments);
 
-        if(!is_array($arguments[$key])){
+        if (!is_array($arguments[$lastKey])) {
             throw new DaoException('update method arguments last element must be array type');
         }
 
         if (isset($declares['timestamps'][1])) {
-            $arguments[$key][$declares['timestamps'][1]] = time();
+            $arguments[$lastKey][$declares['timestamps'][1]] = time();
         }
 
-        $this->serialize($arguments[$key]);
+        $this->serialize($arguments[$lastKey]);
 
         $row = $this->callRealDao($method, $arguments);
         $this->unserialize($row);

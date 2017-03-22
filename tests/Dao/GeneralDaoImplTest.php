@@ -309,7 +309,38 @@ class GeneralDaoImplTest extends TestCase
 
         $this->assertCount(1, $result);
         $row = $dao->create(array('name' => 'test2'));
-        $result = $dao->findByIds(array(1, 2), array('created_time' => 'desc'), '0', '2');
+        $result = $dao->findByIds(array(1, 2), array('created_time' => 'desc'), '0', 1);
+        $this->assertCount(1, $result);
+
+        $result = $dao->findByIds(array(1, 2), array('created_time' => 'desc'), '0', 10);
         $this->assertCount(2, $result);
+    }
+
+    /**
+     * @expectedException \Codeages\Biz\Framework\Dao\DaoException
+     */
+    public function testOnlySetStart()
+    {
+        /**
+         * @var ExampleDao $dao
+         */
+        $dao = $this->biz->dao('TestProject:Example:ExampleDao');
+
+        $row = $dao->create(array('name' => 'test1'));
+        $result = $dao->findByIds(array(1, 2), array('created_time' => 'desc'), '0', null);
+    }
+
+    /**
+     * @expectedException \Codeages\Biz\Framework\Dao\DaoException
+     */
+    public function testOnlySetLimit()
+    {
+        /**
+         * @var ExampleDao $dao
+         */
+        $dao = $this->biz->dao('TestProject:Example:ExampleDao');
+
+        $row = $dao->create(array('name' => 'test1'));
+        $result = $dao->findByIds(array(1, 2), array('created_time' => 'desc'), null, 10);
     }
 }

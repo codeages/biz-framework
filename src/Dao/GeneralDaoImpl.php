@@ -41,13 +41,13 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
 
     public function update($identifier, array $fields)
     {
-        if(empty($identifier)){
+        if (empty($identifier)) {
             return null;
         }
 
-        if(is_numeric($identifier)){
-            return $this->updateOne($identifier, $fields);
-        }else if(is_array($identifier)){
+        if (is_numeric($identifier)) {
+            return $this->updateById($identifier, $fields);
+        } elseif (is_array($identifier)) {
             return $this->updateByConditions($identifier, $fields);
         }
 
@@ -100,10 +100,10 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
         $builder = $this->createQueryBuilder($conditions)
             ->select('COUNT(*)');
 
-        return (int)($builder->execute()->fetchColumn(0));
+        return (int) ($builder->execute()->fetchColumn(0));
     }
 
-    private function updateOne($id, $fields)
+    protected function updateById($id, $fields)
     {
         $timestampField = $this->getTimestampField('updated');
         if ($timestampField) {
@@ -120,7 +120,12 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
         $builder = $this->createQueryBuilder($conditions)
             ->update($this->table, $this->table);
 
-        foreach ($fields as $key => $value){
+        $timestampField = $this->getTimestampField('updated');
+        if ($timestampField) {
+            $fields[$timestampField] = time();
+        }
+
+        foreach ($fields as $key => $value) {
             $builder
                 ->set($key, ':'.$key)
                 ->setParameter($key, $value);
@@ -129,42 +134,44 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
         $builder->execute();
 
         $resultBuilder = $this->createQueryBuilder($conditions)->select('*')->from($this->table(), $this->table());
+
         return $resultBuilder->execute()->fetchAll();
     }
 
     /**
      * @param string $sql
-     * @param array $orderBys
-     * @param int $start
-     * @param int $limit
+     * @param array  $orderBys
+     * @param int    $start
+     * @param int    $limit
+     *
      * @throws DaoException
      *
      * @return string
      */
     protected function sql($sql, array $orderBys = array(), $start = null, $limit = null)
     {
-        if(!empty($orderBys)){
+        if (!empty($orderBys)) {
             $sql .= ' ORDER BY ';
-            $output = $separate = '';
+            $orderByStr = $separate = '';
             $declares = $this->declares();
-            foreach( $orderBys as $order => $sort ) {
+            foreach ($orderBys as $order => $sort) {
                 $this->checkOrderBy($order, $sort, $declares['orderbys']);
-                $output .= sprintf('%s %s %s', $separate, $order, $sort);
+                $orderByStr .= sprintf('%s %s %s', $separate, $order, $sort);
                 $separate = ',';
             }
 
-            $sql .= $output;
+            $sql .= $orderByStr;
         }
 
-        if(isset($start) && (!is_numeric($start))){
+        if (null !== $start && ($limit === null || !is_numeric($start))) {
             throw $this->createDaoException('SQL Limit must can be cast to integer');
         }
 
-        if(isset($limit) && !is_numeric($limit)){
+        if (null !== $limit && ($start === null || !is_numeric($limit))) {
             throw $this->createDaoException('SQL Limit must can be cast to integer');
         }
 
-        if(is_numeric($start) && is_numeric($limit)){
+        if (is_numeric($start) && is_numeric($limit)) {
             $sql .= sprintf(' LIMIT %d, %d', $start, $limit);
         }
 
