@@ -46,7 +46,7 @@ class Biz extends Container
                 $class = "{$namespace}\\Dao\\Impl\\{$name}Impl";
                 $dao = new $class($biz);
                 $declares = $dao->declares();
-                $daoProxy = $this['dao.proxy'];
+                $daoProxy = $biz['dao.proxy'];
                 $daoProxy->setDao($dao);
                 return $daoProxy;
             };
