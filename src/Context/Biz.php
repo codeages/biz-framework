@@ -4,9 +4,11 @@ namespace Codeages\Biz\Framework\Context;
 
 use Codeages\Biz\Framework\Dao\DaoProxy\DaoProxy;
 use Codeages\Biz\Framework\Event\Event;
+use Codeages\Biz\Framework\Dao\FieldSerializer;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class Biz extends Container
 {
@@ -22,6 +24,10 @@ class Biz extends Container
         $this['migration.directories'] = new \ArrayObject();
 
         $this['autoload.aliases'] = new \ArrayObject(array('' => 'Biz'));
+
+        $this['dao.serializer'] = function () {
+            return new FieldSerializer();
+        };
 
         $this['autoload.object_maker.service'] = function ($biz) {
             return function ($namespace, $name) use ($biz) {
@@ -52,13 +58,17 @@ class Biz extends Container
         };
 
         $this['autoloader'] = function ($biz) {
-            return new ContainerAutoloader($biz, $biz['autoload.aliases'], array(
-                'service' => $biz['autoload.object_maker.service'],
-                'dao' => $biz['autoload.object_maker.dao'],
-            ));
+            return new ContainerAutoloader(
+                $biz,
+                $biz['autoload.aliases'],
+                array(
+                    'service' => $biz['autoload.object_maker.service'],
+                    'dao' => $biz['autoload.object_maker.dao'],
+                )
+            );
         };
 
-        $this['dispatcher'] = function ($biz) {
+        $this['dispatcher'] = function () {
             return new EventDispatcher();
         };
 
@@ -79,7 +89,7 @@ class Biz extends Container
         return $this;
     }
 
-    public function boot($options = array())
+    public function boot()
     {
         if (true === $this->booted) {
             return;
