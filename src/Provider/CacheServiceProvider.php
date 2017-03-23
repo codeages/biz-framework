@@ -42,7 +42,7 @@ class CacheServiceProvider implements ServiceProviderInterface
             return new RedisCluster($app);
         });
 
-        $app['cache.dao.proxy'] = $app->factory(function($app) {
+        $app['dao.proxy'] = $app->factory(function($app) {
             return new CacheDaoProxy($app);
         });
 

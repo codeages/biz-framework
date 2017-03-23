@@ -10,7 +10,7 @@ class CacheDaoProxy extends DaoProxy
     {
         $this->dao = $dao;
 
-        if ($this->getCacheStrategy($this->dao)) {
+        if ($this->hasCacheStrategy($this->dao)) {
             if(empty(self::$cacheDelegate)) {
                 self::$cacheDelegate = $this->container['cache.dao.delegate'];
             }
@@ -18,7 +18,7 @@ class CacheDaoProxy extends DaoProxy
         }
     }
 
-    protected function getCacheStrategy()
+    protected function hasCacheStrategy()
     {
         $declares = $this->dao->declares();
         return !empty($declares['cache']);
@@ -26,10 +26,16 @@ class CacheDaoProxy extends DaoProxy
 
     public function __call($method, $arguments)
     {
+
+        $hasCacheStrategy = $this->hasCacheStrategy($this->dao);
+        if(!$hasCacheStrategy) {
+            return parent::__call($method, $arguments);
+        }
+
         $that       = $this;
         $daoProxyMethod = $this->getDaoProxyMethod($method);
 
-        if ($this->getCacheStrategy($this->dao) && $daoProxyMethod) {
+        if ($daoProxyMethod) {
             return self::$cacheDelegate->proccess($this->dao, $method, $arguments, function ($method, $arguments) use ($that, $daoProxyMethod) {
                 return $that->$daoProxyMethod($method, $arguments);
             });
