@@ -118,7 +118,7 @@ class DaoProxy
         $serializes = empty($declares['serializes']) ? array() : $declares['serializes'];
 
         foreach ($serializes as $key => $method) {
-            if (!isset($row[$key])) {
+            if (!array_key_exists($key, $row)) {
                 continue;
             }
             $method    = "_{$method}Unserialize";
@@ -143,7 +143,7 @@ class DaoProxy
         $serializes = empty($declares['serializes']) ? array() : $declares['serializes'];
 
         foreach ($serializes as $key => $method) {
-            if (!isset($row[$key])) {
+            if (!array_key_exists($key, $row)) {
                 continue;
             }
             $method    = "_{$method}Serialize";
@@ -167,7 +167,6 @@ class DaoProxy
         if (empty($value)) {
             return array();
         }
-
         return json_decode($value, true);
     }
 

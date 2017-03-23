@@ -38,8 +38,16 @@ class PromiseCacheStrategy extends CacheStrategy
 
     protected function isDataUpdated($fields, $originData, $data)
     {
+        if(empty($originData) && !empty($data)) {
+            return true;
+        }
+
         foreach ($fields as $key => $field) {
             $field = lcfirst($field);
+            if (!array_key_exists($field, $originData)) {
+                continue;
+            }
+
             if ($originData[$field] != $data[$field]) {
                 return true;
             }

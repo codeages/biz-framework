@@ -60,6 +60,7 @@ class GeneralDaoImplTest extends TestCase
               `counter2` int(10) unsigned NOT NULL DEFAULT 0,
               `ids1` varchar(32) NOT NULL DEFAULT '',
               `ids2` varchar(32) NOT NULL DEFAULT '',
+              `null_value` VARCHAR(32) DEFAULT NULL,
               `created_time` int(10) unsigned NOT NULL DEFAULT 0,
               `updated_time` int(10) unsigned NOT NULL DEFAULT 0,
               PRIMARY KEY (`id`)
@@ -75,6 +76,7 @@ class GeneralDaoImplTest extends TestCase
               `counter2` int(10) unsigned NOT NULL DEFAULT 0,
               `ids1` varchar(32) NOT NULL DEFAULT '',
               `ids2` varchar(32) NOT NULL DEFAULT '',
+              `null_value` VARCHAR(32) DEFAULT NULL,
               `created_time` int(10) unsigned NOT NULL DEFAULT 0,
               `updated_time` int(10) unsigned NOT NULL DEFAULT 0,
               PRIMARY KEY (`id`)
@@ -92,9 +94,9 @@ class GeneralDaoImplTest extends TestCase
     private function getTestDao()
     {
         return array(
-            'TestProject:Example:ExampleDao',
+            // 'TestProject:Example:ExampleDao',
             'TestProject:Example:Example2Dao',
-            'TestProject:Example:Example3Dao',
+            // 'TestProject:Example:Example3Dao',
         );
     }
 
@@ -341,7 +343,6 @@ class GeneralDaoImplTest extends TestCase
         $row = $dao->create(array('name' => 'test1'));
 
         $result = $dao->get($row['id']);
-
         $this->assertInternalType('array', $result['null_value']);
     }
 
