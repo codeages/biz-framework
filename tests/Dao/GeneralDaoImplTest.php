@@ -94,9 +94,9 @@ class GeneralDaoImplTest extends TestCase
     private function getTestDao()
     {
         return array(
-            // 'TestProject:Example:ExampleDao',
+            'TestProject:Example:ExampleDao',
             'TestProject:Example:Example2Dao',
-            // 'TestProject:Example:Example3Dao',
+            'TestProject:Example:Example3Dao',
         );
     }
 
