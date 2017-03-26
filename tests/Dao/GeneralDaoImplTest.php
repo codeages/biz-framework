@@ -27,7 +27,7 @@ class GeneralDaoImplTest extends TestCase
         $biz = new Biz($config);
         $biz['autoload.aliases']['TestProject'] = 'TestProject\Biz';
         $biz->register(new DoctrineServiceProvider());
-        // $biz->register(new CacheServiceProvider());
+        $biz->register(new CacheServiceProvider());
         $biz->boot();
 
         $this->biz = $biz;
