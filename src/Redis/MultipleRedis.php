@@ -10,11 +10,10 @@ class MultipleRedis
     private $redisNodes = array();
     private $servers = array();
 
-    public function __construct($redisConfig)
+    public function __construct($servers)
     {
         $this->createRedisManager();
 
-        $servers = $redisConfig['servers'];
         foreach ($servers as $key => $config) {
             $node = $config['host'].':'.$config['port'];
             $this->hash->addNode($node);
@@ -36,7 +35,7 @@ class MultipleRedis
 
     public function __call($method, $arguments)
     {
-        return call_user_func_array(array($this->lookup($key), $method), $arguments);
+        return call_user_func_array(array($this->lookup($arguments[0]), $method), $arguments);
     }
 
     public function lookup($key)
