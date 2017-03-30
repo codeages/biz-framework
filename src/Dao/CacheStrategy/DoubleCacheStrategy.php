@@ -3,7 +3,7 @@ namespace Codeages\Biz\Framework\Dao\CacheStrategy;
 
 use Codeages\Biz\Framework\Dao\CacheStrategy;
 
-class DoubleCacheStrategy implements CacheStrategy
+class DoubleCacheStrategy extends AbstractCacheStrategy implements CacheStrategy
 {
     private $first;
 

@@ -3,7 +3,7 @@ namespace Codeages\Biz\Framework\Dao\CacheStrategy;
 
 use Codeages\Biz\Framework\Dao\CacheStrategy;
 
-class MemoryCacheStrategy implements CacheStrategy
+class MemoryCacheStrategy extends AbstractCacheStrategy implements CacheStrategy
 {
     protected $cache = array();
 
@@ -29,7 +29,7 @@ class MemoryCacheStrategy implements CacheStrategy
 
     public function afterFind($methd, $arguments, array $rows)
     {
-
+        //@ ????
     }
 
     public function beforeSearch($methd, $arguments)
@@ -57,8 +57,5 @@ class MemoryCacheStrategy implements CacheStrategy
         $this->cache = array();
     }
 
-    protected function key($methd, $arguments)
-    {
 
-    }
 }

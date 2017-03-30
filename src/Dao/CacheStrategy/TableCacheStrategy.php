@@ -3,7 +3,7 @@ namespace Codeages\Biz\Framework\Dao\CacheStrategy;
 
 use Codeages\Biz\Framework\Dao\CacheStrategy;
 
-class TabelCacheStrategy implements CacheStrategy
+class TabelCacheStrategy extends AbstractCacheStrategy implements CacheStrategy
 {
     public function beforeGet($method, $arguments)
     {
