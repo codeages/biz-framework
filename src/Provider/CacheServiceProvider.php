@@ -10,20 +10,15 @@ namespace Codeages\Biz\Framework\Provider;
 
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
-use Codeages\Biz\Framework\Redis\RedisCluster;
 use Codeages\Biz\Framework\Dao\DaoProxy\CacheDaoProxy;
-use Codeages\Biz\Framework\Dao\DaoProxy\CacheDelegate;
 use Codeages\Biz\Framework\Dao\CacheStrategy\TableCacheStrategy;
 use Codeages\Biz\Framework\Dao\CacheStrategy\PromiseCacheStrategy;
 
-/**
- * Cache Provider.
- */
 class CacheServiceProvider implements ServiceProviderInterface
 {
-    public function register(Container $app)
+    public function register(Container $container)
     {
-        $app['cache.options'] = array(
+        $container['cache.options'] = array(
             array(
                 'host' => '127.0.0.1',
                 'port' => 6379,
@@ -33,24 +28,30 @@ class CacheServiceProvider implements ServiceProviderInterface
             )
         );
 
-        $app['cache.cluster'] = $app->factory(function ($app) {
-            return new RedisCluster($app);
-        });
-
-        $app['dao.proxy'] = $app->factory(function ($app) {
-            return new CacheDaoProxy($app);
-        });
-
-        $app['cache.dao.delegate'] = function ($app) {
-            return new CacheDelegate($app);
+        $container['autoload.object_maker.dao'] = function ($container) {
+            return function ($namespace, $name) use ($container) {
+                $class = "{$namespace}\\Dao\\Impl\\{$name}Impl";
+                return new CacheDaoProxy($container, new $class($container), $container['dao.serializer']);
+            };
         };
 
-        $app['cache.dao.strategy.table'] = function ($app) {
-            return new TableCacheStrategy($app);
+        $container['dao.cache.enabled'] = true;
+        $container['dao.cache.double.enabled'] = true;
+
+        $container['dao.cache.double.first'] = function () {
+            return new MemoryCacheStrategy();
         };
 
-        $app['cache.dao.strategy.promise'] = function ($app) {
-            return new PromiseCacheStrategy($app);
+        $container['cache.dao.double'] = $container->factory(function ($container) {
+            return new DoubleCacheStrategy();
+        });
+
+        $container['cache.dao.strategy.table'] = function ($container) {
+            return new TableCacheStrategy($container);
+        };
+
+        $container['cache.dao.strategy.promise'] = function ($container) {
+            return new PromiseCacheStrategy($container);
         };
     }
 }

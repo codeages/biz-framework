@@ -8,6 +8,9 @@ use Codeages\Biz\Framework\Dao\DaoInterface;
 
 class DaoProxy
 {
+    /**
+     * @var DaoInterface
+     */
     protected $dao;
 
     /**
@@ -15,8 +18,9 @@ class DaoProxy
      */
     protected $serializer;
 
-    public function __construct(DaoInterface $dao, SerializerInterface $serializer)
+    public function __construct($container, DaoInterface $dao, SerializerInterface $serializer)
     {
+        $this->container = $container;
         $this->dao = $dao;
         $this->serializer = $serializer;
     }
@@ -159,5 +163,31 @@ class DaoProxy
 
             $row[$key] = $this->serializer->serialize($method, $row[$key]);
         }
+    }
+
+    private function getCacheStrategy()
+    {
+        if (empty($this->container['dao.cache.enabled'])) {
+            return null;
+        }
+
+        $declares = $this->dao->declares();
+        if (empty($declares['cache'])) {
+            return null;
+        }
+
+        $key = 'cache.dao.strategy.'.$declares['cache'];
+        if (!isset($this->container[$key])) {
+            throw new DaoException("Dao cache strategy `{$key}` is not defined.");
+        }
+
+        if (empty($this->container['dao.cache.double.enabled'])) {
+            return $this->container[$key];
+        }
+
+        $double = $this->container['dao.cache.double'];
+        $double->setStrategies($this->container['dao.cache.double.first'], $this->container[$key]);
+
+        return $double;
     }
 }
