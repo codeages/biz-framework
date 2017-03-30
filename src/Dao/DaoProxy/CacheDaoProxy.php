@@ -4,17 +4,19 @@ namespace Codeages\Biz\Framework\Dao\DaoProxy;
 
 class CacheDaoProxy extends DaoProxy
 {
-    protected static $cacheDelegate;
+    protected $cacheDelegate;
+
+    public function __construct($cacheDelegate)
+    {
+        $this->cacheDelegate = $CacheDaoProxy;
+    }
 
     public function setDao($dao)
     {
         $this->dao = $dao;
 
         if ($this->hasCacheStrategy($this->dao)) {
-            if (empty(self::$cacheDelegate)) {
-                self::$cacheDelegate = $this->container['cache.dao.delegate'];
-            }
-            self::$cacheDelegate->parseDao($dao);
+            $this->cacheDelegate->parseDao($dao);
         }
     }
 

@@ -43,12 +43,7 @@ class Biz extends Container
         $this['autoload.object_maker.dao'] = function ($biz) {
             return function ($namespace, $name) use ($biz) {
                 $class = "{$namespace}\\Dao\\Impl\\{$name}Impl";
-                $dao = new $class($biz);
-                $declares = $dao->declares();
-                $daoProxy = $biz['dao.proxy'];
-                $daoProxy->setDao($dao);
-
-                return $daoProxy;
+                return new DaoProxy(new $class($biz), $biz['dao.serializer']);
             };
         };
 
