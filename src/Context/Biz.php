@@ -24,27 +24,12 @@ class Biz extends Container
 
         $this['autoload.aliases'] = new \ArrayObject(array('' => 'Biz'));
 
-        $this['dao.serializer'] = function () {
-            return new FieldSerializer();
+        $this['dispatcher'] = function () {
+            return new EventDispatcher();
         };
 
-        $this['autoload.object_maker.service'] = function ($biz) {
-            return function ($namespace, $name) use ($biz) {
-                $class = "{$namespace}\\Service\\Impl\\{$name}Impl";
-
-                return new $class($biz);
-            };
-        };
-
-        $this['dao.proxy'] = $this->factory(function ($biz) {
-            return new DaoProxy($biz);
-        });
-
-        $this['autoload.object_maker.dao'] = function ($biz) {
-            return function ($namespace, $name) use ($biz) {
-                $class = "{$namespace}\\Dao\\Impl\\{$name}Impl";
-                return new DaoProxy(new $class($biz), $biz['dao.serializer']);
-            };
+        $this['callback_resolver'] = function ($biz) {
+            return new CallbackResolver($biz);
         };
 
         $this['autoloader'] = function ($biz) {
@@ -58,16 +43,26 @@ class Biz extends Container
             );
         };
 
-        $this['dispatcher'] = function () {
-            return new EventDispatcher();
+        $this['autoload.object_maker.service'] = function ($biz) {
+            return function ($namespace, $name) use ($biz) {
+                $class = "{$namespace}\\Service\\Impl\\{$name}Impl";
+                return new $class($biz);
+            };
         };
 
-        $this['callback_resolver'] = function ($biz) {
-            return new CallbackResolver($biz);
+        $this['autoload.object_maker.dao'] = function ($biz) {
+            return function ($namespace, $name) use ($biz) {
+                $class = "{$namespace}\\Dao\\Impl\\{$name}Impl";
+                return new DaoProxy($biz, new $class($biz), $biz['dao.serializer']);
+            };
+        };
+
+        $this['dao.serializer'] = function () {
+            return new FieldSerializer();
         };
 
         foreach ($values as $key => $value) {
-            $this[$key] = $value;
+            $this->offsetSet($key, $value);
         }
     }
 

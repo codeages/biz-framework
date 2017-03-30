@@ -45,9 +45,101 @@ class DaoProxy
         return null;
     }
 
+    protected function get($method, $arguments)
+    {
+        $strategy = $this->getCacheStrategy();
+        if ($strategy) {
+            $cache = $strategy->beforeGet($method, $arguments);
+        }
+
+        if (isset($cache)) {
+            return $cache;
+        }
+
+        $row = $this->callRealDao($method, $arguments);
+        $this->unserialize($row);
+
+        if ($strategy) {
+            $strategy->afterGet($method, $arguments, $row);
+        }
+
+        return $row;
+    }
+
+    protected function find($method, $arguments)
+    {
+        $strategy = $this->getCacheStrategy();
+        if ($strategy) {
+            $cache = $strategy->beforeFind($method, $arguments);
+        }
+
+        if (isset($cache)) {
+            return $cache;
+        }
+
+        $rows = $this->callRealDao($method, $arguments);
+        $this->unserializes($rows);
+
+        if ($strategy) {
+            $strategy->afterFind($method, $arguments, $rows);
+        }
+
+        return $rows;
+    }
+
+    protected function search($method, $arguments)
+    {
+        $strategy = $this->getCacheStrategy();
+        if ($strategy) {
+            $cache = $strategy->beforeSearch($method, $arguments);
+        }
+
+        if (isset($cache)) {
+            return $cache;
+        }
+
+        $rows = $this->callRealDao($method, $arguments);
+        $this->unserializes($rows);
+
+        if ($strategy) {
+            $strategy->afterSearch($method, $arguments, $rows);
+        }
+
+        return $rows;
+    }
+
+    protected function create($method, $arguments)
+    {
+        $declares = $this->dao->declares();
+        if (isset($declares['timestamps'][0])) {
+            $arguments[0][$declares['timestamps'][0]] = time();
+        }
+
+        if (isset($declares['timestamps'][1])) {
+            $arguments[0][$declares['timestamps'][1]] = time();
+        }
+
+        $this->serialize($arguments[0]);
+        $row = $this->callRealDao($method, $arguments);
+        $this->unserialize($row);
+
+        $strategy = $this->getCacheStrategy();
+        if ($strategy) {
+            $this->getCacheStrategy()->afterCreate($method, $arguments, $row);
+        }
+
+        return $row;
+    }
+
     protected function wave($method, $arguments)
     {
         $result = $this->callRealDao($method, $arguments);
+
+        $strategy = $this->getCacheStrategy();
+        if ($strategy) {
+            $this->getCacheStrategy()->afterWave($method, $arguments);
+        }
+
         return $result;
     }
 
@@ -72,23 +164,10 @@ class DaoProxy
         $row = $this->callRealDao($method, $arguments);
         $this->unserialize($row);
 
-        return $row;
-    }
-
-    protected function create($method, $arguments)
-    {
-        $declares = $this->dao->declares();
-        if (isset($declares['timestamps'][0])) {
-            $arguments[0][$declares['timestamps'][0]] = time();
+        $strategy = $this->getCacheStrategy();
+        if ($strategy) {
+            $this->getCacheStrategy()->afterUpdate($method, $arguments, $row);
         }
-
-        if (isset($declares['timestamps'][1])) {
-            $arguments[0][$declares['timestamps'][1]] = time();
-        }
-
-        $this->serialize($arguments[0]);
-        $row = $this->callRealDao($method, $arguments);
-        $this->unserialize($row);
 
         return $row;
     }
@@ -96,29 +175,13 @@ class DaoProxy
     protected function delete($method, $arguments)
     {
         $result = $this->callRealDao($method, $arguments);
+
+        $strategy = $this->getCacheStrategy();
+        if ($strategy) {
+            $this->getCacheStrategy()->afterDelete($method, $arguments);
+        }
+
         return $result;
-    }
-
-    protected function get($method, $arguments)
-    {
-        $row = $this->callRealDao($method, $arguments);
-        $this->unserialize($row);
-        return $row;
-    }
-
-    protected function find($method, $arguments)
-    {
-        $rows = $this->callRealDao($method, $arguments);
-        $this->unserializes($rows);
-        return $rows;
-    }
-
-    protected function search($method, $arguments)
-    {
-        $rows = $this->callRealDao($method, $arguments);
-        $this->unserializes($rows);
-
-        return $rows;
     }
 
     protected function callRealDao($method, $arguments)

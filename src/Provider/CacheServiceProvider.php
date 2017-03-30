@@ -13,26 +13,39 @@ use Pimple\ServiceProviderInterface;
 use Codeages\Biz\Framework\Dao\DaoProxy\CacheDaoProxy;
 use Codeages\Biz\Framework\Dao\CacheStrategy\TableCacheStrategy;
 use Codeages\Biz\Framework\Dao\CacheStrategy\PromiseCacheStrategy;
+use Codeages\Biz\Framework\Context\BizException;
 
 class CacheServiceProvider implements ServiceProviderInterface
 {
-    public function register(Container $container)
+    public function register(Container $container)  
     {
-        $container['cache.options'] = array(
-            array(
-                'host' => '127.0.0.1',
-                'port' => 6379,
-                'timeout' => 1,
-                'reserved' => null,
-                'retry_interval' => 100,
-            )
+        $options = $container['cache.options'] = array(
+            'host' => '127.0.0.1:6379',
+            'timeout' => 1,
+            'reserved' => null,
+            'retry_interval' => 100,
         );
 
-        $container['autoload.object_maker.dao'] = function ($container) {
-            return function ($namespace, $name) use ($container) {
-                $class = "{$namespace}\\Dao\\Impl\\{$name}Impl";
-                return new CacheDaoProxy($container, new $class($container), $container['dao.serializer']);
-            };
+        $container['cache.redis'] = function($container) {
+            $options = $container['cache.options'];
+            if (!is_array($options['host'])) {
+                $options['host'] = array((string)$options['host']);
+            }
+
+            if (empty($options['host'])) {
+                throw new BizException("Biz value `cache.options`['host'] is error.");
+            }
+
+            if (count($options['host']) == 1) {
+                list($host, $port) = explode(':', $options['host']);
+                $redis = new Redis();
+                $redis->pconnect($host, $port, $options['timeout'], $options['reserved'], $options['retry_interval']);
+            } else {
+                $redis = new RedisArray($options['host']);
+            }
+            $redis->setOption(Redis::OPT_SERIALIZER, Redis::SERIALIZER_PHP);
+
+            return $redis;
         };
 
         $container['dao.cache.enabled'] = true;
@@ -42,16 +55,16 @@ class CacheServiceProvider implements ServiceProviderInterface
             return new MemoryCacheStrategy();
         };
 
-        $container['cache.dao.double'] = $container->factory(function ($container) {
+        $container['dao.cache.double'] = $container->factory(function ($container) {
             return new DoubleCacheStrategy();
         });
 
-        $container['cache.dao.strategy.table'] = function ($container) {
-            return new TableCacheStrategy($container);
+        $container['dao.cache.strategy.table'] = function ($container) {
+            return new TableCacheStrategy($container['cache.redis']);
         };
 
-        $container['cache.dao.strategy.promise'] = function ($container) {
-            return new PromiseCacheStrategy($container);
+        $container['dao.cache.strategy.promise'] = function ($container) {
+            return new PromiseCacheStrategy($container['cache.redis']);
         };
     }
 }
