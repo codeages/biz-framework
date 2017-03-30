@@ -9,18 +9,19 @@ class TableCacheStrategy extends CacheStrategy
         $data = call_user_func_array($callback, array($method, $arguments));
         $table = $dao->table();
         $this->incrNamespaceVersion($dao, $table);
+
         return $data;
     }
 
     protected function generateKey($dao, $method, $args)
-    {   
+    {
         $table = $dao->table();
         if ($method == 'get') {
             return "{$table}:{$this->getVersionByNamespace($dao, $table)}:id:{$args[0]}";
         }
 
         $fileds = $this->parseFields($method);
-        $keys   = '';
+        $keys = '';
         foreach ($fileds as $key => $value) {
             if (!empty($keys)) {
                 $keys = "{$keys}:";

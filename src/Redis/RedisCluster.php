@@ -20,6 +20,7 @@ class RedisCluster
         if (empty($config['host']) && empty($config['port'])) {
             return false;
         }
+
         return true;
     }
 

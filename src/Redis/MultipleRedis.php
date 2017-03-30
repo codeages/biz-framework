@@ -25,7 +25,7 @@ class MultipleRedis
     {
         if (empty($this->hash)) {
             $this->hash = new \Canoma\Manager(
-                new \Canoma\HashAdapter\Md5,
+                new \Canoma\HashAdapter\Md5(),
                 30
             );
         }

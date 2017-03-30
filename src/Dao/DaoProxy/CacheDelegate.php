@@ -25,6 +25,7 @@ class CacheDelegate
     private function getCacheStrategy($dao)
     {
         $declares = $dao->declares();
+
         return $this->container["cache.dao.strategy.{$declares['cache']}"];
     }
 
@@ -39,6 +40,7 @@ class CacheDelegate
             return $this->fetchCache($dao, $daoMethod, $arguments, $callback);
         } else {
             $strategy = $this->daoStrategyMap[get_class($dao)];
+
             return $strategy->wave($dao, $daoMethod, $arguments, $callback);
         }
     }

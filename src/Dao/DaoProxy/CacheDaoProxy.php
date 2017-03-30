@@ -21,6 +21,7 @@ class CacheDaoProxy extends DaoProxy
     protected function hasCacheStrategy()
     {
         $declares = $this->dao->declares();
+
         return !empty($declares['cache']);
     }
 

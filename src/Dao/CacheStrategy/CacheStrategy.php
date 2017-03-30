@@ -8,6 +8,7 @@ abstract class CacheStrategy
     protected $maxLifeTime = 86400;
 
     abstract public function wave($dao, $method, $arguments, $callback);
+
     abstract protected function generateKey($dao, $method, $arguments);
 
     public function __construct($container)
@@ -22,7 +23,7 @@ abstract class CacheStrategy
     protected function parseFields($method)
     {
         $prefixs = array('get', 'find');
-        $prefix  = $this->getPrefix($method, $prefixs);
+        $prefix = $this->getPrefix($method, $prefixs);
 
         if (empty($prefix)) {
             return array();
@@ -30,7 +31,7 @@ abstract class CacheStrategy
 
         $method = str_replace($prefix.'By', '', $method);
 
-        $fileds = explode("And", $method);
+        $fileds = explode('And', $method);
         foreach ($fileds as $key => $filed) {
             $fileds[$key] = lcfirst($filed);
         }
@@ -67,6 +68,7 @@ abstract class CacheStrategy
 
         if (!empty($prefix)) {
             $key = $this->generateKey($dao, $method, $arguments);
+
             return $this->_getCacheCluster($dao->table())->get($key);
         }
     }

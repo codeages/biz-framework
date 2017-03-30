@@ -55,6 +55,7 @@ class DaoProxy
     {
         $result = $this->callRealDao($method, $arguments);
         $this->clearMemoryCache();
+
         return $result;
     }
 
@@ -92,6 +93,7 @@ class DaoProxy
         $row = $this->callRealDao($method, $arguments);
         $this->clearMemoryCache();
         $this->unserialize($row);
+
         return $row;
     }
 
@@ -107,9 +109,10 @@ class DaoProxy
         }
 
         $this->serialize($arguments[0]);
-        $row          = $this->callRealDao($method, $arguments);
+        $row = $this->callRealDao($method, $arguments);
         $this->clearMemoryCache();
         $this->unserialize($row);
+
         return $row;
     }
 
@@ -117,6 +120,7 @@ class DaoProxy
     {
         $result = $this->callRealDao($method, $arguments);
         $this->clearMemoryCache();
+
         return $result;
     }
 
@@ -130,6 +134,7 @@ class DaoProxy
         $row = $this->callRealDao($method, $arguments);
         $this->unserialize($row);
         $this->cache[$key] = $row;
+
         return $row;
     }
 
@@ -156,6 +161,7 @@ class DaoProxy
         $rows = $this->callRealDao($method, $arguments);
         $this->unserializes($rows);
         $this->cache[$key] = $rows;
+
         return $rows;
     }
 
@@ -163,6 +169,7 @@ class DaoProxy
     {
         $rows = $this->callRealDao($method, $arguments);
         $this->unserializes($rows);
+
         return $rows;
     }
 
@@ -177,7 +184,7 @@ class DaoProxy
             return;
         }
 
-        $declares   = $this->dao->declares();
+        $declares = $this->dao->declares();
         $serializes = empty($declares['serializes']) ? array() : $declares['serializes'];
 
         foreach ($serializes as $key => $method) {
@@ -198,7 +205,7 @@ class DaoProxy
 
     protected function serialize(&$row)
     {
-        $declares   = $this->dao->declares();
+        $declares = $this->dao->declares();
         $serializes = empty($declares['serializes']) ? array() : $declares['serializes'];
 
         foreach ($serializes as $key => $method) {

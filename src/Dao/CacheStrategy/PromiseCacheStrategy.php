@@ -11,8 +11,8 @@ class PromiseCacheStrategy extends CacheStrategy
         $table = $dao->table();
         $className = get_class($dao);
         if (in_array($daoMethod, array('update', 'delete'))) {
-            $data       = call_user_func_array($callback, array($daoMethod, $arguments));
-            if(empty($this->methodMap[$className])) {
+            $data = call_user_func_array($callback, array($daoMethod, $arguments));
+            if (empty($this->methodMap[$className])) {
                 return;
             }
 
@@ -22,7 +22,7 @@ class PromiseCacheStrategy extends CacheStrategy
                     $args = array();
                     foreach ($fields as $field) {
                         $field = lcfirst($field);
-                        $args[]   = $originData[$field];
+                        $args[] = $originData[$field];
                     }
 
                     $keys = $this->getKeys($method, $args);
@@ -33,12 +33,13 @@ class PromiseCacheStrategy extends CacheStrategy
             $data = call_user_func_array($callback, array($daoMethod, $arguments));
             $this->incrNamespaceVersion($dao, $table);
         }
+
         return $data;
     }
 
     protected function isDataUpdated($fields, $originData, $data)
     {
-        if(empty($originData) && !empty($data)) {
+        if (empty($originData) && !empty($data)) {
             return true;
         }
 
@@ -52,18 +53,19 @@ class PromiseCacheStrategy extends CacheStrategy
                 return true;
             }
         }
+
         return false;
     }
 
     public function parseDao($dao)
     {
         $className = get_class($dao);
-        $class   = new \ReflectionClass($className);
+        $class = new \ReflectionClass($className);
         $methods = $class->getMethods();
         foreach ($methods as $key => $method) {
             if ($method->isPublic()) {
                 $methodName = $method->getName();
-                $whiteList  = array('__construct', 'declares', 'db', 'table');
+                $whiteList = array('__construct', 'declares', 'db', 'table');
                 if (in_array($methodName, $whiteList)) {
                     continue;
                 }
@@ -83,21 +85,20 @@ class PromiseCacheStrategy extends CacheStrategy
                 $this->methodMap[$className] = array();
             }
 
-            if(empty($this->methodMap[$className][$methodName])){
+            if (empty($this->methodMap[$className][$methodName])) {
                 $this->methodMap[$className][$methodName] = $fields;
             }
         }
     }
-    
+
     protected function generateKey($dao, $method, $args)
     {
         $table = $dao->table();
         if ($method == 'get') {
-
             return "{$table}:{$this->getVersionByNamespace($dao, $table)}:id:{$args[0]}";
         }
 
-        $keys    = $this->getKeys($method, $args);
+        $keys = $this->getKeys($method, $args);
         $version = $this->getVersionByNamespace($dao, "{$table}:{$keys}");
 
         return "{$table}:version:{$this->getVersionByNamespace($dao, $table)}:{$keys}:version:{$version}";
@@ -106,7 +107,7 @@ class PromiseCacheStrategy extends CacheStrategy
     protected function getKeys($method, $args)
     {
         $fileds = $this->parseFields($method);
-        $keys   = '';
+        $keys = '';
         foreach ($fileds as $key => $value) {
             if (!empty($keys)) {
                 $keys = "{$keys}:";
