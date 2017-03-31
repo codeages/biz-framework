@@ -3,59 +3,60 @@ namespace Codeages\Biz\Framework\Dao\CacheStrategy;
 
 use Codeages\Biz\Framework\Dao\CacheStrategy;
 
+/**
+ * 内存缓存策略
+ */
 class MemoryCacheStrategy extends AbstractCacheStrategy implements CacheStrategy
 {
     protected $cache = array();
 
-    public function beforeGet($method, $arguments)
+    public function beforeGet($table, $method, $arguments)
     {
         $key = $this->key($method, $arguments);
         if (isset($this->cache[$key])) {
             return $this->cache[$key];
         }
-        return null;
+        return false;
     }
 
-    public function afterGet($method, $arguments, $row)
+    public function afterGet($table, $method, $arguments, $row)
     {
         $key = $this->key($method, $arguments);
         $this->cache[$key] = $row;
     }
 
-    public function beforeFind($methd, $arguments)
+    public function beforeFind($table, $methd, $arguments)
     {
-        return null;
+        return false;
     }
 
-    public function afterFind($methd, $arguments, array $rows)
-    {
-        //@ ????
-    }
-
-    public function beforeSearch($methd, $arguments)
-    {
-        return null;
-    }
-
-    public function afterSearch($methd, $arguments, array $rows)
+    public function afterFind($table, $methd, $arguments, array $rows)
     {
 
     }
 
-    public function afterCreate($methd, $arguments, $row)
+    public function beforeSearch($table, $methd, $arguments)
+    {
+        return false;
+    }
+
+    public function afterSearch($table, $methd, $arguments, array $rows)
     {
 
     }
 
-    public function afterUpdate($methd, $arguments, $row)
+    public function afterCreate($table, $methd, $arguments, $row)
     {
-        $this->cache = array();
+
     }
 
-    public function afterDelete($methd, $arguments)
+    public function afterUpdate($table, $methd, $arguments, $row)
     {
         $this->cache = array();
     }
 
-
+    public function afterDelete($table, $methd, $arguments)
+    {
+        $this->cache = array();
+    }
 }
