@@ -2,68 +2,81 @@
 namespace Codeages\Biz\Framework\Dao\CacheStrategy;
 
 use Codeages\Biz\Framework\Dao\CacheStrategy;
+use Codeages\Biz\Framework\Dao\GeneralDaoInterface;
 
 /**
  * 表级别缓存策略
  */
-class TabelCacheStrategy extends AbstractCacheStrategy implements CacheStrategy
+class TableCacheStrategy extends AbstractCacheStrategy implements CacheStrategy
 {
+    private $redis;
+
     const LIFE_TIME = 3600;
 
-    public function beforeGet($table, $method, $arguments)
+    public function __construct($redis)
     {
-        $key = $this->key($method, $arguments);
+        $this->redis = $redis;
+    }
+
+    public function beforeGet(GeneralDaoInterface $dao, $method, $arguments)
+    {
+        $key = $this->key($dao, $method, $arguments);
         return $this->redis->get($key);
     }
 
-    public function afterGet($table, $method, $arguments, $row)
+    public function afterGet(GeneralDaoInterface $dao, $method, $arguments, $row)
     {
-        $key = $this->key($method, $arguments);
+        $key = $this->key($dao, $method, $arguments);
         return $this->redis->set($key, $row, self::LIFE_TIME);
     }
 
-    public function beforeFind($table, $method, $arguments)
+    public function beforeFind(GeneralDaoInterface $dao, $method, $arguments)
     {
-        $key = $this->key($method, $arguments);
+        $key = $this->key($dao, $method, $arguments);
         return $this->redis->get($key);
     }
 
-    public function afterFind($table, $method, $arguments, array $rows)
+    public function afterFind(GeneralDaoInterface $dao, $method, $arguments, array $rows)
     {
-        $key = $this->key($method, $arguments);
+        $key = $this->key($dao, $method, $arguments);
         return $this->redis->set($key, $rows, self::LIFE_TIME);
     }
 
-    public function beforeSearch($table, $method, $arguments)
+    public function beforeSearch(GeneralDaoInterface $dao, $method, $arguments)
     {
-        $key = $this->key($method, $arguments);
+        $key = $this->key($dao, $method, $arguments);
         return $this->redis->get($key);
     }
 
-    public function afterSearch($table, $method, $arguments, array $rows)
+    public function afterSearch(GeneralDaoInterface $dao, $method, $arguments, array $rows)
     {
-        $key = $this->key($method, $arguments);
+        $key = $this->key($dao, $method, $arguments);
         return $this->redis->set($key, $rows, self::LIFE_TIME);
     }
 
-    public function afterCreate($table, $method, $arguments, $row)
+    public function afterCreate(GeneralDaoInterface $dao, $method, $arguments, $row)
     {
-        $this->upTableVersion($table);
+        $this->upTableVersion($dao);
     }
 
-    public function afterUpdate($table, $method, $arguments, $row)
+    public function afterUpdate(GeneralDaoInterface $dao, $method, $arguments, $row)
     {
-        $this->upTableVersion($table);
+        $this->upTableVersion($dao);
     }
 
-    public function afterDelete($table, $method, $arguments)
+    public function afterWave(GeneralDaoInterface $dao, $methd, $arguments, $affected)
     {
-        $this->upTableVersion($table);
+        $this->upTableVersion($dao);
     }
 
-    private function getTableVersion($table)
+    public function afterDelete(GeneralDaoInterface $dao, $method, $arguments)
     {
-        $key = "dao:{$table}:v";
+        $this->upTableVersion($dao);
+    }
+
+    private function getTableVersion($dao)
+    {
+        $key = sprintf('dao:%s:v', $dao->table());
         $version = $this->redis->get($key);
         if ($version === false) {
             return $this->redis->incr($key);
@@ -72,16 +85,16 @@ class TabelCacheStrategy extends AbstractCacheStrategy implements CacheStrategy
         return $version;
     }
 
-    private function upTableVersion($table)
+    private function upTableVersion($dao)
     {
-        $key = "dao:{$table}:v";
+        $key = sprintf('dao:%s:v', $dao->table());
         return $this->redis->incr($key);
     }
 
-    private function key($table, $method, $arguments)
+    private function key(GeneralDaoInterface $dao, $method, $arguments)
     {
-        $version = $this->getTableVersion();
-        $key = sprintf("dao:%s:v:%s:%s:%s", $table, $version, $method, json_encode($arguments));
+        $version = $this->getTableVersion($dao);
+        $key = sprintf("dao:%s:v:%s:%s:%s", $dao->table(), $version, $method, json_encode($arguments));
 
         return $key;
     }

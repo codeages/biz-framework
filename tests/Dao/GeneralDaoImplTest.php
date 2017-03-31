@@ -23,6 +23,9 @@ class GeneralDaoImplTest extends TestCase
                 'charset' => getenv('DB_CHARSET'),
                 'port' => getenv('DB_PORT'),
             ),
+            'redis.options' => array(
+                'host' => '127.0.0.1:6379',
+            ),
         );
         $biz = new Biz($config);
         $biz['autoload.aliases']['TestProject'] = 'TestProject\Biz';
@@ -93,6 +96,9 @@ class GeneralDaoImplTest extends TestCase
         ");
     }
 
+    /**
+     * @group current
+     */
     public function testGet()
     {
         foreach ($this->getTestDao() as $dao) {
@@ -117,9 +123,9 @@ class GeneralDaoImplTest extends TestCase
     private function getTestDao()
     {
         return array(
-            'TestProject:Example:ExampleDao',
+            // 'TestProject:Example:ExampleDao',
             'TestProject:Example:Example2Dao',
-            'TestProject:Example:Example3Dao',
+            // 'TestProject:Example:Example3Dao',
         );
     }
 

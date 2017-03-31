@@ -2,6 +2,7 @@
 namespace Codeages\Biz\Framework\Dao\CacheStrategy;
 
 use Codeages\Biz\Framework\Dao\CacheStrategy;
+use Codeages\Biz\Framework\Dao\GeneralDaoInterface;
 
 class DoubleCacheStrategy extends AbstractCacheStrategy implements CacheStrategy
 {
@@ -16,69 +17,75 @@ class DoubleCacheStrategy extends AbstractCacheStrategy implements CacheStrategy
 
     }
 
-    public function beforeGet($table, $method, $arguments)
+    public function beforeGet(GeneralDaoInterface $dao, $method, $arguments)
     {
-        $cache = $this->first->beforeGet($table, $method, $arguments);
+        $cache = $this->first->beforeGet($dao, $method, $arguments);
         if ($cache) {
             return $cache;
         }
 
-        return $this->second->beforeGet($table, $method, $arguments);
+        return $this->second->beforeGet($dao, $method, $arguments);
     }
 
-    public function afterGet($table, $method, $arguments, $row)
+    public function afterGet(GeneralDaoInterface $dao, $method, $arguments, $row)
     {
-        $this->first->afterGet($table, $method, $arguments, $row);
-        $this->second->afterGet($table, $method, $arguments, $row);
+        $this->first->afterGet($dao, $method, $arguments, $row);
+        $this->second->afterGet($dao, $method, $arguments, $row);
     }
 
-    public function beforeFind($table, $methd, $arguments)
+    public function beforeFind(GeneralDaoInterface $dao, $method, $arguments)
     {
-        $cache = $this->first->beforeFind($table, $method, $arguments);
+        $cache = $this->first->beforeFind($dao, $method, $arguments);
         if ($cache) {
             return $cache;
         }
 
-        return $this->second->beforeFind($table, $method, $arguments);
+        return $this->second->beforeFind($dao, $method, $arguments);
     }
 
-    public function afterFind($table, $methd, $arguments, array $rows)
+    public function afterFind(GeneralDaoInterface $dao, $method, $arguments, array $rows)
     {
-        $this->first->afterGet($method, $arguments, $rows);
-        $this->second->afterGet($method, $arguments, $rows);
+        $this->first->afterGet($dao, $method, $arguments, $rows);
+        $this->second->afterGet($dao, $method, $arguments, $rows);
     }
 
-    public function beforeSearch($table, $methd, $arguments)
+    public function beforeSearch(GeneralDaoInterface $dao, $method, $arguments)
     {
-        $cache = $this->first->beforeSearch($method, $arguments);
+        $cache = $this->first->beforeSearch($dao, $method, $arguments);
         if ($cache) {
             return $cache;
         }
 
-        return $this->second->beforeSearch($method, $arguments);
+        return $this->second->beforeSearch($dao, $method, $arguments);
     }
 
-    public function afterSearch($table, $methd, $arguments, array $rows)
+    public function afterSearch(GeneralDaoInterface $dao, $method, $arguments, array $rows)
     {
-        $this->first->afterSearch($method, $arguments, $rows);
-        $this->second->afterSearch($method, $arguments, $rows);
+        $this->first->afterSearch($dao, $method, $arguments, $rows);
+        $this->second->afterSearch($dao, $method, $arguments, $rows);
     }
 
-    public function afterCreate($table, $methd, $arguments, $row)
+    public function afterCreate(GeneralDaoInterface $dao, $method, $arguments, $row)
     {
-        $this->first->afterCreate($method, $arguments, $row);
-        $this->second->afterCreate($method, $arguments, $row);
+        $this->first->afterCreate($dao, $method, $arguments, $row);
+        $this->second->afterCreate($dao, $method, $arguments, $row);
     }
 
-    public function afterUpdate($table, $methd, $arguments, $row)
+    public function afterUpdate(GeneralDaoInterface $dao, $method, $arguments, $row)
     {
-        $this->first->afterUpdate($method, $arguments, $row);
-        $this->second->afterUpdate($method, $arguments, $row);
+        $this->first->afterUpdate($dao, $method, $arguments, $row);
+        $this->second->afterUpdate($dao, $method, $arguments, $row);
     }
 
-    public function afterDelete($table, $methd, $arguments)
+    public function afterWave(GeneralDaoInterface $dao, $method, $arguments, $affected)
     {
-        $this->first->afterDelete($method, $arguments);
-        $this->second->afterDelete($method, $arguments);
+        $this->first->afterWave($dao, $method, $arguments, $affected);
+        $this->second->afterWave($dao, $method, $arguments, $affected);
+    }
+
+    public function afterDelete(GeneralDaoInterface $dao, $method, $arguments)
+    {
+        $this->first->afterDelete($dao, $method, $arguments);
+        $this->second->afterDelete($dao, $method, $arguments);
     }
 }

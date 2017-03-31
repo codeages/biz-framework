@@ -63,7 +63,7 @@ class Biz extends Container
         };
 
         $this['dao.cache.first.enabled'] = true;
-        $this['dao.cache.second.enabled'] = false;
+        $this['dao.cache.second.enabled'] = true;
 
         $this['dao.cache.chain'] = $this->factory(function ($biz) {
             return new CacheStrategy\DoubleCacheStrategy();

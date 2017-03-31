@@ -46,7 +46,7 @@ class Example2DaoImpl extends GeneralDaoImpl implements ExampleDao
                 'id iN (:ids)',
                 'ids1 = :ids1',
             ),
-            'cache' => 'promise',
+            'cache' => 'table',
         );
     }
 }

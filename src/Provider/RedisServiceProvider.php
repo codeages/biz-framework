@@ -12,7 +12,6 @@ use Pimple\Container;
 use Pimple\ServiceProviderInterface;
 use Codeages\Biz\Framework\Dao\DaoProxy\CacheDaoProxy;
 use Codeages\Biz\Framework\Dao\CacheStrategy\TableCacheStrategy;
-use Codeages\Biz\Framework\Dao\CacheStrategy\PromiseCacheStrategy;
 use Codeages\Biz\Framework\Context\BizException;
 use Redis;
 use RedisArray;
@@ -39,10 +38,10 @@ class RedisServiceProvider implements ServiceProviderInterface
             }
 
             if (count($options['host']) == 1) {
-                list($host, $port) = explode(':', $options['host']);
+                list($host, $port) = explode(':', current($options['host']));
                 $redis = new Redis();
-                $redis->setOption(Redis::OPT_SERIALIZER, Redis::SERIALIZER_PHP);
                 $redis->pconnect($host, $port, $options['timeout'], $options['reserved'], $options['retry_interval']);
+                $redis->setOption(Redis::OPT_SERIALIZER, Redis::SERIALIZER_PHP);
             } else {
                 $redis = new RedisArray($options['host']);
                 $redis->setOption(Redis::OPT_SERIALIZER, Redis::SERIALIZER_PHP);
