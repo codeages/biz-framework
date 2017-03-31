@@ -17,19 +17,19 @@ use Codeages\Biz\Framework\Context\BizException;
 use Redis;
 use RedisArray;
 
-class CacheServiceProvider implements ServiceProviderInterface
+class RedisServiceProvider implements ServiceProviderInterface
 {
     public function register(Container $container)  
     {
-        $options = $container['cache.options'] = array(
+        $container['redis.default_options'] = array(
             'host' => '127.0.0.1:6379',
             'timeout' => 1,
             'reserved' => null,
             'retry_interval' => 100,
         );
 
-        $container['cache.redis'] = function($container) {
-            $options = $container['cache.options'];
+        $container['redis'] = function($container) {
+            $options = array_replace($container['redis.default_options'], $container['redis.options']);
             if (!is_array($options['host'])) {
                 $options['host'] = array((string)$options['host']);
             }
@@ -51,23 +51,5 @@ class CacheServiceProvider implements ServiceProviderInterface
             return $redis;
         };
 
-        $container['dao.cache.first.enabled'] = true;
-        $container['dao.cache.second.enabled'] = true;
-
-        $container['dao.cache.chain'] = $container->factory(function ($container) {
-            return new DoubleCacheStrategy();
-        });
-
-        $container['dao.cache.first'] = function() {
-            return new MemoryCacheStrategy();
-        };
-
-        $container['dao.cache.second.strategy.table'] = function ($container) {
-            return new TableCacheStrategy($container['cache.redis']);
-        };
-
-        $container['dao.cache.second.strategy.promise'] = function ($container) {
-            return new PromiseCacheStrategy($container['cache.redis']);
-        };
     }
 }

@@ -3,7 +3,7 @@
 namespace Tests;
 
 use Codeages\Biz\Framework\Context\Biz;
-use Codeages\Biz\Framework\Provider\CacheServiceProvider;
+use Codeages\Biz\Framework\Provider\RedisServiceProvider;
 use Codeages\Biz\Framework\Provider\DoctrineServiceProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -27,7 +27,7 @@ class GeneralDaoImplTest extends TestCase
         $biz = new Biz($config);
         $biz['autoload.aliases']['TestProject'] = 'TestProject\Biz';
         $biz->register(new DoctrineServiceProvider());
-        // $biz->register(new CacheServiceProvider());
+        $biz->register(new RedisServiceProvider());
         $biz->boot();
 
         $this->biz = $biz;

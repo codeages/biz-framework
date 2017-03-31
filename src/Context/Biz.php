@@ -8,6 +8,7 @@ use Pimple\Container;
 use Pimple\ServiceProviderInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Codeages\Biz\Framework\Dao\CacheStrategy;
 
 class Biz extends Container
 {
@@ -59,6 +60,21 @@ class Biz extends Container
 
         $this['dao.serializer'] = function () {
             return new FieldSerializer();
+        };
+
+        $this['dao.cache.first.enabled'] = true;
+        $this['dao.cache.second.enabled'] = false;
+
+        $this['dao.cache.chain'] = $this->factory(function ($biz) {
+            return new CacheStrategy\DoubleCacheStrategy();
+        });
+
+        $this['dao.cache.first'] = function() {
+            return new CacheStrategy\MemoryCacheStrategy();
+        };
+
+        $this['dao.cache.second.strategy.table'] = function ($biz) {
+            return new CacheStrategy\TableCacheStrategy($biz['redis']);
         };
 
         foreach ($values as $key => $value) {

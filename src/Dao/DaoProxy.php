@@ -49,10 +49,10 @@ class DaoProxy
     {
         $strategy = $this->getCacheStrategy();
         if ($strategy) {
-            $cache = $strategy->beforeGet($method, $arguments);
+            $cache = $strategy->beforeGet($this->dao, $method, $arguments);
         }
 
-        if (isset($cache)) {
+        if (isset($cache) && $cache !== false) {
             return $cache;
         }
 
@@ -60,7 +60,7 @@ class DaoProxy
         $this->unserialize($row);
 
         if ($strategy) {
-            $strategy->afterGet($method, $arguments, $row);
+            $strategy->afterGet($this->dao, $method, $arguments, $row);
         }
 
         return $row;
@@ -70,10 +70,10 @@ class DaoProxy
     {
         $strategy = $this->getCacheStrategy();
         if ($strategy) {
-            $cache = $strategy->beforeFind($method, $arguments);
+            $cache = $strategy->beforeFind($this->dao, $method, $arguments);
         }
 
-        if (isset($cache)) {
+        if (isset($cache) && $cache !== false) {
             return $cache;
         }
 
@@ -81,7 +81,7 @@ class DaoProxy
         $this->unserializes($rows);
 
         if ($strategy) {
-            $strategy->afterFind($method, $arguments, $rows);
+            $strategy->afterFind($this->dao, $method, $arguments, $rows);
         }
 
         return $rows;
@@ -91,10 +91,10 @@ class DaoProxy
     {
         $strategy = $this->getCacheStrategy();
         if ($strategy) {
-            $cache = $strategy->beforeSearch($method, $arguments);
+            $cache = $strategy->beforeSearch($this->dao, $method, $arguments);
         }
 
-        if (isset($cache)) {
+        if (isset($cache) && $cache !== false) {
             return $cache;
         }
 
@@ -102,7 +102,7 @@ class DaoProxy
         $this->unserializes($rows);
 
         if ($strategy) {
-            $strategy->afterSearch($method, $arguments, $rows);
+            $strategy->afterSearch($this->dao, $method, $arguments, $rows);
         }
 
         return $rows;
@@ -125,7 +125,7 @@ class DaoProxy
 
         $strategy = $this->getCacheStrategy();
         if ($strategy) {
-            $this->getCacheStrategy()->afterCreate($method, $arguments, $row);
+            $this->getCacheStrategy()->afterCreate($this->dao, $method, $arguments, $row);
         }
 
         return $row;
@@ -137,7 +137,7 @@ class DaoProxy
 
         $strategy = $this->getCacheStrategy();
         if ($strategy) {
-            $this->getCacheStrategy()->afterWave($method, $arguments);
+            $this->getCacheStrategy()->afterWave($this->dao, $method, $arguments, $result);
         }
 
         return $result;
@@ -166,7 +166,7 @@ class DaoProxy
 
         $strategy = $this->getCacheStrategy();
         if ($strategy) {
-            $this->getCacheStrategy()->afterUpdate($method, $arguments, $row);
+            $this->getCacheStrategy()->afterUpdate($this->dao, $method, $arguments, $row);
         }
 
         return $row;
@@ -178,7 +178,7 @@ class DaoProxy
 
         $strategy = $this->getCacheStrategy();
         if ($strategy) {
-            $this->getCacheStrategy()->afterDelete($method, $arguments);
+            $this->getCacheStrategy()->afterDelete($this->dao, $method, $arguments);
         }
 
         return $result;
