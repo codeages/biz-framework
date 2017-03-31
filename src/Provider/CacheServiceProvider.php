@@ -14,6 +14,8 @@ use Codeages\Biz\Framework\Dao\DaoProxy\CacheDaoProxy;
 use Codeages\Biz\Framework\Dao\CacheStrategy\TableCacheStrategy;
 use Codeages\Biz\Framework\Dao\CacheStrategy\PromiseCacheStrategy;
 use Codeages\Biz\Framework\Context\BizException;
+use Redis;
+use RedisArray;
 
 class CacheServiceProvider implements ServiceProviderInterface
 {
@@ -39,31 +41,32 @@ class CacheServiceProvider implements ServiceProviderInterface
             if (count($options['host']) == 1) {
                 list($host, $port) = explode(':', $options['host']);
                 $redis = new Redis();
+                $redis->setOption(Redis::OPT_SERIALIZER, Redis::SERIALIZER_PHP);
                 $redis->pconnect($host, $port, $options['timeout'], $options['reserved'], $options['retry_interval']);
             } else {
                 $redis = new RedisArray($options['host']);
+                $redis->setOption(Redis::OPT_SERIALIZER, Redis::SERIALIZER_PHP);
             }
-            $redis->setOption(Redis::OPT_SERIALIZER, Redis::SERIALIZER_PHP);
 
             return $redis;
         };
 
-        $container['dao.cache.enabled'] = true;
-        $container['dao.cache.double.enabled'] = true;
+        $container['dao.cache.first.enabled'] = true;
+        $container['dao.cache.second.enabled'] = true;
 
-        $container['dao.cache.double.first'] = function () {
-            return new MemoryCacheStrategy();
-        };
-
-        $container['dao.cache.double'] = $container->factory(function ($container) {
+        $container['dao.cache.chain'] = $container->factory(function ($container) {
             return new DoubleCacheStrategy();
         });
 
-        $container['dao.cache.strategy.table'] = function ($container) {
+        $container['dao.cache.first'] = function() {
+            return new MemoryCacheStrategy();
+        };
+
+        $container['dao.cache.second.strategy.table'] = function ($container) {
             return new TableCacheStrategy($container['cache.redis']);
         };
 
-        $container['dao.cache.strategy.promise'] = function ($container) {
+        $container['dao.cache.second.strategy.promise'] = function ($container) {
             return new PromiseCacheStrategy($container['cache.redis']);
         };
     }

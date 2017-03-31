@@ -2,7 +2,7 @@
 
 namespace Codeages\Biz\Framework\Context;
 
-use Codeages\Biz\Framework\Dao\DaoProxy\DaoProxy;
+use Codeages\Biz\Framework\Dao\DaoProxy;
 use Codeages\Biz\Framework\Dao\FieldSerializer;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;

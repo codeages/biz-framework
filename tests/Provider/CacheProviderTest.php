@@ -10,11 +10,6 @@ class CacheProviderTest extends TestCase
 {
     public function testRegister()
     {
-        echo serialize(array('a'=>'11', 'b'=>'cc'));
-        echo "\n";
-        echo json_encode(array(111, 222, array('ccc'=>'ccc', 'ddd'=>'ddd')));
-        exit();
-
         $biz = new Biz();
         $provider = new CacheServiceProvider();
         $biz->register($provider, array(

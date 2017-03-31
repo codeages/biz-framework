@@ -1,6 +1,6 @@
 <?php
 
-namespace Codeages\Biz\Framework\Dao\DaoProxy;
+namespace Codeages\Biz\Framework\Dao;
 
 use Codeages\Biz\Framework\Dao\DaoException;
 use Codeages\Biz\Framework\Dao\SerializerInterface;
@@ -230,27 +230,32 @@ class DaoProxy
 
     private function getCacheStrategy()
     {
-        if (empty($this->container['dao.cache.enabled'])) {
-            return null;
+        $firstEnabled = empty($this->container['dao.cache.first.enabled']) ? false : true;
+        $secondEnabled = empty($this->container['dao.cache.second.enabled']) ? false : true;
+
+        if ($secondEnabled) {
+            $declares = $this->dao->declares();
+            if (empty($declares['cache'])) {
+                $secondEnabled = false;
+            } else {
+                $secondStrategy = $this->container['dao.cache.second.strategy.'.$declares['cache']];
+            }
         }
 
-        $declares = $this->dao->declares();
-        if (empty($declares['cache'])) {
-            return null;
+        if ($firstEnabled && $secondEnabled) {
+            $chain = $this->container['dao.cache.chain'];
+            $chain->setStrategies($this->container['dao.cache.first'], $secondStrategy);
+            return $chain;
         }
 
-        $key = 'cache.dao.strategy.'.$declares['cache'];
-        if (!isset($this->container[$key])) {
-            throw new DaoException("Dao cache strategy `{$key}` is not defined.");
+        if ($firstEnabled && !$secondEnabled) {
+            return $this->container['dao.cache.first'];
         }
 
-        if (empty($this->container['dao.cache.double.enabled'])) {
-            return $this->container[$key];
+        if (!$firstEnabled && $secondEnabled) {
+            return $secondStrategy;
         }
 
-        $double = $this->container['dao.cache.double'];
-        $double->setStrategies($this->container['dao.cache.double.first'], $this->container[$key]);
-
-        return $double;
+        return null;
     }
 }
