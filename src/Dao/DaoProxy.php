@@ -2,10 +2,6 @@
 
 namespace Codeages\Biz\Framework\Dao;
 
-use Codeages\Biz\Framework\Dao\DaoException;
-use Codeages\Biz\Framework\Dao\SerializerInterface;
-use Codeages\Biz\Framework\Dao\DaoInterface;
-
 class DaoProxy
 {
     /**
@@ -42,6 +38,7 @@ class DaoProxy
                 return $prefix;
             }
         }
+
         return null;
     }
 
@@ -245,6 +242,7 @@ class DaoProxy
         if ($firstEnabled && $secondEnabled) {
             $chain = $this->container['dao.cache.chain'];
             $chain->setStrategies($this->container['dao.cache.first'], $secondStrategy);
+
             return $chain;
         }
 

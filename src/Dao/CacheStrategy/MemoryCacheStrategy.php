@@ -1,11 +1,12 @@
 <?php
+
 namespace Codeages\Biz\Framework\Dao\CacheStrategy;
 
 use Codeages\Biz\Framework\Dao\CacheStrategy;
 use Codeages\Biz\Framework\Dao\GeneralDaoInterface;
 
 /**
- * 内存缓存策略
+ * 内存缓存策略.
  */
 class MemoryCacheStrategy extends AbstractCacheStrategy implements CacheStrategy
 {
@@ -17,6 +18,7 @@ class MemoryCacheStrategy extends AbstractCacheStrategy implements CacheStrategy
         if (isset($this->cache[$key])) {
             return $this->cache[$key];
         }
+
         return false;
     }
 
@@ -33,7 +35,6 @@ class MemoryCacheStrategy extends AbstractCacheStrategy implements CacheStrategy
 
     public function afterFind(GeneralDaoInterface $dao, $methd, $arguments, array $rows)
     {
-
     }
 
     public function beforeSearch(GeneralDaoInterface $dao, $methd, $arguments)
@@ -43,12 +44,10 @@ class MemoryCacheStrategy extends AbstractCacheStrategy implements CacheStrategy
 
     public function afterSearch(GeneralDaoInterface $dao, $methd, $arguments, array $rows)
     {
-
     }
 
     public function afterCreate(GeneralDaoInterface $dao, $methd, $arguments, $row)
     {
-
     }
 
     public function afterUpdate(GeneralDaoInterface $dao, $methd, $arguments, $row)
@@ -68,7 +67,8 @@ class MemoryCacheStrategy extends AbstractCacheStrategy implements CacheStrategy
 
     private function key(GeneralDaoInterface $dao, $method, $arguments)
     {
-        $key = sprintf("dao:%s:%s:%s", $dao->table(), $method, json_encode($arguments));
+        $key = sprintf('dao:%s:%s:%s', $dao->table(), $method, json_encode($arguments));
+
         return $key;
     }
 }
