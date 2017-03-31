@@ -24,7 +24,7 @@ class GeneralDaoImplTest extends TestCase
                 'port' => getenv('DB_PORT'),
             ),
             'redis.options' => array(
-                'host' => '127.0.0.1:6379',
+                'host' => array('127.0.0.1:6379'),
             ),
         );
         $biz = new Biz($config);
