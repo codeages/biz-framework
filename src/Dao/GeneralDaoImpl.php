@@ -123,7 +123,7 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
      * @param array $conditions conditions of need update rows
      * @param array $fields     updated values
      *
-     * @return integer The number of affected rows.
+     * @return int the number of affected rows
      */
     protected function updateByConditions(array $conditions, array $fields)
     {
@@ -158,13 +158,13 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
     protected function sql($sql, array $orderBys = array(), $start = null, $limit = null)
     {
         if (!empty($orderBys)) {
-            $sql        .= ' ORDER BY ';
+            $sql .= ' ORDER BY ';
             $orderByStr = $separate = '';
-            $declares   = $this->declares();
+            $declares = $this->declares();
             foreach ($orderBys as $order => $sort) {
                 $this->checkOrderBy($order, $sort, $declares['orderbys']);
                 $orderByStr .= sprintf('%s %s %s', $separate, $order, $sort);
-                $separate   = ',';
+                $separate = ',';
             }
 
             $sql .= $orderByStr;
@@ -226,7 +226,7 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
         }
 
         $marks = str_repeat('?,', count($values) - 1).'?';
-        $sql   = "SELECT * FROM {$this->table} WHERE {$field} IN ({$marks});";
+        $sql = "SELECT * FROM {$this->table} WHERE {$field} IN ({$marks});";
 
         return $this->db()->fetchAll($sql, $values);
     }
@@ -265,7 +265,7 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
         $builder = $this->getQueryBuilder($conditions);
         $builder->from($this->table(), $this->table());
 
-        $declares               = $this->declares();
+        $declares = $this->declares();
         $declares['conditions'] = isset($declares['conditions']) ? $declares['conditions'] : array();
 
         foreach ($declares['conditions'] as $condition) {

@@ -12,7 +12,7 @@ class DaoProxyTest extends TestCase
 {
     public function testGetWithHitCache()
     {
-        $expected = array('id' => 1, 'name' => 'test',);
+        $expected = array('id' => 1, 'name' => 'test');
         $proxy = $this->mockDaoProxyWithHitCache($expected, 'get');
         $row = $proxy->get($expected['id']);
 
@@ -22,8 +22,8 @@ class DaoProxyTest extends TestCase
     public function testFindWithHitCache()
     {
         $expected = array(
-            array('id' => 1, 'name' => 'test 1',),
-            array('id' => 2, 'name' => 'test 2',),
+            array('id' => 1, 'name' => 'test 1'),
+            array('id' => 2, 'name' => 'test 2'),
         );
         $proxy = $this->mockDaoProxyWithHitCache($expected, 'find');
         $rows = $proxy->find();
@@ -34,8 +34,8 @@ class DaoProxyTest extends TestCase
     public function testSearchWithHitCache()
     {
         $expected = array(
-            array('id' => 1, 'name' => 'test 1',),
-            array('id' => 2, 'name' => 'test 2',),
+            array('id' => 1, 'name' => 'test 1'),
+            array('id' => 2, 'name' => 'test 2'),
         );
         $proxy = $this->mockDaoProxyWithHitCache($expected, 'search');
         $rows = $proxy->search();
@@ -64,8 +64,8 @@ class DaoProxyTest extends TestCase
     public function testSearchWithMissCache()
     {
         $expected = array(
-            array('id' => 1, 'name' => 'test 1',),
-            array('id' => 2, 'name' => 'test 2',),
+            array('id' => 1, 'name' => 'test 1'),
+            array('id' => 2, 'name' => 'test 2'),
         );
         $proxy = $this->mockDaoProxyWithMissCache($expected, 'search');
         $row = $proxy->search(array(), array(), 0, 100);
@@ -158,13 +158,12 @@ class DaoProxyTest extends TestCase
         $expected = 1;
         $proxy = $this->mockDaoProxyWithNoCache($expected, 'count');
         $count = $proxy->count(array());
-        
+
         $this->assertEquals($expected, $count);
     }
 
     public function mockDaoProxyWithNoCache($expected, $proxyMethod)
     {
-
         $dao = $this->prophesize('Codeages\Biz\Framework\Dao\GeneralDaoInterface');
         $dao->declares()->willReturn(array());
         $dao->$proxyMethod(Argument::cetera())->willReturn($expected);
@@ -177,5 +176,4 @@ class DaoProxyTest extends TestCase
 
         return new DaoProxy($biz, $dao->reveal(), $serializer);
     }
-
 }

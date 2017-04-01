@@ -2,7 +2,6 @@
 
 namespace Codeages\Biz\Framework\Dao;
 
-use Codeages\Biz\Framework\Dao\DaoInterface;
 use Pimple\Container;
 
 class DaoProxy
@@ -41,6 +40,7 @@ class DaoProxy
                 return $prefix;
             }
         }
+
         return null;
     }
 
@@ -178,11 +178,11 @@ class DaoProxy
 
         $row = $this->callRealDao($method, $arguments);
 
-        if(is_array($row)){
+        if (is_array($row)) {
             $this->unserialize($row);
         }
 
-        if(!is_array($row) && !is_numeric($row)){
+        if (!is_array($row) && !is_numeric($row)) {
             throw new DaoException('update method return value must be array type or int type');
         }
 
@@ -267,6 +267,7 @@ class DaoProxy
         if ($firstEnabled && $secondEnabled) {
             $chain = $this->container['dao.cache.chain'];
             $chain->setStrategies($this->container['dao.cache.first'], $secondStrategy);
+
             return $chain;
         }
 
