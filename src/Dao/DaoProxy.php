@@ -5,6 +5,7 @@ namespace Codeages\Biz\Framework\Dao;
 use Codeages\Biz\Framework\Dao\DaoException;
 use Codeages\Biz\Framework\Dao\SerializerInterface;
 use Codeages\Biz\Framework\Dao\DaoInterface;
+use Pimple\Container;
 
 class DaoProxy
 {
