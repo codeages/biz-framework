@@ -2,6 +2,10 @@
 
 namespace Codeages\Biz\Framework\Dao;
 
+use Codeages\Biz\Framework\Dao\DaoException;
+use Codeages\Biz\Framework\Dao\SerializerInterface;
+use Codeages\Biz\Framework\Dao\DaoInterface;
+
 class DaoProxy
 {
     /**
@@ -33,12 +37,11 @@ class DaoProxy
 
     protected function getProxyMethod($method)
     {
-        foreach (array('get', 'find', 'search', 'create', 'update', 'wave', 'delete') as $prefix) {
+        foreach (array('get', 'find', 'search', 'count', 'create', 'update', 'wave', 'delete') as $prefix) {
             if (strpos($method, $prefix) === 0) {
                 return $prefix;
             }
         }
-
         return null;
     }
 
@@ -47,10 +50,9 @@ class DaoProxy
         $strategy = $this->getCacheStrategy();
         if ($strategy) {
             $cache = $strategy->beforeGet($this->dao, $method, $arguments);
-        }
-
-        if (isset($cache) && $cache !== false) {
-            return $cache;
+            if ($cache !== false) {
+                return $cache;
+            }
         }
 
         $row = $this->callRealDao($method, $arguments);
@@ -68,10 +70,9 @@ class DaoProxy
         $strategy = $this->getCacheStrategy();
         if ($strategy) {
             $cache = $strategy->beforeFind($this->dao, $method, $arguments);
-        }
-
-        if (isset($cache) && $cache !== false) {
-            return $cache;
+            if ($cache !== false) {
+                return $cache;
+            }
         }
 
         $rows = $this->callRealDao($method, $arguments);
@@ -89,10 +90,9 @@ class DaoProxy
         $strategy = $this->getCacheStrategy();
         if ($strategy) {
             $cache = $strategy->beforeSearch($this->dao, $method, $arguments);
-        }
-
-        if (isset($cache) && $cache !== false) {
-            return $cache;
+            if ($cache !== false) {
+                return $cache;
+            }
         }
 
         $rows = $this->callRealDao($method, $arguments);
@@ -103,6 +103,25 @@ class DaoProxy
         }
 
         return $rows;
+    }
+
+    protected function count($method, $arguments)
+    {
+        $strategy = $this->getCacheStrategy();
+        if ($strategy) {
+            $cache = $strategy->beforeCount($this->dao, $method, $arguments);
+            if ($cache !== false) {
+                return $cache;
+            }
+        }
+
+        $count = $this->callRealDao($method, $arguments);
+
+        if ($strategy) {
+            $strategy->afterCount($this->dao, $method, $arguments, $count);
+        }
+
+        return $count;
     }
 
     protected function create($method, $arguments)
@@ -232,17 +251,16 @@ class DaoProxy
 
         if ($secondEnabled) {
             $declares = $this->dao->declares();
-            if (empty($declares['cache'])) {
+            if (isset($declares['cache']) && $declares['cache'] === false) {
                 $secondEnabled = false;
             } else {
-                $secondStrategy = $this->container['dao.cache.second.strategy.'.$declares['cache']];
+                $secondStrategy = $this->container['dao.cache.second.strategy.'.(empty($declares['cache']) ? 'default' : $declares['cache'])];
             }
         }
 
         if ($firstEnabled && $secondEnabled) {
             $chain = $this->container['dao.cache.chain'];
             $chain->setStrategies($this->container['dao.cache.first'], $secondStrategy);
-
             return $chain;
         }
 

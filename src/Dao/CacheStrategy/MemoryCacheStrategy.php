@@ -1,12 +1,11 @@
 <?php
-
 namespace Codeages\Biz\Framework\Dao\CacheStrategy;
 
 use Codeages\Biz\Framework\Dao\CacheStrategy;
 use Codeages\Biz\Framework\Dao\GeneralDaoInterface;
 
 /**
- * 内存缓存策略.
+ * 内存缓存策略
  */
 class MemoryCacheStrategy extends AbstractCacheStrategy implements CacheStrategy
 {
@@ -18,7 +17,6 @@ class MemoryCacheStrategy extends AbstractCacheStrategy implements CacheStrategy
         if (isset($this->cache[$key])) {
             return $this->cache[$key];
         }
-
         return false;
     }
 
@@ -28,47 +26,59 @@ class MemoryCacheStrategy extends AbstractCacheStrategy implements CacheStrategy
         $this->cache[$key] = $row;
     }
 
-    public function beforeFind(GeneralDaoInterface $dao, $methd, $arguments)
+    public function beforeFind(GeneralDaoInterface $dao, $method, $arguments)
     {
         return false;
     }
 
-    public function afterFind(GeneralDaoInterface $dao, $methd, $arguments, array $rows)
+    public function afterFind(GeneralDaoInterface $dao, $method, $arguments, array $rows)
     {
+
     }
 
-    public function beforeSearch(GeneralDaoInterface $dao, $methd, $arguments)
+    public function beforeSearch(GeneralDaoInterface $dao, $method, $arguments)
     {
         return false;
     }
 
-    public function afterSearch(GeneralDaoInterface $dao, $methd, $arguments, array $rows)
+    public function afterSearch(GeneralDaoInterface $dao, $method, $arguments, array $rows)
     {
+
     }
 
-    public function afterCreate(GeneralDaoInterface $dao, $methd, $arguments, $row)
+    public function beforeCount(GeneralDaoInterface $dao, $method, $arguments)
     {
+        return false;
     }
 
-    public function afterUpdate(GeneralDaoInterface $dao, $methd, $arguments, $row)
+    public function afterCount(GeneralDaoInterface $dao, $method, $arguments, array $count)
+    {
+
+    }
+
+    public function afterCreate(GeneralDaoInterface $dao, $method, $arguments, $row)
+    {
+
+    }
+
+    public function afterUpdate(GeneralDaoInterface $dao, $method, $arguments, $row)
     {
         $this->cache = array();
     }
 
-    public function afterWave(GeneralDaoInterface $dao, $methd, $arguments, $affected)
+    public function afterWave(GeneralDaoInterface $dao, $method, $arguments, $affected)
     {
         $this->cache = array();
     }
 
-    public function afterDelete(GeneralDaoInterface $dao, $methd, $arguments)
+    public function afterDelete(GeneralDaoInterface $dao, $method, $arguments)
     {
         $this->cache = array();
     }
 
     private function key(GeneralDaoInterface $dao, $method, $arguments)
     {
-        $key = sprintf('dao:%s:%s:%s', $dao->table(), $method, json_encode($arguments));
-
+        $key = sprintf("dao:%s:%s:%s", $dao->table(), $method, json_encode($arguments));
         return $key;
     }
 }

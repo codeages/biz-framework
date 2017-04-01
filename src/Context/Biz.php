@@ -47,7 +47,6 @@ class Biz extends Container
         $this['autoload.object_maker.service'] = function ($biz) {
             return function ($namespace, $name) use ($biz) {
                 $class = "{$namespace}\\Service\\Impl\\{$name}Impl";
-
                 return new $class($biz);
             };
         };
@@ -55,7 +54,6 @@ class Biz extends Container
         $this['autoload.object_maker.dao'] = function ($biz) {
             return function ($namespace, $name) use ($biz) {
                 $class = "{$namespace}\\Dao\\Impl\\{$name}Impl";
-
                 return new DaoProxy($biz, new $class($biz), $biz['dao.serializer']);
             };
         };
@@ -64,19 +62,23 @@ class Biz extends Container
             return new FieldSerializer();
         };
 
-        $this['dao.cache.first.enabled'] = true;
+        $this['dao.cache.first.enabled'] = false;
         $this['dao.cache.second.enabled'] = true;
 
         $this['dao.cache.chain'] = $this->factory(function ($biz) {
             return new CacheStrategy\DoubleCacheStrategy();
         });
 
-        $this['dao.cache.first'] = function () {
+        $this['dao.cache.first'] = function() {
             return new CacheStrategy\MemoryCacheStrategy();
         };
 
+        $this['dao.cache.second.strategy.default'] = function($biz) {
+            return $biz['dao.cache.second.strategy.table'];
+        };
+
         $this['dao.cache.second.strategy.table'] = function ($biz) {
-            return new CacheStrategy\TableCacheStrategy($biz['redis']);
+            return new CacheStrategy\TableCacheStrategy($biz['redis'], $biz['logger']);
         };
 
         foreach ($values as $key => $value) {
