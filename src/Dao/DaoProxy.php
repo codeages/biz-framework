@@ -2,8 +2,6 @@
 
 namespace Codeages\Biz\Framework\Dao;
 
-use Codeages\Biz\Framework\Dao\DaoException;
-use Codeages\Biz\Framework\Dao\SerializerInterface;
 use Codeages\Biz\Framework\Dao\DaoInterface;
 
 class DaoProxy
@@ -178,7 +176,14 @@ class DaoProxy
         $this->serialize($arguments[$lastKey]);
 
         $row = $this->callRealDao($method, $arguments);
-        $this->unserialize($row);
+
+        if(is_array($row)){
+            $this->unserialize($row);
+        }
+
+        if(!is_array($row) && !is_numeric($row)){
+            throw new DaoException('update method return value must be array type or int type');
+        }
 
         $strategy = $this->getCacheStrategy();
         if ($strategy) {
