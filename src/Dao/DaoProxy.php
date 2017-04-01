@@ -3,6 +3,7 @@
 namespace Codeages\Biz\Framework\Dao;
 
 use Codeages\Biz\Framework\Dao\DaoInterface;
+use Pimple\Container;
 
 class DaoProxy
 {
