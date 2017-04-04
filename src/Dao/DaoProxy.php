@@ -46,6 +46,15 @@ class DaoProxy
 
     protected function get($method, $arguments)
     {
+        $lastArgument = end($arguments);
+        reset($arguments);
+
+        if (is_array($lastArgument) && isset($lastArgument['lock']) && $lastArgument['lock'] === true) {
+            $row = $this->callRealDao($method, $arguments);
+            $this->unserialize($row);
+            return $row;
+        }
+
         $strategy = $this->getCacheStrategy();
         if ($strategy) {
             $cache = $strategy->beforeGet($this->dao, $method, $arguments);

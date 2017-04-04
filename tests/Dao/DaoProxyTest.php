@@ -36,16 +36,30 @@ class DaoProxyTest extends TestCase
         $this->assertEquals($expected, $row);
     }
 
-    public function testCountWithNoCache()
+    /**
+     * @group current
+     * @return [type] [description]
+     */
+    public function testGetWithLock()
     {
-        $expected = 1;
-        $proxy = $this->mockDaoProxyWithNoCache($expected, 'count');
-        $count = $proxy->count(array());
+        $expected = array('id' => 1, 'name' => 'test');
 
-        $this->assertEquals($expected, $count);
+        $dao = $this->prophesize('Codeages\Biz\Framework\Dao\GeneralDaoInterface');
+        $dao->declares()->willReturn(array());
+        $dao->get(Argument::cetera())->willReturn($expected);
+
+        $serializer = new FieldSerializer();
+
+        $biz = new Biz();
+        $biz['dao.cache.first.enabled'] = true;
+        $biz['dao.cache.second.enabled'] = true;
+
+        $proxy = new DaoProxy($biz, $dao->reveal(), $serializer);
+
+        $row = $proxy->get($expected['id'], array('lock' => true));
+
+        $this->assertEquals($expected['id'], $row['id']);
     }
-
-
 
     public function testFindWithHitCache()
     {
@@ -109,7 +123,16 @@ class DaoProxyTest extends TestCase
         $this->assertEquals($expected, $count);
     }
 
-    public function mockDaoProxyWithHitCache($expected, $proxyMethod)
+    public function testCountWithNoCache()
+    {
+        $expected = 1;
+        $proxy = $this->mockDaoProxyWithNoCache($expected, 'count');
+        $count = $proxy->count(array());
+
+        $this->assertEquals($expected, $count);
+    }
+
+    private function mockDaoProxyWithHitCache($expected, $proxyMethod)
     {
         $method = 'before'.ucfirst($proxyMethod);
 
@@ -132,7 +155,7 @@ class DaoProxyTest extends TestCase
         return new DaoProxy($biz, $dao->reveal(), $serializer);
     }
 
-    public function mockDaoProxyWithMissCache($expected, $proxyMethod)
+    private function mockDaoProxyWithMissCache($expected, $proxyMethod)
     {
         $beforeMethod = 'before'.ucfirst($proxyMethod);
         $afterMethod = 'after'.ucfirst($proxyMethod);
@@ -164,7 +187,7 @@ class DaoProxyTest extends TestCase
         return new DaoProxy($biz, $dao->reveal(), $serializer);
     }
 
-    public function mockDaoProxyWithNoCache($expected, $proxyMethod)
+    private function mockDaoProxyWithNoCache($expected, $proxyMethod)
     {
         $dao = $this->prophesize('Codeages\Biz\Framework\Dao\GeneralDaoInterface');
         $dao->declares()->willReturn(array());
