@@ -16,11 +16,17 @@ class DaoProxy
      */
     protected $serializer;
 
+    /**
+     * @var CacheStrategy
+     */
+    protected $cacheStrategy;
+
     public function __construct($container, DaoInterface $dao, SerializerInterface $serializer)
     {
         $this->container = $container;
         $this->dao = $dao;
         $this->serializer = $serializer;
+        $this->cacheStrategy = false;
     }
 
     public function __call($method, $arguments)
@@ -55,7 +61,7 @@ class DaoProxy
             return $row;
         }
 
-        $strategy = $this->getCacheStrategy();
+        $strategy = $this->buildCacheStrategy();
         if ($strategy) {
             $cache = $strategy->beforeGet($this->dao, $method, $arguments);
             if ($cache !== false) {
@@ -75,7 +81,7 @@ class DaoProxy
 
     protected function find($method, $arguments)
     {
-        $strategy = $this->getCacheStrategy();
+        $strategy = $this->buildCacheStrategy();
         if ($strategy) {
             $cache = $strategy->beforeFind($this->dao, $method, $arguments);
             if ($cache !== false) {
@@ -95,7 +101,7 @@ class DaoProxy
 
     protected function search($method, $arguments)
     {
-        $strategy = $this->getCacheStrategy();
+        $strategy = $this->buildCacheStrategy();
         if ($strategy) {
             $cache = $strategy->beforeSearch($this->dao, $method, $arguments);
             if ($cache !== false) {
@@ -115,7 +121,7 @@ class DaoProxy
 
     protected function count($method, $arguments)
     {
-        $strategy = $this->getCacheStrategy();
+        $strategy = $this->buildCacheStrategy();
         if ($strategy) {
             $cache = $strategy->beforeCount($this->dao, $method, $arguments);
             if ($cache !== false) {
@@ -147,9 +153,9 @@ class DaoProxy
         $row = $this->callRealDao($method, $arguments);
         $this->unserialize($row);
 
-        $strategy = $this->getCacheStrategy();
+        $strategy = $this->buildCacheStrategy();
         if ($strategy) {
-            $this->getCacheStrategy()->afterCreate($this->dao, $method, $arguments, $row);
+            $this->buildCacheStrategy()->afterCreate($this->dao, $method, $arguments, $row);
         }
 
         return $row;
@@ -159,9 +165,9 @@ class DaoProxy
     {
         $result = $this->callRealDao($method, $arguments);
 
-        $strategy = $this->getCacheStrategy();
+        $strategy = $this->buildCacheStrategy();
         if ($strategy) {
-            $this->getCacheStrategy()->afterWave($this->dao, $method, $arguments, $result);
+            $this->buildCacheStrategy()->afterWave($this->dao, $method, $arguments, $result);
         }
 
         return $result;
@@ -195,9 +201,9 @@ class DaoProxy
             throw new DaoException('update method return value must be array type or int type');
         }
 
-        $strategy = $this->getCacheStrategy();
+        $strategy = $this->buildCacheStrategy();
         if ($strategy) {
-            $this->getCacheStrategy()->afterUpdate($this->dao, $method, $arguments, $row);
+            $this->buildCacheStrategy()->afterUpdate($this->dao, $method, $arguments, $row);
         }
 
         return $row;
@@ -207,9 +213,9 @@ class DaoProxy
     {
         $result = $this->callRealDao($method, $arguments);
 
-        $strategy = $this->getCacheStrategy();
+        $strategy = $this->buildCacheStrategy();
         if ($strategy) {
-            $this->getCacheStrategy()->afterDelete($this->dao, $method, $arguments);
+            $this->buildCacheStrategy()->afterDelete($this->dao, $method, $arguments);
         }
 
         return $result;
@@ -259,8 +265,12 @@ class DaoProxy
         }
     }
 
-    private function getCacheStrategy()
+    private function buildCacheStrategy()
     {
+        if ($this->cacheStrategy !== false) {
+            return $this->cacheStrategy;
+        }
+
         $firstEnabled = empty($this->container['dao.cache.first.enabled']) ? false : true;
         $secondEnabled = empty($this->container['dao.cache.second.enabled']) ? false : true;
 
@@ -277,15 +287,15 @@ class DaoProxy
             $chain = $this->container['dao.cache.chain'];
             $chain->setStrategies($this->container['dao.cache.first'], $secondStrategy);
 
-            return $chain;
+            return $this->cacheStrategy = $chain;
         }
 
         if ($firstEnabled && !$secondEnabled) {
-            return $this->container['dao.cache.first'];
+            return  $this->cacheStrategy = $this->container['dao.cache.first'];
         }
 
         if (!$firstEnabled && $secondEnabled) {
-            return $secondStrategy;
+            return  $this->cacheStrategy = $secondStrategy;
         }
 
         return null;
