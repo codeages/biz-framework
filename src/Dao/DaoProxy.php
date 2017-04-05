@@ -58,6 +58,7 @@ class DaoProxy
         if (is_array($lastArgument) && isset($lastArgument['lock']) && $lastArgument['lock'] === true) {
             $row = $this->callRealDao($method, $arguments);
             $this->unserialize($row);
+
             return $row;
         }
 
@@ -68,7 +69,6 @@ class DaoProxy
                 return $cache;
             }
         }
-
 
         $row = $this->callRealDao($method, $arguments);
         $this->unserialize($row);
