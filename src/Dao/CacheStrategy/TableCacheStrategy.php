@@ -12,14 +12,16 @@ class TableCacheStrategy extends AbstractCacheStrategy implements CacheStrategy
 {
     private $redis;
 
-    private $logger;
+    private $storage;
 
     const LIFE_TIME = 3600;
 
-    public function __construct($redis, $logger)
+    const MAX_WAVE_CACHEABLE_TIMES = 32;
+
+    public function __construct($redis, $storage)
     {
         $this->redis = $redis;
-        $this->logger = $logger;
+        $this->storage = $storage;
     }
 
     public function beforeGet(GeneralDaoInterface $dao, $method, $arguments)
@@ -90,6 +92,39 @@ class TableCacheStrategy extends AbstractCacheStrategy implements CacheStrategy
 
     public function afterWave(GeneralDaoInterface $dao, $method, $arguments, $affected)
     {
+        $declares = $dao->declares();
+        if ($method === 'wave' && !empty($declares['wave_cahceable_fields'])) {
+            $cacheable = true;
+            foreach (array_keys($arguments[1]) as $key) {
+                if (!in_array($key, $declares['wave_cahceable_fields'])) {
+                    $cacheable = false;
+                    break;
+                }
+            }
+            if ($cacheable) {
+                $key = sprintf('dao:%s:%s:%s:wave_times', $dao->table(), $method, json_encode($arguments));
+                $waveTimes = $this->redis->incr($key);
+                if ($waveTimes > self::MAX_WAVE_CACHEABLE_TIMES) {
+                    $this->redis->delete($key);
+                    goto end;
+                } else {
+                    foreach ($arguments[0] as $id) {
+                        $cachKey = $this->key($dao, 'get', array($id));
+                        $row = $this->redis->get($cachKey);
+                        if ($row) {
+                            foreach ($arguments[1] as $key => $value) {
+                                $row[$key] += $value;
+                                $row[$key] = (string) $row[$key];
+                            }
+                            $this->redis->set($cachKey, $row, self::LIFE_TIME);
+                        }
+                    }
+                }
+                return ;
+            }
+        }
+
+        end:
         $this->upTableVersion($dao);
     }
 
@@ -101,10 +136,18 @@ class TableCacheStrategy extends AbstractCacheStrategy implements CacheStrategy
     private function getTableVersion($dao)
     {
         $key = sprintf('dao:%s:v', $dao->table());
+
+        // 跑单元测试时，因为每个test会flushdb，而TableCacheStrategy又是单例，这里还缓存着原来的结果，会有问题，暂时注释，待重构
+        if (isset($this->storage[$key])) {
+            return $this->storage[$key];
+        }
+
         $version = $this->redis->get($key);
         if ($version === false) {
-            return $this->redis->incr($key);
+            $version = $this->redis->incr($key);
         }
+
+        $this->storage[$key] = $version;
 
         return $version;
     }
@@ -112,8 +155,9 @@ class TableCacheStrategy extends AbstractCacheStrategy implements CacheStrategy
     private function upTableVersion($dao)
     {
         $key = sprintf('dao:%s:v', $dao->table());
+        $version = $this->storage[$key] = $this->redis->incr($key);
 
-        return $this->redis->incr($key);
+        return $version;
     }
 
     private function key(GeneralDaoInterface $dao, $method, $arguments)

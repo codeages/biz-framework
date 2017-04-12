@@ -51,12 +51,13 @@ class MemoryCacheStrategy extends AbstractCacheStrategy implements CacheStrategy
         return false;
     }
 
-    public function afterCount(GeneralDaoInterface $dao, $method, $arguments, array $count)
+    public function afterCount(GeneralDaoInterface $dao, $method, $arguments, $count)
     {
     }
 
     public function afterCreate(GeneralDaoInterface $dao, $method, $arguments, $row)
     {
+        $this->cache = array();
     }
 
     public function afterUpdate(GeneralDaoInterface $dao, $method, $arguments, $row)
