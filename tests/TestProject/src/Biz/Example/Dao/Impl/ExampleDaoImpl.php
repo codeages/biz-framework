@@ -54,8 +54,7 @@ class ExampleDaoImpl extends GeneralDaoImpl implements ExampleDao
                 'ids1 = :ids1',
             ),
             'wave_cahceable_fields' => array(
-
-            )
+            ),
         );
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 namespace Codeages\Biz\Framework\Targetlog\Service\Impl;
 
 use Codeages\Biz\Framework\Service\BaseService;

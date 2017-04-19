@@ -1,4 +1,5 @@
 <?php
+
 namespace Codeages\Biz\Framework\Dao\CacheStrategy;
 
 class SharedStorage implements \ArrayAccess

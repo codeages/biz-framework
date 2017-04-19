@@ -1,4 +1,5 @@
 <?php
+
 namespace Tests\Targetlog;
 
 use Codeages\Biz\Framework\UnitTests\BaseTestCase;

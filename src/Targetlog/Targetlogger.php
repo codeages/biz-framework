@@ -1,4 +1,5 @@
 <?php
+
 namespace Codeages\Biz\Framework\Targetlog;
 
 use Psr\Log\LoggerInterface;

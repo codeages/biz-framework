@@ -120,7 +120,8 @@ class TableCacheStrategy extends AbstractCacheStrategy implements CacheStrategy
                         }
                     }
                 }
-                return ;
+
+                return;
             }
         }
 
