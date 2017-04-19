@@ -12,7 +12,7 @@ class TargetlogDaoImpl extends GeneralDaoImpl implements TargetlogDao
     public function declares()
     {
         return array(
-            'timestamps' => array('created'),
+            'timestamps' => array('created_at'),
             'serializes' => array('context' => 'json'),
             'conditions' => array(
                 'level = :level',
