@@ -1,6 +1,6 @@
-# EduSoho Service Layer Framework
+# Biz Framework
 
-简单、易用、优雅。
+A PHP Service Layer Framework.
 
 [![Build Status](https://travis-ci.org/codeages/biz-framework.svg?branch=master)](https://travis-ci.org/codeages/biz-framework)
 [![Latest Stable Version](https://img.shields.io/packagist/v/codeages/biz-framework.svg)](https://packagist.org/packages/codeages/biz-framework)
