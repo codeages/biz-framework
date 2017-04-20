@@ -14,6 +14,7 @@ class TargetlogDaoImpl extends GeneralDaoImpl implements TargetlogDao
         return array(
             'timestamps' => array('created_at'),
             'serializes' => array('context' => 'json'),
+            'orderbys' => array('created_at'),
             'conditions' => array(
                 'level = :level',
                 'target_type = :target_type',
