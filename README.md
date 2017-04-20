@@ -26,3 +26,7 @@ A PHP Service Layer Framework.
   * ScheduleJob
   * Queue
   * TODO.
+
+## Thanks
+
+感谢[Jetbrains](https://www.jetbrains.com/)授予了All Products Pack的4个开源项目授权码。
