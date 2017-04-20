@@ -23,7 +23,7 @@ class Targetlog extends Migration
               `context` longtext COLLATE utf8_unicode_ci NOT NULL COMMENT '日志上下文',
               `user_id` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '操作人ID',
               `ip` varchar(32) COLLATE utf8_unicode_ci NOT NULL DEFAULT '' COMMENT '操作人IP',
-              `created_at` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '创建时间',
+              `created_time` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '创建时间',
               PRIMARY KEY (`id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
         ");
