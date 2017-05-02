@@ -53,7 +53,6 @@ class JobPool
         $lockName = "job_pool.{$options['group']}";
         $this->biz['lock']->get($lockName, 10);
 
-
         $jobPool = $this->getPoolDetail($options['group']);
         if (empty($jobPool)) {
             $jobPool = ArrayToolkit::parts($options, array('maxNum', 'num', 'timeout'));
