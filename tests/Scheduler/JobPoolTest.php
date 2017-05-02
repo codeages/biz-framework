@@ -8,6 +8,7 @@ use Codeages\Biz\Framework\Provider\RedisServiceProvider;
 use Codeages\Biz\Framework\Provider\SchedulerServiceProvider;
 use Codeages\Biz\Framework\Scheduler\Job\AbstractJob;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Runner\Exception;
 
 class JobPoolTest extends TestCase
 {
@@ -77,5 +78,6 @@ class ExampleJob extends AbstractJob
     {
         $i = 0;
         $i++;
+        throw new \Exception('xxx');
     }
 }

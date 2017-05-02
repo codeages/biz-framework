@@ -28,7 +28,12 @@ class JobPool
 
         $this->wavePoolNum($jobPool['id'], 1);
 
-        $this->runJob($job);
+        try {
+            $this->runJob($job);
+        } catch (\Exception $e) {
+            $this->wavePoolNum($jobPool['id'], -1);
+            throw new \RuntimeException($e->getMessage());
+        }
 
         $this->wavePoolNum($jobPool['id'], -1);
     }
