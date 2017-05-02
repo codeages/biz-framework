@@ -24,6 +24,7 @@ $config = array(
 $biz = new Biz($config);
 $biz->register(new DoctrineServiceProvider());
 $biz->register(new TargetlogServiceProvider());
+$biz->register(new \Codeages\Biz\Framework\Provider\SchedulerServiceProvider());
 $biz->boot();
 
 $bootstrap = new UnitTestsBootstrap($biz);
