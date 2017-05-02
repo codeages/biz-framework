@@ -20,22 +20,17 @@ class JobPool
     public function execute(Job $job)
     {
         $this->options['group'] = $job['group'];
-        $jobPool = $this->initPool($this->options);
 
-        if ($jobPool['num'] == $jobPool['maxNum']) {
-            throw new AccessDeniedException('job pool is full.');
-        }
-
-        $this->wavePoolNum($jobPool['id'], 1);
+        $jobPool = $this->prepare($this->options);
 
         try {
-            $this->runJob($job);
+            $job->execute();
         } catch (\Exception $e) {
-            $this->wavePoolNum($jobPool['id'], -1);
+            $this->release($jobPool['id']);
             throw new \RuntimeException($e->getMessage());
         }
 
-        $this->wavePoolNum($jobPool['id'], -1);
+        $this->release($jobPool);
     }
 
     public function getPoolDetail($name = 'default')
@@ -43,20 +38,39 @@ class JobPool
         return $this->getJobPoolDao()->getByName($name);
     }
 
-    protected function runJob(Job $job)
+    protected function release($jobPool)
     {
-        $job->execute();
+        $lockName = "job_pool.{$jobPool['name']}";
+        $this->biz['lock']->get($lockName, 10);
+
+        $this->wavePoolNum($jobPool['id'], -1);
+
+        $this->biz['lock']->release($lockName);
     }
 
-    protected function initPool($options)
+    protected function prepare($options)
     {
-        $jobPool = $this->getJobPoolDao()->getByName($options['group']);
+        $lockName = "job_pool.{$options['group']}";
+        $this->biz['lock']->get($lockName, 10);
+
+
+        $jobPool = $this->getPoolDetail($options['group']);
         if (empty($jobPool)) {
             $jobPool = ArrayToolkit::parts($options, array('maxNum', 'num', 'timeout'));
             $jobPool['name'] = $options['group'];
 
             $jobPool = $this->getJobPoolDao()->create($jobPool);
         }
+
+        if ($jobPool['num'] == $jobPool['maxNum']) {
+
+            $this->biz['lock']->release($lockName);
+            throw new AccessDeniedException('job pool is full.');
+        }
+
+        $this->wavePoolNum($jobPool['id'], 1);
+
+        $this->biz['lock']->release($lockName);
         return $jobPool;
     }
 
