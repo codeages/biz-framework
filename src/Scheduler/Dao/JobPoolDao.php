@@ -2,7 +2,7 @@
 
 namespace Codeages\Biz\Framework\Scheduler\Dao;
 
-class JobPoolDao
+interface JobPoolDao
 {
-
+    public function getByName($name = 'default');
 }

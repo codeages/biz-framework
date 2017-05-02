@@ -2,6 +2,9 @@
 
 namespace Tests;
 
+use Codeages\Biz\Framework\Context\Biz;
+use Codeages\Biz\Framework\Provider\DoctrineServiceProvider;
+use Codeages\Biz\Framework\Provider\RedisServiceProvider;
 use Codeages\Biz\Framework\Provider\SchedulerServiceProvider;
 use Codeages\Biz\Framework\Scheduler\Job\AbstractJob;
 use PHPUnit\Framework\TestCase;
@@ -38,14 +41,14 @@ class JobPoolTest extends TestCase
 
     public function setUp()
     {
-        $this->biz['db']->exec('DROP TABLE IF EXISTS `example`');
+        $this->biz['db']->exec('DROP TABLE IF EXISTS `job_pool`');
         $this->biz['db']->exec("
-            CREATE TABLE `job_pool` (
+            CREATE TABLE IF NOT EXISTS `job_pool` (
               `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'id',
-              `group` varchar(1024) NOT NULL DEFAULT 'default' COMMENT '组名',
+              `name` varchar(1024) NOT NULL DEFAULT 'default' COMMENT '组名',
               `maxNum` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '最大数',
               `num` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '已使用的数量',
-              `timeOut` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '执行超时时间',
+              `timeout` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '执行超时时间',
               `updatedTime` int(10) unsigned NOT NULL COMMENT '更新时间',
               `createdTime` int(10) unsigned NOT NULL COMMENT '创建时间',
               PRIMARY KEY (`id`)
@@ -55,7 +58,16 @@ class JobPoolTest extends TestCase
 
     public function testRun()
     {
+        $job = new ExampleJob(array(
+            'group'=>'default'
+        ));
 
+        $this->biz['scheduler.job.pool']->execute($job);
+
+        $poolDetail = $this->biz['scheduler.job.pool']->getPoolDetail();
+        $this->assertEquals(0, $poolDetail['num']);
+        $this->assertEquals(10, $poolDetail['maxNum']);
+        $this->assertEquals(120, $poolDetail['timeout']);
     }
 }
 
@@ -63,6 +75,7 @@ class ExampleJob extends AbstractJob
 {
     public function execute()
     {
-        print_r('test job.');
+        $i = 0;
+        $i++;
     }
 }

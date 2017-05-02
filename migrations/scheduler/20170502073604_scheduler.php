@@ -12,12 +12,12 @@ class Scheduler extends Migration
         $biz = $this->getContainer();
         $connection = $biz['db'];
         $connection->exec("
-            CREATE TABLE `job_pool` (
+            CREATE TABLE IF NOT EXISTS `job_pool` (
               `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'id',
-              `group` varchar(1024) NOT NULL DEFAULT 'default' COMMENT '组名',
+              `name` varchar(1024) NOT NULL DEFAULT 'default' COMMENT '组名',
               `maxNum` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '最大数',
               `num` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '已使用的数量',
-              `timeOut` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '执行超时时间',
+              `timeout` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '执行超时时间',
               `updatedTime` int(10) unsigned NOT NULL COMMENT '更新时间',
               `createdTime` int(10) unsigned NOT NULL COMMENT '创建时间',
               PRIMARY KEY (`id`)

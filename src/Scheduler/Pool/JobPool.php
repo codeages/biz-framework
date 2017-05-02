@@ -8,18 +8,19 @@ use Codeages\Biz\Framework\Util\ArrayToolkit;
 
 class JobPool
 {
-    private $data = array();
+    private $options = array();
     private $biz;
 
-    public function __construct($options)
+    public function __construct($biz)
     {
-        $this->data = $options;
+        $this->biz = $biz;
+        $this->options = $biz['scheduler.job.pool.options'];
     }
 
     public function execute(Job $job)
     {
-        $this->data['group'] = $job['group'];
-        $jobPool = $this->initPool($this->data);
+        $this->options['group'] = $job['group'];
+        $jobPool = $this->initPool($this->options);
 
         if ($jobPool['num'] == $jobPool['maxNum']) {
             throw new AccessDeniedException('job pool is full.');
@@ -32,6 +33,11 @@ class JobPool
         $this->wavePoolNum($jobPool['id'], -1);
     }
 
+    public function getPoolDetail($name = 'default')
+    {
+        return $this->getJobPoolDao()->getByName($name);
+    }
+
     protected function runJob(Job $job)
     {
         $job->execute();
@@ -39,9 +45,11 @@ class JobPool
 
     protected function initPool($options)
     {
-        $jobPool = $this->getJobPoolDao()->getJobPoolByGroup($job['group']);
+        $jobPool = $this->getJobPoolDao()->getByName($options['group']);
         if (empty($jobPool)) {
-            $jobPool = ArrayToolkit::parts($options, array('group', 'maxNum', 'num', 'timeOut'));
+            $jobPool = ArrayToolkit::parts($options, array('maxNum', 'num', 'timeout'));
+            $jobPool['name'] = $options['group'];
+
             $jobPool = $this->getJobPoolDao()->create($jobPool);
         }
         return $jobPool;
@@ -54,14 +62,9 @@ class JobPool
         $this->getJobPoolDao()->wave($ids, $diff);
     }
 
-    protected function getBiz()
-    {
-        return $this->biz;
-    }
-
     protected function getJobPoolDao()
     {
-        $this->getBiz()->dao('Scheduler:JobPoolDao');
+        return $this->biz->dao('Scheduler:JobPoolDao');
     }
 
     public function __get($name)
