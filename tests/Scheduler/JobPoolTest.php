@@ -78,6 +78,5 @@ class ExampleJob extends AbstractJob
     {
         $i = 0;
         $i++;
-        throw new \Exception('xxx');
     }
 }
