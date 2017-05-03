@@ -19,12 +19,12 @@ class JobPool
 
     public function execute(Job $job)
     {
-        $this->options['group'] = $job['group'];
-
-        $jobPool = $this->prepare($this->options);
+        $jobPool = $this->prepare($job);
 
         try {
-            $job->execute();
+            if (!empty($jobPool)) {
+                $job->execute();
+            }
         } catch (\Exception $e) {
             $this->release($jobPool['id']);
             throw new \RuntimeException($e->getMessage());
@@ -33,7 +33,7 @@ class JobPool
         $this->release($jobPool);
     }
 
-    public function getPoolDetail($name = 'default')
+    public function getJobPool($name = 'default')
     {
         return $this->getJobPoolDao()->getByName($name);
     }
@@ -48,12 +48,18 @@ class JobPool
         $this->biz['lock']->release($lockName);
     }
 
-    protected function prepare($options)
+    protected function prepare($job)
     {
+        $options = array_merge($this->options, array('group' => $job['group']));
+
+        if (!empty($this->biz["scheduler.job.pool.{$job['group']}.options"])) {
+            $options = array_merge($options, $this->biz["scheduler.job.pool.{$job['group']}.options"]);
+        }
+
         $lockName = "job_pool.{$options['group']}";
         $this->biz['lock']->get($lockName, 10);
 
-        $jobPool = $this->getPoolDetail($options['group']);
+        $jobPool = $this->getJobPool($options['group']);
         if (empty($jobPool)) {
             $jobPool = ArrayToolkit::parts($options, array('maxNum', 'num', 'timeout'));
             $jobPool['name'] = $options['group'];

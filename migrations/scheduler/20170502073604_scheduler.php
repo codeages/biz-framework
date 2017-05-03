@@ -23,6 +23,36 @@ class Scheduler extends Migration
               PRIMARY KEY (`id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
         ");
+
+        $connection->exec("
+            CREATE TABLE IF NOT EXISTS `job_detail` (
+              `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '编号',
+              `name` varchar(1024) NOT NULL COMMENT '任务名称',
+              `group` varchar(1024) NOT NULL DEFAULT 'default' COMMENT '所属组',
+              `source` varchar(1024) NOT NULL COMMENT '来源',
+              `expression` varchar(1024) NOT NULL COMMENT '任务触发的表达式',
+              `class` varchar(1024) NOT NULL COMMENT '任务的Class名称',
+              `data` text COMMENT '任务参数',
+              `priority` int(10) unsigned NOT NULL DEFAULT 50 COMMENT '优先级',
+              `status` varchar(1024) NOT NULL DEFAULT 'waiting' COMMENT '任务执行状态, waiting, acquired, , executing, finished',
+              `preFireTime` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '任务下次执行的时间',
+              `nextFireTime` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '任务下次执行的时间',
+              `enabled` tinyint(1) DEFAULT 1 COMMENT '是否启用',
+              `creatorId` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '任务创建人',
+              `createdTime` int(10) unsigned NOT NULL COMMENT '任务创建时间',
+              PRIMARY KEY (`id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+        ");
+
+        $connection->exec("
+            CREATE TABLE IF NOT EXISTS `fired_job` (
+              `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '编号',
+              `jobDetailId` varchar(1024) NOT NULL COMMENT '任务名称',
+              `scheduler` varchar(1024) NOT NULL COMMENT '调度器',
+              `createdTime` int(10) unsigned NOT NULL COMMENT '任务创建时间',
+              PRIMARY KEY (`id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+        ");
     }
 
     /**
