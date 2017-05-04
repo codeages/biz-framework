@@ -50,19 +50,19 @@ class JobPool
 
     protected function prepare($job)
     {
-        $options = array_merge($this->options, array('group' => $job['group']));
+        $options = array_merge($this->options, array('pool' => $job['pool']));
 
-        if (!empty($this->biz["scheduler.job.pool.{$job['group']}.options"])) {
-            $options = array_merge($options, $this->biz["scheduler.job.pool.{$job['group']}.options"]);
+        if (!empty($this->biz["scheduler.job.pool.{$job['pool']}.options"])) {
+            $options = array_merge($options, $this->biz["scheduler.job.pool.{$job['pool']}.options"]);
         }
 
-        $lockName = "job_pool.{$options['group']}";
+        $lockName = "job_pool.{$options['pool']}";
         $this->biz['lock']->get($lockName, 10);
 
-        $jobPool = $this->getJobPool($options['group']);
+        $jobPool = $this->getJobPool($options['pool']);
         if (empty($jobPool)) {
             $jobPool = ArrayToolkit::parts($options, array('maxNum', 'num', 'timeout'));
-            $jobPool['name'] = $options['group'];
+            $jobPool['name'] = $options['pool'];
 
             $jobPool = $this->getJobPoolDao()->create($jobPool);
         }

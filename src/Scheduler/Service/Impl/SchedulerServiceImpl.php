@@ -5,13 +5,16 @@ namespace Codeages\Biz\Framework\Scheduler\Service\Impl;
 use Codeages\Biz\Framework\Scheduler\Service\SchedulerService;
 use Codeages\Biz\Framework\Service\BaseService;
 use Codeages\Biz\Framework\Service\Exception\ServiceException;
+use Codeages\Biz\Framework\Util\ArrayToolkit;
 use Codeages\Biz\Framework\Util\Lock;
 
 class SchedulerServiceImpl extends BaseService implements SchedulerService
 {
-    public function schedule($jobDetail)
+    public function create($jobDetail)
     {
-        // TODO: Implement schedule() method.
+        $jobDetail = $this->getJobDao()->create($jobDetail);
+        $this->createJobLog($jobDetail, 'created');
+        return $jobDetail;
     }
 
     public function run()
@@ -24,7 +27,8 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         }
 
         $jobInstance = $this->createJobInstance($fireJob);
-        $this->getJobPool()->execute($jobInstance);
+        $result = $this->getJobPool()->execute($jobInstance);
+        $this->createJobLog($fireJob['jobDetail'], $result);
     }
 
     protected function triggerJob()
@@ -59,6 +63,7 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         $result =  $this->getCheckerChain()->check($createdFireJob);
 
         $fireJob = $this->getFireJobDao()->update($createdFireJob['id'], array('status' => $result));
+        $this->createJobLog($jobDetail, $result);
 
         $fireJob['jobDetail'] = $jobDetail;
         $this->triggerNextExecuteJob($fireJob);
@@ -109,13 +114,23 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         );
         $this->getFireJobDao()->create($fireJob);
 
-        $this->createJobLog($jobDetail);
+        $this->createJobLog($jobDetail, 'acquired');
     }
 
-    protected function createJobLog($jobDetail)
+    protected function createJobLog($jobDetail, $status)
     {
-        // TODO:
-        $log = array();
+        $log = ArrayToolkit::parts($jobDetail, array(
+            'name',
+            'group',
+            'source',
+            'class',
+            'data',
+            'priority',
+            'status',
+        ));
+
+        $log['status'] = $status;
+
         $this->biz->service('Scheduler:JobLogService')->create($log);
     }
 

@@ -4,7 +4,7 @@ namespace Codeages\Biz\Framework\Scheduler\Service;
 
 interface SchedulerService
 {
-    public function schedule($jobDetail);
+    public function create($jobDetail);
 
     public function run();
 }

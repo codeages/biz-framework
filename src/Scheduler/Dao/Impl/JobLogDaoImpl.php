@@ -11,6 +11,8 @@ class JobLogDaoImpl extends GeneralDaoImpl implements JobLogDao
 
     public function declares()
     {
-        return array();
+        return array(
+            'timestamps' => array('createdTime')
+        );
     }
 }

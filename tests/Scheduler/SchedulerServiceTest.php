@@ -3,13 +3,11 @@
 namespace Tests;
 
 use Codeages\Biz\Framework\Context\Biz;
-use Codeages\Biz\Framework\Provider\DoctrineServiceProvider;
 use Codeages\Biz\Framework\Provider\RedisServiceProvider;
 use Codeages\Biz\Framework\Provider\SchedulerServiceProvider;
 use PHPUnit\Framework\TestCase;
-use TestProject\Biz\Example\Job\ExampleJob;
 
-class JobPoolTest extends TestCase
+class SchedulerServiceTest extends TestCase
 {
     const NOT_EXIST_ID = 9999;
 
@@ -31,7 +29,7 @@ class JobPoolTest extends TestCase
         );
         $biz = new Biz($config);
         $biz['autoload.aliases']['TestProject'] = 'TestProject\Biz';
-        $biz->register(new DoctrineServiceProvider());
+        $biz->register(new \Codeages\Biz\Framework\Provider\DoctrineServiceProvider());
         $biz->register(new RedisServiceProvider());
         $biz->register(new SchedulerServiceProvider());
         $biz->boot();
@@ -39,17 +37,24 @@ class JobPoolTest extends TestCase
         $this->biz = $biz;
     }
 
-    public function testRun()
+    public function testCreateJob()
     {
-        $job = new ExampleJob(array(
-            'pool'=>'default'
-        ));
+        $jobDetail = array(
+            'name' => 'test',
+            'pool' => 'test',
+            'source' => 'MAIN',
+            'expression' => '0 0 12 * * ?',
+            'class' => '\\\\Tests\\\\ExampleJob',
+            'data' => array('courseId'=>1),
+            'misfireThreshold' => 30,
+            'misfirePolicy' => 'miss',
+        );
 
-        $this->biz['scheduler.job.pool']->execute($job);
+        $this->getSchedulerService()->create($jobDetail);
+    }
 
-        $poolDetail = $this->biz['scheduler.job.pool']->getJobPool('default');
-        $this->assertEquals(0, $poolDetail['num']);
-        $this->assertEquals(10, $poolDetail['maxNum']);
-        $this->assertEquals(120, $poolDetail['timeout']);
+    public function getSchedulerService()
+    {
+        return $this->biz->service('Scheduler:SchedulerService');
     }
 }

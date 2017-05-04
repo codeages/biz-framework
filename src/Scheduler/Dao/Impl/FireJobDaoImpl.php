@@ -11,6 +11,8 @@ class FireJobDaoImpl extends GeneralDaoImpl implements FireJobDao
 
     public function declares()
     {
-        return array();
+        return array(
+            'timestamps' => array('createdTime', 'updatedTime')
+        );
     }
 }
