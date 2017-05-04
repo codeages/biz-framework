@@ -9,21 +9,21 @@ class JobLogServiceImpl extends BaseService implements JobLogService
 {
     public function create($log)
     {
-        // TODO: Implement create() method.
+        return $this->getJobLogDao()->create($log);
     }
 
     public function search($condition, $orderBy, $start, $limit)
     {
-        // TODO: Implement search() method.
+        return $this->getJobLogDao()->search($condition, $orderBy, $start, $limit);
     }
 
     public function count($condition)
     {
-        // TODO: Implement count() method.
+        return $this->getJobLogDao()->count($condition);
     }
 
     protected function getJobLogDao()
     {
-        return $this->biz->dao('Scheduler:');
+        return $this->biz->dao('Scheduler:JobLogDao');
     }
 }

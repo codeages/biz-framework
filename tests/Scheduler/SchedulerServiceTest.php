@@ -5,6 +5,7 @@ namespace Tests;
 use Codeages\Biz\Framework\Context\Biz;
 use Codeages\Biz\Framework\Provider\RedisServiceProvider;
 use Codeages\Biz\Framework\Provider\SchedulerServiceProvider;
+use Codeages\Biz\Framework\Util\ArrayToolkit;
 use PHPUnit\Framework\TestCase;
 
 class SchedulerServiceTest extends TestCase
@@ -46,11 +47,41 @@ class SchedulerServiceTest extends TestCase
             'expression' => '0 0 12 * * ?',
             'class' => '\\\\Tests\\\\ExampleJob',
             'data' => array('courseId'=>1),
+            'priority' => 100,
             'misfireThreshold' => 30,
             'misfirePolicy' => 'miss',
         );
 
-        $this->getSchedulerService()->create($jobDetail);
+        $savedJobDetail = $this->getSchedulerService()->create($jobDetail);
+
+        $this->asserts($jobDetail, $savedJobDetail);
+
+        $logs = $this->getJobLogService()->search(array(), array(), 0, 1);
+
+        $excepted = array(
+            'name' => 'test',
+            'pool' => 'test',
+            'source' => 'MAIN',
+            'class' => '\\\\Tests\\\\ExampleJob',
+            'data' => array('courseId'=>1),
+            'status' => 'created',
+        );
+        foreach ($logs as $log) {
+            $this->asserts($excepted, $log);
+        }
+    }
+
+    protected function asserts($excepted, $acturel)
+    {
+        $keys = array_keys($excepted);
+        foreach ($keys as $key) {
+            $this->assertEquals($excepted[$key], $acturel[$key]);
+        }
+    }
+
+    protected function getJobLogService()
+    {
+        return $this->biz->service('Scheduler:JobLogService');
     }
 
     public function getSchedulerService()

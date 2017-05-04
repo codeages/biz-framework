@@ -121,7 +121,7 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
     {
         $log = ArrayToolkit::parts($jobDetail, array(
             'name',
-            'group',
+            'pool',
             'source',
             'class',
             'data',
