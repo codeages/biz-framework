@@ -15,11 +15,15 @@ class CheckerChain
     {
         $processors = $this->biz['scheduler.job.processors'];
         foreach ($processors as $processor) {
-            if(!$processor->check($jobDetail)) {
-                return false;
+            $result = $processor->check($jobDetail);
+            switch ($result) {
+                case '';
+            }
+            if ($result) {
+                return $result;
             }
         }
 
-        return true;
+        return false;
     }
 }

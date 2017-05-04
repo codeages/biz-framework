@@ -9,16 +9,16 @@ class JobDaoImpl extends GeneralDaoImpl implements JobDao
 {
     protected $table = 'job_detail';
 
-    public function getWaitingJobByLessThanFireTime($fireTime)
+    public function findWaitingJobsByLessThanFireTime($fireTime)
     {
         $sql = "SELECT * FROM 
                 (
                   SELECT *, floor(createdTime/60)*60 as formattedCreatedTime FROM {$this->table} 
-                  WHERE nextFireTime <= ? AND status = 'waiting'
+                  WHERE nextFireTime <= ? AND status = 'waiting' AND enabled = 1
                 ) as {$this->table} 
-                ORDER BY formattedCreatedTime ASC , priority DESC LIMIT 1";
+                ORDER BY formattedCreatedTime ASC , priority DESC";
 
-        return $this->db()->fetchAssoc($sql, array($fireTime));
+        return $this->db()->fetchAll($sql, array($fireTime));
     }
 
     public function declares()

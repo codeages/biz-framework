@@ -34,9 +34,11 @@ class Scheduler extends Migration
               `class` varchar(1024) NOT NULL COMMENT '任务的Class名称',
               `data` text COMMENT '任务参数',
               `priority` int(10) unsigned NOT NULL DEFAULT 50 COMMENT '优先级',
-              `status` varchar(1024) NOT NULL DEFAULT 'waiting' COMMENT '任务执行状态, waiting, acquired, , executing, finished',
+              `status` varchar(1024) NOT NULL DEFAULT 'waiting' COMMENT '任务执行状态, waiting, acquired, executing, finished, missed',
               `preFireTime` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '任务下次执行的时间',
               `nextFireTime` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '任务下次执行的时间',
+              `misfireThreshold` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '触发过期时间',
+              `misfirePolicy` varchar(1024) NOT NULL COMMENT '触发过期策略: miss, execute, ',
               `enabled` tinyint(1) DEFAULT 1 COMMENT '是否启用',
               `creatorId` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '任务创建人',
               `createdTime` int(10) unsigned NOT NULL COMMENT '任务创建时间',
@@ -48,7 +50,9 @@ class Scheduler extends Migration
             CREATE TABLE IF NOT EXISTS `fired_job` (
               `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '编号',
               `jobDetailId` varchar(1024) NOT NULL COMMENT '任务名称',
-              `scheduler` varchar(1024) NOT NULL COMMENT '调度器',
+              `firedTime` int(10) unsigned NOT NULL COMMENT '触发时间',
+              `priority` int(10) unsigned NOT NULL DEFAULT 50 COMMENT '优先级',
+              `status` varchar(1024) NOT NULL DEFAULT 'created' COMMENT '状态：created, executing',
               `createdTime` int(10) unsigned NOT NULL COMMENT '任务创建时间',
               PRIMARY KEY (`id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
