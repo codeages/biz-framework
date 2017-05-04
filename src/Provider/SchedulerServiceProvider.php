@@ -4,7 +4,7 @@ namespace Codeages\Biz\Framework\Provider;
 
 use Codeages\Biz\Framework\Scheduler\Pool\JobPool;
 use Codeages\Biz\Framework\Scheduler\Processor\CheckerChain;
-use Codeages\Biz\Framework\Scheduler\Processor\MisFireChecker;
+use Codeages\Biz\Framework\Scheduler\Processor\MissFireChecker;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
 
@@ -27,7 +27,7 @@ class SchedulerServiceProvider implements ServiceProviderInterface
         };
 
         $biz['scheduler.job.processors'] = array(
-            new MisFireChecker()
+            new MissFireChecker()
         );
 
         $biz['autoload.aliases']['Scheduler'] = 'Codeages\Biz\Framework\Scheduler';

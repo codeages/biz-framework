@@ -22,14 +22,14 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
     public function run()
     {
         $this->acquiredWaitingJobs();
-        $fireJob = $this->triggerJob();
-        if (empty($fireJob)) {
+        $firedJob = $this->triggerJob();
+        if (empty($firedJob)) {
             return;
         }
 
-        $jobInstance = $this->createJobInstance($fireJob);
+        $jobInstance = $this->createJobInstance($firedJob);
         $result = $this->getJobPool()->execute($jobInstance);
-        $this->createJobLog($fireJob['jobDetail'], $result);
+        $this->createJobLog($firedJob['jobDetail'], $result);
     }
 
     protected function getNextRunTime($expression)
@@ -46,12 +46,12 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
             $lock->get($lockName, 20);
             $this->biz['db']->beginTransaction();
 
-            $fireJob = $this->getTriggeredJob();
-
+            $firedJob = $this->getTriggeredJob();
 
             $this->biz['db']->commit();
             $lock->release($lockName);
-            return $fireJob;
+
+            return $firedJob;
         } catch (\Exception $e) {
             $this->biz['db']->rollback();
             $lock->release($lockName);
@@ -70,16 +70,16 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         $createdFireJob['jobDetail'] = $jobDetail;
         $result =  $this->getCheckerChain()->check($createdFireJob);
 
-        $fireJob = $this->getFiredJobDao()->update($createdFireJob['id'], array('status' => $result));
+        $firedJob = $this->getFiredJobDao()->update($createdFireJob['id'], array('status' => $result));
         $this->createJobLog($jobDetail, $result);
 
-        $fireJob['jobDetail'] = $jobDetail;
-        $this->updateNextFireTime($fireJob);
+        $firedJob['jobDetail'] = $jobDetail;
+        $this->updateNextFireTime($firedJob);
 
-        $this->createJobLog($jobDetail, $fireJob['status']);
+        $this->createJobLog($jobDetail, $firedJob['status']);
 
-        if ($fireJob['status'] == 'executing') {
-            return $fireJob;
+        if ($firedJob['status'] == 'executing') {
+            return $firedJob;
         }
 
         return $this->getTriggeredJob();
