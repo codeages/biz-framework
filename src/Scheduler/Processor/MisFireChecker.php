@@ -11,17 +11,7 @@ class MisFireChecker implements JobChecker
         $fireTime = $jobDetail['nextFireTime'];
 
         if (!empty($jobDetail['misfireThreshold']) && ($now - $fireTime) > $jobDetail['misfireThreshold']) {
-            switch ($jobDetail['misfirePolicy']) {
-                case '':
-                    return $jobDetail['misfirePolicy'];
-                    break;
-                case '':
-                    return $jobDetail['misfirePolicy'];
-                    break;
-                case '':
-                    return $jobDetail['misfirePolicy'];
-                    break;
-            }
+            return $jobDetail['misfirePolicy'];
         }
 
         return 'executing';

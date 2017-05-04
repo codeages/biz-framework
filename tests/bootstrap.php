@@ -7,6 +7,7 @@ use Codeages\Biz\Framework\UnitTests\UnitTestsBootstrap;
 
 define('ROOT_DIR', dirname(__DIR__));
 
+date_default_timezone_set('Asia/Shanghai');
 require_once ROOT_DIR.'/vendor/autoload.php';
 
 $config = array(

@@ -5,7 +5,7 @@ namespace Tests;
 use Codeages\Biz\Framework\Context\Biz;
 use Codeages\Biz\Framework\Provider\RedisServiceProvider;
 use Codeages\Biz\Framework\Provider\SchedulerServiceProvider;
-use Codeages\Biz\Framework\Util\ArrayToolkit;
+use Cron\CronExpression;
 use PHPUnit\Framework\TestCase;
 
 class SchedulerServiceTest extends TestCase
@@ -44,7 +44,7 @@ class SchedulerServiceTest extends TestCase
             'name' => 'test',
             'pool' => 'test',
             'source' => 'MAIN',
-            'expression' => '0 0 12 * * ?',
+            'expression' => '0 17 * * *',
             'class' => 'TestProject\\Biz\\Example\\Job\\ExampleJob',
             'data' => array('courseId'=>1),
             'priority' => 100,
@@ -55,6 +55,7 @@ class SchedulerServiceTest extends TestCase
         $savedJobDetail = $this->getSchedulerService()->create($jobDetail);
 
         $this->asserts($jobDetail, $savedJobDetail);
+        $this->assertNotEmpty($savedJobDetail['nextFireTime']);
 
         $logs = $this->getJobLogService()->search(array(), array(), 0, 1);
 

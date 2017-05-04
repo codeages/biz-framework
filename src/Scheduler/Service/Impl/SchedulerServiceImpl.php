@@ -7,11 +7,17 @@ use Codeages\Biz\Framework\Service\BaseService;
 use Codeages\Biz\Framework\Service\Exception\ServiceException;
 use Codeages\Biz\Framework\Util\ArrayToolkit;
 use Codeages\Biz\Framework\Util\Lock;
+use Cron\CronExpression;
 
 class SchedulerServiceImpl extends BaseService implements SchedulerService
 {
     public function create($jobDetail)
     {
+        $cron = CronExpression::factory($jobDetail['expression']);
+        if(!$cron->isDue()) {
+            $jobDetail['nextFireTime'] = strtotime($cron->getNextRunDate()->format('Y-m-d H:i:s'));
+        }
+
         $jobDetail = $this->getJobDao()->create($jobDetail);
         $this->createJobLog($jobDetail, 'created');
         return $jobDetail;
