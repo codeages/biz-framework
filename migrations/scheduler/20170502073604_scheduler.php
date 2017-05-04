@@ -48,7 +48,7 @@ class Scheduler extends Migration
         ");
 
         $connection->exec("
-            CREATE TABLE IF NOT EXISTS `fired_job` (
+            CREATE TABLE IF NOT EXISTS `job_fired` (
               `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '编号',
               `jobDetailId` varchar(1024) NOT NULL COMMENT '任务名称',
               `firedTime` int(10) unsigned NOT NULL COMMENT '触发时间',

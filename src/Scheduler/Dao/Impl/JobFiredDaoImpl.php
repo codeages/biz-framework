@@ -7,7 +7,7 @@ use Codeages\Biz\Framework\Scheduler\Dao\JobFiredDao;
 
 class JobFiredDaoImpl extends GeneralDaoImpl implements JobFiredDao
 {
-    protected $table = 'fired_job';
+    protected $table = 'job_fired';
 
     public function getByStatus($status)
     {
