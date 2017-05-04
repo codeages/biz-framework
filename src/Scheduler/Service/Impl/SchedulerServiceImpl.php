@@ -15,7 +15,10 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
     {
         $jobDetail['nextFireTime'] = $this->getNextRunTime($jobDetail['expression']);
         $jobDetail = $this->getJobDetailDao()->create($jobDetail);
-        $this->createJobLog($jobDetail, 'created');
+
+        $jobFired['jobDetail'] = $jobDetail;
+        $this->createJobLog($jobFired, 'created');
+
         return $jobDetail;
     }
 
@@ -29,7 +32,12 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
 
         $jobInstance = $this->createJobInstance($jobFired);
         $result = $this->getJobPool()->execute($jobInstance);
-        $this->createJobLog($jobFired['jobDetail'], $result);
+        $this->createJobLog($jobFired, $result);
+
+        if ($result != 'success') {
+            $this->getJobFiredDao()->update($jobFired['id'], array('status' => 'created'));
+            $this->createJobLog($jobFired, $jobFired['status']);
+        }
     }
 
     protected function getNextRunTime($expression)
@@ -71,12 +79,11 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         $result =  $this->getCheckerChain()->check($createdJobFired);
 
         $jobFired = $this->getJobFiredDao()->update($createdJobFired['id'], array('status' => $result));
-        $this->createJobLog($jobDetail, $result);
 
         $jobFired['jobDetail'] = $jobDetail;
         $this->updateNextFireTime($jobFired);
 
-        $this->createJobLog($jobDetail, $jobFired['status']);
+        $this->createJobLog($jobFired, $jobFired['status']);
 
         if ($jobFired['status'] == 'executing') {
             return $jobFired;
@@ -128,12 +135,14 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
             'jobDetailId' => $jobDetail['id'],
             'firedTime' => $jobDetail['nextFireTime'],
         );
-        $this->getJobFiredDao()->create($jobFired);
-        $this->createJobLog($jobDetail, 'acquired');
+        $jobFired = $this->getJobFiredDao()->create($jobFired);
+        $jobFired['jobDetail'] = $jobDetail;
+        $this->createJobLog($jobFired, 'acquired');
     }
 
-    protected function createJobLog($jobDetail, $status)
+    protected function createJobLog($jobFired, $status)
     {
+        $jobDetail = $jobFired['jobDetail'];
         $log = ArrayToolkit::parts($jobDetail, array(
             'name',
             'pool',
@@ -144,6 +153,9 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
             'status',
         ));
 
+        if (!empty($jobFired['id'])) {
+            $log['jobFiredId'] = $jobFired['id'];
+        }
         $log['status'] = $status;
         $log['jobDetailId'] = $jobDetail['id'];
 

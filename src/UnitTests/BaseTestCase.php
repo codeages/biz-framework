@@ -14,7 +14,7 @@ abstract class BaseTestCase extends TestCase
 
     public function setUp()
     {
-        self::emptyDatabase();
+//        self::emptyDatabase();
     }
 
     public static function setBiz($biz)

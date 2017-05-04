@@ -11,6 +11,9 @@ class JobPool
     private $options = array();
     private $biz;
 
+    const SUCCESS = 'success';
+    const POOL_FULL = 'pool_full';
+
     public function __construct($biz)
     {
         $this->biz = $biz;
@@ -25,13 +28,16 @@ class JobPool
             if (!empty($jobPool)) {
                 $job->execute();
             }
+        } catch (AccessDeniedException $e) {
+            $this->release($jobPool['id']);
+            return static::POOL_FULL;
         } catch (\Exception $e) {
             $this->release($jobPool['id']);
             throw new \RuntimeException($e->getMessage());
         }
 
         $this->release($jobPool);
-        return 'success';
+        return static::SUCCESS;
     }
 
     public function getJobPool($name = 'default')

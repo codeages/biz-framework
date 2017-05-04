@@ -64,6 +64,7 @@ class Scheduler extends Migration
             CREATE TABLE IF NOT EXISTS `job_log` (
               `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '编号',
               `jobDetailId` int(10) unsigned NOT NULL COMMENT '任务编号',
+              `jobFiredId` int(10) unsigned NOT NULL DEFAULT 0 COMMENT '激活的任务编号',
               `name` varchar(1024) NOT NULL COMMENT '任务名称',
               `pool` varchar(1024) NOT NULL DEFAULT 'default' COMMENT '所属组',
               `source` varchar(1024) NOT NULL COMMENT '来源',
