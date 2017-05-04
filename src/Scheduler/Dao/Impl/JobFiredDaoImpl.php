@@ -3,9 +3,9 @@
 namespace Codeages\Biz\Framework\Scheduler\Dao\Impl;
 
 use Codeages\Biz\Framework\Dao\GeneralDaoImpl;
-use Codeages\Biz\Framework\Scheduler\Dao\FiredJobDao;
+use Codeages\Biz\Framework\Scheduler\Dao\JobFiredDao;
 
-class FiredJobDaoImpl extends GeneralDaoImpl implements FiredJobDao
+class JobFiredDaoImpl extends GeneralDaoImpl implements JobFiredDao
 {
     protected $table = 'fired_job';
 

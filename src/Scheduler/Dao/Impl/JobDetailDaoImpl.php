@@ -3,9 +3,9 @@
 namespace Codeages\Biz\Framework\Scheduler\Dao\Impl;
 
 use Codeages\Biz\Framework\Dao\GeneralDaoImpl;
-use Codeages\Biz\Framework\Scheduler\Dao\JobDao;
+use Codeages\Biz\Framework\Scheduler\Dao\JobDetailDao;
 
-class JobDaoImpl extends GeneralDaoImpl implements JobDao
+class JobDetailDaoImpl extends GeneralDaoImpl implements JobDetailDao
 {
     protected $table = 'job_detail';
 

@@ -46,12 +46,12 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
             $lock->get($lockName, 20);
             $this->biz['db']->beginTransaction();
 
-            $firedJob = $this->getTriggeredJob();
+            $jobFired = $this->getTriggeredJob();
 
             $this->biz['db']->commit();
             $lock->release($lockName);
 
-            return $firedJob;
+            return $jobFired;
         } catch (\Exception $e) {
             $this->biz['db']->rollback();
             $lock->release($lockName);
@@ -61,33 +61,33 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
 
     protected function getTriggeredJob()
     {
-        $createdFireJob = $this->getFiredJobDao()->getByStatus('created');
-        if (empty($createdFireJob)) {
+        $createdJobFired = $this->getJobFiredDao()->getByStatus('created');
+        if (empty($createdJobFired)) {
             return;
         }
 
-        $jobDetail = $this->getJobDao()->get($createdFireJob['jobDetailId']);
-        $createdFireJob['jobDetail'] = $jobDetail;
-        $result =  $this->getCheckerChain()->check($createdFireJob);
+        $jobDetail = $this->getJobDao()->get($createdJobFired['jobDetailId']);
+        $createdJobFired['jobDetail'] = $jobDetail;
+        $result =  $this->getCheckerChain()->check($createdJobFired);
 
-        $firedJob = $this->getFiredJobDao()->update($createdFireJob['id'], array('status' => $result));
+        $jobFired = $this->getJobFiredDao()->update($createdJobFired['id'], array('status' => $result));
         $this->createJobLog($jobDetail, $result);
 
-        $firedJob['jobDetail'] = $jobDetail;
-        $this->updateNextFireTime($firedJob);
+        $jobFired['jobDetail'] = $jobDetail;
+        $this->updateNextFireTime($jobFired);
 
-        $this->createJobLog($jobDetail, $firedJob['status']);
+        $this->createJobLog($jobDetail, $jobFired['status']);
 
-        if ($firedJob['status'] == 'executing') {
-            return $firedJob;
+        if ($jobFired['status'] == 'executing') {
+            return $jobFired;
         }
 
         return $this->getTriggeredJob();
     }
 
-    protected function updateNextFireTime($fireJob)
+    protected function updateNextFireTime($jobFired)
     {
-        $jobDetail = $fireJob['jobDetail'];
+        $jobDetail = $jobFired['jobDetail'];
         $fields = array(
             'status' => 'waiting',
             'preFireTime' => $jobDetail['nextFireTime'],
@@ -124,11 +124,11 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
     {
         $jobDetail = $this->getJobDao()->update($jobDetail['id'], array('status' => 'acquired'));
 
-        $fireJob = array(
+        $jobFired = array(
             'jobDetailId' => $jobDetail['id'],
             'firedTime' => $jobDetail['nextFireTime'],
         );
-        $this->getFiredJobDao()->create($fireJob);
+        $this->getJobFiredDao()->create($jobFired);
         $this->createJobLog($jobDetail, 'acquired');
     }
 
@@ -150,10 +150,10 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         $this->biz->service('Scheduler:JobLogService')->create($log);
     }
 
-    protected function createJobInstance($fireJob)
+    protected function createJobInstance($jobFired)
     {
-        $jobDetail = $fireJob['jobDetail'];
-        $class = $fireJob['jobDetail']['class'];
+        $jobDetail = $jobFired['jobDetail'];
+        $class = $jobFired['jobDetail']['class'];
         return new $class($jobDetail);
     }
 
@@ -162,14 +162,14 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         return $this->biz['scheduler.job.checker_chain'];
     }
 
-    protected function getFiredJobDao()
+    protected function getJobFiredDao()
     {
-        return $this->biz->dao('Scheduler:FiredJobDao');
+        return $this->biz->dao('Scheduler:JobFiredDao');
     }
 
     protected function getJobDao()
     {
-        return $this->biz->dao('Scheduler:JobDao');
+        return $this->biz->dao('Scheduler:JobDetailDao');
     }
 
     protected function getJobPool()

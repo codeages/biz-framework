@@ -2,7 +2,7 @@
 
 namespace Codeages\Biz\Framework\Scheduler\Dao;
 
-interface FiredJobDao
+interface JobFiredDao
 {
     public function getByStatus($status);
 }
