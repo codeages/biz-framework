@@ -2,7 +2,7 @@
 
 namespace TestProject\Biz\Example\Job;
 
-use Codeages\Biz\Framework\Scheduler\Job\AbstractJob;
+use Codeages\Biz\Framework\Scheduler\AbstractJob;
 
 class ExampleJob extends AbstractJob
 {

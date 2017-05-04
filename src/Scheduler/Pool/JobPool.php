@@ -2,7 +2,7 @@
 
 namespace Codeages\Biz\Framework\Scheduler\Pool;
 
-use Codeages\Biz\Framework\Scheduler\Job\Job;
+use Codeages\Biz\Framework\Scheduler\Job;
 use Codeages\Biz\Framework\Service\Exception\AccessDeniedException;
 use Codeages\Biz\Framework\Util\ArrayToolkit;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Codeages\Biz\Framework\Scheduler\Job;
+namespace Codeages\Biz\Framework\Scheduler;
 
 interface Job
 {
