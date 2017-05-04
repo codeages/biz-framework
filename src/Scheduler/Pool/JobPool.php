@@ -50,25 +50,22 @@ class JobPool
 
     protected function prepare($job)
     {
-        $options = array_merge($this->options, array('pool' => $job['pool']));
+        $options = array_merge($this->options, array('name' => $job['pool']));
 
         if (!empty($this->biz["scheduler.job.pool.{$job['pool']}.options"])) {
             $options = array_merge($options, $this->biz["scheduler.job.pool.{$job['pool']}.options"]);
         }
 
-        $lockName = "job_pool.{$options['pool']}";
+        $lockName = "job_pool.{$options['name']}";
         $this->biz['lock']->get($lockName, 10);
 
-        $jobPool = $this->getJobPool($options['pool']);
+        $jobPool = $this->getJobPool($options['name']);
         if (empty($jobPool)) {
-            $jobPool = ArrayToolkit::parts($options, array('maxNum', 'num', 'timeout'));
-            $jobPool['name'] = $options['pool'];
-
+            $jobPool = ArrayToolkit::parts($options, array('maxNum', 'num', 'name', 'timeout'));
             $jobPool = $this->getJobPoolDao()->create($jobPool);
         }
 
         if ($jobPool['num'] == $jobPool['maxNum']) {
-
             $this->biz['lock']->release($lockName);
             throw new AccessDeniedException('job pool is full.');
         }

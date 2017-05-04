@@ -45,7 +45,7 @@ class SchedulerServiceTest extends TestCase
             'pool' => 'test',
             'source' => 'MAIN',
             'expression' => '0 0 12 * * ?',
-            'class' => '\\\\Tests\\\\ExampleJob',
+            'class' => 'TestProject\\Biz\\Example\\Job\\ExampleJob',
             'data' => array('courseId'=>1),
             'priority' => 100,
             'misfireThreshold' => 30,
@@ -62,13 +62,19 @@ class SchedulerServiceTest extends TestCase
             'name' => 'test',
             'pool' => 'test',
             'source' => 'MAIN',
-            'class' => '\\\\Tests\\\\ExampleJob',
+            'class' => 'TestProject\\Biz\\Example\\Job\\ExampleJob',
             'data' => array('courseId'=>1),
             'status' => 'created',
         );
         foreach ($logs as $log) {
             $this->asserts($excepted, $log);
         }
+    }
+
+    public function testRun()
+    {
+        $this->testCreateJob();
+        $this->getSchedulerService()->run();
     }
 
     protected function asserts($excepted, $acturel)

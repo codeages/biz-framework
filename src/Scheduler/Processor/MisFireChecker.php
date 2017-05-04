@@ -4,9 +4,10 @@ namespace Codeages\Biz\Framework\Scheduler\Processor;
 
 class MisFireChecker implements JobChecker
 {
-    public function check($jobDetail)
+    public function check($firedJob)
     {
         $now = time();
+        $jobDetail = $firedJob['jobDetail'];
         $fireTime = $jobDetail['nextFireTime'];
 
         if (!empty($jobDetail['misfireThreshold']) && ($now - $fireTime) > $jobDetail['misfireThreshold']) {
@@ -23,6 +24,6 @@ class MisFireChecker implements JobChecker
             }
         }
 
-        return $jobDetail;
+        return 'executing';
     }
 }
