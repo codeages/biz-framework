@@ -145,6 +145,7 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         ));
 
         $log['status'] = $status;
+        $log['jobDetailId'] = $jobDetail['id'];
 
         $this->biz->service('Scheduler:JobLogService')->create($log);
     }

@@ -37,7 +37,7 @@ class Scheduler extends Migration
               `status` varchar(1024) NOT NULL DEFAULT 'waiting' COMMENT '任务执行状态, waiting, acquired, executing, finished, missed',
               `preFireTime` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '任务下次执行的时间',
               `nextFireTime` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '任务下次执行的时间',
-              `misfireThreshold` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '触发过期时间',
+              `misfireThreshold` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '触发过期时间，单位秒',
               `misfirePolicy` varchar(1024) NOT NULL COMMENT '触发过期策略: miss, execute, ',
               `enabled` tinyint(1) DEFAULT 1 COMMENT '是否启用',
               `creatorId` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '任务创建人',
@@ -63,6 +63,7 @@ class Scheduler extends Migration
         $connection->exec("
             CREATE TABLE IF NOT EXISTS `job_log` (
               `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '编号',
+              `jobDetailId` int(10) unsigned NOT NULL COMMENT '任务编号',
               `name` varchar(1024) NOT NULL COMMENT '任务名称',
               `pool` varchar(1024) NOT NULL DEFAULT 'default' COMMENT '所属组',
               `source` varchar(1024) NOT NULL COMMENT '来源',
