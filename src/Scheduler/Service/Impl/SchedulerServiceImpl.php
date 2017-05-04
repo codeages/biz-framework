@@ -44,16 +44,16 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         $lockName = 'scheduler.job.trigger';
         try {
             $lock->get($lockName, 20);
-//            $this->biz['db']->beginTransaction();
+            $this->biz['db']->beginTransaction();
 
             $fireJob = $this->getTriggeredJob();
 
 
-//            $this->biz['db']->commit();
+            $this->biz['db']->commit();
             $lock->release($lockName);
             return $fireJob;
         } catch (\Exception $e) {
-//            $this->biz['db']->rollback();
+            $this->biz['db']->rollback();
             $lock->release($lockName);
             throw new ServiceException($e);
         }
@@ -93,7 +93,7 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
             'preFireTime' => $jobDetail['nextFireTime'],
             'nextFireTime' => $this->getNextRunTime($jobDetail['expression'])
         );
-        $this->getFiredJobDao()->update($jobDetail['id'], $fields);
+        $this->getJobDao()->update($jobDetail['id'], $fields);
     }
 
     protected function acquiredWaitingJobs()
@@ -103,7 +103,7 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
 
         try {
             $lock->get($lockName, 20);
-//            $this->biz['db']->beginTransaction();
+            $this->biz['db']->beginTransaction();
 
             $jobDetails = $this->getJobDao()->findWaitingJobsByLessThanFireTime(strtotime('+1 minutes'));
 
@@ -111,10 +111,10 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
                 $this->createFireJob($jobDetail);
             }
 
-//            $this->biz['db']->commit();
+            $this->biz['db']->commit();
             $lock->release($lockName);
         } catch (\Exception $e) {
-//            $this->biz['db']->rollback();
+            $this->biz['db']->rollback();
             $lock->release($lockName);
             throw new ServiceException($e);
         }

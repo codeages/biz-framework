@@ -31,6 +31,7 @@ class JobPool
         }
 
         $this->release($jobPool);
+        return 'success';
     }
 
     public function getJobPool($name = 'default')

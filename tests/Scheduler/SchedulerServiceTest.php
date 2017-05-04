@@ -19,7 +19,7 @@ class SchedulerServiceTest extends BaseTestCase
             'class' => 'TestProject\\Biz\\Example\\Job\\ExampleJob',
             'data' => array('courseId'=>1),
             'priority' => 100,
-            'misfireThreshold' => 30,
+            'misfireThreshold' => 3000,
             'misfirePolicy' => 'miss',
         );
 
