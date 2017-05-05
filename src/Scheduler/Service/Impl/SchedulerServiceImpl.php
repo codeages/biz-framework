@@ -4,6 +4,7 @@ namespace Codeages\Biz\Framework\Scheduler\Service\Impl;
 
 use Codeages\Biz\Framework\Scheduler\Service\SchedulerService;
 use Codeages\Biz\Framework\Service\BaseService;
+use Codeages\Biz\Framework\Service\Exception\InvalidArgumentException;
 use Codeages\Biz\Framework\Service\Exception\ServiceException;
 use Codeages\Biz\Framework\Util\ArrayToolkit;
 use Codeages\Biz\Framework\Util\Lock;
@@ -13,6 +14,10 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
 {
     public function create($jobDetail)
     {
+        if(!CronExpression::isValidExpression($jobDetail['expression'])) {
+            throw new InvalidArgumentException('cron expression is invalid.');
+        }
+
         $jobDetail['nextFireTime'] = $this->getNextRunTime($jobDetail['expression']);
         $jobDetail = $this->getJobDetailDao()->create($jobDetail);
 
