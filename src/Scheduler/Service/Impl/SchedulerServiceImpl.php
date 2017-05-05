@@ -115,7 +115,7 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
             $jobDetails = $this->getJobDetailDao()->findWaitingJobsByLessThanFireTime(strtotime('+1 minutes'));
 
             foreach ($jobDetails as $jobDetail) {
-                $this->createFireJob($jobDetail);
+                $this->createJobFired($jobDetail);
             }
 
             $this->biz['db']->commit();
@@ -127,7 +127,7 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         }
     }
 
-    protected function createFireJob($jobDetail)
+    protected function createJobFired($jobDetail)
     {
         $jobDetail = $this->getJobDetailDao()->update($jobDetail['id'], array('status' => 'acquired'));
 
@@ -158,6 +158,7 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         }
         $log['status'] = $status;
         $log['jobDetailId'] = $jobDetail['id'];
+        $log['ip'] = getHostByName(getHostName());
 
         $this->biz->service('Scheduler:JobLogService')->create($log);
     }

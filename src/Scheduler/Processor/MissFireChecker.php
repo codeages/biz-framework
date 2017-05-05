@@ -14,6 +14,6 @@ class MissFireChecker implements JobChecker
             return $jobDetail['misfirePolicy'];
         }
 
-        return 'executing';
+        return static::EXECUTING;
     }
 }

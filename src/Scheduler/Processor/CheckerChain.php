@@ -13,17 +13,19 @@ class CheckerChain
 
     public function check($jobDetail)
     {
-        $processors = $this->biz['scheduler.job.processors'];
+        $processors = $this->getProcessors();
         foreach ($processors as $processor) {
             $result = $processor->check($jobDetail);
-            switch ($result) {
-                case '';
-            }
-            if ($result) {
+            if ($result != JobChecker::EXECUTING) {
                 return $result;
             }
         }
 
-        return false;
+        return JobChecker::EXECUTING;
+    }
+
+    protected function getProcessors()
+    {
+        return $this->biz['scheduler.job.processors'];
     }
 }
