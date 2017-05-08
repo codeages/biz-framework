@@ -11,7 +11,14 @@ class JobFiredDaoImpl extends GeneralDaoImpl implements JobFiredDao
 
     public function getByStatus($status)
     {
-        return $this->getByFields(array('status' => $status));
+        $sql = "SELECT * FROM 
+                (
+                  SELECT *, floor(firedTime/60)*60 as formattedFiredTime FROM {$this->table} 
+                  WHERE firedTime <= ? AND status = ?
+                ) as {$this->table} 
+                ORDER BY formattedFiredTime ASC , priority DESC LIMIT 1";
+
+        return $this->db()->fetchAssoc($sql, array(strtotime('+1 minutes'), $status));
     }
 
     public function declares()

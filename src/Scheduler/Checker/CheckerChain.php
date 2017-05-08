@@ -11,11 +11,11 @@ class CheckerChain
         $this->biz = $biz;
     }
 
-    public function check($jobDetail)
+    public function check($jobFired)
     {
         $checkers = $this->getCheckers();
         foreach ($checkers as $checker) {
-            $result = $checker->check($jobDetail);
+            $result = $checker->check($jobFired);
             if ($result != JobChecker::EXECUTING) {
                 return $result;
             }

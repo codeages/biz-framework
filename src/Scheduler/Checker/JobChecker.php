@@ -6,5 +6,5 @@ interface JobChecker
 {
     const EXECUTING = 'executing';
 
-    public function check($jobDetail);
+    public function check($jobFired);
 }

@@ -16,11 +16,12 @@ class SchedulerTest extends BaseTestCase
             'pool' => 'test',
             'source' => 'MAIN',
             'expression' => '0 17 * * *',
+//            'nextFireTime' => time()-1,
             'class' => 'TestProject\\Biz\\Example\\Job\\ExampleJob',
             'data' => array('courseId'=>1),
             'priority' => 100,
             'misfireThreshold' => 3000,
-            'misfirePolicy' => 'miss',
+            'misfirePolicy' => 'missed',
         );
 
         $savedJobDetail = self::$biz['scheduler']->create($jobDetail);
@@ -46,6 +47,21 @@ class SchedulerTest extends BaseTestCase
     public function testRun()
     {
         $this->testCreateJob();
+        self::$biz['scheduler']->run();
+
+        $jobDetail = array(
+            'name' => 'test2',
+            'pool' => 'test2',
+            'source' => 'MAIN',
+            'nextFireTime' => time()-1,
+            'class' => 'TestProject\\Biz\\Example\\Job\\ExampleJob',
+            'data' => array('courseId'=>1),
+            'priority' => 100,
+            'misfireThreshold' => 3000,
+            'misfirePolicy' => 'executing',
+        );
+
+        self::$biz['scheduler']->create($jobDetail);
         self::$biz['scheduler']->run();
     }
 

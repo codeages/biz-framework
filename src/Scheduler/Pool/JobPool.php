@@ -22,21 +22,13 @@ class JobPool
 
     public function execute(Job $job)
     {
-        $jobPool = $this->prepare($job);
-
-        try {
-            if (!empty($jobPool)) {
-                $job->execute();
-            }
-        } catch (AccessDeniedException $e) {
-            $this->release($jobPool['id']);
+        if ($this->isFull($job)) {
             return static::POOL_FULL;
-        } catch (\Exception $e) {
-            $this->release($jobPool['id']);
-            throw new \RuntimeException($e->getMessage());
         }
 
-        $this->release($jobPool);
+        $job->execute();
+        $this->release($job);
+
         return static::SUCCESS;
     }
 
@@ -45,8 +37,10 @@ class JobPool
         return $this->getJobPoolDao()->getByName($name);
     }
 
-    protected function release($jobPool)
+    protected function release($job)
     {
+        $jobPool = $this->getJobPool($job['pool']);
+
         $lockName = "job_pool.{$jobPool['name']}";
         $this->biz['lock']->get($lockName, 10);
 
@@ -55,7 +49,7 @@ class JobPool
         $this->biz['lock']->release($lockName);
     }
 
-    protected function prepare($job)
+    protected function isFull($job)
     {
         $options = array_merge($this->options, array('name' => $job['pool']));
 
@@ -74,13 +68,13 @@ class JobPool
 
         if ($jobPool['num'] == $jobPool['maxNum']) {
             $this->biz['lock']->release($lockName);
-            throw new AccessDeniedException('job pool is full.');
+            return true;
         }
 
         $this->wavePoolNum($jobPool['id'], 1);
 
         $this->biz['lock']->release($lockName);
-        return $jobPool;
+        return false;
     }
 
     protected function wavePoolNum($id, $diff)

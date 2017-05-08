@@ -4,10 +4,10 @@ namespace Codeages\Biz\Framework\Scheduler\Checker;
 
 class MissFireChecker implements JobChecker
 {
-    public function check($firedJob)
+    public function check($jobFired)
     {
         $now = time();
-        $jobDetail = $firedJob['jobDetail'];
+        $jobDetail = $jobFired['jobDetail'];
         $fireTime = $jobDetail['nextFireTime'];
 
         if (!empty($jobDetail['misfireThreshold']) && ($now - $fireTime) > $jobDetail['misfireThreshold']) {

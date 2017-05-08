@@ -13,7 +13,7 @@ class Scheduler
 
     public function create($jobDetail)
     {
-        return $this->getSchedulerService()->create($jobDetail);
+        return $this->getSchedulerService()->schedule($jobDetail);
     }
 
     public function run()
