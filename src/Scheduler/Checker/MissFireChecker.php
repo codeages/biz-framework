@@ -1,6 +1,6 @@
 <?php
 
-namespace Codeages\Biz\Framework\Scheduler\Processor;
+namespace Codeages\Biz\Framework\Scheduler\Checker;
 
 class MissFireChecker implements JobChecker
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Codeages\Biz\Framework\Scheduler\Processor;
+namespace Codeages\Biz\Framework\Scheduler\Checker;
 
 class CheckerChain
 {
@@ -13,9 +13,9 @@ class CheckerChain
 
     public function check($jobDetail)
     {
-        $processors = $this->getProcessors();
-        foreach ($processors as $processor) {
-            $result = $processor->check($jobDetail);
+        $checkers = $this->getCheckers();
+        foreach ($checkers as $checker) {
+            $result = $checker->check($jobDetail);
             if ($result != JobChecker::EXECUTING) {
                 return $result;
             }
@@ -24,8 +24,8 @@ class CheckerChain
         return JobChecker::EXECUTING;
     }
 
-    protected function getProcessors()
+    protected function getCheckers()
     {
-        return $this->biz['scheduler.job.processors'];
+        return $this->biz['scheduler.job.checkers'];
     }
 }
