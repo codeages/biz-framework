@@ -23,6 +23,10 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
             throw new InvalidArgumentException('cron expression is invalid.');
         }
 
+        if (!empty($jobDetail['misfireThreshold']) && empty($jobDetail['misfirePolicy'])) {
+            throw new InvalidArgumentException('args is invalid.');
+        }
+
         if (!empty($jobDetail['expression'])) {
             $jobDetail['nextFireTime'] = $this->getNextRunTime($jobDetail['expression']);
         }
