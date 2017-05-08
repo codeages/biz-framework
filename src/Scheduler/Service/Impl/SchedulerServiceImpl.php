@@ -54,9 +54,9 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
 
     protected function jobExecuted($jobFired, $result)
     {
-        if ($result == 'success') {
-            $this->createJobLog($jobFired, $result);
-        } else {
+        $this->createJobLog($jobFired, $result);
+
+        if ($result != 'success') {
             $this->getJobFiredDao()->update($jobFired['id'], array(
                 'firedTime' => time(),
                 'status' => 'acquired'
