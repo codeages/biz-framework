@@ -7,7 +7,7 @@ use Codeages\Biz\Framework\Provider\RedisServiceProvider;
 use Codeages\Biz\Framework\Provider\SchedulerServiceProvider;
 use Codeages\Biz\Framework\UnitTests\BaseTestCase;
 
-class SchedulerServiceTest extends BaseTestCase
+class SchedulerTest extends BaseTestCase
 {
     public function testCreateJob()
     {
@@ -23,7 +23,7 @@ class SchedulerServiceTest extends BaseTestCase
             'misfirePolicy' => 'miss',
         );
 
-        $savedJobDetail = $this->getSchedulerService()->create($jobDetail);
+        $savedJobDetail = self::$biz['scheduler']->create($jobDetail);
 
         $this->asserts($jobDetail, $savedJobDetail);
         $this->assertNotEmpty($savedJobDetail['nextFireTime']);
@@ -46,7 +46,7 @@ class SchedulerServiceTest extends BaseTestCase
     public function testRun()
     {
         $this->testCreateJob();
-        $this->getSchedulerService()->run();
+        self::$biz['scheduler']->run();
     }
 
     protected function asserts($excepted, $acturel)

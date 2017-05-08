@@ -5,6 +5,7 @@ namespace Codeages\Biz\Framework\Provider;
 use Codeages\Biz\Framework\Scheduler\Pool\JobPool;
 use Codeages\Biz\Framework\Scheduler\Checker\CheckerChain;
 use Codeages\Biz\Framework\Scheduler\Checker\MissFireChecker;
+use Codeages\Biz\Framework\Scheduler\Scheduler;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
 
@@ -31,5 +32,9 @@ class SchedulerServiceProvider implements ServiceProviderInterface
         $biz['scheduler.job.checkers'] = array(
             new MissFireChecker()
         );
+
+        $biz['scheduler'] = function ($biz){
+            return new Scheduler($biz);
+        };
     }
 }
