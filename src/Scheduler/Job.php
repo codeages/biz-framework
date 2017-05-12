@@ -4,5 +4,5 @@ namespace Codeages\Biz\Framework\Scheduler;
 
 interface Job
 {
-    public function execute();
+    public function run();
 }

@@ -13,6 +13,15 @@ abstract class AbstractJob implements Job, \ArrayAccess
 
     abstract public function execute();
 
+    public function run()
+    {
+        try {
+            $this->execute();
+        } catch (\Exception $e) {
+            // TODO: log
+        }
+    }
+
     public function __get($name)
     {
         return empty($this->params[$name] ) ? '' : $this->params[$name];

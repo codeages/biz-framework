@@ -25,7 +25,7 @@ class JobPool
             return static::POOL_FULL;
         }
 
-        $job->execute();
+        $job->run();
         $this->release($job);
 
         return static::SUCCESS;
