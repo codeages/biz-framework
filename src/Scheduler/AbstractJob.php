@@ -2,13 +2,17 @@
 
 namespace Codeages\Biz\Framework\Scheduler;
 
+use Codeages\Biz\Framework\Targetlog\Service\TargetlogService;
+
 abstract class AbstractJob implements Job, \ArrayAccess
 {
     private $params = array();
+    private $biz;
 
-    public function __construct($params = array())
+    public function __construct($params = array(), $biz = null)
     {
         $this->params = $params;
+        $this->biz = $biz;
     }
 
     abstract public function execute();
@@ -18,7 +22,7 @@ abstract class AbstractJob implements Job, \ArrayAccess
         try {
             $this->execute();
         } catch (\Exception $e) {
-            // TODO: log
+            $this->getTargetlogService()->log(TargetlogService::ERROR, 'job', $this->id, $e->getMessage());
         }
     }
 
@@ -50,5 +54,10 @@ abstract class AbstractJob implements Job, \ArrayAccess
 
     public function offsetGet($offset) {
         return isset($this->params[$offset]) ? $this->params[$offset] : null;
+    }
+
+    protected function getTargetlogService()
+    {
+        return $this->biz->service('Targetlog:TargetlogService');
     }
 }

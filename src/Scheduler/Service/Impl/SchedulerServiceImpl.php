@@ -54,21 +54,19 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
 
     protected function jobExecuted($jobFired, $result)
     {
-        $this->createJobLog($jobFired, $result);
-
         if ($result != 'success') {
-            $jobFired = $this->getJobFiredDao()->update($jobFired['id'], array(
+            $this->createJobLog($jobFired, $result);
+            $this->getJobFiredDao()->update($jobFired['id'], array(
                 'firedTime' => time(),
                 'status' => 'acquired'
             ));
-            $this->createJobLog($jobFired, $jobFired['status']);
+            $this->createJobLog($jobFired, 'acquired');
         } else {
             $this->getJobFiredDao()->update($jobFired['id'], array(
-                'firedTime' => time(),
                 'status' => 'success'
             ));
+            $this->createJobLog($jobFired, 'success');
         }
-
     }
 
     protected function getNextRunTime($expression)
@@ -206,7 +204,7 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
     {
         $jobDetail = $jobFired['jobDetail'];
         $class = $jobFired['jobDetail']['class'];
-        return new $class($jobDetail);
+        return new $class($jobDetail, $this->biz);
     }
 
     protected function getCheckerChain()
