@@ -30,9 +30,9 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         if (!empty($jobDetail['expression'])) {
             $jobDetail['nextFireTime'] = $this->getNextRunTime($jobDetail['expression']);
         }
-
         $jobDetail = $this->getJobDetailDao()->create($jobDetail);
         $jobFired['jobDetail'] = $jobDetail;
+
         $this->createJobLog($jobFired, 'created');
 
         return $jobDetail;
@@ -57,12 +57,18 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         $this->createJobLog($jobFired, $result);
 
         if ($result != 'success') {
-            $this->getJobFiredDao()->update($jobFired['id'], array(
+            $jobFired = $this->getJobFiredDao()->update($jobFired['id'], array(
                 'firedTime' => time(),
                 'status' => 'acquired'
             ));
             $this->createJobLog($jobFired, $jobFired['status']);
+        } else {
+            $this->getJobFiredDao()->update($jobFired['id'], array(
+                'firedTime' => time(),
+                'status' => 'success'
+            ));
         }
+
     }
 
     protected function getNextRunTime($expression)
@@ -191,7 +197,7 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         }
         $log['status'] = $status;
         $log['jobDetailId'] = $jobDetail['id'];
-        $log['ip'] = getHostByName(getHostName());
+        $log['hostname'] = getHostName();
 
         $this->biz->service('Scheduler:JobLogService')->create($log);
     }

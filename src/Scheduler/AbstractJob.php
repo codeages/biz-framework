@@ -2,7 +2,7 @@
 
 namespace Codeages\Biz\Framework\Scheduler;
 
-class AbstractJob implements Job, \ArrayAccess
+abstract class AbstractJob implements Job, \ArrayAccess
 {
     private $params = array();
 
@@ -11,10 +11,7 @@ class AbstractJob implements Job, \ArrayAccess
         $this->params = $params;
     }
 
-    public function execute()
-    {
-
-    }
+    abstract public function execute();
 
     public function __get($name)
     {

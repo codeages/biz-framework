@@ -24,7 +24,7 @@ class SchedulerTest extends BaseTestCase
             'misfirePolicy' => 'missed',
         );
 
-        $savedJobDetail = self::$biz['scheduler']->create($jobDetail);
+        $savedJobDetail = self::$biz['scheduler']->schedule($jobDetail);
 
         $this->asserts($jobDetail, $savedJobDetail);
         $this->assertNotEmpty($savedJobDetail['nextFireTime']);
@@ -61,7 +61,7 @@ class SchedulerTest extends BaseTestCase
             'misfirePolicy' => 'executing',
         );
 
-        self::$biz['scheduler']->create($jobDetail);
+        self::$biz['scheduler']->schedule($jobDetail);
         self::$biz['scheduler']->run();
     }
 

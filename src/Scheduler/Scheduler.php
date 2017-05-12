@@ -11,7 +11,7 @@ class Scheduler
         $this->biz = $biz;
     }
 
-    public function create($jobDetail)
+    public function schedule($jobDetail)
     {
         return $this->getSchedulerService()->schedule($jobDetail);
     }
