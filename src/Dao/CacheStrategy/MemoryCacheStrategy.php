@@ -8,12 +8,16 @@ use Codeages\Biz\Framework\Dao\GeneralDaoInterface;
 /**
  * 内存缓存策略.
  */
-class MemoryCacheStrategy extends AbstractCacheStrategy implements CacheStrategy
+class MemoryCacheStrategy implements CacheStrategy
 {
     protected $cache = array();
 
-    public function beforeGet(GeneralDaoInterface $dao, $method, $arguments)
+    public function beforeQuery(GeneralDaoInterface $dao, $method, $arguments)
     {
+        if (strpos($method, 'get') !== 0) {
+            return false;
+        }
+
         $key = $this->key($dao, $method, $arguments);
         if (isset($this->cache[$key])) {
             return $this->cache[$key];
@@ -22,37 +26,14 @@ class MemoryCacheStrategy extends AbstractCacheStrategy implements CacheStrategy
         return false;
     }
 
-    public function afterGet(GeneralDaoInterface $dao, $method, $arguments, $row)
+    public function afterQuery(GeneralDaoInterface $dao, $method, $arguments, $data)
     {
+        if (strpos($method, 'get') !== 0) {
+            return;
+        }
+
         $key = $this->key($dao, $method, $arguments);
-        $this->cache[$key] = $row;
-    }
-
-    public function beforeFind(GeneralDaoInterface $dao, $method, $arguments)
-    {
-        return false;
-    }
-
-    public function afterFind(GeneralDaoInterface $dao, $method, $arguments, array $rows)
-    {
-    }
-
-    public function beforeSearch(GeneralDaoInterface $dao, $method, $arguments)
-    {
-        return false;
-    }
-
-    public function afterSearch(GeneralDaoInterface $dao, $method, $arguments, array $rows)
-    {
-    }
-
-    public function beforeCount(GeneralDaoInterface $dao, $method, $arguments)
-    {
-        return false;
-    }
-
-    public function afterCount(GeneralDaoInterface $dao, $method, $arguments, $count)
-    {
+        $this->cache[$key] = $data;
     }
 
     public function afterCreate(GeneralDaoInterface $dao, $method, $arguments, $row)

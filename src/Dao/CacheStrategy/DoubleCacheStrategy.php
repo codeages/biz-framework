@@ -7,78 +7,36 @@ use Codeages\Biz\Framework\Dao\GeneralDaoInterface;
 
 class DoubleCacheStrategy extends AbstractCacheStrategy implements CacheStrategy
 {
+    /**
+     * @var CacheStrategy
+     */
     private $first;
 
+    /**
+     * @var CacheStrategy
+     */
     private $second;
 
-    public function setStrategies($first, $second)
+    public function setStrategies(CacheStrategy $first, CacheStrategy $second)
     {
         $this->first = $first;
         $this->second = $second;
     }
 
-    public function beforeGet(GeneralDaoInterface $dao, $method, $arguments)
+    public function beforeQuery(GeneralDaoInterface $dao, $method, $arguments)
     {
-        $cache = $this->first->beforeGet($dao, $method, $arguments);
+        $cache = $this->first->beforeQuery($dao, $method, $arguments);
         if ($cache && $cache !== false) {
             return $cache;
         }
 
-        return $this->second->beforeGet($dao, $method, $arguments);
+        return $this->second->beforeQuery($dao, $method, $arguments);
     }
 
-    public function afterGet(GeneralDaoInterface $dao, $method, $arguments, $row)
+    public function afterQuery(GeneralDaoInterface $dao, $method, $arguments, $row)
     {
-        $this->first->afterGet($dao, $method, $arguments, $row);
-        $this->second->afterGet($dao, $method, $arguments, $row);
-    }
-
-    public function beforeFind(GeneralDaoInterface $dao, $method, $arguments)
-    {
-        $cache = $this->first->beforeFind($dao, $method, $arguments);
-        if ($cache && $cache !== false) {
-            return $cache;
-        }
-
-        return $this->second->beforeFind($dao, $method, $arguments);
-    }
-
-    public function afterFind(GeneralDaoInterface $dao, $method, $arguments, array $rows)
-    {
-        $this->first->afterGet($dao, $method, $arguments, $rows);
-        $this->second->afterGet($dao, $method, $arguments, $rows);
-    }
-
-    public function beforeSearch(GeneralDaoInterface $dao, $method, $arguments)
-    {
-        $cache = $this->first->beforeSearch($dao, $method, $arguments);
-        if ($cache && $cache !== false) {
-            return $cache;
-        }
-
-        return $this->second->beforeSearch($dao, $method, $arguments);
-    }
-
-    public function afterSearch(GeneralDaoInterface $dao, $method, $arguments, array $rows)
-    {
-        $this->first->afterSearch($dao, $method, $arguments, $rows);
-        $this->second->afterSearch($dao, $method, $arguments, $rows);
-    }
-
-    public function beforeCount(GeneralDaoInterface $dao, $method, $arguments)
-    {
-        $cache = $this->first->beforeCount($dao, $method, $arguments);
-        if ($cache && $cache !== false) {
-            return $cache;
-        }
-
-        return $this->second->beforeCount($dao, $method, $arguments);
-    }
-
-    public function afterCount(GeneralDaoInterface $dao, $method, $arguments, $count)
-    {
-        $this->first->afterCount($dao, $method, $arguments, $count);
-        $this->second->afterCount($dao, $method, $arguments, $count);
+        $this->first->afterQuery($dao, $method, $arguments, $row);
+        $this->second->afterQuery($dao, $method, $arguments, $row);
     }
 
     public function afterCreate(GeneralDaoInterface $dao, $method, $arguments, $row)

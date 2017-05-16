@@ -36,11 +36,6 @@ class DaoProxyTest extends TestCase
         $this->assertEquals($expected, $row);
     }
 
-    /**
-     * @group current
-     *
-     * @return [type] [description]
-     */
     public function testGetWithLock()
     {
         $expected = array('id' => 1, 'name' => 'test');
@@ -135,10 +130,8 @@ class DaoProxyTest extends TestCase
 
     private function mockDaoProxyWithHitCache($expected, $proxyMethod)
     {
-        $method = 'before'.ucfirst($proxyMethod);
-
         $strategy = $this->prophesize('Codeages\Biz\Framework\Dao\CacheStrategy');
-        $strategy->$method(
+        $strategy->beforeQuery(
             Argument::type('Codeages\Biz\Framework\Dao\GeneralDaoInterface'),
             Argument::any(),
             Argument::type('array')
@@ -158,16 +151,13 @@ class DaoProxyTest extends TestCase
 
     private function mockDaoProxyWithMissCache($expected, $proxyMethod)
     {
-        $beforeMethod = 'before'.ucfirst($proxyMethod);
-        $afterMethod = 'after'.ucfirst($proxyMethod);
-
         $strategy = $this->prophesize('Codeages\Biz\Framework\Dao\CacheStrategy');
-        $strategy->$beforeMethod(
+        $strategy->beforeQuery(
             Argument::type('Codeages\Biz\Framework\Dao\GeneralDaoInterface'),
             Argument::type('string'),
             Argument::type('array')
         )->willReturn(false);
-        $strategy->$afterMethod(
+        $strategy->afterQuery(
             Argument::type('Codeages\Biz\Framework\Dao\GeneralDaoInterface'),
             Argument::type('string'),
             Argument::type('array'),

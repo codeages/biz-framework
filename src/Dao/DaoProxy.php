@@ -55,6 +55,7 @@ class DaoProxy
         $lastArgument = end($arguments);
         reset($arguments);
 
+        // lock模式下，因为需要借助mysql的锁，不走cache
         if (is_array($lastArgument) && isset($lastArgument['lock']) && $lastArgument['lock'] === true) {
             $row = $this->callRealDao($method, $arguments);
             $this->unserialize($row);
@@ -64,7 +65,7 @@ class DaoProxy
 
         $strategy = $this->buildCacheStrategy();
         if ($strategy) {
-            $cache = $strategy->beforeGet($this->dao, $method, $arguments);
+            $cache = $strategy->beforeQuery($this->dao, $method, $arguments);
             if ($cache !== false) {
                 return $cache;
             }
@@ -74,7 +75,7 @@ class DaoProxy
         $this->unserialize($row);
 
         if ($strategy) {
-            $strategy->afterGet($this->dao, $method, $arguments, $row);
+            $strategy->afterQuery($this->dao, $method, $arguments, $row);
         }
 
         return $row;
@@ -82,29 +83,14 @@ class DaoProxy
 
     protected function find($method, $arguments)
     {
-        $strategy = $this->buildCacheStrategy();
-        if ($strategy) {
-            $cache = $strategy->beforeFind($this->dao, $method, $arguments);
-            if ($cache !== false) {
-                return $cache;
-            }
-        }
-
-        $rows = $this->callRealDao($method, $arguments);
-        $this->unserializes($rows);
-
-        if ($strategy) {
-            $strategy->afterFind($this->dao, $method, $arguments, $rows);
-        }
-
-        return $rows;
+        return $this->search($method, $arguments);
     }
 
     protected function search($method, $arguments)
     {
         $strategy = $this->buildCacheStrategy();
         if ($strategy) {
-            $cache = $strategy->beforeSearch($this->dao, $method, $arguments);
+            $cache = $strategy->beforeQuery($this->dao, $method, $arguments);
             if ($cache !== false) {
                 return $cache;
             }
@@ -114,7 +100,7 @@ class DaoProxy
         $this->unserializes($rows);
 
         if ($strategy) {
-            $strategy->afterSearch($this->dao, $method, $arguments, $rows);
+            $strategy->afterQuery($this->dao, $method, $arguments, $rows);
         }
 
         return $rows;
@@ -124,7 +110,7 @@ class DaoProxy
     {
         $strategy = $this->buildCacheStrategy();
         if ($strategy) {
-            $cache = $strategy->beforeCount($this->dao, $method, $arguments);
+            $cache = $strategy->beforeQuery($this->dao, $method, $arguments);
             if ($cache !== false) {
                 return $cache;
             }
@@ -133,7 +119,7 @@ class DaoProxy
         $count = $this->callRealDao($method, $arguments);
 
         if ($strategy) {
-            $strategy->afterCount($this->dao, $method, $arguments, $count);
+            $strategy->afterQuery($this->dao, $method, $arguments, $count);
         }
 
         return $count;
@@ -269,6 +255,9 @@ class DaoProxy
         }
     }
 
+    /**
+     * @return CacheStrategy|null
+     */
     private function buildCacheStrategy()
     {
         if ($this->cacheStrategy !== false) {
