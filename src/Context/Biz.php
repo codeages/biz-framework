@@ -69,11 +69,11 @@ class Biz extends Container
         $this['dao.cache.second.enabled'] = false;
 
         $this['dao.cache.chain'] = $this->factory(function ($biz) {
-            return new CacheStrategy\DoubleCacheStrategy();
+            return new CacheStrategy\DoubleStrategy();
         });
 
         $this['dao.cache.first'] = function () {
-            return new CacheStrategy\MemoryCacheStrategy();
+            return new CacheStrategy\MemoryStrategy();
         };
 
         $this['dao.cache.second.strategy.default'] = function ($biz) {
@@ -81,7 +81,7 @@ class Biz extends Container
         };
 
         $this['dao.cache.second.strategy.table'] = function ($biz) {
-            return new CacheStrategy\TableCacheStrategy($biz['redis'], $biz['dao.cache.shared_storage']);
+            return new CacheStrategy\TableStrategy($biz['redis'], $biz['dao.cache.shared_storage']);
         };
 
         $this['dao.cache.shared_storage'] = function ($biz) {

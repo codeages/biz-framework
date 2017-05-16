@@ -8,7 +8,7 @@ use Codeages\Biz\Framework\Dao\GeneralDaoInterface;
 /**
  * 内存缓存策略.
  */
-class MemoryCacheStrategy implements CacheStrategy
+class MemoryStrategy implements CacheStrategy
 {
     protected $cache = array();
 

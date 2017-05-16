@@ -5,7 +5,7 @@ namespace Codeages\Biz\Framework\Dao\CacheStrategy;
 use Codeages\Biz\Framework\Dao\CacheStrategy;
 use Codeages\Biz\Framework\Dao\GeneralDaoInterface;
 
-class DoubleCacheStrategy extends AbstractCacheStrategy implements CacheStrategy
+class DoubleStrategy implements CacheStrategy
 {
     /**
      * @var CacheStrategy

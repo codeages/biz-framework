@@ -8,7 +8,7 @@ use Codeages\Biz\Framework\Dao\GeneralDaoInterface;
 /**
  * 表级别缓存策略.
  */
-class TableCacheStrategy implements CacheStrategy
+class TableStrategy implements CacheStrategy
 {
     private $redis;
 
