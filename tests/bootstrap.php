@@ -1,5 +1,6 @@
 <?php
 
+use Doctrine\Common\Annotations\AnnotationRegistry;
 use Codeages\Biz\Framework\Context\Biz;
 use Codeages\Biz\Framework\Provider\DoctrineServiceProvider;
 use Codeages\Biz\Framework\Provider\TargetlogServiceProvider;
@@ -7,7 +8,9 @@ use Codeages\Biz\Framework\UnitTests\UnitTestsBootstrap;
 
 define('ROOT_DIR', dirname(__DIR__));
 
-require_once ROOT_DIR.'/vendor/autoload.php';
+$loader = require ROOT_DIR.'/vendor/autoload.php';
+
+AnnotationRegistry::registerLoader(array($loader, 'loadClass'));
 
 $config = array(
     'db.options' => array(

@@ -1,8 +1,8 @@
 <?php
 
-namespace Codeages\Biz\Framework\Dao\CacheStrategy;
+namespace Codeages\Biz\Framework\Dao;
 
-class SharedStorage implements \ArrayAccess
+class ArrayStorage implements \ArrayAccess
 {
     private $data;
 

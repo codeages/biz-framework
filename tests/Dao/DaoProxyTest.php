@@ -47,8 +47,7 @@ class DaoProxyTest extends TestCase
         $serializer = new FieldSerializer();
 
         $biz = new Biz();
-        $biz['dao.cache.first.enabled'] = true;
-        $biz['dao.cache.second.enabled'] = true;
+        $biz['dao.cache.enabled'] = true;
 
         $proxy = new DaoProxy($biz, $dao->reveal(), $serializer);
 
@@ -57,6 +56,9 @@ class DaoProxyTest extends TestCase
         $this->assertEquals($expected['id'], $row['id']);
     }
 
+    /**
+     * @group current
+     */
     public function testFindWithHitCache()
     {
         $expected = array(
@@ -64,6 +66,7 @@ class DaoProxyTest extends TestCase
             array('id' => 2, 'name' => 'test 2'),
         );
         $proxy = $this->mockDaoProxyWithHitCache($expected, 'find');
+
         $rows = $proxy->find();
 
         $this->assertEquals($expected, $rows);
@@ -142,9 +145,8 @@ class DaoProxyTest extends TestCase
         $serializer = new FieldSerializer();
 
         $biz = new Biz();
-        $biz['dao.cache.first.enabled'] = false;
-        $biz['dao.cache.second.enabled'] = true;
-        $biz['dao.cache.second.strategy.default'] = $strategy->reveal();
+        $biz['dao.cache.enabled'] = true;
+        $biz['dao.cache.strategy.default'] = $strategy->reveal();
 
         return new DaoProxy($biz, $dao->reveal(), $serializer);
     }
@@ -171,9 +173,8 @@ class DaoProxyTest extends TestCase
         $serializer = new FieldSerializer();
 
         $biz = new Biz();
-        $biz['dao.cache.first.enabled'] = false;
-        $biz['dao.cache.second.enabled'] = true;
-        $biz['dao.cache.second.strategy.default'] = $strategy->reveal();
+        $biz['dao.cache.enabled'] = true;
+        $biz['dao.cache.strategy.default'] = $strategy->reveal();
 
         return new DaoProxy($biz, $dao->reveal(), $serializer);
     }
@@ -187,8 +188,7 @@ class DaoProxyTest extends TestCase
         $serializer = new FieldSerializer();
 
         $biz = new Biz();
-        $biz['dao.cache.first.enabled'] = false;
-        $biz['dao.cache.second.enabled'] = false;
+        $biz['dao.cache.enabled'] = false;
 
         return new DaoProxy($biz, $dao->reveal(), $serializer);
     }
