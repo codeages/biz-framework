@@ -5,12 +5,14 @@ use Codeages\Biz\Framework\Context\Biz;
 use Codeages\Biz\Framework\Provider\DoctrineServiceProvider;
 use Codeages\Biz\Framework\Provider\TargetlogServiceProvider;
 use Codeages\Biz\Framework\UnitTests\UnitTestsBootstrap;
+use Tests\BaseTestCase;
 
 define('ROOT_DIR', dirname(__DIR__));
 
 $loader = require ROOT_DIR.'/vendor/autoload.php';
 
 AnnotationRegistry::registerLoader(array($loader, 'loadClass'));
+BaseTestCase::$classLoader = $loader;
 
 $config = array(
     'db.options' => array(

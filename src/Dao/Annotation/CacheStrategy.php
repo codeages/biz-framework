@@ -13,4 +13,9 @@ class CacheStrategy
     {
         $this->name = $data['value'];
     }
+
+    public function getName()
+    {
+        return $this->name;
+    }
 }
