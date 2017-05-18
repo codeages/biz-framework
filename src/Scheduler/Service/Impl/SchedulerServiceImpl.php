@@ -2,7 +2,7 @@
 
 namespace Codeages\Biz\Framework\Scheduler\Service\Impl;
 
-use Codeages\Biz\Framework\Scheduler\Checker\JobChecker;
+use Codeages\Biz\Framework\Scheduler\Checker\AbstractJobChecker;
 use Codeages\Biz\Framework\Scheduler\Service\SchedulerService;
 use Codeages\Biz\Framework\Service\BaseService;
 use Codeages\Biz\Framework\Service\Exception\InvalidArgumentException;
@@ -37,7 +37,7 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         $job = array_merge($default, $job);
 
         $job = $this->getJobDao()->create($job);
-        $this->dispatch('job.created', $job);
+        $this->dispatch('scheduler.job.created', $job);
 
         $jobFired['job'] = $job;
 
@@ -58,6 +58,11 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         $result = $this->getJobPool()->execute($jobInstance);
 
         $this->jobExecuted($jobFired, $result);
+    }
+
+    public function findJobFiredByJobId($jobId)
+    {
+        return $this->getJobFiredDao()->findByJobId($jobId);
     }
 
     public function deleteJob($id)
@@ -102,9 +107,9 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
                 'status' => 'success'
             ));
             $this->createJobLog($jobFired, 'success');
+            $this->dispatch('scheduler.job.executed', $jobFired, array('result' => $result));
         }
 
-        $this->dispatch('job.executed', $jobFired, array('result' => $result));
     }
 
     protected function getNextRunTime($expression)
@@ -152,8 +157,8 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
 
         $this->createJobLog($jobFired, $result);
 
-        if ($result == JobChecker::EXECUTING) {
-            $this->dispatch('job.executing', $jobFired);
+        if ($result == AbstractJobChecker::EXECUTING) {
+            $this->dispatch('scheduler.job.executing', $jobFired);
             return $jobFired;
         }
 
@@ -216,7 +221,7 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         $jobFired = $this->getJobFiredDao()->create($jobFired);
         $jobFired['job'] = $job;
 
-        $this->dispatch('job.acquired', $jobFired);
+        $this->dispatch('scheduler.job.acquired', $jobFired);
 
         $this->createJobLog($jobFired, 'acquired');
     }

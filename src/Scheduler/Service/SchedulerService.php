@@ -8,7 +8,7 @@ interface SchedulerService
 
     public function execute();
 
-    public function deleteJobByPoolAndName($pool, $name);
+    public function deleteJobByName($name);
 
     public function deleteJob($id);
 

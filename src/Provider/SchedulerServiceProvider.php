@@ -2,6 +2,7 @@
 
 namespace Codeages\Biz\Framework\Provider;
 
+use Codeages\Biz\Framework\Scheduler\Checker\ExecutingChecker;
 use Codeages\Biz\Framework\Scheduler\Pool\JobPool;
 use Codeages\Biz\Framework\Scheduler\Checker\CheckerChain;
 use Codeages\Biz\Framework\Scheduler\Checker\MisfireChecker;
@@ -30,7 +31,8 @@ class SchedulerServiceProvider implements ServiceProviderInterface
         };
 
         $biz['scheduler.job.checkers'] = array(
-            new MisfireChecker()
+            new MisfireChecker($biz),
+            new ExecutingChecker($biz)
         );
 
         $biz['scheduler'] = function ($biz){

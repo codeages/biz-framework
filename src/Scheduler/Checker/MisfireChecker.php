@@ -2,7 +2,7 @@
 
 namespace Codeages\Biz\Framework\Scheduler\Checker;
 
-class MisfireChecker implements JobChecker
+class MisfireChecker extends AbstractJobChecker
 {
     public function check($jobFired)
     {

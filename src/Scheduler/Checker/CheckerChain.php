@@ -16,12 +16,12 @@ class CheckerChain
         $checkers = $this->getCheckers();
         foreach ($checkers as $checker) {
             $result = $checker->check($jobFired);
-            if ($result != JobChecker::EXECUTING) {
+            if ($result != AbstractJobChecker::EXECUTING) {
                 return $result;
             }
         }
 
-        return JobChecker::EXECUTING;
+        return AbstractJobChecker::EXECUTING;
     }
 
     protected function getCheckers()
