@@ -65,7 +65,7 @@ class Scheduler extends Migration
         $connection->exec("
             CREATE TABLE IF NOT EXISTS `job_log` (
               `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '编号',
-              `jobDetailId` int(10) unsigned NOT NULL COMMENT '任务编号',
+              `jobId` int(10) unsigned NOT NULL COMMENT '任务编号',
               `jobFiredId` int(10) unsigned NOT NULL DEFAULT 0 COMMENT '激活的任务编号',
               `hostname` varchar(1024) NOT NULL DEFAULT '' COMMENT '执行的主机',
               `name` varchar(1024) NOT NULL COMMENT '任务名称',

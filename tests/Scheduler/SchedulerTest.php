@@ -11,7 +11,7 @@ class SchedulerTest extends BaseTestCase
 {
     public function testCreateJob()
     {
-        $jobDetail = array(
+        $job = array(
             'name' => 'test',
             'pool' => 'test',
             'source' => 'MAIN',
@@ -24,10 +24,10 @@ class SchedulerTest extends BaseTestCase
             'misfirePolicy' => 'missed',
         );
 
-        $savedJobDetail = self::$biz['scheduler']->schedule($jobDetail);
+        $savedJob = self::$biz['scheduler']->schedule($job);
 
-        $this->asserts($jobDetail, $savedJobDetail);
-        $this->assertNotEmpty($savedJobDetail['nextFireTime']);
+        $this->asserts($job, $savedJob);
+        $this->assertNotEmpty($savedJob['nextFireTime']);
 
         $logs = $this->getJobLogService()->search(array(), array(), 0, 1);
 
@@ -49,7 +49,7 @@ class SchedulerTest extends BaseTestCase
         $this->testCreateJob();
         self::$biz['scheduler']->execute();
 
-        $jobDetail = array(
+        $job = array(
             'name' => 'test2',
             'pool' => 'test2',
             'source' => 'MAIN',
@@ -61,7 +61,7 @@ class SchedulerTest extends BaseTestCase
             'misfirePolicy' => 'executing',
         );
 
-        self::$biz['scheduler']->schedule($jobDetail);
+        self::$biz['scheduler']->schedule($job);
         self::$biz['scheduler']->execute();
     }
 
