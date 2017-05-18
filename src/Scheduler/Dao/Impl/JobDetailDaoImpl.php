@@ -26,7 +26,7 @@ class JobDetailDaoImpl extends GeneralDaoImpl implements JobDetailDao
         return array(
             'timestamps' => array('createdTime', 'updatedTime'),
             'serializes' => array(
-                'data' => 'json',
+                'args' => 'json',
             )
         );
     }

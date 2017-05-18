@@ -195,7 +195,7 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
             'pool',
             'source',
             'class',
-            'data',
+            'args',
             'priority',
             'status',
         ));

@@ -18,7 +18,7 @@ class SchedulerTest extends BaseTestCase
             'expression' => '0 17 * * *',
 //            'nextFireTime' => time()-1,
             'class' => 'TestProject\\Biz\\Example\\Job\\ExampleJob',
-            'data' => array('courseId'=>1),
+            'args' => array('courseId'=>1),
             'priority' => 100,
             'misfireThreshold' => 3000,
             'misfirePolicy' => 'missed',
@@ -36,7 +36,7 @@ class SchedulerTest extends BaseTestCase
             'pool' => 'test',
             'source' => 'MAIN',
             'class' => 'TestProject\\Biz\\Example\\Job\\ExampleJob',
-            'data' => array('courseId'=>1),
+            'args' => array('courseId'=>1),
             'status' => 'created',
         );
         foreach ($logs as $log) {
@@ -55,7 +55,7 @@ class SchedulerTest extends BaseTestCase
             'source' => 'MAIN',
             'nextFireTime' => time()-1,
             'class' => 'TestProject\\Biz\\Example\\Job\\ExampleJob',
-            'data' => array('courseId'=>1),
+            'args' => array('courseId'=>1),
             'priority' => 100,
             'misfireThreshold' => 3000,
             'misfirePolicy' => 'executing',

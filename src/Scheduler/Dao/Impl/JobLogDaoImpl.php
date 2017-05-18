@@ -14,7 +14,7 @@ class JobLogDaoImpl extends GeneralDaoImpl implements JobLogDao
         return array(
             'timestamps' => array('createdTime'),
             'serializes' => array(
-                'data' => 'json',
+                'args' => 'json',
             )
         );
     }
