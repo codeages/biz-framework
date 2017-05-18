@@ -16,6 +16,7 @@ class Cache
 
     public function __construct(array $data)
     {
+        var_dump($data);exit();
         $this->key = $data['value'];
 
         if (!empty($data['rel_fields'])) {

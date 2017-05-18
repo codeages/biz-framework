@@ -10,7 +10,7 @@ use Codeages\Biz\Framework\Dao\Annotation\Cache;
 class ExampleWithCacheStrategyAnnotationDaoImpl extends ExampleDaoImpl
 {
     /**
-     * @Cache("example:{1}", rel_fields="id")
+     * @Cache({"id"})
      */
     public function get($id, array $options = array())
     {
