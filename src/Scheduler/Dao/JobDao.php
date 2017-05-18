@@ -6,5 +6,5 @@ interface JobDao
 {
     public function findWaitingJobsByLessThanFireTime($fireTime);
 
-    public function getByPoolAndName($pool, $name);
+    public function getByName($name);
 }

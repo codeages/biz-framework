@@ -80,10 +80,12 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         }
     }
 
-    public function deleteJobByPoolAndName($pool, $name)
+    public function deleteJobByName($name)
     {
-        $job = $this->getJobDao()->getByPoolAndName($pool, $name);
-        $this->deleteJob($job['id']);
+        $job = $this->getJobDao()->getByName($name);
+        if (!empty($job)) {
+            $this->deleteJob($job['id']);
+        }
     }
 
     protected function jobExecuted($jobFired, $result)

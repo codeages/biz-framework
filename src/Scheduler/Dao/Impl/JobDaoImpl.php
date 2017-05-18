@@ -21,10 +21,9 @@ class JobDaoImpl extends GeneralDaoImpl implements JobDao
         return $this->db()->fetchAll($sql, array($fireTime));
     }
 
-    public function getByPoolAndName($pool, $name)
+    public function getByName($name)
     {
         return $this->getByFields(array(
-            'pool' => $pool,
             'name' => $name,
             'deleted' => 0
         ));
