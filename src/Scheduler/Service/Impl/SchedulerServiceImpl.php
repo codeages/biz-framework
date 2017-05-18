@@ -54,6 +54,32 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         $this->jobExecuted($jobFired, $result);
     }
 
+    public function deleteJobDetail($id)
+    {
+        $this->getJobDetailDao()->update($id, array(
+            'deleted' => 1,
+            'deletedTime' => time()
+        ));
+    }
+
+    public function clearJobDetails()
+    {
+        $jobs = $this->getJobDetailDao()->search(array(
+            'deleted' => 1,
+            'lessThanDeletedTime' => time() - 24*60*60
+        ), array(), 0, 100);
+
+        foreach ($jobs as $job) {
+            $this->getJobDetailDao()->delete($job['id']);
+        }
+    }
+
+    public function deleteJobDetailByPoolAndName($pool, $name)
+    {
+        $jobDetail = $this->getJobDetailDao()->getByPoolAndName($pool, $name);
+        $this->deleteJobDetail($jobDetail['id']);
+    }
+
     protected function jobExecuted($jobFired, $result)
     {
         if ($result != 'success') {

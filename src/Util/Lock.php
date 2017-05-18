@@ -15,7 +15,7 @@ class Lock
 
     public function get($lockName, $lockTime)
     {
-        $result = $this->getConnection()->fetchAssoc("SELECT GET_LOCK('im_{$lockName}', {$lockTime}) AS getLock");
+        $result = $this->getConnection()->fetchAssoc("SELECT GET_LOCK('lock_{$lockName}', {$lockTime}) AS getLock");
 
         return $result['getLock'];
     }
