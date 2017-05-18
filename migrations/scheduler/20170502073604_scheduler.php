@@ -25,7 +25,7 @@ class Scheduler extends Migration
         ");
 
         $connection->exec("
-            CREATE TABLE IF NOT EXISTS `job_detail` (
+            CREATE TABLE IF NOT EXISTS `job` (
               `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '编号',
               `name` varchar(1024) NOT NULL COMMENT '任务名称',
               `pool` varchar(1024) NOT NULL DEFAULT 'default' COMMENT '所属组',
@@ -52,7 +52,7 @@ class Scheduler extends Migration
         $connection->exec("
             CREATE TABLE IF NOT EXISTS `job_fired` (
               `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '编号',
-              `jobDetailId` varchar(1024) NOT NULL COMMENT '任务名称',
+              `jobId` varchar(1024) NOT NULL COMMENT '任务名称',
               `firedTime` int(10) unsigned NOT NULL COMMENT '触发时间',
               `priority` int(10) unsigned NOT NULL DEFAULT 50 COMMENT '优先级',
               `status` varchar(1024) NOT NULL DEFAULT 'created' COMMENT '状态：created, executing',

@@ -3,11 +3,11 @@
 namespace Codeages\Biz\Framework\Scheduler\Dao\Impl;
 
 use Codeages\Biz\Framework\Dao\GeneralDaoImpl;
-use Codeages\Biz\Framework\Scheduler\Dao\JobDetailDao;
+use Codeages\Biz\Framework\Scheduler\Dao\JobDao;
 
-class JobDetailDaoImpl extends GeneralDaoImpl implements JobDetailDao
+class JobDaoImpl extends GeneralDaoImpl implements JobDao
 {
-    protected $table = 'job_detail';
+    protected $table = 'job';
 
     public function findWaitingJobsByLessThanFireTime($fireTime)
     {

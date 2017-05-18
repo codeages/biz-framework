@@ -2,7 +2,7 @@
 
 namespace Codeages\Biz\Framework\Scheduler\Dao;
 
-interface JobDetailDao
+interface JobDao
 {
     public function findWaitingJobsByLessThanFireTime($fireTime);
 

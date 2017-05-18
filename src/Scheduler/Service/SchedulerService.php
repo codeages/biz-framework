@@ -4,13 +4,13 @@ namespace Codeages\Biz\Framework\Scheduler\Service;
 
 interface SchedulerService
 {
-    public function schedule($jobDetail);
+    public function schedule($job);
 
     public function execute();
 
-    public function deleteJobDetailByPoolAndName($pool, $name);
+    public function deleteJobByPoolAndName($pool, $name);
 
-    public function deleteJobDetail($id);
+    public function deleteJob($id);
 
-    public function clearJobDetails();
+    public function clearJobs();
 }

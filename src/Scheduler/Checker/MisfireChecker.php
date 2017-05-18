@@ -7,11 +7,11 @@ class MisfireChecker implements JobChecker
     public function check($jobFired)
     {
         $now = time();
-        $jobDetail = $jobFired['jobDetail'];
-        $fireTime = $jobDetail['nextFireTime'];
+        $job = $jobFired['job'];
+        $fireTime = $job['nextFireTime'];
 
-        if (!empty($jobDetail['misfireThreshold']) && ($now - $fireTime) > $jobDetail['misfireThreshold']) {
-            return $jobDetail['misfirePolicy'];
+        if (!empty($job['misfireThreshold']) && ($now - $fireTime) > $job['misfireThreshold']) {
+            return $job['misfirePolicy'];
         }
 
         return static::EXECUTING;
