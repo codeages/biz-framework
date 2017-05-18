@@ -2,19 +2,27 @@
 namespace TestProject\Biz\Example\Dao\Impl;
 
 use Codeages\Biz\Framework\Dao\Annotation\CacheStrategy;
-use Codeages\Biz\Framework\Dao\Annotation\Cache;
+use Codeages\Biz\Framework\Dao\Annotation\RowCache;
 
 /**
- * @CacheStrategy("PrimaryKey")
+ * @CacheStrategy("Row")
  */
 class ExampleWithCacheStrategyAnnotationDaoImpl extends ExampleDaoImpl
 {
     /**
-     * @Cache({"id"})
+     * @RowCache({"id"}, primary=true)
      */
     public function get($id, array $options = array())
     {
         return parent::get($id, $options);
+    }
+
+    /**
+     * @RowCache()
+     */
+    public function getByName($name)
+    {
+        return $this->getByFields(array('name' => $name));
     }
 
     public function findByName($name, $start, $limit)

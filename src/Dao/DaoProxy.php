@@ -271,8 +271,15 @@ class DaoProxy
             return $this->cacheStrategy;
         }
 
-        if (!$this->container['dao.cache.enabled']) {
+        if (empty($this->container['dao.cache.enabled'])) {
             return null;
+        }
+
+        if (!empty($this->container['dao.cache.annotation'])) {
+            $strategy = $this->getStrategyFromAnnotation($this->dao);
+            if ($strategy) {
+                return $strategy;
+            }
         }
 
         $declares = $this->dao->declares();
@@ -280,9 +287,20 @@ class DaoProxy
             return null;
         }
 
-        $this->cacheStrategy = $this->container['dao.cache.strategy.'.(empty($declares['cache']) ? 'default' : $declares['cache'])];
+        if (!empty($declares['cache'])) {
+            return $this->container['dao.cache.strategy.'.$declares['cache']];
+        }
 
-        return $this->cacheStrategy;
+        if (isset($this->container['dao.cache.strategy.default'])) {
+            return $this->container['dao.cache.strategy.default'];
+        }
+
+        return null;
+    }
+
+    private function getStrategyFromAnnotation($dao)
+    {
+
     }
 
     private function getCacheKey(GeneralDaoInterface $dao, $method, $arguments)

@@ -52,7 +52,7 @@ class AnnotationCacheBuilder
 
                 $methodRefs = $classRef->getMethods(\ReflectionMethod::IS_PUBLIC);
                 foreach ($methodRefs as $methodRef) {
-                    $annotation = $reader->getMethodAnnotation($methodRef, 'Codeages\Biz\Framework\Dao\Annotation\Cache');
+                    $annotation = $reader->getMethodAnnotation($methodRef, 'Codeages\Biz\Framework\Dao\Annotation\RowCache');
                     if (empty($annotation)) {
                         continue;
                     }

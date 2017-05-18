@@ -10,7 +10,7 @@ Dao Cache
 class ExampleDaoImpl
 {
     /**
-     *@RowCache({"id"}, Primary=true) 
+     *@RowCache({"id"}, primary=true)
      */
     public function get($id, array $options = array())
     {
@@ -18,7 +18,7 @@ class ExampleDaoImpl
     }
 
     /**
-     * @RowCache()
+     * @RowCache
      */
     public function getByField1($field1)
     {
@@ -26,7 +26,7 @@ class ExampleDaoImpl
     }
     
     /**
-     * @RowCache()
+     * @RowCache
      */
     public function getByField2AndField3($field1, $field2)
     {
@@ -34,7 +34,7 @@ class ExampleDaoImpl
     }
     
     /**
-     * @RowCache()
+     * @RowCache
      */
     public function getByField2AndField4($field2, $field4)
     {
