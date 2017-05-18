@@ -17,15 +17,6 @@ abstract class AbstractJob implements Job, \ArrayAccess
 
     abstract public function execute();
 
-    public function run()
-    {
-        try {
-            $this->execute();
-        } catch (\Exception $e) {
-            $this->getTargetlogService()->log(TargetlogService::ERROR, 'job', $this->id, $e->getMessage());
-        }
-    }
-
     public function __get($name)
     {
         return empty($this->params[$name] ) ? '' : $this->params[$name];
@@ -54,10 +45,5 @@ abstract class AbstractJob implements Job, \ArrayAccess
 
     public function offsetGet($offset) {
         return isset($this->params[$offset]) ? $this->params[$offset] : null;
-    }
-
-    protected function getTargetlogService()
-    {
-        return $this->biz->service('Targetlog:TargetlogService');
     }
 }

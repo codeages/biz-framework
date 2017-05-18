@@ -47,7 +47,7 @@ class SchedulerTest extends BaseTestCase
     public function testRun()
     {
         $this->testCreateJob();
-        self::$biz['scheduler']->run();
+        self::$biz['scheduler']->execute();
 
         $jobDetail = array(
             'name' => 'test2',
@@ -62,7 +62,7 @@ class SchedulerTest extends BaseTestCase
         );
 
         self::$biz['scheduler']->schedule($jobDetail);
-        self::$biz['scheduler']->run();
+        self::$biz['scheduler']->execute();
     }
 
     protected function asserts($excepted, $acturel)

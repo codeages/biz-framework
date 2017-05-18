@@ -6,7 +6,7 @@ interface SchedulerService
 {
     public function schedule($jobDetail);
 
-    public function run();
+    public function execute();
 
     public function deleteJobDetailByPoolAndName($pool, $name);
 

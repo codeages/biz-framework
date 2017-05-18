@@ -23,13 +23,19 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
             throw new InvalidArgumentException('cron expression is invalid.');
         }
 
-        if (!empty($jobDetail['misfireThreshold']) && empty($jobDetail['misfirePolicy'])) {
-            throw new InvalidArgumentException('args is invalid.');
-        }
-
         if (!empty($jobDetail['expression'])) {
             $jobDetail['nextFireTime'] = $this->getNextRunTime($jobDetail['expression']);
         }
+
+        $default = array(
+            'misfireThreshold' => 300,
+            'misfirePolicy' => 'missed',
+            'priority' => 100,
+            'pool' => 'default',
+            'source' => 'MAIN'
+        );
+        $jobDetail = array_merge($default, $jobDetail);
+
         $jobDetail = $this->getJobDetailDao()->create($jobDetail);
         $this->dispatch('job.created', $jobDetail);
 
@@ -40,7 +46,7 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         return $jobDetail;
     }
 
-    public function run()
+    public function execute()
     {
         $this->updateWaitingJobsToAcquired();
         $jobFired = $this->triggerJob();

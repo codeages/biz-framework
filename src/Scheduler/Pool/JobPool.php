@@ -25,7 +25,12 @@ class JobPool
             return static::POOL_FULL;
         }
 
-        $job->run();
+        try {
+            $job->execute();
+        } catch (\Exception $e) {
+            $this->getTargetlogService()->log(TargetlogService::ERROR, 'job', $this->id, $e->getMessage());
+        }
+
         $this->release($job);
 
         return static::SUCCESS;
@@ -86,6 +91,11 @@ class JobPool
     protected function getJobPoolDao()
     {
         return $this->biz->dao('Scheduler:JobPoolDao');
+    }
+
+    protected function getTargetlogService()
+    {
+        return $this->biz->service('Targetlog:TargetlogService');
     }
 
     public function __get($name)

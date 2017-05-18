@@ -16,9 +16,9 @@ class Scheduler
         return $this->getSchedulerService()->schedule($jobDetail);
     }
 
-    public function run()
+    public function execute()
     {
-        $this->getSchedulerService()->run();
+        $this->getSchedulerService()->execute();
     }
 
     /**
