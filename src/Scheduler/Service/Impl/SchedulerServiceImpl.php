@@ -153,7 +153,7 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         $jobFired = $this->getJobFiredDao()->update($createdJobFired['id'], array('status' => $result));
 
         $jobFired['job'] = $job;
-        $this->updateNextFireTime($jobFired);
+        $jobFired['job'] = $this->updateNextFireTime($jobFired);
 
         $this->createJobLog($jobFired, $result);
 
@@ -180,7 +180,7 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
             'next_fire_time' => $nextFireTime
         );
 
-        $this->getJobDao()->update($job['id'], $fields);
+        return $this->getJobDao()->update($job['id'], $fields);
     }
 
     protected function updateWaitingJobsToAcquired()
