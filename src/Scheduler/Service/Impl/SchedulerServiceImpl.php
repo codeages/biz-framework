@@ -200,8 +200,6 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
 
             $this->biz['db']->commit();
             $lock->release($lockName);
-
-
         } catch (\Exception $e) {
             $this->biz['db']->rollback();
             $lock->release($lockName);
