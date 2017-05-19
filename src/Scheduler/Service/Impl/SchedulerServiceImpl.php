@@ -246,7 +246,27 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         $log['job_id'] = $job['id'];
         $log['hostname'] = getHostName();
 
-        $this->biz->service('Scheduler:JobLogService')->create($log);
+        $this->getJobLogDao()->create($log);
+    }
+
+    public function searchJobLogs($condition, $orderBy, $start, $limit)
+    {
+        return $this->getJobLogDao()->search($condition, $orderBy, $start, $limit);
+    }
+
+    public function countJobLogs($condition)
+    {
+        return $this->getJobLogDao()->count($condition);
+    }
+
+    public function searchJobs($condition, $orderBy, $start, $limit)
+    {
+        return $this->getJobDao()->search($condition, $orderBy, $start, $limit);
+    }
+
+    public function countJobs($condition)
+    {
+        return $this->getJobDao()->count($condition);
     }
 
     protected function createJobInstance($jobFired)
@@ -264,6 +284,11 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
     protected function getJobFiredDao()
     {
         return $this->biz->dao('Scheduler:JobFiredDao');
+    }
+
+    protected function getJobLogDao()
+    {
+        return $this->biz->dao('Scheduler:JobLogDao');
     }
 
     protected function getJobDao()

@@ -13,4 +13,12 @@ interface SchedulerService
     public function deleteJob($id);
 
     public function clearJobs();
+
+    public function searchJobLogs($condition, $orderBy, $start, $limit);
+
+    public function countJobLogs($condition);
+
+    public function searchJobs($condition, $orderBy, $start, $limit);
+
+    public function countJobs($condition);
 }

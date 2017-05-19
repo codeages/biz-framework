@@ -29,7 +29,7 @@ class SchedulerTest extends BaseTestCase
         $this->asserts($job, $savedJob);
         $this->assertNotEmpty($savedJob['next_fire_time']);
 
-        $logs = $this->getJobLogService()->search(array(), array(), 0, 1);
+        $logs = $this->getSchedulerService()->searchJobLogs(array(), array(), 0, 1);
 
         $excepted = array(
             'name' => 'test',
@@ -71,11 +71,6 @@ class SchedulerTest extends BaseTestCase
         foreach ($keys as $key) {
             $this->assertEquals($excepted[$key], $acturel[$key]);
         }
-    }
-
-    protected function getJobLogService()
-    {
-        return self::$biz->service('Scheduler:JobLogService');
     }
 
     public function getSchedulerService()
