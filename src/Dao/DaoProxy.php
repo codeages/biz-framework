@@ -307,7 +307,12 @@ class DaoProxy
 
     private function getStrategyFromAnnotation($dao)
     {
+        $metadata = $this->metadataReader->read($dao);
+        if (empty($metadata)) {
+            return null;
+        }
 
+        return $metadata['strategy'];
     }
 
     private function getCacheKey(GeneralDaoInterface $dao, $method, $arguments)

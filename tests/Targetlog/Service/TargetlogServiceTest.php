@@ -2,10 +2,10 @@
 
 namespace Tests\Targetlog\Service;
 
-use Codeages\Biz\Framework\UnitTests\BaseTestCase;
 use Codeages\Biz\Framework\TargetLog\Service\TargetlogService;
+use Tests\IntegrationTestCase;
 
-class TargetlogServiceTest extends BaseTestCase
+class TargetlogServiceTest extends IntegrationTestCase
 {
     public function testAddLog()
     {
@@ -24,6 +24,6 @@ class TargetlogServiceTest extends BaseTestCase
 
     protected function getTargetlogService()
     {
-        return self::$biz->service('Targetlog:TargetlogService');
+        return $this->biz->service('Targetlog:TargetlogService');
     }
 }

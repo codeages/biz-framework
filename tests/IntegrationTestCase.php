@@ -1,17 +1,35 @@
 <?php
 namespace Tests;
 
+use Codeages\Biz\Framework\Provider\RedisServiceProvider;
+use Codeages\Biz\Framework\Provider\TargetlogServiceProvider;
 use PHPUnit\Framework\TestCase;
 use Codeages\Biz\Framework\Context\Biz;
 use Codeages\Biz\Framework\Provider\DoctrineServiceProvider;
 
-
-class BaseTestCase extends TestCase
+class IntegrationTestCase extends TestCase
 {
     /**
      * @var \Composer\Autoload\ClassLoader
      */
     public static $classLoader = null;
+
+    /**
+     * @var Biz
+     */
+    protected $biz;
+
+    public function setUp()
+    {
+        $this->biz = $this->createBiz();
+        $this->biz['db']->beginTransaction();
+        $this->biz['redis']->flushDB();
+    }
+
+    public function tearDown()
+    {
+        $this->biz['db']->rollBack();
+    }
 
     protected function createBiz()
     {
@@ -25,10 +43,15 @@ class BaseTestCase extends TestCase
                 'driver' => 'pdo_mysql',
                 'charset' => 'utf8',
             ),
+            'redis.options' => array(
+                'host' => array('127.0.0.1:6379'),
+            ),
         );
 
         $biz = new Biz($config);
         $biz->register(new DoctrineServiceProvider());
+        $biz->register(new RedisServiceProvider());
+        $biz->register(new TargetlogServiceProvider());
         $biz->boot();
 
         return $biz;

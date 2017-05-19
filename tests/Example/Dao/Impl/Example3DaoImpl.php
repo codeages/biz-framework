@@ -1,8 +1,8 @@
 <?php
 
-namespace TestProject\Biz\Example\Dao\Impl;
+namespace Tests\Example\Dao\Impl;
 
-use TestProject\Biz\Example\Dao\ExampleDao;
+use Tests\Example\Dao\ExampleDao;
 use Codeages\Biz\Framework\Dao\GeneralDaoImpl;
 
 class Example3DaoImpl extends GeneralDaoImpl implements ExampleDao

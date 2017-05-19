@@ -1,22 +1,22 @@
 <?php
 
-namespace TestProject\Biz\Example\Dao\Impl;
+namespace Tests\Example\Dao\Impl;
 
-use TestProject\Biz\Example\Dao\ExampleDao;
 use Codeages\Biz\Framework\Dao\GeneralDaoImpl;
+use Tests\Example\Dao\ExampleDao;
 
-class Example2DaoImpl extends GeneralDaoImpl implements ExampleDao
+class ExampleDaoImpl extends GeneralDaoImpl implements ExampleDao
 {
-    protected $table = 'example2';
-
-    public function findByNameAndId($name, $id)
-    {
-        return $this->findByFields(array('name' => $name, 'id' => $id));
-    }
+    protected $table = 'example';
 
     public function findByName($name, $start, $limit)
     {
         return $this->search(array('name' => $name), array('created' => 'DESC'), $start, $limit);
+    }
+
+    public function findByNameAndId($name, $ids1)
+    {
+        return $this->findByFields(array('name' => $name, 'ids1' => $ids1));
     }
 
     public function findByIds(array $ids, array $orderBys, $start, $limit)
@@ -36,7 +36,14 @@ class Example2DaoImpl extends GeneralDaoImpl implements ExampleDao
     {
         return array(
             'timestamps' => array('created_time', 'updated_time'),
-            'serializes' => array('ids1' => 'json', 'ids2' => 'delimiter', 'null_value' => 'json'),
+            'serializes' => array(
+                'ids1' => 'json',
+                'ids2' => 'delimiter',
+                'null_value' => 'json',
+                'php_serialize_value' => 'php',
+                'json_serialize_value' => 'json',
+                'delimiter_serialize_value' => 'delimiter',
+            ),
             'orderbys' => array('name', 'created_time'),
             'conditions' => array(
                 'name = :name',
@@ -46,7 +53,8 @@ class Example2DaoImpl extends GeneralDaoImpl implements ExampleDao
                 'id iN (:ids)',
                 'ids1 = :ids1',
             ),
-            'cache' => 'table',
+            'wave_cahceable_fields' => array(
+            ),
         );
     }
 }

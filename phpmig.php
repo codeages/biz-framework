@@ -1,14 +1,14 @@
 <?php
 
-use Codeages\Biz\Framework\Context\Biz;
-use Codeages\Biz\Framework\Provider\DoctrineServiceProvider;
-use Codeages\Biz\Framework\Provider\TargetlogServiceProvider;
-use Codeages\Biz\Framework\Dao\MigrationBootstrap;
+use Doctrine\DBAL\DriverManager;
+use Phpmig\Adapter;
+use Pimple\Container;
+use Symfony\Component\Finder\Finder;
 
-define('ROOT_DIR', dirname(__DIR__));
+$container = new Container();
 
-$config = array(
-    'db.options' => array(
+$container['db'] = function () {
+    return DriverManager::getConnection(array(
         'dbname' => getenv('DB_NAME') ? : 'biz-framework',
         'user' => getenv('DB_USER') ? : 'root',
         'password' => getenv('DB_PASSWORD') ? : '',
@@ -16,14 +16,24 @@ $config = array(
         'port' => getenv('DB_PORT') ? : 3306,
         'driver' => 'pdo_mysql',
         'charset' => 'utf8',
-    ),
-);
+    ));
+};
 
-$biz = new Biz($config);
-$biz->register(new DoctrineServiceProvider());
-$biz->register(new TargetlogServiceProvider());
-$biz->boot();
+$container['phpmig.adapter'] = function ($c) {
+    return new Adapter\Doctrine\DBAL($c['db'], 'migrations');
+};
 
-$migration = new MigrationBootstrap($biz['db'], $biz['migration.directories']);
+$container['phpmig.migrations'] = function () {
+    $finder = new Finder();
+    $finder->in(__DIR__.DIRECTORY_SEPARATOR.'migrations');
+    $finder->files()->name('*.php');
 
-return $migration->boot();
+    $files = array();
+    foreach ($finder as $file) {
+        $files[] = $file->getRealPath();
+    }
+
+    return $files;
+};
+
+return $container;

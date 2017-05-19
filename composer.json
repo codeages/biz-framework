@@ -10,8 +10,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Tests\\": "tests/",
-            "TestProject\\": "tests/TestProject/src/"
+            "Tests\\": "tests/"
         }
     },
     "require": {

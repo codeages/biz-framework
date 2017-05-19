@@ -1,8 +1,8 @@
 <?php
 
-namespace TestProject\Biz\Example\Service\Impl;
+namespace Tests\Example\Service\Impl;
 
-use TestProject\Biz\Example\Service\ExampleService;
+use Tests\Example\Service\ExampleService;
 
 class ExampleServiceImpl implements ExampleService
 {

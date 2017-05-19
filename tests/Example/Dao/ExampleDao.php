@@ -1,6 +1,6 @@
 <?php
 
-namespace TestProject\Biz\Example\Dao;
+namespace Tests\Example\Dao;
 
 use Codeages\Biz\Framework\Dao\GeneralDaoInterface;
 

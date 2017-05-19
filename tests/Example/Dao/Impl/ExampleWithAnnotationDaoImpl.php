@@ -1,5 +1,5 @@
 <?php
-namespace TestProject\Biz\Example\Dao\Impl;
+namespace Tests\Example\Dao\Impl;
 
 use Codeages\Biz\Framework\Dao\Annotation\CacheStrategy;
 use Codeages\Biz\Framework\Dao\Annotation\RowCache;

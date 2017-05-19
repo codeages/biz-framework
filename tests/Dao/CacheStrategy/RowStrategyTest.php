@@ -3,23 +3,20 @@ namespace Tests\Dao\CacheStrategy;
 
 use Codeages\Biz\Framework\Dao\CacheStrategy\RowStrategy;
 use Codeages\Biz\Framework\Dao\GeneralDaoInterface;
-use TestProject\Biz\Example\Dao\Impl\ExampleWithAnnotationDaoImpl;
-use Tests\BaseTestCase;
+use Tests\Example\Dao\Impl\ExampleWithAnnotationDaoImpl;
+use Tests\IntegrationTestCase;
 
-class RowStrategyTest extends BaseTestCase
+class RowStrategyTest extends IntegrationTestCase
 {
     /**
      * @var \Redis
      */
     protected $redis;
 
-    protected $biz;
-
     public function setUp()
     {
-        $this->redis = $this->createRedis();
-        $this->redis->flushDB();
-        $this->biz = $this->createBiz();
+        parent::setUp();
+        $this->redis = $this->biz['redis'];
     }
 
     public function testBeforeQuery_HitCache()

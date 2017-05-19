@@ -2,9 +2,9 @@
 namespace Tests\Dao\Annotation;
 
 use Codeages\Biz\Framework\Dao\Annotation\AnnotationCacheBuilder;
-use Tests\BaseTestCase;
+use Tests\IntegrationTestCase;
 
-class AnnotationCacheBuilderTest extends BaseTestCase
+class AnnotationCacheBuilderTest extends IntegrationTestCase
 {
     public function testWarmUp()
     {
