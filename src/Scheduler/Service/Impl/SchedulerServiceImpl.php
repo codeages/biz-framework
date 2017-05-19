@@ -32,8 +32,14 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
             'misfire_policy' => 'missed',
             'priority' => 100,
             'pool' => 'default',
-            'source' => 'MAIN'
+            'source' => 'MAIN',
         );
+
+        if (!empty($this->biz['user'])) {
+            $user = $this->biz['user'];
+            $default['creator_id'] = $user['id'];
+        }
+
         $job = array_merge($default, $job);
 
         $job = $this->getJobDao()->create($job);

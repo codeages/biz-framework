@@ -41,7 +41,7 @@ class Scheduler extends Migration
               `misfire_policy` varchar(32) NOT NULL COMMENT '触发过期策略: missed, executing',
               `enabled` tinyint(1) DEFAULT 1 COMMENT '是否启用',
               `deleted` tinyint(1) DEFAULT 0 COMMENT '是否被删除',
-              `creatorId` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '任务创建人',
+              `creator_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '任务创建人',
               `deleted_time` int(10) unsigned NOT NULL DEFAULT 0 COMMENT '删除时间',
               `updated_time` int(10) unsigned NOT NULL COMMENT '修改时间',
               `created_time` int(10) unsigned NOT NULL COMMENT '任务创建时间',
