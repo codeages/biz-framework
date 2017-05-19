@@ -37,7 +37,8 @@ class JobDaoImpl extends GeneralDaoImpl implements JobDao
                 'args' => 'json',
             ),
             'conditions' => array(
-                'deleted_time < :lessThanDeletedTime'
+                'deleted_time < :lessThanDeletedTime',
+                'name like :name'
             )
         );
     }
