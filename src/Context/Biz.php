@@ -2,6 +2,7 @@
 
 namespace Codeages\Biz\Framework\Context;
 
+use Codeages\Biz\Framework\Dao\Annotation\MetadataReader;
 use Codeages\Biz\Framework\Dao\DaoProxy;
 use Codeages\Biz\Framework\Dao\FieldSerializer;
 use Pimple\Container;
@@ -58,8 +59,12 @@ class Biz extends Container
         $biz['autoload.object_maker.dao'] = function ($biz) {
             return function ($namespace, $name) use ($biz) {
                 $class = "{$namespace}\\Dao\\Impl\\{$name}Impl";
-                return new DaoProxy($biz, new $class($biz), $biz['dao.serializer'], $biz['dao.cache.array_storage']);
+                return new DaoProxy($biz, new $class($biz), $biz['dao.metadata_reader'], $biz['dao.serializer'], $biz['dao.cache.array_storage']);
             };
+        };
+
+        $biz['dao.metadata_reader'] = function ($biz) {
+            return new MetadataReader();
         };
 
         $biz['dao.serializer'] = function () {

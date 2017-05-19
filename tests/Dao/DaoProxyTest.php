@@ -2,6 +2,7 @@
 
 namespace Tests\Dao;
 
+use Codeages\Biz\Framework\Dao\Annotation\MetadataReader;
 use PHPUnit\Framework\TestCase;
 use Codeages\Biz\Framework\Context\Biz;
 use Codeages\Biz\Framework\Dao\FieldSerializer;
@@ -49,7 +50,7 @@ class DaoProxyTest extends TestCase
         $biz = new Biz();
         $biz['dao.cache.enabled'] = true;
 
-        $proxy = new DaoProxy($biz, $dao->reveal(), $serializer);
+        $proxy = new DaoProxy($biz, $dao->reveal(), new MetadataReader(), $serializer);
 
         $row = $proxy->get($expected['id'], array('lock' => true));
 
@@ -148,7 +149,7 @@ class DaoProxyTest extends TestCase
         $biz['dao.cache.enabled'] = true;
         $biz['dao.cache.strategy.default'] = $strategy->reveal();
 
-        return new DaoProxy($biz, $dao->reveal(), $serializer);
+        return new DaoProxy($biz, $dao->reveal(), new MetadataReader(), $serializer);
     }
 
     private function mockDaoProxyWithMissCache($expected, $proxyMethod)
@@ -176,7 +177,7 @@ class DaoProxyTest extends TestCase
         $biz['dao.cache.enabled'] = true;
         $biz['dao.cache.strategy.default'] = $strategy->reveal();
 
-        return new DaoProxy($biz, $dao->reveal(), $serializer);
+        return new DaoProxy($biz, $dao->reveal(), new MetadataReader(), $serializer);
     }
 
     private function mockDaoProxyWithNoCache($expected, $proxyMethod)
@@ -190,6 +191,6 @@ class DaoProxyTest extends TestCase
         $biz = new Biz();
         $biz['dao.cache.enabled'] = false;
 
-        return new DaoProxy($biz, $dao->reveal(), $serializer);
+        return new DaoProxy($biz, $dao->reveal(), new MetadataReader(), $serializer);
     }
 }

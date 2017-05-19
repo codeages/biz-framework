@@ -27,7 +27,6 @@ class MetadataReader
 
         $metadata = array(
             'strategy' =>  $annotation->getName(),
-            'primary_query_method' => '',
             'cache_key_of_field_name' => array(),
             'cache_key_of_arg_index' => array(),
             'update_rel_query_methods' => array(),
@@ -45,16 +44,7 @@ class MetadataReader
                 $annotation->relFields = $args;
             }
 
-            if (!empty($metadata['primary_query_method']) && $annotation->primaryQuery) {
-                throw new ReadException("In dao `{$classRef->getName()}` have more than one primary query.");
-            }
-
-            if ($annotation->primaryQuery) {
-                $metadata['primary_query_method'] = $methodRef->getName();
-            }
-
             $metadata['cache_key_of_field_name'][$methodRef->getName()] = $annotation->relFields;
-
 
             $args = array_flip($args);
             foreach ($annotation->relFields as $field) {
@@ -70,6 +60,9 @@ class MetadataReader
             }
         }
 
+        $metadata['cache_key_of_arg_index']['get'] = [0];
+        $metadata['cache_key_of_field_name']['get'] = ['id'];
+
         return $metadata;
     }
 
@@ -81,10 +74,5 @@ class MetadataReader
             $names[] = $arg->getName();
         }
         return $names;
-    }
-
-    protected function readForRowCache($classRef)
-    {
-
     }
 }

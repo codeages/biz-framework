@@ -2,6 +2,7 @@
 
 namespace Codeages\Biz\Framework\Dao;
 
+use Codeages\Biz\Framework\Dao\Annotation\MetadataReader;
 use Pimple\Container;
 
 class DaoProxy
@@ -26,10 +27,16 @@ class DaoProxy
      */
     protected $arrayStorage;
 
-    public function __construct($container, DaoInterface $dao, SerializerInterface $serializer, ArrayStorage $arrayStorage = null)
+    /**
+     * @var MetadataReader
+     */
+    protected $metadataReader;
+
+    public function __construct($container, DaoInterface $dao, MetadataReader $metadataReader, SerializerInterface $serializer, ArrayStorage $arrayStorage = null)
     {
         $this->container = $container;
         $this->dao = $dao;
+        $this->metadataReader = $metadataReader;
         $this->serializer = $serializer;
         $this->arrayStorage = $arrayStorage;
     }

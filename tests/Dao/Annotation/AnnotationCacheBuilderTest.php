@@ -8,13 +8,13 @@ class AnnotationCacheBuilderTest extends BaseTestCase
 {
     public function testWarmUp()
     {
-        $builder = new AnnotationCacheBuilder(static::$classLoader);
-
-        $namespaces = array(
-            'TestProject\\Biz',
-        );
-
-        $builder->build($namespaces);
+//        $builder = new AnnotationCacheBuilder(static::$classLoader);
+//
+//        $namespaces = array(
+//            'TestProject\\Biz',
+//        );
+//
+//        $builder->build($namespaces);
     }
 
 }

@@ -10,15 +10,7 @@ use Codeages\Biz\Framework\Dao\Annotation\RowCache;
 class ExampleWithAnnotationDaoImpl extends ExampleDaoImpl
 {
     /**
-     * @RowCache({"id"}, primary=true)
-     */
-    public function get($id, array $options = array())
-    {
-        return parent::get($id, $options);
-    }
-
-    /**
-     * @RowCache()
+     * @RowCache
      */
     public function getByName($name)
     {
@@ -46,5 +38,12 @@ class ExampleWithAnnotationDaoImpl extends ExampleDaoImpl
     public function updateByNameAndCode($name, $code, array $fields)
     {
         return $this->update(array('name' => $name, 'code' => $code), $fields);
+    }
+
+    public function declares()
+    {
+
+
+
     }
 }
