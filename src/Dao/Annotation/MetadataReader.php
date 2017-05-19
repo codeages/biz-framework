@@ -1,14 +1,13 @@
 <?php
+
 namespace Codeages\Biz\Framework\Dao\Annotation;
 
-use Codeages\Biz\Framework\Dao\Annotation\ReadException;
 use Doctrine\Common\Annotations\AnnotationReader;
 
 class MetadataReader
 {
     public function __construct()
     {
-
     }
 
     public function read($dao)
@@ -26,7 +25,7 @@ class MetadataReader
         }
 
         $metadata = array(
-            'strategy' =>  $annotation->getName(),
+            'strategy' => $annotation->getName(),
             'cache_key_of_field_name' => array(),
             'cache_key_of_arg_index' => array(),
             'update_rel_query_methods' => array(),
@@ -73,6 +72,7 @@ class MetadataReader
         foreach ($args as $arg) {
             $names[] = $arg->getName();
         }
+
         return $names;
     }
 }

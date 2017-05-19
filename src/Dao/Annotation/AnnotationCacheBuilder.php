@@ -1,4 +1,5 @@
 <?php
+
 namespace Codeages\Biz\Framework\Dao\Annotation;
 
 use Composer\Autoload\ClassLoader;
@@ -31,7 +32,7 @@ class AnnotationCacheBuilder
             $finder->in($directory);
 
             foreach ($finder->files()->name('*.php') as $file) {
-                $class = $namespace . '\\'. str_replace(DIRECTORY_SEPARATOR, '\\', substr($file->getRelativePathname(), 0, -4));
+                $class = $namespace.'\\'.str_replace(DIRECTORY_SEPARATOR, '\\', substr($file->getRelativePathname(), 0, -4));
 
                 $classRef = new \ReflectionClass($class);
                 $isDao = $classRef->implementsInterface('Codeages\Biz\Framework\Dao\DaoInterface');
@@ -44,7 +45,7 @@ class AnnotationCacheBuilder
                     continue;
                 }
 
-                $cache[$class] =  array(
+                $cache[$class] = array(
                     'strategy' => $annotation->getName(),
                     'update_rel_fields' => array(),
                     'methods' => array(),

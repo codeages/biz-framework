@@ -80,6 +80,7 @@ class DaoProxy
             $cache = $strategy->beforeQuery($this->dao, $method, $arguments);
             if ($cache !== false) {
                 $this->arrayStorage && ($this->arrayStorage[$this->getCacheKey($this->dao, $method, $arguments)] = $cache);
+
                 return $cache;
             }
         }

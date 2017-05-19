@@ -1,4 +1,5 @@
 <?php
+
 namespace Tests\Dao\Annotation;
 
 use Codeages\Biz\Framework\Dao\Annotation\AnnotationCacheBuilder;
@@ -8,7 +9,7 @@ class AnnotationCacheBuilderTest extends IntegrationTestCase
 {
     public function testWarmUp()
     {
-//        $builder = new AnnotationCacheBuilder(static::$classLoader);
+        //        $builder = new AnnotationCacheBuilder(static::$classLoader);
 //
 //        $namespaces = array(
 //            'TestProject\\Biz',
@@ -16,5 +17,4 @@ class AnnotationCacheBuilderTest extends IntegrationTestCase
 //
 //        $builder->build($namespaces);
     }
-
 }

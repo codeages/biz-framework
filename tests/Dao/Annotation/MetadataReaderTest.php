@@ -1,4 +1,5 @@
 <?php
+
 namespace Tests\Dao\Annotation;
 
 use Codeages\Biz\Framework\Dao\Annotation\MetadataReader;
@@ -7,10 +8,9 @@ use Tests\IntegrationTestCase;
 
 class MetadataReaderTest extends IntegrationTestCase
 {
-
     public function testRead()
     {
-//        $reader = new MetadataReader();
+        //        $reader = new MetadataReader();
 //
 //        $dao = new ExampleWithAnnotationDaoImpl($this->createBiz());
 //

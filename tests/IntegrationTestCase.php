@@ -1,4 +1,5 @@
 <?php
+
 namespace Tests;
 
 use Codeages\Biz\Framework\Provider\RedisServiceProvider;
@@ -62,6 +63,7 @@ class IntegrationTestCase extends TestCase
         $redis = new \Redis();
         $redis->connect(getenv('REDIS_HOST'), getenv('REDIS_PORT'));
         $redis->setOption(\Redis::OPT_SERIALIZER, \Redis::SERIALIZER_PHP);
+
         return $redis;
     }
 }

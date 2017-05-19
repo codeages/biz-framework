@@ -60,7 +60,7 @@ class RowStrategy implements CacheStrategy
 
         $key = $this->getCacheKey($dao, $metadata, $method, $arguments);
         if (!$key) {
-            return ;
+            return;
         }
 
         $primaryKey = $this->getPrimaryCacheKey($dao, $metadata, $data['id']);

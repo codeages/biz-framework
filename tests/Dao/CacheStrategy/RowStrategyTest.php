@@ -1,4 +1,5 @@
 <?php
+
 namespace Tests\Dao\CacheStrategy;
 
 use Codeages\Biz\Framework\Dao\CacheStrategy\RowStrategy;
@@ -162,7 +163,7 @@ class RowStrategyTest extends IntegrationTestCase
     {
         return array(
             'id' => 1,
-            'name' => 'lilei'
+            'name' => 'lilei',
         );
     }
 }

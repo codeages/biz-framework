@@ -23,7 +23,7 @@ class UnitTestsBootstrapTest extends TestCase
             ),
         );
         $biz = new Biz($config);
-        $biz['migration.directories'][] = dirname(__DIR__) . '/Example/migrations';
+        $biz['migration.directories'][] = dirname(__DIR__).'/Example/migrations';
         $biz->register(new DoctrineServiceProvider());
         $biz->boot();
 

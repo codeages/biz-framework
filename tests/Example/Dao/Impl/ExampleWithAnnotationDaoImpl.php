@@ -1,4 +1,5 @@
 <?php
+
 namespace Tests\Example\Dao\Impl;
 
 use Codeages\Biz\Framework\Dao\Annotation\CacheStrategy;
@@ -42,8 +43,5 @@ class ExampleWithAnnotationDaoImpl extends ExampleDaoImpl
 
     public function declares()
     {
-
-
-
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 namespace Tests;
 
 use Tests\Example\Fixtures\Loader;
