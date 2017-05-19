@@ -15,7 +15,7 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
 {
     public function schedule($job)
     {
-        if (empty($job['expression']) && empty($job['nextFireTime'])) {
+        if (empty($job['expression']) && empty($job['next_fire_time'])) {
             throw new InvalidArgumentException('args is invalid.');
         }
 
@@ -24,12 +24,12 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         }
 
         if (!empty($job['expression'])) {
-            $job['nextFireTime'] = $this->getNextRunTime($job['expression']);
+            $job['next_fire_time'] = $this->getNextRunTime($job['expression']);
         }
 
         $default = array(
-            'misfireThreshold' => 300,
-            'misfirePolicy' => 'missed',
+            'misfire_threshold' => 300,
+            'misfire_policy' => 'missed',
             'priority' => 100,
             'pool' => 'default',
             'source' => 'MAIN'
@@ -69,7 +69,7 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
     {
         $this->getJobDao()->update($id, array(
             'deleted' => 1,
-            'deletedTime' => time()
+            'deleted_time' => time()
         ));
     }
 
@@ -98,7 +98,7 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         if ($result != 'success') {
             $this->createJobLog($jobFired, $result);
             $this->getJobFiredDao()->update($jobFired['id'], array(
-                'firedTime' => time(),
+                'fired_time' => time(),
                 'status' => 'acquired'
             ));
             $this->createJobLog($jobFired, 'acquired');
@@ -146,7 +146,7 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
             return;
         }
 
-        $job = $this->getJobDao()->get($createdJobFired['jobId']);
+        $job = $this->getJobDao()->get($createdJobFired['job_id']);
         $createdJobFired['job'] = $job;
         $result =  $this->getCheckerChain()->check($createdJobFired);
 
@@ -169,15 +169,15 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
     {
         $job = $jobFired['job'];
 
-        $nextFireTime = $job['nextFireTime'];
+        $nextFireTime = $job['next_fire_time'];
         if (!empty($job['expression'])) {
             $nextFireTime = $this->getNextRunTime($job['expression']);
         }
 
         $fields = array(
             'status' => 'waiting',
-            'preFireTime' => $job['nextFireTime'],
-            'nextFireTime' => $nextFireTime
+            'pre_fire_time' => $job['next_fire_time'],
+            'next_fire_time' => $nextFireTime
         );
 
         $this->getJobDao()->update($job['id'], $fields);
@@ -214,8 +214,8 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         $job = $this->getJobDao()->update($job['id'], array('status' => 'acquired'));
 
         $jobFired = array(
-            'jobId' => $job['id'],
-            'firedTime' => $job['nextFireTime'],
+            'job_id' => $job['id'],
+            'fired_time' => $job['next_fire_time'],
             'status' => 'acquired'
         );
         $jobFired = $this->getJobFiredDao()->create($jobFired);
@@ -240,10 +240,10 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         ));
 
         if (!empty($jobFired['id'])) {
-            $log['jobFiredId'] = $jobFired['id'];
+            $log['job_fired_id'] = $jobFired['id'];
         }
         $log['status'] = $status;
-        $log['jobId'] = $job['id'];
+        $log['job_id'] = $job['id'];
         $log['hostname'] = getHostName();
 
         $this->biz->service('Scheduler:JobLogService')->create($log);

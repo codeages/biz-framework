@@ -2,7 +2,9 @@
 
 namespace Codeages\Biz\Framework\Scheduler\Dao;
 
-interface JobLogDao
+use Codeages\Biz\Framework\Dao\GeneralDaoInterface;
+
+interface JobLogDao extends GeneralDaoInterface
 {
 
 }

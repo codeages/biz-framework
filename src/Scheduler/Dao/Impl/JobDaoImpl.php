@@ -13,10 +13,10 @@ class JobDaoImpl extends GeneralDaoImpl implements JobDao
     {
         $sql = "SELECT * FROM 
                 (
-                  SELECT *, floor(createdTime/60)*60 as formattedCreatedTime FROM {$this->table} 
-                  WHERE status = 'waiting' AND enabled = 1 AND deleted = 0 AND nextFireTime <= ?
+                  SELECT *, floor(created_time/60)*60 as formatted_created_time FROM {$this->table} 
+                  WHERE status = 'waiting' AND enabled = 1 AND deleted = 0 AND next_fire_time <= ?
                 ) as {$this->table} 
-                ORDER BY formattedCreatedTime ASC , priority DESC";
+                ORDER BY formatted_created_time ASC , priority DESC";
 
         return $this->db()->fetchAll($sql, array($fireTime));
     }
@@ -32,12 +32,12 @@ class JobDaoImpl extends GeneralDaoImpl implements JobDao
     public function declares()
     {
         return array(
-            'timestamps' => array('createdTime', 'updatedTime'),
+            'timestamps' => array('created_time', 'updated_time'),
             'serializes' => array(
                 'args' => 'json',
             ),
             'conditions' => array(
-                'deletedTime < :lessThanDeletedTime'
+                'deleted_time < :lessThanDeletedTime'
             )
         );
     }

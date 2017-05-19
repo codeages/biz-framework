@@ -17,7 +17,7 @@ class JobPoolDaoImpl extends GeneralDaoImpl implements JobPoolDao
     public function declares()
     {
         return array(
-            'timestamps' => array('createdTime', 'updatedTime')
+            'timestamps' => array('created_time', 'updated_time')
         );
     }
 }

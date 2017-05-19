@@ -49,7 +49,7 @@ class JobPoolTest extends TestCase
 
         $poolDetail = $this->biz['scheduler.job.pool']->getJobPool('default');
         $this->assertEquals(0, $poolDetail['num']);
-        $this->assertEquals(10, $poolDetail['maxNum']);
+        $this->assertEquals(10, $poolDetail['max_num']);
         $this->assertEquals(120, $poolDetail['timeout']);
     }
 }

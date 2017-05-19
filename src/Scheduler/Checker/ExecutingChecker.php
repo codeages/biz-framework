@@ -6,7 +6,7 @@ class ExecutingChecker extends AbstractJobChecker
 {
     public function check($jobFired)
     {
-        $jobFireds = $this->getSchedulerService()->findJobFiredByJobId($jobFired['jobId']);
+        $jobFireds = $this->getSchedulerService()->findJobFiredByJobId($jobFired['job_id']);
         foreach ($jobFireds as $item) {
             if ($item['id'] == $jobFired['id']) {
                 continue;

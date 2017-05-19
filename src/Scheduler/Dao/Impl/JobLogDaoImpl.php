@@ -12,7 +12,7 @@ class JobLogDaoImpl extends GeneralDaoImpl implements JobLogDao
     public function declares()
     {
         return array(
-            'timestamps' => array('createdTime'),
+            'timestamps' => array('created_time'),
             'serializes' => array(
                 'args' => 'json',
             )

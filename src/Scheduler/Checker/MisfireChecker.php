@@ -8,10 +8,10 @@ class MisfireChecker extends AbstractJobChecker
     {
         $now = time();
         $job = $jobFired['job'];
-        $fireTime = $job['nextFireTime'];
+        $fireTime = $job['next_fire_time'];
 
-        if (!empty($job['misfireThreshold']) && ($now - $fireTime) > $job['misfireThreshold']) {
-            return $job['misfirePolicy'];
+        if (!empty($job['misfire_threshold']) && ($now - $fireTime) > $job['misfire_threshold']) {
+            return $job['misfire_policy'];
         }
 
         return static::EXECUTING;

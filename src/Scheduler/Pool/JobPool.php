@@ -66,11 +66,11 @@ class JobPool
 
         $jobPool = $this->getJobPool($options['name']);
         if (empty($jobPool)) {
-            $jobPool = ArrayToolkit::parts($options, array('maxNum', 'num', 'name', 'timeout'));
+            $jobPool = ArrayToolkit::parts($options, array('max_num', 'num', 'name', 'timeout'));
             $jobPool = $this->getJobPoolDao()->create($jobPool);
         }
 
-        if ($jobPool['num'] == $jobPool['maxNum']) {
+        if ($jobPool['num'] == $jobPool['max_num']) {
             $this->biz['lock']->release($lockName);
             return true;
         }

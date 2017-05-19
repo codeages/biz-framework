@@ -2,7 +2,9 @@
 
 namespace Codeages\Biz\Framework\Scheduler\Dao;
 
-interface JobFiredDao
+use Codeages\Biz\Framework\Dao\GeneralDaoInterface;
+
+interface JobFiredDao extends GeneralDaoInterface
 {
     public function getByStatus($status);
 

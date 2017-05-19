@@ -20,14 +20,14 @@ class SchedulerTest extends BaseTestCase
             'class' => 'TestProject\\Biz\\Example\\Job\\ExampleJob',
             'args' => array('courseId'=>1),
             'priority' => 100,
-            'misfireThreshold' => 3000,
-            'misfirePolicy' => 'missed',
+            'misfire_threshold' => 3000,
+            'misfire_policy' => 'missed',
         );
 
-        $savedJob = self::$biz['scheduler']->schedule($job);
+        $savedJob = $this->getSchedulerService()->schedule($job);
 
         $this->asserts($job, $savedJob);
-        $this->assertNotEmpty($savedJob['nextFireTime']);
+        $this->assertNotEmpty($savedJob['next_fire_time']);
 
         $logs = $this->getJobLogService()->search(array(), array(), 0, 1);
 
@@ -47,22 +47,22 @@ class SchedulerTest extends BaseTestCase
     public function testRun()
     {
         $this->testCreateJob();
-        self::$biz['scheduler']->execute();
+        $this->getSchedulerService()->execute();
 
         $job = array(
             'name' => 'test2',
             'pool' => 'test2',
             'source' => 'MAIN',
-            'nextFireTime' => time()-1,
+            'next_fire_time' => time()-1,
             'class' => 'TestProject\\Biz\\Example\\Job\\ExampleJob',
             'args' => array('courseId'=>1),
             'priority' => 100,
-            'misfireThreshold' => 3000,
-            'misfirePolicy' => 'executing',
+            'misfire_threshold' => 3000,
+            'misfire_policy' => 'executing',
         );
 
-        self::$biz['scheduler']->schedule($job);
-        self::$biz['scheduler']->execute();
+        $this->getSchedulerService()->schedule($job);
+        $this->getSchedulerService()->execute();
     }
 
     protected function asserts($excepted, $acturel)

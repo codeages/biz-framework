@@ -18,7 +18,7 @@ class SchedulerServiceProvider implements ServiceProviderInterface
         $biz['autoload.aliases']['Scheduler'] = 'Codeages\Biz\Framework\Scheduler';
 
         $biz['scheduler.job.pool.options'] = array(
-            'maxNum'  => 10,
+            'max_num'  => 10,
             'timeout' => 120,
         );
 
@@ -34,9 +34,5 @@ class SchedulerServiceProvider implements ServiceProviderInterface
             new MisfireChecker($biz),
             new ExecutingChecker($biz)
         );
-
-        $biz['scheduler'] = function ($biz){
-            return new Scheduler($biz);
-        };
     }
 }
