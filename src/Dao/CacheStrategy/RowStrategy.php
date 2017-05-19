@@ -31,9 +31,13 @@ class RowStrategy implements CacheStrategy
 
     public function beforeQuery(GeneralDaoInterface $dao, $method, $arguments)
     {
+        if (strpos($method, 'get') !== 0) {
+            return false;
+        }
+
         $metadata = $this->metadataReader->read($dao);
 
-        $key = $this->key($dao, $metadata, $method, $arguments);
+        $key = $this->getCacheKey($dao, $metadata, $method, $arguments);
         if (!$key) {
             return false;
         }
@@ -48,39 +52,65 @@ class RowStrategy implements CacheStrategy
 
     public function afterQuery(GeneralDaoInterface $dao, $method, $arguments, $data)
     {
+        if (strpos($method, 'get') !== 0) {
+            return;
+        }
+
         $metadata = $this->metadataReader->read($dao);
 
-        $key = $this->key($dao, $metadata, $method, $arguments);
+        $key = $this->getCacheKey($dao, $metadata, $method, $arguments);
         if (!$key) {
             return ;
         }
 
-        $primaryKey = $this->saveRowCache($dao, $metadata, $data);
+        $primaryKey = $this->getPrimaryCacheKey($dao, $metadata, $data['id']);
 
+        $this->redis->set($primaryKey, $data, self::LIFE_TIME);
         $this->redis->set($key, $primaryKey, self::LIFE_TIME);
     }
 
     public function afterCreate(GeneralDaoInterface $dao, $method, $arguments, $row)
     {
-
+        return;
     }
 
     public function afterUpdate(GeneralDaoInterface $dao, $method, $arguments, $row)
     {
+        $metadata = $this->metadataReader->read($dao);
+        $primaryKey = $this->getPrimaryCacheKey($dao, $metadata, $row['id']);
+        $this->redis->del($primaryKey);
 
+//        @todo
+//        foreach ($arguments[1] as $field) {
+//            if (empty($metadata['update_rel_query_methods'][$field])) {
+//                continue;
+//            }
+//
+//            foreach ($metadata['update_rel_query_methods'][$field] as $method) {
+//
+//            }
+//        }
     }
 
     public function afterDelete(GeneralDaoInterface $dao, $method, $arguments)
     {
-
+        $metadata = $this->metadataReader->read($dao);
+        // $arguments[0] is GeneralDaoInterface delete function first argument `id`.
+        $primaryKey = $this->getPrimaryCacheKey($dao, $metadata, $arguments[0]);
+        $this->redis->del($primaryKey);
     }
 
     public function afterWave(GeneralDaoInterface $dao, $method, $arguments, $affected)
     {
-
+        $metadata = $this->metadataReader->read($dao);
+        // $arguments[0] is GeneralDaoInterface wave function first argument `$ids`.
+        foreach ($arguments[0] as $id) {
+            $primaryKey = $this->getPrimaryCacheKey($dao, $metadata, $id);
+            $this->redis->del($primaryKey);
+        }
     }
 
-    protected function key(GeneralDaoInterface $dao, $metadata, $method, $arguments)
+    protected function getCacheKey(GeneralDaoInterface $dao, $metadata, $method, $arguments)
     {
         $argumentsForKey = array();
 
@@ -97,24 +127,8 @@ class RowStrategy implements CacheStrategy
         return $key.implode(',', $argumentsForKey);
     }
 
-    protected function saveRowCache(GeneralDaoInterface $dao, $metadata, $data)
+    protected function getPrimaryCacheKey(GeneralDaoInterface $dao, $metadata, $id)
     {
-        $method = $metadata['primary_query_method'];
-
-        $args = array();
-        foreach ($metadata['cache_key_of_field_name'][$method] as $field) {
-            $args[] = $data[$field];
-        }
-
-        $key = $this->key($dao, $metadata, $method, $args);
-
-        $this->redis->set($key, $data, self::LIFE_TIME);
-
-        return $key;
-    }
-
-    protected function getPrimaryCacheKey()
-    {
-
+        return $this->getCacheKey($dao, $metadata, 'get', [$id]);
     }
 }
