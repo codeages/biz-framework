@@ -261,12 +261,23 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
 
     public function searchJobs($condition, $orderBy, $start, $limit)
     {
+        $condition = $this->mergeCondition($condition);
         return $this->getJobDao()->search($condition, $orderBy, $start, $limit);
     }
 
     public function countJobs($condition)
     {
+        $condition = $this->mergeCondition($condition);
         return $this->getJobDao()->count($condition);
+    }
+
+    protected function mergeCondition($condition)
+    {
+        $defaultCondition = array(
+            'deleted' => 0
+        );
+
+        return array_merge($defaultCondition, $condition);
     }
 
     protected function createJobInstance($jobFired)
