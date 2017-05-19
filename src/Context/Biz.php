@@ -82,6 +82,10 @@ class Biz extends Container
             return new CacheStrategy\TableStrategy($biz['redis'], $biz['dao.cache.shared_storage']);
         };
 
+        $biz['dao.cache.strategy.row'] = function ($biz) {
+            return new CacheStrategy\RowStrategy($biz['redis']);
+        };
+
         foreach ($values as $key => $value) {
             $this->offsetSet($key, $value);
         }

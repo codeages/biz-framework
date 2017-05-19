@@ -8,7 +8,7 @@ use Codeages\Biz\Framework\Dao\Annotation\RowCache;
 /**
  * @CacheStrategy("Row")
  */
-class ExampleWithAnnotationDaoImpl extends ExampleDaoImpl
+class AnnotationExampleDaoImpl extends ExampleDaoImpl
 {
     /**
      * @RowCache

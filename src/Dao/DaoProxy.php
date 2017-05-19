@@ -313,7 +313,7 @@ class DaoProxy
             return null;
         }
 
-        return $metadata['strategy'];
+        return $this->container['dao.cache.strategy.'.strtolower($metadata['strategy'])];
     }
 
     private function getCacheKey(GeneralDaoInterface $dao, $method, $arguments)

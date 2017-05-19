@@ -11,7 +11,6 @@ class GeneralDaoImplTest extends IntegrationTestCase
     public function setUp()
     {
         parent::setUp();
-        $this->biz['autoload.aliases']['Example'] = 'Tests\\Example';
         $this->biz['db']->exec(Loader::loadSql());
     }
 

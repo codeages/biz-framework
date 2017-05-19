@@ -4,7 +4,7 @@ namespace Tests\Dao\CacheStrategy;
 
 use Codeages\Biz\Framework\Dao\CacheStrategy\RowStrategy;
 use Codeages\Biz\Framework\Dao\GeneralDaoInterface;
-use Tests\Example\Dao\Impl\ExampleWithAnnotationDaoImpl;
+use Tests\Example\Dao\Impl\AnnotationExampleDaoImpl;
 use Tests\IntegrationTestCase;
 
 class RowStrategyTest extends IntegrationTestCase
@@ -23,7 +23,7 @@ class RowStrategyTest extends IntegrationTestCase
     public function testBeforeQuery_HitCache()
     {
         $strategy = new RowStrategy($this->redis);
-        $dao = new ExampleWithAnnotationDaoImpl($this->biz);
+        $dao = new AnnotationExampleDaoImpl($this->biz);
 
         $row = $this->fakeRow();
 
@@ -39,7 +39,7 @@ class RowStrategyTest extends IntegrationTestCase
     public function testBeforeQuery_MissCache_RefKeyAndPrimaryKeyNotExist()
     {
         $strategy = new RowStrategy($this->redis);
-        $dao = new ExampleWithAnnotationDaoImpl($this->biz);
+        $dao = new AnnotationExampleDaoImpl($this->biz);
 
         $row = $this->fakeRow();
 
@@ -53,7 +53,7 @@ class RowStrategyTest extends IntegrationTestCase
     public function testBeforeQuery_MissCache_PrimaryKeyNotExist()
     {
         $strategy = new RowStrategy($this->redis);
-        $dao = new ExampleWithAnnotationDaoImpl($this->biz);
+        $dao = new AnnotationExampleDaoImpl($this->biz);
 
         $row = $this->fakeRow();
 
@@ -65,7 +65,7 @@ class RowStrategyTest extends IntegrationTestCase
     public function testBeforeQuery_NoCache()
     {
         $strategy = new RowStrategy($this->redis);
-        $dao = new ExampleWithAnnotationDaoImpl($this->biz);
+        $dao = new AnnotationExampleDaoImpl($this->biz);
 
         $cache = $strategy->beforeQuery($dao, 'getNoCache', [1]);
 
@@ -75,7 +75,7 @@ class RowStrategyTest extends IntegrationTestCase
     public function testBeforeQuery_OnlyForGetMethod()
     {
         $strategy = new RowStrategy($this->redis);
-        $dao = new ExampleWithAnnotationDaoImpl($this->biz);
+        $dao = new AnnotationExampleDaoImpl($this->biz);
 
         $row = $this->fakeRow();
 
@@ -90,7 +90,7 @@ class RowStrategyTest extends IntegrationTestCase
     public function testAfterQuery_WithCache()
     {
         $strategy = new RowStrategy($this->redis);
-        $dao = new ExampleWithAnnotationDaoImpl($this->biz);
+        $dao = new AnnotationExampleDaoImpl($this->biz);
 
         $row = $this->fakeRow();
         $strategy->afterQuery($dao, 'getByName', [$row['name']], $row);
@@ -106,7 +106,7 @@ class RowStrategyTest extends IntegrationTestCase
     public function testAfterQuery_NoCache()
     {
         $strategy = new RowStrategy($this->redis);
-        $dao = new ExampleWithAnnotationDaoImpl($this->biz);
+        $dao = new AnnotationExampleDaoImpl($this->biz);
 
         $row = $this->fakeRow();
         $strategy->afterQuery($dao, 'getNoCache', [1], $row);
@@ -118,7 +118,7 @@ class RowStrategyTest extends IntegrationTestCase
     public function testAfterQuery_OnlyForGetMethod()
     {
         $strategy = new RowStrategy($this->redis);
-        $dao = new ExampleWithAnnotationDaoImpl($this->biz);
+        $dao = new AnnotationExampleDaoImpl($this->biz);
 
         $row = $this->fakeRow();
         $strategy->afterQuery($dao, 'findByName', [$row['name']], $row);
@@ -131,7 +131,7 @@ class RowStrategyTest extends IntegrationTestCase
     public function testAfterDelete()
     {
         $strategy = new RowStrategy($this->redis);
-        $dao = new ExampleWithAnnotationDaoImpl($this->biz);
+        $dao = new AnnotationExampleDaoImpl($this->biz);
 
         $row = $this->fakeRow();
         $primaryKey = $this->getPrimaryCacheKey($dao, $row['id']);
@@ -144,7 +144,7 @@ class RowStrategyTest extends IntegrationTestCase
     public function testAfterWave()
     {
         $strategy = new RowStrategy($this->redis);
-        $dao = new ExampleWithAnnotationDaoImpl($this->biz);
+        $dao = new AnnotationExampleDaoImpl($this->biz);
 
         $row = $this->fakeRow();
         $primaryKey = $this->getPrimaryCacheKey($dao, $row['id']);

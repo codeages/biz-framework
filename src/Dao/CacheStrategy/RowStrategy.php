@@ -42,12 +42,16 @@ class RowStrategy implements CacheStrategy
             return false;
         }
 
-        $primaryKey = $this->redis->get($key);
-        if ($primaryKey === false) {
+        $cache = $this->redis->get($key);
+        if ($cache === false) {
             return false;
         }
 
-        return $this->redis->get($primaryKey);
+        if ($method === 'get') {
+            return $cache;
+        }
+
+        return $this->redis->get($cache);
     }
 
     public function afterQuery(GeneralDaoInterface $dao, $method, $arguments, $data)
@@ -63,10 +67,13 @@ class RowStrategy implements CacheStrategy
             return;
         }
 
-        $primaryKey = $this->getPrimaryCacheKey($dao, $metadata, $data['id']);
-
-        $this->redis->set($primaryKey, $data, self::LIFE_TIME);
-        $this->redis->set($key, $primaryKey, self::LIFE_TIME);
+        if ($method === 'get') {
+            $this->redis->set($key, $data, self::LIFE_TIME);
+        } else {
+            $primaryKey = $this->getPrimaryCacheKey($dao, $metadata, $data['id']);
+            $this->redis->set($primaryKey, $data, self::LIFE_TIME);
+            $this->redis->set($key, $primaryKey, self::LIFE_TIME);
+        }
     }
 
     public function afterCreate(GeneralDaoInterface $dao, $method, $arguments, $row)

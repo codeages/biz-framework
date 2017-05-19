@@ -2,8 +2,11 @@
 
 namespace Tests;
 
+use Codeages\Biz\Framework\Dao\Connection;
 use Codeages\Biz\Framework\Provider\RedisServiceProvider;
 use Codeages\Biz\Framework\Provider\TargetlogServiceProvider;
+use Codeages\Biz\Framework\UnitTests\DatabaseSeeder;
+use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
 use Codeages\Biz\Framework\Context\Biz;
 use Codeages\Biz\Framework\Provider\DoctrineServiceProvider;
@@ -20,16 +23,29 @@ class IntegrationTestCase extends TestCase
      */
     protected $biz;
 
+    /**
+     * @var Connection
+     */
+    protected $db;
+
+    /**
+     * @var \Redis|\RedisArray
+     */
+    protected $redis;
+
     public function setUp()
     {
         $this->biz = $this->createBiz();
-        $this->biz['db']->beginTransaction();
-        $this->biz['redis']->flushDB();
+        $this->db = $this->biz['db'];
+        $this->redis = $this->biz['redis'];
+
+        $this->db->beginTransaction();
+        $this->redis->flushDB();
     }
 
     public function tearDown()
     {
-        $this->biz['db']->rollBack();
+        $this->db->rollBack();
     }
 
     protected function createBiz()
@@ -50,6 +66,7 @@ class IntegrationTestCase extends TestCase
         );
 
         $biz = new Biz($config);
+        $biz['autoload.aliases']['Example'] = 'Tests\\Example';
         $biz->register(new DoctrineServiceProvider());
         $biz->register(new RedisServiceProvider());
         $biz->register(new TargetlogServiceProvider());
@@ -65,5 +82,16 @@ class IntegrationTestCase extends TestCase
         $redis->setOption(\Redis::OPT_SERIALIZER, \Redis::SERIALIZER_PHP);
 
         return $redis;
+    }
+
+    /**
+     * @param string $seeder
+     * @param bool $isRun
+     * @return ArrayCollection
+     */
+    protected function seed($seeder, $isRun = true)
+    {
+        $seeder = new $seeder($this->db);
+        return $seeder->run($isRun);
     }
 }
