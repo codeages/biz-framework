@@ -3,7 +3,7 @@ namespace Tests\Dao\CacheStrategy;
 
 use Codeages\Biz\Framework\Dao\CacheStrategy\RowStrategy;
 use Codeages\Biz\Framework\Dao\GeneralDaoInterface;
-use TestProject\Biz\Example\Dao\Impl\ExampleWithCacheStrategyAnnotationDaoImpl;
+use TestProject\Biz\Example\Dao\Impl\ExampleWithAnnotationDaoImpl;
 use Tests\BaseTestCase;
 
 class RowStrategyTest extends BaseTestCase
@@ -25,7 +25,7 @@ class RowStrategyTest extends BaseTestCase
     public function testBeforeQuery_HitCache()
     {
         $strategy = new RowStrategy($this->redis);
-        $dao = new ExampleWithCacheStrategyAnnotationDaoImpl($this->biz);
+        $dao = new ExampleWithAnnotationDaoImpl($this->biz);
 
         $row = $this->fakeRow();
 
@@ -41,7 +41,7 @@ class RowStrategyTest extends BaseTestCase
     public function testBeforeQuery_MissCache_RefKeyAndPrimaryKeyNotExist()
     {
         $strategy = new RowStrategy($this->redis);
-        $dao = new ExampleWithCacheStrategyAnnotationDaoImpl($this->biz);
+        $dao = new ExampleWithAnnotationDaoImpl($this->biz);
 
         $row = $this->fakeRow();
 
@@ -55,7 +55,7 @@ class RowStrategyTest extends BaseTestCase
     public function testBeforeQuery_MissCache_PrimaryKeyNotExist()
     {
         $strategy = new RowStrategy($this->redis);
-        $dao = new ExampleWithCacheStrategyAnnotationDaoImpl($this->biz);
+        $dao = new ExampleWithAnnotationDaoImpl($this->biz);
 
         $row = $this->fakeRow();
 
@@ -67,7 +67,7 @@ class RowStrategyTest extends BaseTestCase
     public function testBeforeQuery_NoCache()
     {
         $strategy = new RowStrategy($this->redis);
-        $dao = new ExampleWithCacheStrategyAnnotationDaoImpl($this->biz);
+        $dao = new ExampleWithAnnotationDaoImpl($this->biz);
 
         $cache = $strategy->beforeQuery($dao, 'getNoCache', [1]);
 
@@ -77,7 +77,7 @@ class RowStrategyTest extends BaseTestCase
     public function testBeforeQuery_OnlyForGetMethod()
     {
         $strategy = new RowStrategy($this->redis);
-        $dao = new ExampleWithCacheStrategyAnnotationDaoImpl($this->biz);
+        $dao = new ExampleWithAnnotationDaoImpl($this->biz);
 
         $row = $this->fakeRow();
 
@@ -92,7 +92,7 @@ class RowStrategyTest extends BaseTestCase
     public function testAfterQuery_WithCache()
     {
         $strategy = new RowStrategy($this->redis);
-        $dao = new ExampleWithCacheStrategyAnnotationDaoImpl($this->biz);
+        $dao = new ExampleWithAnnotationDaoImpl($this->biz);
 
         $row = $this->fakeRow();
         $strategy->afterQuery($dao, 'getByName', [$row['name']], $row);
@@ -108,7 +108,7 @@ class RowStrategyTest extends BaseTestCase
     public function testAfterQuery_NoCache()
     {
         $strategy = new RowStrategy($this->redis);
-        $dao = new ExampleWithCacheStrategyAnnotationDaoImpl($this->biz);
+        $dao = new ExampleWithAnnotationDaoImpl($this->biz);
 
         $row = $this->fakeRow();
         $strategy->afterQuery($dao, 'getNoCache', [1], $row);
@@ -120,7 +120,7 @@ class RowStrategyTest extends BaseTestCase
     public function testAfterQuery_OnlyForGetMethod()
     {
         $strategy = new RowStrategy($this->redis);
-        $dao = new ExampleWithCacheStrategyAnnotationDaoImpl($this->biz);
+        $dao = new ExampleWithAnnotationDaoImpl($this->biz);
 
         $row = $this->fakeRow();
         $strategy->afterQuery($dao, 'findByName', [$row['name']], $row);
@@ -133,7 +133,7 @@ class RowStrategyTest extends BaseTestCase
     public function testAfterDelete()
     {
         $strategy = new RowStrategy($this->redis);
-        $dao = new ExampleWithCacheStrategyAnnotationDaoImpl($this->biz);
+        $dao = new ExampleWithAnnotationDaoImpl($this->biz);
 
         $row = $this->fakeRow();
         $primaryKey = $this->getPrimaryCacheKey($dao, $row['id']);
@@ -146,7 +146,7 @@ class RowStrategyTest extends BaseTestCase
     public function testAfterWave()
     {
         $strategy = new RowStrategy($this->redis);
-        $dao = new ExampleWithCacheStrategyAnnotationDaoImpl($this->biz);
+        $dao = new ExampleWithAnnotationDaoImpl($this->biz);
 
         $row = $this->fakeRow();
         $primaryKey = $this->getPrimaryCacheKey($dao, $row['id']);
