@@ -113,7 +113,9 @@ class SchedulerTest extends BaseTestCase
 
         $savedJob = $this->getSchedulerService()->schedule($job);
         $this->getSchedulerService()->deleteJobByName('test');
-        $this->getJobDao()->update($savedJob['id'], array('deleted_time' => time()-25*60*60));
+        $savedJob = $this->getJobDao()->update($savedJob['id'], array('deleted_time' => time()-25*60*60));
+        $this->assertNotEmpty($savedJob);
+
         $this->getSchedulerService()->clearJobs();
         $savedJob = $this->getJobDao()->get($savedJob['id']);
 
@@ -128,12 +130,12 @@ class SchedulerTest extends BaseTestCase
         }
     }
 
-    public function getJobDao()
+    protected function getJobDao()
     {
         return self::$biz->dao('Scheduler:JobDao');
     }
 
-    public function getSchedulerService()
+    protected function getSchedulerService()
     {
         return self::$biz->service('Scheduler:SchedulerService');
     }
