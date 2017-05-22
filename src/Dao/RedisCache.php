@@ -1,4 +1,5 @@
 <?php
+
 namespace Codeages\Biz\Framework\Dao;
 
 use Symfony\Component\EventDispatcher\EventDispatcher;

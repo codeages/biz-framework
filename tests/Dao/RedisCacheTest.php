@@ -1,4 +1,5 @@
 <?php
+
 namespace Tests\Dao;
 
 use Codeages\Biz\Framework\Dao\CacheEvent;
@@ -8,7 +9,6 @@ use Tests\IntegrationTestCase;
 
 class RedisCacheTest extends IntegrationTestCase
 {
-
     public function testSet()
     {
         $dispatcher = new EventDispatcher();

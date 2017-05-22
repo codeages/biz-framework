@@ -1,4 +1,5 @@
 <?php
+
 namespace Codeages\Biz\Framework\UnitTests;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -25,6 +26,7 @@ abstract class DatabaseSeeder
                 $this->db->insert($table, $row);
             }
         }
+
         return new ArrayCollection($rows);
     }
 }

@@ -106,20 +106,20 @@ class MetadataReader
     protected function saveCache($dao, $metadata)
     {
         if (!$this->cacheDirectory) {
-            return ;
+            return;
         }
 
         $metadata['cached_time'] = time();
 
         $filePath = $this->getCacheFilePath($this->cacheDirectory, $dao);
-        $content = "<?php \n return ".var_export($metadata, true) . ";";
+        $content = "<?php \n return ".var_export($metadata, true).';';
 
         file_put_contents($filePath, $content);
     }
 
     protected function getCacheFilePath($cacheDirectory, $dao)
     {
-        $filename = str_replace('\\', '_', is_string($dao) ? $dao :  get_class($dao)).'.php';
+        $filename = str_replace('\\', '_', is_string($dao) ? $dao : get_class($dao)).'.php';
         $filepath = $this->cacheDirectory.DIRECTORY_SEPARATOR.$filename;
 
         return $filepath;

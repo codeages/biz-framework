@@ -1,4 +1,5 @@
 <?php
+
 namespace Tests\Example\Tests\Dao;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -105,7 +106,7 @@ class AnnotationExampleDaoTest extends IntegrationTestCase
         $this->assertFalse($this->redis->get($this->getPrimaryCacheKey($row['id'])));
         $updated = $this->db->query("SELECT * FROM {$this->dao->table()} WHERE id = {$row['id']}")->fetch(\PDO::FETCH_ASSOC);
         $this->assertEquals($row['id'], $updated['id']);
-        $this->assertEquals('updated_content',  $updated['content']);
+        $this->assertEquals('updated_content', $updated['content']);
     }
 
     public function testDelete()

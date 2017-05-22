@@ -2,8 +2,6 @@
 
 namespace Tests;
 
-use Tests\Example\Fixtures\Loader;
-
 class GeneralDaoImplTest extends IntegrationTestCase
 {
     const NOT_EXIST_ID = 9999;

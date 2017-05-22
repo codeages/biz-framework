@@ -17,7 +17,7 @@ class MetadataReaderTest extends IntegrationTestCase
 
         $this->assertEquals('Row', $metadata['strategy']);
 
-        $filename = str_replace('\\', '_', is_string($dao) ? $dao :  get_class($dao)).'.php';
+        $filename = str_replace('\\', '_', is_string($dao) ? $dao : get_class($dao)).'.php';
 
         $this->assertFileExists("/tmp/{$filename}");
     }

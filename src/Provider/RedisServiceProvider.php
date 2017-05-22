@@ -4,8 +4,8 @@ namespace Codeages\Biz\Framework\Provider;
 
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
-use \Redis;
-use \RedisArray;
+use Redis;
+use RedisArray;
 
 class RedisServiceProvider implements ServiceProviderInterface
 {

@@ -14,7 +14,7 @@ class RedisServiceProviderTest extends TestCase
             'redis.options' => array(
                 'host' => '127.0.0.1:6379',
                 'pconnect' => true,
-            )
+            ),
         ));
         $provider = new RedisServiceProvider();
         $provider->register($container);
@@ -29,8 +29,7 @@ class RedisServiceProviderTest extends TestCase
     public function testRegister_MultRedis()
     {
         $container = new Container(array(
-            'mult_redis.options' =>
-                array(
+            'mult_redis.options' => array(
                     'master' => array(
                         'host' => '127.0.0.1:6379',
                         'pconnect' => true,
@@ -38,7 +37,7 @@ class RedisServiceProviderTest extends TestCase
                     'slave' => array(
                         'host' => '127.0.0.1:6379',
                         'pconnect' => true,
-                    )
+                    ),
                 ),
         ));
         $provider = new RedisServiceProvider();
@@ -66,7 +65,7 @@ class RedisServiceProviderTest extends TestCase
             'redis.options' => array(
                 'host' => '127.0.0.1:6379,127.0.0.1:6379',
                 'pconnect' => true,
-            )
+            ),
         ));
         $provider = new RedisServiceProvider();
         $provider->register($container);

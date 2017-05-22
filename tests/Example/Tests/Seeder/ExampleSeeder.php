@@ -1,8 +1,8 @@
 <?php
+
 namespace Tests\Example\Tests\Seeder;
 
 use Codeages\Biz\Framework\UnitTests\DatabaseSeeder;
-use Doctrine\DBAL\Connection;
 
 class ExampleSeeder extends DatabaseSeeder
 {
@@ -19,8 +19,8 @@ class ExampleSeeder extends DatabaseSeeder
                 'ids2' => '',
                 'null_value' => null,
                 'content' => 'test content 1',
-                'php_serialize_value' => serialize(array(1,2,3)),
-                'json_serialize_value' => json_encode(array(1,2,3)),
+                'php_serialize_value' => serialize(array(1, 2, 3)),
+                'json_serialize_value' => json_encode(array(1, 2, 3)),
                 'delimiter_serialize_value' => '|1|2|3|',
                 'created_time' => time(),
                 'updated_time' => time(),
@@ -35,8 +35,8 @@ class ExampleSeeder extends DatabaseSeeder
                 'ids2' => '',
                 'null_value' => null,
                 'content' => 'test content 1',
-                'php_serialize_value' => serialize(array(1,2,3)),
-                'json_serialize_value' => json_encode(array(1,2,3)),
+                'php_serialize_value' => serialize(array(1, 2, 3)),
+                'json_serialize_value' => json_encode(array(1, 2, 3)),
                 'delimiter_serialize_value' => '|1|2|3|',
                 'created_time' => time(),
                 'updated_time' => time(),
@@ -51,8 +51,8 @@ class ExampleSeeder extends DatabaseSeeder
                 'ids2' => '',
                 'null_value' => null,
                 'content' => 'test content 1',
-                'php_serialize_value' => serialize(array(1,2,3)),
-                'json_serialize_value' => json_encode(array(1,2,3)),
+                'php_serialize_value' => serialize(array(1, 2, 3)),
+                'json_serialize_value' => json_encode(array(1, 2, 3)),
                 'delimiter_serialize_value' => '|1|2|3|',
                 'created_time' => time(),
                 'updated_time' => time(),
