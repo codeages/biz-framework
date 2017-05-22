@@ -22,7 +22,7 @@ class Lock
 
     public function release($lockName)
     {
-        $result = $this->getConnection()->fetchAssoc("SELECT RELEASE_LOCK('im_{$lockName}') AS releaseLock");
+        $result = $this->getConnection()->fetchAssoc("SELECT RELEASE_LOCK('lock_{$lockName}') AS releaseLock");
 
         return $result['releaseLock'];
     }
