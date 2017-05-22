@@ -8,17 +8,6 @@ use Tests\IntegrationTestCase;
 
 class MetadataReaderTest extends IntegrationTestCase
 {
-    public function testRead()
-    {
-        $reader = new MetadataReader();
-
-        $dao = new AnnotationExampleDaoImpl($this->createBiz());
-
-        $metadata = $reader->read($dao);
-
-        $this->assertEquals('Row', $metadata['strategy']);
-    }
-
     public function testRead_SaveCache()
     {
         $reader = new MetadataReader('/tmp');

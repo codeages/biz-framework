@@ -1,15 +1,20 @@
 <?php
 namespace Codeages\Biz\Framework\Dao;
 
-class CacheEvent
+use Symfony\Component\EventDispatcher\Event;
+
+class CacheEvent extends Event
 {
     public $key;
 
     public $value;
 
-    public function __construct($key, $value = null)
+    public $lifetime;
+
+    public function __construct($key, $value = null, $lifetime=0)
     {
         $this->key = $key;
         $this->value = $value;
+        $this->lifetime = $lifetime;
     }
 }

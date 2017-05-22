@@ -29,13 +29,13 @@ class RedisCache
     public function set($key, $value, $lifetime = 0)
     {
         $this->redis->set($key, $value, $lifetime);
-        $this->eventDispatcher->dispatch('dao.cache.set');
+        $this->eventDispatcher->dispatch('dao.cache.set', new CacheEvent($key, $value, $lifetime));
     }
 
     public function del($key)
     {
         $this->redis->del($key);
-        $this->eventDispatcher->dispatch('dao.cache.del');
+        $this->eventDispatcher->dispatch('dao.cache.del', new CacheEvent($key));
     }
 
     public function __call($name, $arguments)
