@@ -16,6 +16,7 @@ class RedisServiceProvider implements ServiceProviderInterface
             'timeout' => 1,
             'reserved' => null,
             'retry_interval' => 100,
+            'key_prefix' => '',
         );
 
         $app['mult_redis.options.initializer'] = $app->protect(function () use ($app) {
@@ -60,11 +61,13 @@ class RedisServiceProvider implements ServiceProviderInterface
                         } else {
                             $redis->connect($host, $port, $options['timeout'], $options['reserved'], $options['retry_interval']);
                         }
-
-                        $redis->setOption(Redis::OPT_SERIALIZER, Redis::SERIALIZER_PHP);
                     } else {
                         $redis = new RedisArray($hosts);
-                        $redis->setOption(Redis::OPT_SERIALIZER, Redis::SERIALIZER_PHP);
+                    }
+
+                    $redis->setOption(Redis::OPT_SERIALIZER, Redis::SERIALIZER_PHP);
+                    if ($options['key_prefix']) {
+                        $redis->setOption(Redis::OPT_PREFIX, $options['key_prefix']);
                     }
 
                     return $redis;

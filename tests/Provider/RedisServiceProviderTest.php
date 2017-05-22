@@ -73,4 +73,24 @@ class RedisServiceProviderTest extends TestCase
         $redis = $container['redis'];
         $this->assertInstanceOf('\RedisArray', $redis);
     }
+
+    public function testRegister_KeyPrefix()
+    {
+        $container = new Container(array(
+            'redis.options' => array(
+                'host' => '127.0.0.1:6379',
+                'key_prefix' => 'test_prefix:',
+            ),
+        ));
+        $provider = new RedisServiceProvider();
+        $provider->register($container);
+
+        $redis = $container['redis'];
+        $redis->set('test_key', 'test_value');
+
+        $rawRedis = new \Redis();
+        $rawRedis->connect('127.0.0.1', 6379);
+        $rawRedis->setOption(\Redis::OPT_SERIALIZER, \Redis::SERIALIZER_PHP);
+        $this->assertEquals('test_value', $rawRedis->get('test_prefix:test_key'));
+    }
 }
