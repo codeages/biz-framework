@@ -65,7 +65,13 @@ class Biz extends Container
         };
 
         $biz['dao.metadata_reader'] = function ($biz) {
-            return new MetadataReader();
+            if ($biz['debug']) {
+                $cacheDirectory = null;
+            } else {
+                $cacheDirectory = $biz['cache_directory'].DIRECTORY_SEPARATOR.'dao_metadata';
+            }
+
+            return new MetadataReader($cacheDirectory);
         };
 
         $biz['dao.serializer'] = function () {

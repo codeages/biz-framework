@@ -52,9 +52,9 @@ class IntegrationTestCase extends TestCase
         unset($this->biz);
     }
 
-    protected function createBiz()
+    protected function createBiz(array $options = array())
     {
-        $config = array(
+        $defaultOptions = array(
             'db.options' => array(
                 'dbname' => getenv('DB_NAME') ?: 'biz-target-test',
                 'user' => getenv('DB_USER') ?: 'root',
@@ -67,9 +67,11 @@ class IntegrationTestCase extends TestCase
             'redis.options' => array(
                 'host' => getenv('REDIS_HOST'),
             ),
+            'debug' => true,
         );
+        $options = array_merge($defaultOptions, $options);
 
-        $biz = new Biz($config);
+        $biz = new Biz($options);
         $biz['autoload.aliases']['Example'] = 'Tests\\Example';
         $biz->register(new DoctrineServiceProvider());
         $biz->register(new RedisServiceProvider());

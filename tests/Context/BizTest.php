@@ -72,12 +72,16 @@ class BizTest extends TestCase
 
     public function testDao()
     {
-        $biz = new Biz();
+        $biz = new Biz(array(
+            'debug' => true
+        ));
         $biz['autoload.aliases']['Example'] = 'Tests\\Example';
         $dao = $biz->dao('Example:ExampleDao');
         $this->assertEquals($dao, $biz['@Example:ExampleDao']);
 
-        $biz = new Biz();
+        $biz = new Biz(array(
+            'debug' => true
+        ));
         $biz['autoload.aliases']['Example'] = 'Tests\\Example';
         $dao1 = $biz->dao('Example:ExampleDao');
         $dao2 = $biz->dao('Example:ExampleDao');
