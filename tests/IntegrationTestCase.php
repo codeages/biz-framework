@@ -66,7 +66,7 @@ class IntegrationTestCase extends TestCase
                 'charset' => 'utf8',
             ),
             'redis.options' => array(
-                'host' => array('127.0.0.1:6379'),
+                'host' => getenv('REDIS_HOST'),
             ),
         );
 
@@ -78,15 +78,6 @@ class IntegrationTestCase extends TestCase
         $biz->boot();
 
         return $biz;
-    }
-
-    protected function createRedis()
-    {
-        $redis = new \Redis();
-        $redis->connect(getenv('REDIS_HOST'), getenv('REDIS_PORT'));
-        $redis->setOption(\Redis::OPT_SERIALIZER, \Redis::SERIALIZER_PHP);
-
-        return $redis;
     }
 
     /**

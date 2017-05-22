@@ -88,7 +88,7 @@ class Biz extends Container
         };
 
         $biz['dao.cache.strategy.row'] = function ($biz) {
-            return new CacheStrategy\RowStrategy($biz['dao.cache.redis_wrapper']);
+            return new CacheStrategy\RowStrategy($biz['dao.cache.redis_wrapper'], $biz['dao.metadata_reader']);
         };
 
         foreach ($values as $key => $value) {

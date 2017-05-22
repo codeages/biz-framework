@@ -40,8 +40,4 @@ class AnnotationExampleDaoImpl extends ExampleDaoImpl
     {
         return $this->update(array('name' => $name, 'code' => $code), $fields);
     }
-
-    public function declares()
-    {
-    }
 }

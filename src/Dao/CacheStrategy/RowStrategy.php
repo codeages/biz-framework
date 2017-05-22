@@ -23,10 +23,10 @@ class RowStrategy implements CacheStrategy
 
     const LIFE_TIME = 3600;
 
-    public function __construct($redis)
+    public function __construct($redis, MetadataReader $metadataReader)
     {
         $this->redis = $redis;
-        $this->metadataReader = new MetadataReader();
+        $this->metadataReader = $metadataReader;
     }
 
     public function beforeQuery(GeneralDaoInterface $dao, $method, $arguments)

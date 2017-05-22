@@ -3,15 +3,26 @@
 namespace Codeages\Biz\Framework\Dao\Annotation;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Symfony\Component\Filesystem\Filesystem;
 
 class MetadataReader
 {
-    public function __construct()
+    public function __construct($cacheDirectory = null)
     {
+        $this->cacheDirectory = $cacheDirectory;
+        if ($cacheDirectory) {
+            $fs = new Filesystem();
+            $fs->mkdir($cacheDirectory);
+        }
     }
 
     public function read($dao)
     {
+        $cache = $this->readCache($dao);
+        if ($cache) {
+            return $cache;
+        }
+
         $reader = new AnnotationReader();
         $classRef = new \ReflectionClass($dao);
         $isDao = $classRef->implementsInterface('Codeages\Biz\Framework\Dao\DaoInterface');
@@ -62,6 +73,8 @@ class MetadataReader
         $metadata['cache_key_of_arg_index']['get'] = [0];
         $metadata['cache_key_of_field_name']['get'] = ['id'];
 
+        $this->saveCache($dao, $metadata);
+
         return $metadata;
     }
 
@@ -74,5 +87,41 @@ class MetadataReader
         }
 
         return $names;
+    }
+
+    protected function readCache($dao)
+    {
+        if (!$this->cacheDirectory) {
+            return null;
+        }
+
+        $filePath = $this->getCacheFilePath($this->cacheDirectory, $dao);
+        if (file_exists($filePath)) {
+            return include $filePath;
+        }
+
+        return null;
+    }
+
+    protected function saveCache($dao, $metadata)
+    {
+        if (!$this->cacheDirectory) {
+            return ;
+        }
+
+        $metadata['cached_time'] = time();
+
+        $filePath = $this->getCacheFilePath($this->cacheDirectory, $dao);
+        $content = "<?php \n return ".var_export($metadata, true) . ";";
+
+        file_put_contents($filePath, $content);
+    }
+
+    protected function getCacheFilePath($cacheDirectory, $dao)
+    {
+        $filename = str_replace('\\', '_', is_string($dao) ? $dao :  get_class($dao)).'.php';
+        $filepath = $this->cacheDirectory.DIRECTORY_SEPARATOR.$filename;
+
+        return $filepath;
     }
 }

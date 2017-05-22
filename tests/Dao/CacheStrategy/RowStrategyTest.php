@@ -2,6 +2,7 @@
 
 namespace Tests\Dao\CacheStrategy;
 
+use Codeages\Biz\Framework\Dao\Annotation\MetadataReader;
 use Codeages\Biz\Framework\Dao\CacheStrategy\RowStrategy;
 use Codeages\Biz\Framework\Dao\GeneralDaoInterface;
 use Tests\Example\Dao\Impl\AnnotationExampleDaoImpl;
@@ -22,7 +23,8 @@ class RowStrategyTest extends IntegrationTestCase
 
     public function testBeforeQuery_HitCache()
     {
-        $strategy = new RowStrategy($this->redis);
+        $metadataReader = new MetadataReader();
+        $strategy = new RowStrategy($this->redis, $metadataReader);
         $dao = new AnnotationExampleDaoImpl($this->biz);
 
         $row = $this->fakeRow();
@@ -38,7 +40,8 @@ class RowStrategyTest extends IntegrationTestCase
 
     public function testBeforeQuery_MissCache_RefKeyAndPrimaryKeyNotExist()
     {
-        $strategy = new RowStrategy($this->redis);
+        $metadataReader = new MetadataReader();
+        $strategy = new RowStrategy($this->redis, $metadataReader);
         $dao = new AnnotationExampleDaoImpl($this->biz);
 
         $row = $this->fakeRow();
@@ -52,7 +55,8 @@ class RowStrategyTest extends IntegrationTestCase
 
     public function testBeforeQuery_MissCache_PrimaryKeyNotExist()
     {
-        $strategy = new RowStrategy($this->redis);
+        $metadataReader = new MetadataReader();
+        $strategy = new RowStrategy($this->redis, $metadataReader);
         $dao = new AnnotationExampleDaoImpl($this->biz);
 
         $row = $this->fakeRow();
@@ -64,7 +68,8 @@ class RowStrategyTest extends IntegrationTestCase
 
     public function testBeforeQuery_NoCache()
     {
-        $strategy = new RowStrategy($this->redis);
+        $metadataReader = new MetadataReader();
+        $strategy = new RowStrategy($this->redis, $metadataReader);
         $dao = new AnnotationExampleDaoImpl($this->biz);
 
         $cache = $strategy->beforeQuery($dao, 'getNoCache', [1]);
@@ -74,7 +79,8 @@ class RowStrategyTest extends IntegrationTestCase
 
     public function testBeforeQuery_OnlyForGetMethod()
     {
-        $strategy = new RowStrategy($this->redis);
+        $metadataReader = new MetadataReader();
+        $strategy = new RowStrategy($this->redis, $metadataReader);
         $dao = new AnnotationExampleDaoImpl($this->biz);
 
         $row = $this->fakeRow();
@@ -89,7 +95,8 @@ class RowStrategyTest extends IntegrationTestCase
 
     public function testAfterQuery_WithCache()
     {
-        $strategy = new RowStrategy($this->redis);
+        $metadataReader = new MetadataReader();
+        $strategy = new RowStrategy($this->redis, $metadataReader);
         $dao = new AnnotationExampleDaoImpl($this->biz);
 
         $row = $this->fakeRow();
@@ -105,7 +112,8 @@ class RowStrategyTest extends IntegrationTestCase
 
     public function testAfterQuery_NoCache()
     {
-        $strategy = new RowStrategy($this->redis);
+        $metadataReader = new MetadataReader();
+        $strategy = new RowStrategy($this->redis, $metadataReader);
         $dao = new AnnotationExampleDaoImpl($this->biz);
 
         $row = $this->fakeRow();
@@ -117,7 +125,8 @@ class RowStrategyTest extends IntegrationTestCase
 
     public function testAfterQuery_OnlyForGetMethod()
     {
-        $strategy = new RowStrategy($this->redis);
+        $metadataReader = new MetadataReader();
+        $strategy = new RowStrategy($this->redis, $metadataReader);
         $dao = new AnnotationExampleDaoImpl($this->biz);
 
         $row = $this->fakeRow();
@@ -130,7 +139,8 @@ class RowStrategyTest extends IntegrationTestCase
 
     public function testAfterDelete()
     {
-        $strategy = new RowStrategy($this->redis);
+        $metadataReader = new MetadataReader();
+        $strategy = new RowStrategy($this->redis, $metadataReader);
         $dao = new AnnotationExampleDaoImpl($this->biz);
 
         $row = $this->fakeRow();
@@ -143,7 +153,8 @@ class RowStrategyTest extends IntegrationTestCase
 
     public function testAfterWave()
     {
-        $strategy = new RowStrategy($this->redis);
+        $metadataReader = new MetadataReader();
+        $strategy = new RowStrategy($this->redis, $metadataReader);
         $dao = new AnnotationExampleDaoImpl($this->biz);
 
         $row = $this->fakeRow();

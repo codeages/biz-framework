@@ -123,9 +123,11 @@ class AnnotationExampleDaoTest extends IntegrationTestCase
 
     public function testCreate()
     {
-        $row = $this->seed('Tests\\Example\\Tests\\Seeder\\ExampleSeeder', false)->first();
+        $row = array(
+            'name' => 'test_create',
+        );
 
-        $this->dao->create($row);
+        $row = $this->dao->create($row);
 
         $created = $this->db->query("SELECT * FROM {$this->dao->table()} WHERE id = {$row['id']}")->fetch(\PDO::FETCH_ASSOC);
 
