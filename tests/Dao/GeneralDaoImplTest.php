@@ -11,7 +11,6 @@ class GeneralDaoImplTest extends IntegrationTestCase
     public function setUp()
     {
         parent::setUp();
-        $this->biz['db']->exec(Loader::loadSql());
     }
 
     /**
@@ -348,15 +347,16 @@ class GeneralDaoImplTest extends IntegrationTestCase
          */
         $dao = $this->biz->dao('Example:ExampleDao');
 
-        $row = $dao->create(array('name' => 'test1'));
-        $result = $dao->findByIds(array(1), array('created_time' => 'desc'), '0', '2');
+        $row1 = $dao->create(array('name' => 'testNonInject_1'));
 
-        $this->assertCount(1, $result);
-        $row = $dao->create(array('name' => 'test2'));
-        $result = $dao->findByIds(array(1, 2), array('created_time' => 'desc'), '0', 1);
+        $result = $dao->findByIds(array($row1['id']), array('created_time' => 'desc'), '0', '2');
         $this->assertCount(1, $result);
 
-        $result = $dao->findByIds(array(1, 2), array('created_time' => 'desc'), '0', 10);
+        $row2 = $dao->create(array('name' => 'testNonInject_2'));
+        $result = $dao->findByIds(array($row1['id'], $row2['id']), array('created_time' => 'desc'), '0', 1);
+        $this->assertCount(1, $result);
+
+        $result = $dao->findByIds(array($row1['id'], $row2['id']), array('created_time' => 'desc'), '0', 10);
         $this->assertCount(2, $result);
     }
 
