@@ -46,6 +46,11 @@ class IntegrationTestCase extends TestCase
     public function tearDown()
     {
         $this->db->rollBack();
+        $this->redis->close();
+
+        unset($this->db);
+        unset($this->redis);
+        unset($this->biz);
     }
 
     protected function createBiz()

@@ -5,6 +5,7 @@ namespace Codeages\Biz\Framework\Context;
 use Codeages\Biz\Framework\Dao\Annotation\MetadataReader;
 use Codeages\Biz\Framework\Dao\DaoProxy;
 use Codeages\Biz\Framework\Dao\FieldSerializer;
+use Codeages\Biz\Framework\Dao\RedisCache;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -71,6 +72,10 @@ class Biz extends Container
             return new FieldSerializer();
         };
 
+        $biz['dao.cache.redis_wrapper'] = function ($biz) {
+            return new RedisCache($biz['redis'], $biz['dispatcher']);
+        };
+
         $biz['dao.cache.array_storage'] = null;
         $biz['dao.cache.enabled'] = false;
 
@@ -79,11 +84,11 @@ class Biz extends Container
         };
 
         $biz['dao.cache.strategy.table'] = function ($biz) {
-            return new CacheStrategy\TableStrategy($biz['redis'], $biz['dao.cache.shared_storage']);
+            return new CacheStrategy\TableStrategy($biz['dao.cache.redis_wrapper'], $biz['dao.cache.shared_storage']);
         };
 
         $biz['dao.cache.strategy.row'] = function ($biz) {
-            return new CacheStrategy\RowStrategy($biz['redis']);
+            return new CacheStrategy\RowStrategy($biz['dao.cache.redis_wrapper']);
         };
 
         foreach ($values as $key => $value) {
