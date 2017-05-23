@@ -1,6 +1,6 @@
 <?php
 
-namespace Codeages\Biz\Framework\Scheduler\Pool;
+namespace Codeages\Biz\Framework\Scheduler\Service;
 
 use Codeages\Biz\Framework\Scheduler\Job;
 use Codeages\Biz\Framework\Util\ArrayToolkit;
@@ -16,7 +16,7 @@ class JobPool
     public function __construct($biz)
     {
         $this->biz = $biz;
-        $this->options = $biz['scheduler.job.pool.options'];
+        $this->options = $biz['scheduler.options'];
     }
 
     public function execute(Job $job)

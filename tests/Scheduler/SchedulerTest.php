@@ -24,7 +24,7 @@ class SchedulerTest extends BaseTestCase
             'misfire_policy' => 'missed',
         );
 
-        $savedJob = $this->getSchedulerService()->schedule($job);
+        $savedJob = $this->getSchedulerService()->register($job);
 
         $this->asserts($job, $savedJob);
         $this->assertNotEmpty($savedJob['next_fire_time']);
@@ -61,7 +61,7 @@ class SchedulerTest extends BaseTestCase
             'misfire_policy' => 'executing',
         );
 
-        $savedJob = $this->getSchedulerService()->schedule($job);
+        $savedJob = $this->getSchedulerService()->register($job);
         $this->getSchedulerService()->execute();
 
         $this->asserts($job, $savedJob);
@@ -88,39 +88,13 @@ class SchedulerTest extends BaseTestCase
             'misfire_policy' => 'missed',
         );
 
-        $savedJob = $this->getSchedulerService()->schedule($job);
+        $savedJob = $this->getSchedulerService()->register($job);
         $this->getSchedulerService()->deleteJobByName('test');
-        $savedJob = $this->getJobDao()->get($savedJob['id']);
-
-        $this->asserts($job, $savedJob);
-        $this->assertEquals(1, $savedJob['deleted']);
-    }
-
-    public function testClearJobs()
-    {
-        $job = array(
-            'name' => 'test',
-            'pool' => 'test',
-            'source' => 'MAIN',
-            'expression' => '0 17 * * *',
-//            'nextFireTime' => time()-1,
-            'class' => 'TestProject\\Biz\\Example\\Job\\ExampleJob',
-            'args' => array('courseId'=>1),
-            'priority' => 100,
-            'misfire_threshold' => 3000,
-            'misfire_policy' => 'missed',
-        );
-
-        $savedJob = $this->getSchedulerService()->schedule($job);
-        $this->getSchedulerService()->deleteJobByName('test');
-        $savedJob = $this->getJobDao()->update($savedJob['id'], array('deleted_time' => time()-25*60*60));
-        $this->assertNotEmpty($savedJob);
-
-        $this->getSchedulerService()->clearJobs();
         $savedJob = $this->getJobDao()->get($savedJob['id']);
 
         $this->assertEmpty($savedJob);
     }
+
 
     protected function asserts($excepted, $acturel)
     {
