@@ -73,7 +73,34 @@ class RowStrategy implements CacheStrategy
             $primaryKey = $this->getPrimaryCacheKey($dao, $metadata, $data['id']);
             $this->redis->set($primaryKey, $data, self::LIFE_TIME);
             $this->redis->set($key, $primaryKey, self::LIFE_TIME);
+            $this->saveRelKeys($primaryKey, $key, self::LIFE_TIME);
         }
+    }
+
+    private function saveRelKeys($primaryKey, $key, $lifetime)
+    {
+        $existRelKeys = $this->getRelKeys($primaryKey);
+        $existRelKeys = array_merge($existRelKeys, array($key));
+        $this->redis->set($primaryKey.':rel_keys', $existRelKeys, $lifetime);
+    }
+
+    private function getRelKeys($primaryKey)
+    {
+        $keys = $this->redis->get($primaryKey.':rel_keys');
+        if (empty($keys) || !is_array($keys)) {
+            $keys = array();
+        }
+
+        return $keys;
+    }
+
+    private function delRelKeys($primaryKey)
+    {
+        $relKeys = $this->getRelKeys($primaryKey);
+        foreach ($relKeys as $relKey) {
+            $this->redis->del($relKey);
+        }
+        $this->redis->del($primaryKey.':rel_keys');
     }
 
     public function afterCreate(GeneralDaoInterface $dao, $method, $arguments, $row)
@@ -86,17 +113,7 @@ class RowStrategy implements CacheStrategy
         $metadata = $this->metadataReader->read($dao);
         $primaryKey = $this->getPrimaryCacheKey($dao, $metadata, $row['id']);
         $this->redis->del($primaryKey);
-
-//        @todo
-//        foreach ($arguments[1] as $field) {
-//            if (empty($metadata['update_rel_query_methods'][$field])) {
-//                continue;
-//            }
-//
-//            foreach ($metadata['update_rel_query_methods'][$field] as $method) {
-//
-//            }
-//        }
+        $this->delRelKeys($primaryKey);
     }
 
     public function afterDelete(GeneralDaoInterface $dao, $method, $arguments)
@@ -105,6 +122,7 @@ class RowStrategy implements CacheStrategy
         // $arguments[0] is GeneralDaoInterface delete function first argument `id`.
         $primaryKey = $this->getPrimaryCacheKey($dao, $metadata, $arguments[0]);
         $this->redis->del($primaryKey);
+        $this->delRelKeys($primaryKey);
     }
 
     public function afterWave(GeneralDaoInterface $dao, $method, $arguments, $affected)
@@ -114,6 +132,7 @@ class RowStrategy implements CacheStrategy
         foreach ($arguments[0] as $id) {
             $primaryKey = $this->getPrimaryCacheKey($dao, $metadata, $id);
             $this->redis->del($primaryKey);
+            $this->delRelKeys($primaryKey);
         }
     }
 

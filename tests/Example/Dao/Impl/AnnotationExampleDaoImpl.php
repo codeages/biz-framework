@@ -18,6 +18,14 @@ class AnnotationExampleDaoImpl extends ExampleDaoImpl
         return $this->getByFields(array('name' => $name));
     }
 
+    /**
+     * @RowCache
+     */
+    public function getByCode($code)
+    {
+        return $this->getByFields(array('code' => $code));
+    }
+
     public function findByName($name, $start, $limit)
     {
         return $this->search(array('name' => $name), array('created' => 'DESC'), $start, $limit);

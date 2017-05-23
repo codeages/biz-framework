@@ -10,14 +10,6 @@ Dao Cache
 class ExampleDaoImpl
 {
     /**
-     *@RowCache({"id"}, primary=true)
-     */
-    public function get($id, array $options = array())
-    {
-        
-    }
-
-    /**
      * @RowCache
      */
     public function getByField1($field1)
@@ -49,10 +41,14 @@ before:
 ```
 get dao:table_name:method_name:arg1,arg2...argn : dao:table_name:primary_method_name:primary_id
 get dao:table_name:primary_method_name:primary_value : {object}
-get dao:table_name:primary_method_name:primary_value:version : {version}
 ```
 
 after:
+
+set dao:table_name:primary_method_name:primary_value:rel_keys += rel_keys
+
+
+
 
 **update:**
 

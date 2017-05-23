@@ -108,6 +108,26 @@ class RowStrategyTest extends IntegrationTestCase
         $cache = $this->redis->get("dao:{$dao->table()}:get:{$row['id']}");
         $this->assertEquals($row['id'], $cache['id']);
         $this->assertEquals($row['name'], $cache['name']);
+
+        $relKeys = $this->redis->get("dao:{$dao->table()}:get:{$row['id']}:rel_keys");
+        $this->assertCount(1, $relKeys);
+        $this->assertEquals("dao:{$dao->table()}:getByName:{$row['name']}", $relKeys[0]);
+    }
+
+    public function testAfterQuery_WithCache_MultMethodCall()
+    {
+        $metadataReader = new MetadataReader();
+        $strategy = new RowStrategy($this->redis, $metadataReader);
+        $dao = new AnnotationExampleDaoImpl($this->biz);
+
+        $row = $this->fakeRow();
+        $strategy->afterQuery($dao, 'getByName', [$row['name']], $row);
+        $strategy->afterQuery($dao, 'getByCode', [$row['code']], $row);
+
+        $relKeys = $this->redis->get("dao:{$dao->table()}:get:{$row['id']}:rel_keys");
+        $this->assertCount(2, $relKeys);
+        $this->assertEquals("dao:{$dao->table()}:getByName:{$row['name']}", $relKeys[0]);
+        $this->assertEquals("dao:{$dao->table()}:getByCode:{$row['code']}", $relKeys[1]);
     }
 
     public function testAfterQuery_NoCache()
@@ -135,6 +155,31 @@ class RowStrategyTest extends IntegrationTestCase
         $primaryKey = $this->redis->get("dao:{$dao->table()}:findByName:{$row['name']}");
 
         $this->assertFalse($primaryKey);
+    }
+
+    public function testAfterUpdate()
+    {
+        $metadataReader = new MetadataReader();
+        $strategy = new RowStrategy($this->redis, $metadataReader);
+        $dao = new AnnotationExampleDaoImpl($this->biz);
+
+        $row = $this->fakeRow();
+        $strategy->afterQuery($dao, 'getByName', [$row['name']], $row);
+        $strategy->afterQuery($dao, 'getByCode', [$row['code']], $row);
+
+        $strategy->afterUpdate($dao, 'update', array($row['id']), $row);
+
+        $cache = $this->redis->get("dao:{$dao->table()}:get:{$row['id']}");
+        $this->assertFalse($cache);
+
+        $cache = $this->redis->get("dao:{$dao->table()}:getByName:{$row['name']}");
+        $this->assertFalse($cache);
+
+        $cache = $this->redis->get("dao:{$dao->table()}:getByCode:{$row['code']}");
+        $this->assertFalse($cache);
+
+        $cache = $this->redis->get("dao:{$dao->table()}:get:{$row['id']}:rel_keys");
+        $this->assertFalse($cache);
     }
 
     public function testAfterDelete()
@@ -174,7 +219,8 @@ class RowStrategyTest extends IntegrationTestCase
     {
         return array(
             'id' => 1,
-            'name' => 'lilei',
+            'name' => 'biz_framework_name',
+            'code' => 'biz_framework_code',
         );
     }
 }
