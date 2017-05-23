@@ -14,7 +14,7 @@ class JobDaoImpl extends GeneralDaoImpl implements JobDao
         $sql = "SELECT * FROM 
                 (
                   SELECT *, floor(created_time/60)*60 as formatted_created_time FROM {$this->table} 
-                  WHERE status = 'waiting' AND enabled = 1 AND deleted = 0 AND next_fire_time <= ?
+                  WHERE enabled = 1 AND next_fire_time <= ?
                 ) as {$this->table} 
                 ORDER BY formatted_created_time ASC , priority DESC";
 
@@ -25,7 +25,6 @@ class JobDaoImpl extends GeneralDaoImpl implements JobDao
     {
         return $this->getByFields(array(
             'name' => $name,
-            'deleted' => 0
         ));
     }
 
@@ -37,7 +36,6 @@ class JobDaoImpl extends GeneralDaoImpl implements JobDao
                 'args' => 'json',
             ),
             'conditions' => array(
-                'deleted_time < :lessThanDeletedTime',
                 'name like :name'
             )
         );
