@@ -88,6 +88,16 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
 
     protected function check($jobFired)
     {
+        $result = $this->checkExecuting($jobFired);
+        if (static::EXECUTING != $result) {
+            return $result;
+        }
+
+        return $this->checkMisfire($jobFired);
+    }
+
+    protected function checkExecuting($jobFired)
+    {
         $jobFireds = $this->findJobFiredsByJobId($jobFired['job_id']);
         foreach ($jobFireds as $item) {
             if ($item['id'] == $jobFired['id']) {
@@ -99,6 +109,11 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
             }
         }
 
+        return static::EXECUTING;
+    }
+
+    protected function checkMisfire($jobFired)
+    {
         $now = time();
         $job = $jobFired['job'];
         $fireTime = $job['next_fire_time'];
@@ -173,7 +188,7 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
 
         $this->createJobLog($jobFired, $result);
 
-        if ($result == AbstractJobChecker::EXECUTING) {
+        if ($result == self::EXECUTING) {
             $this->dispatch('scheduler.job.executing', $jobFired);
             return $jobFired;
         }

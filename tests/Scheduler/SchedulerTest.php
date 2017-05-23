@@ -13,7 +13,6 @@ class SchedulerTest extends BaseTestCase
     {
         $job = array(
             'name' => 'test',
-            'pool' => 'test',
             'source' => 'MAIN',
             'expression' => '0 17 * * *',
 //            'nextFireTime' => time()-1,
@@ -33,7 +32,6 @@ class SchedulerTest extends BaseTestCase
 
         $excepted = array(
             'name' => 'test',
-            'pool' => 'test',
             'source' => 'MAIN',
             'class' => 'TestProject\\Biz\\Example\\Job\\ExampleJob',
             'args' => array('courseId'=>1),
@@ -51,7 +49,6 @@ class SchedulerTest extends BaseTestCase
 
         $job = array(
             'name' => 'test2',
-            'pool' => 'test2',
             'source' => 'MAIN',
             'next_fire_time' => time()-1,
             'class' => 'TestProject\\Biz\\Example\\Job\\ExampleJob',
@@ -77,7 +74,6 @@ class SchedulerTest extends BaseTestCase
     {
         $job = array(
             'name' => 'test',
-            'pool' => 'test',
             'source' => 'MAIN',
             'expression' => '0 17 * * *',
 //            'nextFireTime' => time()-1,

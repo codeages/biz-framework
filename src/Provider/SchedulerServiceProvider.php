@@ -2,10 +2,6 @@
 
 namespace Codeages\Biz\Framework\Provider;
 
-use Codeages\Biz\Framework\Scheduler\Checker\ExecutingChecker;
-use Codeages\Biz\Framework\Scheduler\Service\JobPool;
-use Codeages\Biz\Framework\Scheduler\Checker\CheckerChain;
-use Codeages\Biz\Framework\Scheduler\Checker\MisfireChecker;
 use Codeages\Biz\Framework\Scheduler\Scheduler;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;

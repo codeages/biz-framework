@@ -6,6 +6,7 @@ use Codeages\Biz\Framework\Context\Biz;
 use Codeages\Biz\Framework\Provider\DoctrineServiceProvider;
 use Codeages\Biz\Framework\Provider\RedisServiceProvider;
 use Codeages\Biz\Framework\Provider\SchedulerServiceProvider;
+use Codeages\Biz\Framework\Scheduler\Service\JobPool;
 use PHPUnit\Framework\TestCase;
 use TestProject\Biz\Example\Job\ExampleJob;
 
@@ -45,9 +46,10 @@ class JobPoolTest extends TestCase
             'pool'=>'default'
         ));
 
-        $this->biz['scheduler.job.pool']->execute($job);
+        $pool = new JobPool($this->biz);
+        $pool->execute($job);
 
-        $poolDetail = $this->biz['scheduler.job.pool']->getJobPool('default');
+        $poolDetail = $pool->getJobPool('default');
         $this->assertEquals(0, $poolDetail['num']);
         $this->assertEquals(10, $poolDetail['max_num']);
         $this->assertEquals(120, $poolDetail['timeout']);
