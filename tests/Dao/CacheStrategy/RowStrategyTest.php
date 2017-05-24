@@ -72,7 +72,7 @@ class RowStrategyTest extends IntegrationTestCase
         $strategy = new RowStrategy($this->redis, $metadataReader);
         $dao = new AnnotationExampleDaoImpl($this->biz);
 
-        $cache = $strategy->beforeQuery($dao, 'getNoCache', [1]);
+        $cache = $strategy->beforeQuery($dao, 'getNoCache', array(1));
 
         $this->assertFalse($cache);
     }
@@ -137,7 +137,7 @@ class RowStrategyTest extends IntegrationTestCase
         $dao = new AnnotationExampleDaoImpl($this->biz);
 
         $row = $this->fakeRow();
-        $strategy->afterQuery($dao, 'getNoCache', [1], $row);
+        $strategy->afterQuery($dao, 'getNoCache', array(1), $row);
 
         $cache = $this->redis->get("dao:{$dao->table()}:getNoCache:1");
         $this->assertFalse($cache);
