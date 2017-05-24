@@ -10,8 +10,9 @@ $loader = require ROOT_DIR.'/vendor/autoload.php';
 AnnotationRegistry::registerLoader(array($loader, 'loadClass'));
 IntegrationTestCase::$classLoader = $loader;
 
-echo "[exec] bin/phpmig migrate\n";
-passthru(dirname(__DIR__).'/bin/phpmig migrate');
+echo "[exec] vendor/bin/phpmig migrate\n";
+chdir(dirname(__DIR__));
+passthru('vendor/bin/phpmig migrate');
 
 $dns = sprintf('mysql:dbname=%s;host=%s', getenv('DB_NAME'), getenv('DB_HOST'));
 
