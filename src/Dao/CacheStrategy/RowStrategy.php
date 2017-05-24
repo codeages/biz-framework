@@ -155,6 +155,6 @@ class RowStrategy implements CacheStrategy
 
     protected function getPrimaryCacheKey(GeneralDaoInterface $dao, $metadata, $id)
     {
-        return $this->getCacheKey($dao, $metadata, 'get', [$id]);
+        return $this->getCacheKey($dao, $metadata, 'get', array($id));
     }
 }
