@@ -43,17 +43,12 @@ class DaoProxyTest extends TestCase
         $storage = new ArrayStorage();
         $expected = array('id' => 1, 'name' => 'test');
         $proxy = $this->mockDaoProxyWithNoCache($expected, 'get', $storage);
-
         $row = $proxy->get($expected['id']);
+        $this->assertEquals($expected, $row);
 
         $proxy = $this->mockDaoProxyWithNoCacheAndNoRealCall($storage);
         $row = $proxy->get($expected['id']);
-
         $this->assertEquals($expected, $row);
-
-//        $row = $proxy->get($expected['id']);
-
-        var_dump($storage);
     }
 
     public function testGet_Lock()
