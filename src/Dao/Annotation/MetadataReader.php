@@ -70,8 +70,8 @@ class MetadataReader
             }
         }
 
-        $metadata['cache_key_of_arg_index']['get'] = [0];
-        $metadata['cache_key_of_field_name']['get'] = ['id'];
+        $metadata['cache_key_of_arg_index']['get'] = array(0);
+        $metadata['cache_key_of_field_name']['get'] = array('id');
 
         $this->saveCache($dao, $metadata);
 
