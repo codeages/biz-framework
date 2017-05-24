@@ -54,8 +54,6 @@ class DaoProxyTest extends TestCase
 //        $row = $proxy->get($expected['id']);
 
         var_dump($storage);
-
-
     }
 
     public function testGet_Lock()
