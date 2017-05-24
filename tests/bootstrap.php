@@ -11,7 +11,7 @@ AnnotationRegistry::registerLoader(array($loader, 'loadClass'));
 IntegrationTestCase::$classLoader = $loader;
 
 echo "[exec] bin/phpmig migrate\n";
-chdir(__DIR__);
+chdir(dirname(__DIR__));
 passthru('bin/phpmig migrate');
 
 $dns = sprintf('mysql:dbname=%s;host=%s', getenv('DB_NAME'), getenv('DB_HOST'));
