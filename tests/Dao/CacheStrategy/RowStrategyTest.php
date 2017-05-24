@@ -100,7 +100,7 @@ class RowStrategyTest extends IntegrationTestCase
         $dao = new AnnotationExampleDaoImpl($this->biz);
 
         $row = $this->fakeRow();
-        $strategy->afterQuery($dao, 'getByName', [$row['name']], $row);
+        $strategy->afterQuery($dao, 'getByName', array($row['name']), $row);
 
         $primaryKey = $this->redis->get("dao:{$dao->table()}:getByName:{$row['name']}");
         $this->assertEquals("dao:{$dao->table()}:get:{$row['id']}", $primaryKey);
@@ -121,8 +121,8 @@ class RowStrategyTest extends IntegrationTestCase
         $dao = new AnnotationExampleDaoImpl($this->biz);
 
         $row = $this->fakeRow();
-        $strategy->afterQuery($dao, 'getByName', [$row['name']], $row);
-        $strategy->afterQuery($dao, 'getByCode', [$row['code']], $row);
+        $strategy->afterQuery($dao, 'getByName', array($row['name']), $row);
+        $strategy->afterQuery($dao, 'getByCode', array($row['code']), $row);
 
         $relKeys = $this->redis->get("dao:{$dao->table()}:get:{$row['id']}:rel_keys");
         $this->assertCount(2, $relKeys);
@@ -150,7 +150,7 @@ class RowStrategyTest extends IntegrationTestCase
         $dao = new AnnotationExampleDaoImpl($this->biz);
 
         $row = $this->fakeRow();
-        $strategy->afterQuery($dao, 'findByName', [$row['name']], $row);
+        $strategy->afterQuery($dao, 'findByName', array($row['name']), $row);
 
         $primaryKey = $this->redis->get("dao:{$dao->table()}:findByName:{$row['name']}");
 
@@ -164,8 +164,8 @@ class RowStrategyTest extends IntegrationTestCase
         $dao = new AnnotationExampleDaoImpl($this->biz);
 
         $row = $this->fakeRow();
-        $strategy->afterQuery($dao, 'getByName', [$row['name']], $row);
-        $strategy->afterQuery($dao, 'getByCode', [$row['code']], $row);
+        $strategy->afterQuery($dao, 'getByName', array($row['name']), $row);
+        $strategy->afterQuery($dao, 'getByCode', array($row['code']), $row);
 
         $strategy->afterUpdate($dao, 'update', array($row['id']), $row);
 
@@ -191,7 +191,7 @@ class RowStrategyTest extends IntegrationTestCase
         $row = $this->fakeRow();
         $primaryKey = $this->getPrimaryCacheKey($dao, $row['id']);
         $this->redis->set($primaryKey, $row);
-        $strategy->afterDelete($dao, 'delete', [$row['id']]);
+        $strategy->afterDelete($dao, 'delete', array($row['id']));
 
         $this->assertFalse($this->redis->get($primaryKey));
     }
@@ -205,7 +205,7 @@ class RowStrategyTest extends IntegrationTestCase
         $row = $this->fakeRow();
         $primaryKey = $this->getPrimaryCacheKey($dao, $row['id']);
         $this->redis->set($primaryKey, $row);
-        $strategy->afterWave($dao, 'wave', [[$row['id']]], 1);
+        $strategy->afterWave($dao, 'wave', array(array($row['id'])), 1);
 
         $this->assertFalse($this->redis->get($primaryKey));
     }
