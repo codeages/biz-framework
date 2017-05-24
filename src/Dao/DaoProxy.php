@@ -75,19 +75,24 @@ class DaoProxy
             return $row;
         }
 
+        if ($this->arrayStorage) {
+            $key = $this->getCacheKey($this->dao, $method, $arguments);
+            if (!empty($this->arrayStorage[$key])) {
+                return $this->arrayStorage[$key];
+            }
+        }
+
         $strategy = $this->buildCacheStrategy();
         if ($strategy) {
             $cache = $strategy->beforeQuery($this->dao, $method, $arguments);
             if ($cache !== false) {
-                $this->arrayStorage && ($this->arrayStorage[$this->getCacheKey($this->dao, $method, $arguments)] = $cache);
-
                 return $cache;
             }
         }
 
         $row = $this->callRealDao($method, $arguments);
         $this->unserialize($row);
-        $this->arrayStorage && ($this->arrayStorage[$this->getCacheKey($this->dao, $method, $arguments)] = $cache);
+        $this->arrayStorage && ($this->arrayStorage[$this->getCacheKey($this->dao, $method, $arguments)] = $row);
 
         if ($strategy) {
             $strategy->afterQuery($this->dao, $method, $arguments, $row);
