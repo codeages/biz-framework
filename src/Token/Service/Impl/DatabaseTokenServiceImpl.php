@@ -1,4 +1,5 @@
 <?php
+
 namespace Codeages\Biz\Framework\Token\Service\Impl;
 
 use Codeages\Biz\Framework\Token\Dao\TokenDao;
@@ -37,11 +38,13 @@ class DatabaseTokenServiceImpl extends BaseService implements TokenService
 
         if (($token['expired_time'] > 0) && ($token['expired_time'] < time())) {
             $this->getTokenDao()->delete($token['id']);
+
             return false;
         }
 
         if ($token['times'] > 0 && ($token['remaining_times'] < 1)) {
             $this->getTokenDao()->delete($token['id']);
+
             return false;
         }
 
@@ -85,6 +88,7 @@ class DatabaseTokenServiceImpl extends BaseService implements TokenService
         $token['key'] = $token['_key'];
         unset($token['_key']);
         unset($token['id']);
+
         return $token;
     }
 

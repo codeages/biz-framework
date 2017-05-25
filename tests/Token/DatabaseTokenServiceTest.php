@@ -21,7 +21,7 @@ class DatabaseTokenServiceTest extends IntegrationTestCase
         $token = $this->getTokenService()->generate('unit_test', 3600, 2);
         $this->assertEquals('unit_test', $token['place']);
         $this->assertEquals(2, $token['times']);
-        $this->assertGreaterThanOrEqual(time()+3599, $token['expired_time']);
+        $this->assertGreaterThanOrEqual(time() + 3599, $token['expired_time']);
         $this->assertArrayHasKey('key', $token);
     }
 
@@ -29,7 +29,7 @@ class DatabaseTokenServiceTest extends IntegrationTestCase
     {
         $tokens = $this->seed('Tests\Token\TokenSeeder');
 
-        $expectedToken = $tokens->filter(function($token) {
+        $expectedToken = $tokens->filter(function ($token) {
             return $token['_key'] == 'unit_test_key_no_expired';
         })->first();
 
@@ -66,7 +66,7 @@ class DatabaseTokenServiceTest extends IntegrationTestCase
     {
         $this->seed('Tests\Token\TokenSeeder');
 
-        for ($i=0; $i<100; $i++) {
+        for ($i = 0; $i < 100; ++$i) {
             $verified = $this->getTokenService()->verify('unit_test', 'unit_test_key');
             $this->assertEquals('unit_test_key', $verified['key']);
         }

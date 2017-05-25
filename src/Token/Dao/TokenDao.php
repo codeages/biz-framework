@@ -1,4 +1,5 @@
 <?php
+
 namespace Codeages\Biz\Framework\Token\Dao;
 
 use Codeages\Biz\Framework\Dao\GeneralDaoInterface;

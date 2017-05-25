@@ -1,4 +1,5 @@
 <?php
+
 namespace Codeages\Biz\Framework\Token\Service;
 
 interface TokenService
@@ -29,5 +30,4 @@ interface TokenService
      * @param [type] $value 要摧毁的Token的值
      */
     public function destroy($place, $value);
-
 }

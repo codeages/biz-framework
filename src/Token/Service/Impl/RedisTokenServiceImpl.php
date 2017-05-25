@@ -1,4 +1,5 @@
 <?php
+
 namespace Codeages\Biz\Framework\Token\Service\Impl;
 
 use Codeages\Biz\Framework\Context\Biz;
@@ -50,6 +51,7 @@ class RedisTokenServiceImpl extends BaseService implements TokenService
 
         if ($token['times'] > 0 && ($token['remaining_times'] < 1)) {
             $this->redis->del($key);
+
             return false;
         }
 

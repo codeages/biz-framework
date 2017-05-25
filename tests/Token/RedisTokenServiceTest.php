@@ -25,7 +25,7 @@ class RedisTokenServiceTest extends IntegrationTestCase
         $token = $this->getTokenService()->generate('unit_test', 3600, 2);
         $this->assertEquals('unit_test', $token['place']);
         $this->assertEquals(2, $token['times']);
-        $this->assertGreaterThanOrEqual(time()+3599, $token['expired_time']);
+        $this->assertGreaterThanOrEqual(time() + 3599, $token['expired_time']);
         $this->assertArrayHasKey('key', $token);
 
         $key = $this->key($token['place'], $token['key']);
@@ -93,7 +93,7 @@ class RedisTokenServiceTest extends IntegrationTestCase
     {
         $token = $this->getTokenService()->generate('unit_test', 0);
 
-        for ($i=0; $i<100; $i++) {
+        for ($i = 0; $i < 100; ++$i) {
             $verified = $this->getTokenService()->verify($token['place'], $token['key']);
             $this->assertEquals($token['place'], $verified['place']);
             $this->assertEquals($token['key'], $verified['key']);

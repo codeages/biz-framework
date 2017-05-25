@@ -1,4 +1,5 @@
 <?php
+
 namespace Tests\Token;
 
 use Codeages\Biz\Framework\UnitTests\DatabaseSeeder;
