@@ -100,10 +100,12 @@ class SchedulerTest extends BaseTestCase
         $this->testCreateJob();
         $this->getSchedulerService()->execute();
 
+        $time = time()-1;
+
         $job = array(
             'name' => 'test2',
             'source' => 'MAIN',
-            'expression' => CronExpression::factory(time()-1),
+            'expression' => $time,
             'class' => 'TestProject\\Biz\\Example\\Job\\ExampleJob',
             'args' => array('courseId'=>1),
             'priority' => 100,
@@ -112,7 +114,10 @@ class SchedulerTest extends BaseTestCase
         );
 
         $savedJob = $this->getSchedulerService()->register($job);
+
+
         $this->getSchedulerService()->execute();
+        $this->assertEquals($time-$time%60, $savedJob['next_fire_time']);
 
         $this->asserts($job, $savedJob);
 
@@ -149,6 +154,9 @@ class SchedulerTest extends BaseTestCase
     {
         $keys = array_keys($excepted);
         foreach ($keys as $key) {
+            if ('expression' == $key) {
+                continue;
+            }
             $this->assertEquals($excepted[$key], $acturel[$key]);
         }
     }

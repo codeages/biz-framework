@@ -29,6 +29,10 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
             throw new InvalidArgumentException('class is empty.');
         }
 
+        if (is_integer($job['expression'])) {
+            $job['expression'] = $this->getExpression($job['expression']);
+        }
+
         if (!CronExpression::isValidExpression($job['expression'])) {
             throw new InvalidArgumentException('expression is invalid.');
         }
@@ -52,6 +56,16 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         $this->createJobLog($jobFired, 'created');
 
         return $job;
+    }
+
+    protected function getExpression($time)
+    {
+        $year = date("Y", $time);
+        $month = date("m", $time);
+        $day = date("d", $time);
+        $hour = date("G", $time);
+        $min = date("i", $time);
+        return "{$min} {$hour} {$day} {$month} * {$year}";
     }
 
     public function execute()
@@ -144,10 +158,10 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
 
     }
 
-    protected function getNextRunTime($expression)
+    protected function getNextRunTime($expression, $currentTime = 'now')
     {
         $cron = CronExpression::factory($expression);
-        return strtotime($cron->getNextRunDate()->format('Y-m-d H:i:s'));
+        return strtotime($cron->getNextRunDate($currentTime, 0, true)->format('Y-m-d H:i:s'));
     }
 
     protected function triggerJob()

@@ -13,10 +13,10 @@ class JobFiredDaoImpl extends GeneralDaoImpl implements JobFiredDao
     {
         $sql = "SELECT * FROM 
                 (
-                  SELECT *, floor(fired_time/60)*60 as formatted_fired_time FROM {$this->table} 
+                  SELECT * FROM {$this->table} 
                   WHERE fired_time <= ? AND status = ?
                 ) as {$this->table} 
-                ORDER BY formatted_fired_time ASC , priority DESC LIMIT 1";
+                ORDER BY fired_time ASC , priority DESC LIMIT 1";
 
         return $this->db()->fetchAssoc($sql, array(strtotime('+1 minutes'), $status));
     }

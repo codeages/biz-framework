@@ -13,10 +13,10 @@ class JobDaoImpl extends GeneralDaoImpl implements JobDao
     {
         $sql = "SELECT * FROM 
                 (
-                  SELECT *, floor(created_time/60)*60 as formatted_created_time FROM {$this->table} 
+                  SELECT * FROM {$this->table} 
                   WHERE enabled = 1 AND next_fire_time <= ?
                 ) as {$this->table} 
-                ORDER BY formatted_created_time ASC , priority DESC";
+                ORDER BY next_fire_time ASC , priority DESC";
 
         return $this->db()->fetchAll($sql, array($fireTime));
     }
