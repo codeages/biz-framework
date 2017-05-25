@@ -38,8 +38,6 @@ interface TokenService
 
     /**
      * 清除过期令牌
-     *
-     * @return void
      */
     public function gc();
 }

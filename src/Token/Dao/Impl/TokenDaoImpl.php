@@ -25,7 +25,7 @@ class TokenDaoImpl extends GeneralDaoImpl implements TokenDao
         return array(
             'timestamps' => array('created_time'),
             'serializes' => array('data' => 'php'),
-            'cache' => false, //
+            'cache' => false, // 该Dao禁用Cache
             'conditions' => array(
             ),
         );

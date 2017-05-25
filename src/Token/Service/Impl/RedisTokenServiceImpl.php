@@ -3,7 +3,6 @@
 namespace Codeages\Biz\Framework\Token\Service\Impl;
 
 use Codeages\Biz\Framework\Context\Biz;
-use Codeages\Biz\Framework\Token\Dao\TokenDao;
 use Codeages\Biz\Framework\Token\Service\GenerateException;
 use Codeages\Biz\Framework\Token\Service\TokenService;
 use Codeages\Biz\Framework\Service\BaseService;
@@ -99,7 +98,7 @@ class RedisTokenServiceImpl extends BaseService implements TokenService
 
     public function gc()
     {
-        return ;
+        return;
     }
 
     protected function key($place, $key)

@@ -86,13 +86,13 @@ class DatabaseTokenServiceImpl extends BaseService implements TokenService
     {
         $divisor = $this->biz['token_service.gc_divisor'];
         if (empty($divisor)) {
-            return ;
+            return;
         }
 
-        $middle = intval((1+$divisor)/2);
+        $middle = intval((1 + $divisor) / 2);
         $rand = rand(1, $divisor);
         if ($rand != $middle) {
-            return ;
+            return;
         }
 
         $this->getTokenDao()->deleteExpired(time());
