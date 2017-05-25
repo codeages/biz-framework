@@ -21,13 +21,13 @@ interface TokenService
      *
      * @return bool 该Token值是否OK
      */
-    public function verify($type, $value);
+    public function verify($place, $key);
 
     /**
      * 作废一个Token
      *
      * @param [type] $value 要摧毁的Token的值
      */
-    public function destroy($value);
+    public function destroy($place, $value);
 
 }

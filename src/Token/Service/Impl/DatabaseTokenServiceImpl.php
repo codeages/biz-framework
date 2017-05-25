@@ -57,7 +57,7 @@ class DatabaseTokenServiceImpl extends BaseService implements TokenService
         return $this->filter($token);
     }
 
-    public function destroy($key)
+    public function destroy($place, $key)
     {
         $token = $this->getTokenDao()->getByKey($key);
         if (empty($token)) {
@@ -84,6 +84,7 @@ class DatabaseTokenServiceImpl extends BaseService implements TokenService
     {
         $token['key'] = $token['_key'];
         unset($token['_key']);
+        unset($token['id']);
         return $token;
     }
 
