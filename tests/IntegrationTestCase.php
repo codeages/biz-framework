@@ -5,6 +5,7 @@ namespace Tests;
 use Codeages\Biz\Framework\Dao\Connection;
 use Codeages\Biz\Framework\Provider\RedisServiceProvider;
 use Codeages\Biz\Framework\Provider\TargetlogServiceProvider;
+use Codeages\Biz\Framework\Provider\TokenServiceProvider;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
 use Codeages\Biz\Framework\Context\Biz;
@@ -76,6 +77,7 @@ class IntegrationTestCase extends TestCase
         $biz->register(new DoctrineServiceProvider());
         $biz->register(new RedisServiceProvider());
         $biz->register(new TargetlogServiceProvider());
+        $biz->register(new TokenServiceProvider());
         $biz->boot();
 
         return $biz;
