@@ -29,6 +29,10 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
             throw new InvalidArgumentException('class is empty.');
         }
 
+        if (is_integer($job['expression']) && $job['expression'] < time()) {
+            throw new InvalidArgumentException('expression is invalid.');
+        }
+
         if (is_integer($job['expression'])) {
             $job['expression'] = $this->getExpression($job['expression']);
         }
@@ -37,7 +41,7 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
             throw new InvalidArgumentException('expression is invalid.');
         }
 
-        $job['next_fire_time'] = $this->getNextRunTime($job['expression']);
+        $job['next_fire_time'] = $this->getNextFireTime($job['expression']);
 
         $default = array(
             'misfire_threshold' => 300,
@@ -158,10 +162,10 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
 
     }
 
-    protected function getNextRunTime($expression, $currentTime = 'now')
+    protected function getNextFireTime($expression)
     {
         $cron = CronExpression::factory($expression);
-        return strtotime($cron->getNextRunDate($currentTime, 0, true)->format('Y-m-d H:i:s'));
+        return strtotime($cron->getNextRunDate('now', 0, true)->format('Y-m-d H:i:s'));
     }
 
     protected function triggerJob()
@@ -212,10 +216,11 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
 
     protected function updateNextFireTime($job)
     {
-        $nextFireTime = $job['next_fire_time'];
-        if (!empty($job['expression'])) {
-            $nextFireTime = $this->getNextRunTime($job['expression']);
+        if ($job['next_fire_time'] > time()) {
+            return $job;
         }
+
+        $nextFireTime = $this->getNextFireTime($job['expression']);
 
         $fields = array(
             'pre_fire_time' => $job['next_fire_time'],

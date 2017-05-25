@@ -100,7 +100,7 @@ class SchedulerTest extends BaseTestCase
         $this->testCreateJob();
         $this->getSchedulerService()->execute();
 
-        $time = time()-1;
+        $time = time()+10;
 
         $job = array(
             'name' => 'test2',
