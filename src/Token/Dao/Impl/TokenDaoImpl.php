@@ -11,7 +11,7 @@ class TokenDaoImpl extends GeneralDaoImpl implements TokenDao
 
     public function getByKey($key)
     {
-        return $this->getByFields(['_key' => $key]);
+        return $this->getByFields(array('_key' => $key));
     }
 
     public function declares()
