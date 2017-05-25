@@ -5,7 +5,7 @@ use Codeages\Biz\Framework\Token\Dao\TokenDao;
 use Codeages\Biz\Framework\Token\Service\TokenService;
 use Codeages\Biz\Framework\Service\BaseService;
 
-class TokenServiceImpl extends BaseService implements TokenService
+class DatabaseTokenServiceImpl extends BaseService implements TokenService
 {
     public function generate($place, $lifetime, $times = 0, $data = null)
     {
@@ -36,10 +36,12 @@ class TokenServiceImpl extends BaseService implements TokenService
         }
 
         if (($token['expired_time'] > 0) && ($token['expired_time'] < time())) {
+            $this->getTokenDao()->delete($token['id']);
             return false;
         }
 
         if ($token['times'] > 0 && ($token['remaining_times'] < 1)) {
+            $this->getTokenDao()->delete($token['id']);
             return false;
         }
 
@@ -48,7 +50,9 @@ class TokenServiceImpl extends BaseService implements TokenService
             $token['remaining_times'] -= 1;
         }
 
-//        $this->_gcToken($token);
+        if ($token['times'] > 0 && $token['remaining_times'] == 0) {
+            $this->getTokenDao()->delete($token['id']);
+        }
 
         return $this->filter($token);
     }
@@ -61,23 +65,6 @@ class TokenServiceImpl extends BaseService implements TokenService
         }
 
         $this->getTokenDao()->delete($token['id']);
-    }
-
-    protected function _gcToken($token)
-    {
-        if (($token['times'] > 0) && ($token['remainedTimes'] <= 1)) {
-            $this->getTokenDao()->delete($token['id']);
-
-            return;
-        }
-
-        if (($token['expiredTime'] > 0) && ($token['expiredTime'] < time())) {
-            $this->getTokenDao()->delete($token['id']);
-
-            return;
-        }
-
-        return;
     }
 
     protected function _makeTokenValue($length)

@@ -5,7 +5,7 @@ namespace Tests\Token;
 use Codeages\Biz\Framework\Token\Service\TokenService;
 use Tests\IntegrationTestCase;
 
-class TokenServiceTest extends IntegrationTestCase
+class DatabaseTokenServiceTest extends IntegrationTestCase
 {
     public function testGenerate_Default()
     {
@@ -100,6 +100,6 @@ class TokenServiceTest extends IntegrationTestCase
      */
     protected function getTokenService()
     {
-        return $this->biz->service('Token:TokenService');
+        return $this->biz->service('Token:DatabaseTokenService');
     }
 }
