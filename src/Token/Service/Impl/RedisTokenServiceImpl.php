@@ -101,12 +101,4 @@ class RedisTokenServiceImpl extends BaseService implements TokenService
     {
         return "biz:token:{$place}:{$key}";
     }
-
-    /**
-     * @return TokenDao
-     */
-    protected function getTokenDao()
-    {
-        return $this->biz->dao('Token:TokenDao');
-    }
 }
