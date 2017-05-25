@@ -97,6 +97,11 @@ class RedisTokenServiceImpl extends BaseService implements TokenService
         return $this->redis->del($this->key($place, $key));
     }
 
+    public function gc()
+    {
+        return ;
+    }
+
     protected function key($place, $key)
     {
         return "biz:token:{$place}:{$key}";

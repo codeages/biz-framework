@@ -10,6 +10,7 @@ class TokenServiceProvider implements ServiceProviderInterface
     public function register(Container $container)
     {
         $container['token_service.impl'] = isset($container['token_service.impl']) ? $container['token_service.impl'] : 'database';
+        $container['token_service.gc_divisor'] = isset($container['token_service.gc_divisor']) ? intval($container['token_service.gc_divisor']) : 1000;
 
         if ($container['token_service.impl'] == 'database') {
             $container['migration.directories'][] = dirname(dirname(__DIR__)).'/migrations/token';

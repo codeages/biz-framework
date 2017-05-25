@@ -35,4 +35,11 @@ interface TokenService
      * @param string $key   令牌的Key
      */
     public function destroy($place, $value);
+
+    /**
+     * 清除过期令牌
+     *
+     * @return void
+     */
+    public function gc();
 }

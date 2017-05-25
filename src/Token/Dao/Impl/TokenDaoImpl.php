@@ -14,11 +14,18 @@ class TokenDaoImpl extends GeneralDaoImpl implements TokenDao
         return $this->getByFields(array('_key' => $key));
     }
 
+    public function deleteExpired($timestamp)
+    {
+        $sql = "DELETE FROM {$this->table()} WHERE expired_time > 0 AND expired_time < ?";
+        $this->db()->executeQuery($sql, array(intval($timestamp)));
+    }
+
     public function declares()
     {
         return array(
             'timestamps' => array('created_time'),
             'serializes' => array('data' => 'php'),
+            'cache' => false, //
             'conditions' => array(
             ),
         );

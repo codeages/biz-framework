@@ -105,6 +105,20 @@ class DatabaseTokenServiceTest extends IntegrationTestCase
         $this->assertFalse($verified);
     }
 
+    public function testGc()
+    {
+        $this->biz['token_service.gc_divisor'] = 1;
+        $tokens = $this->seed('Tests\Token\TokenSeeder');
+        
+        $token = $this->db->query("SELECT * FROM biz_token WHERE _key = 'unit_test_key_expired'")->fetch(\PDO::FETCH_ASSOC);
+        $this->assertEquals('unit_test_key_expired', $token['_key']);
+
+        $this->getTokenService()->gc();
+
+        $token = $this->db->query("SELECT * FROM biz_token WHERE _key = 'unit_test_key_expired'")->fetch(\PDO::FETCH_ASSOC);
+        $this->assertFalse($token);
+    }
+
     /**
      * @var TokenService
      */

@@ -22,6 +22,8 @@ class DatabaseTokenServiceImpl extends BaseService implements TokenService
 
         $token = $this->getTokenDao()->create($token);
 
+        $this->gc();
+
         return $this->filter($token);
     }
 
@@ -78,6 +80,22 @@ class DatabaseTokenServiceImpl extends BaseService implements TokenService
         unset($token['id']);
 
         return $token;
+    }
+
+    public function gc()
+    {
+        $divisor = $this->biz['token_service.gc_divisor'];
+        if (empty($divisor)) {
+            return ;
+        }
+
+        $middle = intval((1+$divisor)/2);
+        $rand = rand(1, $divisor);
+        if ($rand != $middle) {
+            return ;
+        }
+
+        $this->getTokenDao()->deleteExpired(time());
     }
 
     /**
