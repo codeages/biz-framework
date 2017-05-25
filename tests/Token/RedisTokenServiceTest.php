@@ -117,9 +117,18 @@ class RedisTokenServiceTest extends IntegrationTestCase
 
     public function testGenerate_DifferentPlace()
     {
-        $this->seed('Tests\Token\TokenSeeder');
+        $token = $this->getTokenService()->generate('unit_test', 3600);
 
-        $verified = $this->getTokenService()->verify('unit_test_different_place', 'unit_test_key');
+        $verified = $this->getTokenService()->verify('unit_test_different_place', $token['key']);
+        $this->assertFalse($verified);
+    }
+
+    public function testDestroy()
+    {
+        $token = $this->getTokenService()->generate('unit_test', 3600);
+        $this->getTokenService()->destroy($token['place'], $token['key']);
+
+        $verified = $this->getTokenService()->verify($token['place'], $token['key']);
         $this->assertFalse($verified);
     }
 

@@ -95,6 +95,16 @@ class DatabaseTokenServiceTest extends IntegrationTestCase
         $this->assertFalse($verified);
     }
 
+    public function testDestroy()
+    {
+        $tokens = $this->seed('Tests\Token\TokenSeeder');
+
+        $this->getTokenService()->destroy('unit_test', 'unit_test_key');
+
+        $verified = $this->getTokenService()->verify('unit_test', 'unit_test_key');
+        $this->assertFalse($verified);
+    }
+
     /**
      * @var TokenService
      */

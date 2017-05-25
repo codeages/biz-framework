@@ -5,29 +5,34 @@ namespace Codeages\Biz\Framework\Token\Service;
 interface TokenService
 {
     /**
-     * 生成一个一次性的Token
+     * 生成令牌
      *
-     * @param string $type Token类型
-     * @param array  $args 生成Token的一些限制规则
+     * @param string $place 令牌使用场景
+     * @param array  $lifetime 令牌的有效时长（秒），`0`表示永久有效
+     * @param int $times 令牌可被校验的次数，超过该次数则校验失败
+     * @param mixed $data 令牌所属的业务数据
      *
-     * @return array 生成的Token
+     * @throws GenerateException 当生成令牌的Key已存在时抛出异常
+     *
+     * @return array 令牌对象
      */
     public function generate($place, $lifetime, $times = 0, $data = null);
 
     /**
-     * 校验Token
+     * 校验令牌
      *
-     * @param string $type Token类型
-     * @param string $key  Token的值
+     * @param string $place 令牌使用场景
+     * @param string $key  令牌的Key
      *
-     * @return bool 该Token值是否OK
+     * @return bool 校验通过，返回`true`，否则返回`false`
      */
     public function verify($place, $key);
 
     /**
-     * 作废一个Token
+     * 删除令牌
      *
-     * @param [type] $value 要摧毁的Token的值
+     * @param string $place 令牌使用场景
+     * @param string $key  令牌的Key
      */
     public function destroy($place, $value);
 }

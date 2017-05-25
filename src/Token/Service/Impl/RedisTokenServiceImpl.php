@@ -4,8 +4,10 @@ namespace Codeages\Biz\Framework\Token\Service\Impl;
 
 use Codeages\Biz\Framework\Context\Biz;
 use Codeages\Biz\Framework\Token\Dao\TokenDao;
+use Codeages\Biz\Framework\Token\Service\GenerateException;
 use Codeages\Biz\Framework\Token\Service\TokenService;
 use Codeages\Biz\Framework\Service\BaseService;
+use Webpatser\Uuid\Uuid;
 
 class RedisTokenServiceImpl extends BaseService implements TokenService
 {
@@ -30,17 +32,21 @@ class RedisTokenServiceImpl extends BaseService implements TokenService
     {
         $token = array();
         $token['place'] = $place;
-        $token['key'] = $this->_makeTokenValue(32);
+        $token['key'] = str_replace('-', '', Uuid::generate(4));
         $token['data'] = $data;
         $token['expired_time'] = empty($lifetime) ? 0 : time() + $lifetime;
         $token['times'] = $times;
         $token['remaining_times'] = $times;
         $token['created_time'] = time();
 
+        $key = $this->key($place, $token['key']);
+        $seted = $this->redis->setnx($key, $token);
+        if (!$seted) {
+            throw new GenerateException("Generate Token Failed(key:{$token['key']}.");
+        }
+
         if ($lifetime) {
-            $this->redis->set($this->key($place, $token['key']), $token, $lifetime);
-        } else {
-            $this->redis->set($this->key($place, $token['key']), $token);
+            $this->redis->expire($key, $lifetime);
         }
 
         return $token;
@@ -89,19 +95,6 @@ class RedisTokenServiceImpl extends BaseService implements TokenService
     public function destroy($place, $key)
     {
         return $this->redis->del($this->key($place, $key));
-    }
-
-    protected function _makeTokenValue($length)
-    {
-        $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-
-        $value = '';
-
-        for ($i = 0; $i < $length; ++$i) {
-            $value .= $chars[mt_rand(0, strlen($chars) - 1)];
-        }
-
-        return $value;
     }
 
     protected function key($place, $key)

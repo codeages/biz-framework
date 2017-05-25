@@ -5,6 +5,7 @@ namespace Codeages\Biz\Framework\Token\Service\Impl;
 use Codeages\Biz\Framework\Token\Dao\TokenDao;
 use Codeages\Biz\Framework\Token\Service\TokenService;
 use Codeages\Biz\Framework\Service\BaseService;
+use Webpatser\Uuid\Uuid;
 
 class DatabaseTokenServiceImpl extends BaseService implements TokenService
 {
@@ -12,7 +13,7 @@ class DatabaseTokenServiceImpl extends BaseService implements TokenService
     {
         $token = array();
         $token['place'] = $place;
-        $token['_key'] = $this->_makeTokenValue(32);
+        $token['_key'] = str_replace('-', '', Uuid::generate(4));
         $token['data'] = $data;
         $token['expired_time'] = empty($lifetime) ? 0 : time() + $lifetime;
         $token['times'] = $times;
@@ -68,19 +69,6 @@ class DatabaseTokenServiceImpl extends BaseService implements TokenService
         }
 
         $this->getTokenDao()->delete($token['id']);
-    }
-
-    protected function _makeTokenValue($length)
-    {
-        $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-
-        $value = '';
-
-        for ($i = 0; $i < $length; ++$i) {
-            $value .= $chars[mt_rand(0, strlen($chars) - 1)];
-        }
-
-        return $value;
     }
 
     protected function filter($token)
