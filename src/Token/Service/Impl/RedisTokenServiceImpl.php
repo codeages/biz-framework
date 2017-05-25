@@ -17,7 +17,13 @@ class RedisTokenServiceImpl extends BaseService implements TokenService
     public function __construct(Biz $biz)
     {
         parent::__construct($biz);
-        $this->redis = $this->biz['redis'];
+
+        $pool = isset($this->biz['token_service.redis.pool']) ? $this->biz['token_service.redis.pool'] : null;
+        if ($pool) {
+            $this->redis = $this->biz['mult_redis'][$pool];
+        } else {
+            $this->redis = $this->biz['redis'];
+        }
     }
 
     public function generate($place, $lifetime, $times = 0, $data = null)
