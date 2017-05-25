@@ -2,7 +2,6 @@
 
 namespace Codeages\Biz\Framework\Scheduler\Service\Impl;
 
-use Codeages\Biz\Framework\Scheduler\Checker\AbstractJobChecker;
 use Codeages\Biz\Framework\Scheduler\Service\JobPool;
 use Codeages\Biz\Framework\Scheduler\Service\SchedulerService;
 use Codeages\Biz\Framework\Service\BaseService;
@@ -18,17 +17,23 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
 
     public function register($job)
     {
-        if (empty($job['expression']) && empty($job['next_fire_time'])) {
-            throw new InvalidArgumentException('args is invalid.');
+        if (empty($job['expression'])) {
+            throw new InvalidArgumentException('expression is empty.');
         }
 
-        if (!empty($job['expression']) && !CronExpression::isValidExpression($job['expression'])) {
-            throw new InvalidArgumentException('cron expression is invalid.');
+        if (empty($job['name'])) {
+            throw new InvalidArgumentException('name is empty.');
         }
 
-        if (!empty($job['expression'])) {
-            $job['next_fire_time'] = $this->getNextRunTime($job['expression']);
+        if (empty($job['class'])) {
+            throw new InvalidArgumentException('class is empty.');
         }
+
+        if (!CronExpression::isValidExpression($job['expression'])) {
+            throw new InvalidArgumentException('expression is invalid.');
+        }
+
+        $job['next_fire_time'] = $this->getNextRunTime($job['expression']);
 
         $default = array(
             'misfire_threshold' => 300,
@@ -36,11 +41,6 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
             'priority' => 100,
             'source' => 'MAIN',
         );
-
-        if (!empty($this->biz['user'])) {
-            $user = $this->biz['user'];
-            $default['creator_id'] = $user['id'];
-        }
 
         $job = array_merge($default, $job);
 

@@ -2,13 +2,66 @@
 
 namespace Tests;
 
-use Codeages\Biz\Framework\Context\Biz;
-use Codeages\Biz\Framework\Provider\RedisServiceProvider;
-use Codeages\Biz\Framework\Provider\SchedulerServiceProvider;
+use Codeages\Biz\Framework\Service\Exception\InvalidArgumentException;
 use Codeages\Biz\Framework\UnitTests\BaseTestCase;
+use Cron\CronExpression;
 
 class SchedulerTest extends BaseTestCase
 {
+    /**
+     * @expectedException \Exception
+     */
+    public function testCreateJobWithoutName()
+    {
+        $job = array(
+            'source' => 'MAIN',
+            'class' => 'TestProject\\Biz\\Example\\Job\\ExampleJob',
+            'expression' => '0 17 * * *',
+            'args' => array('courseId'=>1),
+            'priority' => 100,
+            'misfire_threshold' => 3000,
+            'misfire_policy' => 'missed',
+        );
+
+        $this->getSchedulerService()->register($job);
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testCreateJobWithoutExpression()
+    {
+        $job = array(
+            'name' => 'test',
+            'source' => 'MAIN',
+            'class' => 'TestProject\\Biz\\Example\\Job\\ExampleJob',
+            'args' => array('courseId'=>1),
+            'priority' => 100,
+            'misfire_threshold' => 3000,
+            'misfire_policy' => 'missed',
+        );
+
+        $this->getSchedulerService()->register($job);
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testCreateJobWithoutClass()
+    {
+        $job = array(
+            'name' => 'test',
+            'expression' => '0 17 * * *',
+            'source' => 'MAIN',
+            'args' => array('courseId'=>1),
+            'priority' => 100,
+            'misfire_threshold' => 3000,
+            'misfire_policy' => 'missed',
+        );
+
+        $this->getSchedulerService()->register($job);
+    }
+
     public function testCreateJob()
     {
         $job = array(
@@ -50,7 +103,7 @@ class SchedulerTest extends BaseTestCase
         $job = array(
             'name' => 'test2',
             'source' => 'MAIN',
-            'next_fire_time' => time()-1,
+            'expression' => CronExpression::factory(time()-1),
             'class' => 'TestProject\\Biz\\Example\\Job\\ExampleJob',
             'args' => array('courseId'=>1),
             'priority' => 100,
