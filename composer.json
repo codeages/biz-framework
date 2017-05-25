@@ -21,7 +21,8 @@
         "davedevelopment/phpmig": "^1.2.0",
         "psr/log": "^1.0.0",
         "symfony/event-dispatcher": "^2.8.9",
-        "symfony/finder": "^2.8.9"
+        "symfony/finder": "^2.8.9",
+        "webpatser/laravel-uuid": "^2.0"
 
     },
     "require-dev": {

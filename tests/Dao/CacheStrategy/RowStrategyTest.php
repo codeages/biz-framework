@@ -61,7 +61,7 @@ class RowStrategyTest extends IntegrationTestCase
 
         $row = $this->fakeRow();
 
-        $cache = $strategy->beforeQuery($dao, 'getByName',  array($row['name']));
+        $cache = $strategy->beforeQuery($dao, 'getByName', array($row['name']));
 
         $this->assertFalse($cache);
     }
@@ -88,7 +88,7 @@ class RowStrategyTest extends IntegrationTestCase
         $this->redis->set("dao:{$dao->table()}:findByName:{$row['name']}", "dao:{$dao->table()}:get:{$row['id']}");
         $this->redis->set("dao:{$dao->table()}:get:{$row['id']}", $row);
 
-        $cache = $strategy->beforeQuery($dao, 'findByName',  array($row['name']));
+        $cache = $strategy->beforeQuery($dao, 'findByName', array($row['name']));
 
         $this->assertFalse($cache);
     }
