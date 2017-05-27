@@ -291,6 +291,23 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         $this->getJobLogDao()->create($log);
     }
 
+    protected function createJobEnabledLog($job, $enableStatus)
+    {
+        $log = ArrayToolkit::parts($job, array(
+            'name',
+            'source',
+            'class',
+            'args',
+            'priority',
+        ));
+
+        $log['status'] = $enableStatus;
+        $log['job_id'] = $job['id'];
+        $log['hostname'] = getHostName();
+
+        $this->getJobLogDao()->create($log);
+    }
+
     public function searchJobLogs($condition, $orderBy, $start, $limit)
     {
         return $this->getJobLogDao()->search($condition, $orderBy, $start, $limit);
@@ -326,14 +343,14 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
     public function enabledJob($jobId)
     {
         $job = $this->getJobDao()->update($jobId, array('enabled' => 1));
-        $this->createEnabledLog($job, 'enabled');
+        $this->createJobEnabledLog($job, 'enabled');
         return $job;
     }
 
     public function disabledJob($jobId)
     {
         $job = $this->getJobDao()->update($jobId, array('enabled' => 0));
-        $this->createEnabledLog($job, 'enabled');
+        $this->createJobEnabledLog($job, 'disabled');
         return $job;
     }
 
@@ -371,23 +388,5 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
     protected function getJobPool()
     {
         return new JobPool($this->biz);
-    }
-
-    protected function createEnabledLog($job, $enableStatus)
-    {
-        $log = ArrayToolkit::parts($job, array(
-            'name',
-            'source',
-            'class',
-            'args',
-            'priority',
-
-        ));
-
-        $log['status'] = $enableStatus;
-        $log['job_id'] = $job['id'];
-        $log['hostname'] = getHostName();
-
-        $this->getJobLogDao()->create($log);
     }
 }
