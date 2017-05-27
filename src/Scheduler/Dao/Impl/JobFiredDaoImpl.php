@@ -31,7 +31,11 @@ class JobFiredDaoImpl extends GeneralDaoImpl implements JobFiredDao
     public function declares()
     {
         return array(
-            'timestamps' => array('created_time', 'updated_time')
+            'timestamps' => array('created_time', 'updated_time'),
+            'orderbys' => array('created_time', 'id'),
+            'conditions' => array(
+                'job_id = :job_id'
+            )
         );
     }
 }

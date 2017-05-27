@@ -313,6 +313,30 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         return $this->getJobDao()->count($condition);
     }
 
+    public function searchJobFires($condition, $orderBy, $start, $limit)
+    {
+        return $this->getJobFiredDao()->search($condition, $orderBy, $start, $limit);
+    }
+
+    public function countJobFires($condition)
+    {
+        return $this->getJobFiredDao()->count($condition);
+    }
+
+    public function enabledJob($jobId)
+    {
+        $job = $this->getJobDao()->update($jobId, array('enabled' => 1));
+        $this->createEnabledLog($job, 'enabled');
+        return $job;
+    }
+
+    public function disabledJob($jobId)
+    {
+        $job = $this->getJobDao()->update($jobId, array('enabled' => 0));
+        $this->createEnabledLog($job, 'enabled');
+        return $job;
+    }
+
     protected function mergeCondition($condition)
     {
         $defaultCondition = array(
@@ -347,5 +371,23 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
     protected function getJobPool()
     {
         return new JobPool($this->biz);
+    }
+
+    protected function createEnabledLog($job, $enableStatus)
+    {
+        $log = ArrayToolkit::parts($job, array(
+            'name',
+            'source',
+            'class',
+            'args',
+            'priority',
+
+        ));
+
+        $log['status'] = $enableStatus;
+        $log['job_id'] = $job['id'];
+        $log['hostname'] = getHostName();
+
+        $this->getJobLogDao()->create($log);
     }
 }
