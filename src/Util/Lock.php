@@ -11,18 +11,16 @@ class Lock
         $this->biz = $biz;
     }
 
-    private $connection = null;
-
     public function get($lockName, $lockTime)
     {
-        $result = $this->getConnection()->fetchAssoc("SELECT GET_LOCK('lock_{$lockName}', {$lockTime}) AS getLock");
+        $result = $this->getConnection()->fetchAssoc("SELECT GET_LOCK('locker_{$lockName}', {$lockTime}) AS getLock");
 
         return $result['getLock'];
     }
 
     public function release($lockName)
     {
-        $result = $this->getConnection()->fetchAssoc("SELECT RELEASE_LOCK('lock_{$lockName}') AS releaseLock");
+        $result = $this->getConnection()->fetchAssoc("SELECT RELEASE_LOCK('locker_{$lockName}') AS releaseLock");
 
         return $result['releaseLock'];
     }
