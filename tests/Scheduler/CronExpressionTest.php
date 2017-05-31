@@ -2,10 +2,9 @@
 
 namespace Tests;
 
-use Codeages\Biz\Framework\UnitTests\BaseTestCase;
 use Cron\CronExpression;
 
-class CronExpressionTest extends BaseTestCase
+class CronExpressionTest extends IntegrationTestCase
 {
     public function testCronExpression()
     {

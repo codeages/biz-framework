@@ -2,11 +2,8 @@
 
 namespace Tests;
 
-use Codeages\Biz\Framework\Service\Exception\InvalidArgumentException;
-use Codeages\Biz\Framework\UnitTests\BaseTestCase;
-use Cron\CronExpression;
 
-class SchedulerTest extends BaseTestCase
+class SchedulerTest extends IntegrationTestCase
 {
     /**
      * @expectedException \Exception
@@ -15,7 +12,7 @@ class SchedulerTest extends BaseTestCase
     {
         $job = array(
             'source' => 'MAIN',
-            'class' => 'TestProject\\Biz\\Example\\Job\\ExampleJob',
+            'class' => 'Tests\\Example\\Job\\ExampleJob',
             'expression' => '0 17 * * *',
             'args' => array('courseId'=>1),
             'priority' => 100,
@@ -34,7 +31,7 @@ class SchedulerTest extends BaseTestCase
         $job = array(
             'name' => 'test',
             'source' => 'MAIN',
-            'class' => 'TestProject\\Biz\\Example\\Job\\ExampleJob',
+            'class' => 'Tests\\Example\\Job\\ExampleJob',
             'args' => array('courseId'=>1),
             'priority' => 100,
             'misfire_threshold' => 3000,
@@ -69,7 +66,7 @@ class SchedulerTest extends BaseTestCase
             'source' => 'MAIN',
             'expression' => '0 17 * * *',
 //            'nextFireTime' => time()-1,
-            'class' => 'TestProject\\Biz\\Example\\Job\\ExampleJob',
+            'class' => 'Tests\\Example\\Job\\ExampleJob',
             'args' => array('courseId'=>1),
             'priority' => 100,
             'misfire_threshold' => 3000,
@@ -86,7 +83,7 @@ class SchedulerTest extends BaseTestCase
         $excepted = array(
             'name' => 'test',
             'source' => 'MAIN',
-            'class' => 'TestProject\\Biz\\Example\\Job\\ExampleJob',
+            'class' => 'Tests\\Example\\Job\\ExampleJob',
             'args' => array('courseId'=>1),
             'status' => 'created',
         );
@@ -106,7 +103,7 @@ class SchedulerTest extends BaseTestCase
             'name' => 'test2',
             'source' => 'MAIN',
             'expression' => $time,
-            'class' => 'TestProject\\Biz\\Example\\Job\\ExampleJob',
+            'class' => 'Tests\\Example\\Job\\ExampleJob',
             'args' => array('courseId'=>1),
             'priority' => 100,
             'misfire_threshold' => 3000,
@@ -135,7 +132,7 @@ class SchedulerTest extends BaseTestCase
             'source' => 'MAIN',
             'expression' => '0 17 * * *',
 //            'nextFireTime' => time()-1,
-            'class' => 'TestProject\\Biz\\Example\\Job\\ExampleJob',
+            'class' => 'Tests\\Example\\Job\\ExampleJob',
             'args' => array('courseId'=>1),
             'priority' => 100,
             'misfire_threshold' => 3000,
@@ -163,11 +160,11 @@ class SchedulerTest extends BaseTestCase
 
     protected function getJobDao()
     {
-        return self::$biz->dao('Scheduler:JobDao');
+        return $this->biz->dao('Scheduler:JobDao');
     }
 
     protected function getSchedulerService()
     {
-        return self::$biz->service('Scheduler:SchedulerService');
+        return $this->biz->service('Scheduler:SchedulerService');
     }
 }

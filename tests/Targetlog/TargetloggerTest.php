@@ -2,10 +2,10 @@
 
 namespace Tests\Targetlog;
 
-use Codeages\Biz\Framework\UnitTests\BaseTestCase;
 use Codeages\Biz\Framework\Targetlog\Targetlogger;
+use Tests\IntegrationTestCase;
 
-class TargetloggerTestCase extends BaseTestCase
+class TargetloggerTestCase extends IntegrationTestCase
 {
     public function testDebug()
     {
@@ -15,11 +15,11 @@ class TargetloggerTestCase extends BaseTestCase
 
     protected function createLogger($targetType, $targetId)
     {
-        return new Targetlogger(self::$biz, $targetType, $targetId);
+        return new Targetlogger($this->biz, $targetType, $targetId);
     }
 
     protected function getTargetlogService()
     {
-        return self::$biz->service['Targetlog:TargetlogService'];
+        return $this->biz->service['Targetlog:TargetlogService'];
     }
 }

@@ -2,43 +2,12 @@
 
 namespace Tests;
 
-use Codeages\Biz\Framework\Context\Biz;
-use Codeages\Biz\Framework\Provider\DoctrineServiceProvider;
-use Codeages\Biz\Framework\Provider\RedisServiceProvider;
-use Codeages\Biz\Framework\Provider\SchedulerServiceProvider;
 use Codeages\Biz\Framework\Scheduler\Service\JobPool;
-use PHPUnit\Framework\TestCase;
-use TestProject\Biz\Example\Job\ExampleJob;
+use Tests\Example\Job\ExampleJob;
 
-class JobPoolTest extends TestCase
+class JobPoolTest extends IntegrationTestCase
 {
     const NOT_EXIST_ID = 9999;
-
-    public function __construct()
-    {
-        $config = array(
-            'db.options' => array(
-                'driver' => getenv('DB_DRIVER'),
-                'dbname' => getenv('DB_NAME'),
-                'host' => getenv('DB_HOST'),
-                'user' => getenv('DB_USER'),
-                'password' => getenv('DB_PASSWORD'),
-                'charset' => getenv('DB_CHARSET'),
-                'port' => getenv('DB_PORT'),
-            ),
-            'redis.options' => array(
-                'host' => array('127.0.0.1:6379'),
-            ),
-        );
-        $biz = new Biz($config);
-        $biz['autoload.aliases']['TestProject'] = 'TestProject\Biz';
-        $biz->register(new DoctrineServiceProvider());
-        $biz->register(new RedisServiceProvider());
-        $biz->register(new SchedulerServiceProvider());
-        $biz->boot();
-
-        $this->biz = $biz;
-    }
 
     public function testRun()
     {

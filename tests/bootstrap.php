@@ -1,32 +1,22 @@
 <?php
 
-use Codeages\Biz\Framework\Context\Biz;
-use Codeages\Biz\Framework\Provider\DoctrineServiceProvider;
-use Codeages\Biz\Framework\Provider\TargetlogServiceProvider;
-use Codeages\Biz\Framework\UnitTests\UnitTestsBootstrap;
+use Doctrine\Common\Annotations\AnnotationRegistry;
+use Tests\IntegrationTestCase;
 
 define('ROOT_DIR', dirname(__DIR__));
 
 date_default_timezone_set('Asia/Shanghai');
-require_once ROOT_DIR.'/vendor/autoload.php';
+$loader = require ROOT_DIR.'/vendor/autoload.php';
 
-$config = array(
-    'db.options' => array(
-        'dbname' => getenv('DB_NAME') ?: 'biz-target-test',
-        'user' => getenv('DB_USER') ?: 'root',
-        'password' => getenv('DB_PASSWORD') ?: '',
-        'host' => getenv('DB_HOST') ?: '127.0.0.1',
-        'port' => getenv('DB_PORT') ?: 3306,
-        'driver' => 'pdo_mysql',
-        'charset' => 'utf8',
-    ),
-);
+AnnotationRegistry::registerLoader(array($loader, 'loadClass'));
+IntegrationTestCase::$classLoader = $loader;
 
-$biz = new Biz($config);
-$biz->register(new DoctrineServiceProvider());
-$biz->register(new TargetlogServiceProvider());
-$biz->register(new \Codeages\Biz\Framework\Provider\SchedulerServiceProvider());
-$biz->boot();
+echo "[exec] vendor/bin/phpmig migrate\n";
+chdir(dirname(__DIR__));
+passthru('vendor/bin/phpmig migrate');
 
-$bootstrap = new UnitTestsBootstrap($biz);
-$bootstrap->boot();
+$dns = sprintf('mysql:dbname=%s;host=%s', getenv('DB_NAME'), getenv('DB_HOST'));
+
+$pdo = new PDO($dns, getenv('DB_USER'), getenv('DB_PASSWORD'));
+$pdo->exec(\Tests\Example\Fixtures\Loader::loadSql());
+unset($pdo);
