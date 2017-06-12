@@ -35,6 +35,43 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
         return $this->get($this->db()->lastInsertId());
     }
 
+    public function batchCreate($items)
+    {
+        if (empty($items)) {
+            return array();
+        }
+
+        $columns = array_keys($items[0]);
+        $this->db()->checkFieldNames($columns);
+        $columnStr = implode(',', $columns);
+
+        $count = count($items);
+        $pageSize = 1000;
+        $pageCount = ceil($count / $pageSize);
+
+        for ($i = 1; $i <= $pageCount; $i++) {
+            $start = ($i - 1) * $pageSize;
+            $pageItems = array_slice($items, $start, $pageSize);
+
+            $params = array();
+            $sql = "INSERT INTO {$this->table} ({$columnStr}) values ";
+            foreach ($pageItems as $key => $item) {
+                $marks = str_repeat('?,', count($item) - 1).'?';
+
+                if ($key != 0) {
+                    $sql .= ',';
+                }
+                $sql .= "({$marks})" ;
+
+                $params = array_merge($params, array_values($item));
+            }
+
+            $this->db()->executeUpdate($sql, $params);
+        }
+
+        return true;
+    }
+
     public function update($identifier, array $fields)
     {
         if (empty($identifier)) {

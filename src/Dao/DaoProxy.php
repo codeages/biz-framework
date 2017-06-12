@@ -53,7 +53,7 @@ class DaoProxy
 
     protected function getProxyMethod($method)
     {
-        foreach (array('get', 'find', 'search', 'count', 'create', 'update', 'wave', 'delete') as $prefix) {
+        foreach (array('get', 'find', 'search', 'count', 'create', 'batchCreate', 'update', 'wave', 'delete') as $prefix) {
             if (strpos($method, $prefix) === 0) {
                 return $prefix;
             }
@@ -169,6 +169,38 @@ class DaoProxy
         }
 
         return $row;
+    }
+
+    protected function batchCreate($method, $arguments)
+    {
+        $declares = $this->dao->declares();
+
+        end($arguments);
+        $lastKey = key($arguments);
+        reset($arguments);
+
+        if (!is_array($arguments[$lastKey])) {
+            throw new DaoException('batchCreate method arguments last element must be array type');
+        }
+
+        $time = time();
+        $items = $arguments[$lastKey];
+
+        foreach ($items as &$item) {
+            if (isset($declares['timestamps'][0])) {
+                $item[$declares['timestamps'][0]] = $time;
+            }
+
+            if (isset($declares['timestamps'][1])) {
+                $item[$declares['timestamps'][1]] = $time;
+            }
+
+            $this->serialize($item);
+        }
+
+        $arguments[$lastKey] = $items;
+
+        return $this->callRealDao($method, $arguments);
     }
 
     protected function wave($method, $arguments)
