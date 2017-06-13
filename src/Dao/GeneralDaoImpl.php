@@ -67,6 +67,7 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
             }
 
             $this->db()->executeUpdate($sql, $params);
+            unset($params);
         }
 
         return true;
