@@ -35,35 +35,35 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
         return $this->get($this->db()->lastInsertId());
     }
 
-    public function batchCreate($items)
+    public function batchCreate($rows)
     {
-        if (empty($items)) {
+        if (empty($rows)) {
             return array();
         }
 
-        $columns = array_keys($items[0]);
+        $columns = array_keys($rows[0]);
         $this->db()->checkFieldNames($columns);
         $columnStr = implode(',', $columns);
 
-        $count = count($items);
+        $count = count($rows);
         $pageSize = 1000;
         $pageCount = ceil($count / $pageSize);
 
         for ($i = 1; $i <= $pageCount; $i++) {
             $start = ($i - 1) * $pageSize;
-            $pageItems = array_slice($items, $start, $pageSize);
+            $pageRows = array_slice($rows, $start, $pageSize);
 
             $params = array();
             $sql = "INSERT INTO {$this->table} ({$columnStr}) values ";
-            foreach ($pageItems as $key => $item) {
-                $marks = str_repeat('?,', count($item) - 1).'?';
+            foreach ($pageRows as $key => $row) {
+                $marks = str_repeat('?,', count($row) - 1).'?';
 
                 if ($key != 0) {
                     $sql .= ',';
                 }
                 $sql .= "({$marks})" ;
 
-                $params = array_merge($params, array_values($item));
+                $params = array_merge($params, array_values($row));
             }
 
             $this->db()->executeUpdate($sql, $params);
