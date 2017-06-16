@@ -64,11 +64,12 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
 
     protected function getExpression($time)
     {
-        $year = date("Y", $time);
-        $month = date("m", $time);
-        $day = date("d", $time);
-        $hour = date("G", $time);
-        $min = date("i", $time);
+        $year = date('Y', $time);
+        $month = date('m', $time);
+        $day = date('d', $time);
+        $hour = date('G', $time);
+        $min = date('i', $time);
+
         return "{$min} {$hour} {$day} {$month} * {$year}";
     }
 
@@ -149,22 +150,22 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
             $this->createJobLog($jobFired, $result);
             $this->getJobFiredDao()->update($jobFired['id'], array(
                 'fired_time' => time(),
-                'status' => 'acquired'
+                'status' => 'acquired',
             ));
             $this->createJobLog($jobFired, 'acquired');
         } else {
             $this->getJobFiredDao()->update($jobFired['id'], array(
-                'status' => 'success'
+                'status' => 'success',
             ));
             $this->createJobLog($jobFired, 'success');
             $this->dispatch('scheduler.job.executed', $jobFired, array('result' => $result));
         }
-
     }
 
     protected function getNextFireTime($expression)
     {
         $cron = CronExpression::factory($expression);
+
         return strtotime($cron->getNextRunDate('now', 0, true)->format('Y-m-d H:i:s'));
     }
 
@@ -198,7 +199,7 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
 
         $job = $this->getJobDao()->get($createdJobFired['job_id']);
         $createdJobFired['job'] = $job;
-        $result =  $this->check($createdJobFired);
+        $result = $this->check($createdJobFired);
 
         $jobFired = $this->getJobFiredDao()->update($createdJobFired['id'], array('status' => $result));
 
@@ -208,6 +209,7 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
 
         if ($result == self::EXECUTING) {
             $this->dispatch('scheduler.job.executing', $jobFired);
+
             return $jobFired;
         }
 
@@ -224,7 +226,7 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
 
         $fields = array(
             'pre_fire_time' => $job['next_fire_time'],
-            'next_fire_time' => $nextFireTime
+            'next_fire_time' => $nextFireTime,
         );
 
         return $this->getJobDao()->update($job['id'], $fields);
@@ -259,7 +261,7 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         $jobFired = array(
             'job_id' => $job['id'],
             'fired_time' => $job['next_fire_time'],
-            'status' => 'acquired'
+            'status' => 'acquired',
         );
         $jobFired = $this->getJobFiredDao()->create($jobFired);
         $jobFired['job'] = $this->updateNextFireTime($job);
@@ -286,7 +288,7 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         }
         $log['status'] = $status;
         $log['job_id'] = $job['id'];
-        $log['hostname'] = getHostName();
+        $log['hostname'] = gethostname();
 
         $this->getJobLogDao()->create($log);
     }
@@ -303,7 +305,7 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
 
         $log['status'] = $enableStatus;
         $log['job_id'] = $job['id'];
-        $log['hostname'] = getHostName();
+        $log['hostname'] = gethostname();
 
         $this->getJobLogDao()->create($log);
     }
@@ -321,12 +323,14 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
     public function searchJobs($condition, $orderBy, $start, $limit)
     {
         $condition = $this->mergeCondition($condition);
+
         return $this->getJobDao()->search($condition, $orderBy, $start, $limit);
     }
 
     public function countJobs($condition)
     {
         $condition = $this->mergeCondition($condition);
+
         return $this->getJobDao()->count($condition);
     }
 
@@ -344,6 +348,7 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
     {
         $job = $this->getJobDao()->update($jobId, array('enabled' => 1));
         $this->createJobEnabledLog($job, 'enabled');
+
         return $job;
     }
 
@@ -351,13 +356,14 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
     {
         $job = $this->getJobDao()->update($jobId, array('enabled' => 0));
         $this->createJobEnabledLog($job, 'disabled');
+
         return $job;
     }
 
     protected function mergeCondition($condition)
     {
         $defaultCondition = array(
-            'deleted' => 0
+            'deleted' => 0,
         );
 
         return array_merge($defaultCondition, $condition);
@@ -367,6 +373,7 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
     {
         $job = $jobFired['job'];
         $class = $jobFired['job']['class'];
+
         return new $class($job, $this->biz);
     }
 

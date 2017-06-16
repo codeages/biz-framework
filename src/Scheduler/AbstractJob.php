@@ -2,8 +2,6 @@
 
 namespace Codeages\Biz\Framework\Scheduler;
 
-use Codeages\Biz\Framework\Targetlog\Service\TargetlogService;
-
 abstract class AbstractJob implements Job, \ArrayAccess
 {
     private $params = array();
@@ -19,15 +17,16 @@ abstract class AbstractJob implements Job, \ArrayAccess
 
     public function __get($name)
     {
-        return empty($this->params[$name] ) ? '' : $this->params[$name];
+        return empty($this->params[$name]) ? '' : $this->params[$name];
     }
 
-    function __set($name, $value)
+    public function __set($name, $value)
     {
         $this->params[$name] = $value;
     }
 
-    public function offsetSet($offset, $value) {
+    public function offsetSet($offset, $value)
+    {
         if (is_null($offset)) {
             $this->params[] = $value;
         } else {
@@ -35,15 +34,18 @@ abstract class AbstractJob implements Job, \ArrayAccess
         }
     }
 
-    public function offsetExists($offset) {
+    public function offsetExists($offset)
+    {
         return isset($this->params[$offset]);
     }
 
-    public function offsetUnset($offset) {
+    public function offsetUnset($offset)
+    {
         unset($this->params[$offset]);
     }
 
-    public function offsetGet($offset) {
+    public function offsetGet($offset)
+    {
         return isset($this->params[$offset]) ? $this->params[$offset] : null;
     }
 }
