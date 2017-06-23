@@ -5,7 +5,7 @@ namespace Codeages\Biz\Framework\Scheduler;
 abstract class AbstractJob implements Job, \ArrayAccess
 {
     private $params = array();
-    private $biz;
+    protected $biz;
 
     public function __construct($params = array(), $biz = null)
     {
