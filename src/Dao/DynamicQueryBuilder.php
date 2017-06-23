@@ -67,7 +67,7 @@ class DynamicQueryBuilder extends QueryBuilder
     private function addWhereLike($where, $likeType)
     {
         $conditionName = $this->getConditionName($where);
-        
+
         //PRE_LIKE
         if ($likeType == 'pre_like') {
             $where = preg_replace('/pre_like/i', 'LIKE', $where, 1);
