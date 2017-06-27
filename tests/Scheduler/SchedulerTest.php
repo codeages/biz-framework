@@ -123,6 +123,10 @@ class SchedulerTest extends IntegrationTestCase
 
         $jobFired = $jobFireds[0];
         $this->assertEquals('success', $jobFired['status']);
+
+        $savedJob = $this->getJobDao()->get($savedJob['id']);
+        $this->assertEquals(1, $savedJob['deleted']);
+        $this->assertNotEmpty($savedJob['deleted_time']);
     }
 
     public function testBeforeNowRun()
@@ -130,7 +134,7 @@ class SchedulerTest extends IntegrationTestCase
         $this->testCreateJob();
         $this->getSchedulerService()->execute();
 
-        $time = time()-50;
+        $time = time()-50000;
 
         $job = array(
             'name' => 'test2',
@@ -156,6 +160,10 @@ class SchedulerTest extends IntegrationTestCase
 
         $jobFired = $jobFireds[0];
         $this->assertEquals('success', $jobFired['status']);
+
+        $savedJob = $this->getJobDao()->get($savedJob['id']);
+        $this->assertEquals(1, $savedJob['deleted']);
+        $this->assertNotEmpty($savedJob['deleted_time']);
     }
 
     public function testDeleteJobByName()
