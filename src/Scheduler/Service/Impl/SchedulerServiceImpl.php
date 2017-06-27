@@ -29,19 +29,17 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
             throw new InvalidArgumentException('class is empty.');
         }
 
-        if (is_integer($job['expression']) && $job['expression'] < time()) {
-            throw new InvalidArgumentException('expression is invalid.');
-        }
-
         if (is_integer($job['expression'])) {
-            $job['expression'] = $this->getExpression($job['expression']);
+            $job['next_fire_time'] = $job['expression'] - $job['expression']%60;
+            unset($job['expression']);
+        } else {
+            if (!CronExpression::isValidExpression($job['expression'])) {
+                throw new InvalidArgumentException('expression is invalid.');
+            }
+
+            $job['next_fire_time'] = $this->getNextFireTime($job['expression']);
         }
 
-        if (!CronExpression::isValidExpression($job['expression'])) {
-            throw new InvalidArgumentException('expression is invalid.');
-        }
-
-        $job['next_fire_time'] = $this->getNextFireTime($job['expression']);
 
         $default = array(
             'misfire_threshold' => 300,
@@ -93,7 +91,10 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
 
     public function deleteJob($id)
     {
-        $this->getJobDao()->delete($id);
+        $this->getJobDao()->update($id, array(
+            'deleted' => 1,
+            'deleted_time' => time()
+        ));
     }
 
     public function deleteJobByName($name)
@@ -217,6 +218,11 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
     protected function updateNextFireTime($job)
     {
         if ($job['next_fire_time'] > time()) {
+            return $job;
+        }
+
+        if(empty($job['expression'])) {
+            $this->deleteJob($job['id']);
             return $job;
         }
 

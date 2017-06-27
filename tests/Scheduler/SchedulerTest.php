@@ -92,12 +92,45 @@ class SchedulerTest extends IntegrationTestCase
         }
     }
 
-    public function testRun()
+    public function testAfterNowRun()
     {
         $this->testCreateJob();
         $this->getSchedulerService()->execute();
 
         $time = time()+10;
+
+        $job = array(
+            'name' => 'test2',
+            'source' => 'MAIN',
+            'expression' => $time,
+            'class' => 'Tests\\Example\\Job\\ExampleJob',
+            'args' => array('courseId'=>1),
+            'priority' => 100,
+            'misfire_threshold' => 3000,
+            'misfire_policy' => 'executing',
+        );
+
+        $savedJob = $this->getSchedulerService()->register($job);
+
+
+        $this->getSchedulerService()->execute();
+        $this->assertEquals($time-$time%60, $savedJob['next_fire_time']);
+
+        $this->asserts($job, $savedJob);
+
+        $jobFireds = $this->getSchedulerService()->findJobFiredsByJobId($savedJob['id']);
+        $this->assertNotEmpty($jobFireds[0]);
+
+        $jobFired = $jobFireds[0];
+        $this->assertEquals('success', $jobFired['status']);
+    }
+
+    public function testBeforeNowRun()
+    {
+        $this->testCreateJob();
+        $this->getSchedulerService()->execute();
+
+        $time = time()-50;
 
         $job = array(
             'name' => 'test2',
@@ -143,7 +176,8 @@ class SchedulerTest extends IntegrationTestCase
         $this->getSchedulerService()->deleteJobByName('test');
         $savedJob = $this->getJobDao()->get($savedJob['id']);
 
-        $this->assertEmpty($savedJob);
+        $this->assertEquals(1, $savedJob['deleted']);
+        $this->assertNotEmpty($savedJob['deleted_time']);
     }
 
 
