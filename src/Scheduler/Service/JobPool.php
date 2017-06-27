@@ -72,12 +72,14 @@ class JobPool
 
         if ($jobPool['num'] == $jobPool['max_num']) {
             $this->biz['lock']->release($lockName);
+
             return true;
         }
 
         $this->wavePoolNum($jobPool['id'], 1);
 
         $this->biz['lock']->release($lockName);
+
         return false;
     }
 
@@ -100,10 +102,10 @@ class JobPool
 
     public function __get($name)
     {
-        return empty($this->data[$name] ) ? '' : $this->data[$name];
+        return empty($this->data[$name]) ? '' : $this->data[$name];
     }
 
-    function __set($name, $value)
+    public function __set($name, $value)
     {
         $this->data[$name] = $value;
     }

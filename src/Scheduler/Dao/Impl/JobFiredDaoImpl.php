@@ -24,7 +24,7 @@ class JobFiredDaoImpl extends GeneralDaoImpl implements JobFiredDao
     public function findByJobId($jobId)
     {
         return $this->findByFields(array(
-            'job_id' => $jobId
+            'job_id' => $jobId,
         ));
     }
 
@@ -34,8 +34,8 @@ class JobFiredDaoImpl extends GeneralDaoImpl implements JobFiredDao
             'timestamps' => array('created_time', 'updated_time'),
             'orderbys' => array('created_time', 'id'),
             'conditions' => array(
-                'job_id = :job_id'
-            )
+                'job_id = :job_id',
+            ),
         );
     }
 }

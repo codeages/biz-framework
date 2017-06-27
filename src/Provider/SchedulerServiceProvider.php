@@ -14,7 +14,7 @@ class SchedulerServiceProvider implements ServiceProviderInterface
         $biz['autoload.aliases']['Scheduler'] = 'Codeages\Biz\Framework\Scheduler';
 
         $biz['scheduler.options'] = array(
-            'max_num'  => 10,
+            'max_num' => 10,
             'timeout' => 120,
         );
     }

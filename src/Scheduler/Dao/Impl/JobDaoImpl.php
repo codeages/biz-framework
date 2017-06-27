@@ -38,8 +38,8 @@ class JobDaoImpl extends GeneralDaoImpl implements JobDao
             'conditions' => array(
                 'name like :name',
                 'class like :class',
-                'source like :source'
-            )
+                'source like :source',
+            ),
         );
     }
 }
