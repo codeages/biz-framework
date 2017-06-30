@@ -61,7 +61,7 @@ class SimpleValidator implements Validator
                     break;
                 }
 
-                if (!isset($fields[$key])) {
+                if (!isset($fields[$key]) || empty($fields[$key])) {
                     continue;
                 }
 
