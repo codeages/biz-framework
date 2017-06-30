@@ -1191,4 +1191,24 @@ class SimpleValidatorTest extends TestCase
         $vd = $v->validate($td, $rules);
         $this->assertEquals($td, $vd);
     }
+
+    public function testOptional_emptyValue()
+    {
+        $v = new SimpleValidator();
+
+        $td = [
+            'foo1' => 'bar1',
+            'foo2' => '',
+        ];
+        $rules = array(
+            'foo1' => 'optional',
+            'foo2' => 'optional',
+        );
+
+        $vd = $v->validate($td, $rules);
+
+        $this->assertEquals($td['foo1'], $vd['foo1']);
+        $this->assertEquals($td['foo2'], $vd['foo2']);
+    }
+    
 }
