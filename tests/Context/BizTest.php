@@ -1,11 +1,14 @@
 <?php
 
+namespace Tests;
+
 use Codeages\Biz\Framework\Context\Biz;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
 use Codeages\Biz\Framework\Provider\MonologServiceProvider;
+use PHPUnit\Framework\TestCase;
 
-class BizTest extends \PHPUnit_Framework_TestCase
+class BizTest extends TestCase
 {
     public function testConstruct()
     {
@@ -48,39 +51,42 @@ class BizTest extends \PHPUnit_Framework_TestCase
     {
         $biz = new Biz();
         $biz['autoload.aliases'][''] = 'Biz';
-        $biz['autoload.aliases']['TestProject'] = 'TestProject\Biz';
+        $biz['autoload.aliases']['Example'] = 'Example';
         $this->assertEquals(2, count($biz['autoload.aliases']));
     }
 
     public function testService()
     {
         $biz = new Biz();
-        $biz['autoload.aliases']['TestProject'] = 'TestProject\Biz';
-        $service = $biz->service('TestProject:Example:ExampleService');
-        $this->assertInstanceOf('TestProject\Biz\Example\Service\ExampleService', $service);
-        $this->assertEquals($service, $biz['@TestProject:Example:ExampleService']);
+        $biz['autoload.aliases']['Example'] = 'Tests\Example';
+        $service = $biz->service('Example:ExampleService');
+        $this->assertInstanceOf('Tests\Example\Service\ExampleService', $service);
+        $this->assertEquals($service, $biz['@Example:ExampleService']);
 
         $biz = new Biz();
-        $biz['autoload.aliases']['TestProject'] = 'TestProject\Biz';
-        $service1 = $biz->service('TestProject:Example:ExampleService');
-        $service2 = $biz->service('TestProject:Example:ExampleService');
+        $biz['autoload.aliases']['Example'] = 'Tests\\Example';
+        $service1 = $biz->service('Example:ExampleService');
+        $service2 = $biz->service('Example:ExampleService');
         $this->assertEquals($service1, $service2);
     }
 
     public function testDao()
     {
-        $biz = new Biz();
-        $biz['autoload.aliases']['TestProject'] = 'TestProject\Biz';
-        $dao = $biz->dao('TestProject:Example:ExampleDao');
-        $this->assertEquals($dao, $biz['@TestProject:Example:ExampleDao']);
+        $biz = new Biz(array(
+            'debug' => true,
+        ));
+        $biz['autoload.aliases']['Example'] = 'Tests\\Example';
+        $dao = $biz->dao('Example:ExampleDao');
+        $this->assertEquals($dao, $biz['@Example:ExampleDao']);
 
-        $biz = new Biz();
-        $biz['autoload.aliases']['TestProject'] = 'TestProject\Biz';
-        $dao1 = $biz->dao('TestProject:Example:ExampleDao');
-        $dao2 = $biz->dao('TestProject:Example:ExampleDao');
+        $biz = new Biz(array(
+            'debug' => true,
+        ));
+        $biz['autoload.aliases']['Example'] = 'Tests\\Example';
+        $dao1 = $biz->dao('Example:ExampleDao');
+        $dao2 = $biz->dao('Example:ExampleDao');
         $this->assertEquals($dao1, $dao2);
     }
-    
 }
 
 class BizTestServiceProvider1 implements ServiceProviderInterface
