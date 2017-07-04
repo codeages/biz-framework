@@ -97,7 +97,7 @@ class SchedulerTest extends IntegrationTestCase
         $this->testCreateJob();
         $this->getSchedulerService()->execute();
 
-        $time = time()+10;
+        $time = time()+1;
 
         $job = array(
             'name' => 'test2',
