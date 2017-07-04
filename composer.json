@@ -28,6 +28,7 @@
         "lokielse/omnipay-alipay": "^2.3"
     },
     "require-dev": {
+        "mockery/mockery": "^0.9.9",
         "phpunit/phpunit": "^4.8 || ^5.7 || ^6.0"
     }
 }

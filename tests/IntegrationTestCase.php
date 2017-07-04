@@ -3,6 +3,8 @@
 namespace Tests;
 
 use Codeages\Biz\Framework\Dao\Connection;
+use Codeages\Biz\Framework\Provider\OrderServiceProvider;
+use Codeages\Biz\Framework\Provider\PayServiceProvider;
 use Codeages\Biz\Framework\Provider\RedisServiceProvider;
 use Codeages\Biz\Framework\Provider\SchedulerServiceProvider;
 use Codeages\Biz\Framework\Provider\TargetlogServiceProvider;
@@ -80,6 +82,8 @@ class IntegrationTestCase extends TestCase
         $biz->register(new TargetlogServiceProvider());
         $biz->register(new TokenServiceProvider());
         $biz->register(new SchedulerServiceProvider());
+        $biz->register(new OrderServiceProvider());
+        $biz->register(new PayServiceProvider());
         $biz->boot();
 
         return $biz;
