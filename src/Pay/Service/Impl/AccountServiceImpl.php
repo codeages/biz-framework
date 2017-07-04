@@ -7,7 +7,6 @@ use Codeages\Biz\Framework\Util\RandomToolkit;
 use Codeages\Biz\Framework\Pay\Service\AccountService;
 use Codeages\Biz\Framework\Service\BaseService;
 use Codeages\Biz\Framework\Service\Exception\ServiceException;
-use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
 
 class AccountServiceImpl extends BaseService implements AccountService
 {
@@ -164,7 +163,7 @@ class AccountServiceImpl extends BaseService implements AccountService
 
     protected function getPasswordEncoder()
     {
-        return new MessageDigestPasswordEncoder('sha256');
+        return new PasswordEncoder('sha256');
     }
 
     protected function getUserBalanceDao()
