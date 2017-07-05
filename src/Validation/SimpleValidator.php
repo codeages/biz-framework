@@ -64,7 +64,7 @@ class SimpleValidator implements Validator
                     break;
                 }
                 if (empty($fields[$key])) {
-                    continue;
+                    break;
                 }
 
                 if (isset($this->rules[$ruleName])) {
