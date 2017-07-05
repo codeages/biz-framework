@@ -63,6 +63,9 @@ class SimpleValidator implements Validator
                     }
                     break;
                 }
+                if(empty($fields[$key])){
+                     break;
+                }
 
                 if (isset($this->rules[$ruleName])) {
                     $func = $this->rules[$ruleName];

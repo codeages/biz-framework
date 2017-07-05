@@ -1177,5 +1177,19 @@ class SimpleValidatorTest extends TestCase
         $this->assertEquals($td['foo1'], $vd['foo1']);
         $this->assertEquals($td['foo2'], $vd['foo2']);
     }
+
+    public function test_notRequired_emptyValue()
+    {
+        $v = new SimpleValidator();
+        $td = array(
+            'foo1' => '',
+        );
+        $rules = array(
+            'foo1' => 'integer',
+        );
+
+        $vd = $v->validate($td, $rules);
+        $this->assertEquals($vd['foo1'],$td['foo1']);
+    }
     
 }
