@@ -1159,24 +1159,6 @@ class SimpleValidatorTest extends TestCase
         $this->assertEquals($td, $vd);
     }
 
-    public function testOptional_emptyValue()
-    {
-        $v = new SimpleValidator();
-
-        $td = [
-            'foo1' => 'bar1',
-            'foo2' => '',
-        ];
-        $rules = array(
-            'foo1' => 'optional',
-            'foo2' => 'optional',
-        );
-
-        $vd = $v->validate($td, $rules);
-
-        $this->assertEquals($td['foo1'], $vd['foo1']);
-        $this->assertEquals($td['foo2'], $vd['foo2']);
-    }
 
     public function test_notRequired_emptyValue()
     {
@@ -1185,7 +1167,7 @@ class SimpleValidatorTest extends TestCase
             'foo1' => '',
         );
         $rules = array(
-            'foo1' => 'integer',
+            'foo1' => 'email',
         );
 
         $vd = $v->validate($td, $rules);

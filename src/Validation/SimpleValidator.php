@@ -57,14 +57,14 @@ class SimpleValidator implements Validator
                     $params = $rule;
                 }
 
-                if (!isset($fields[$key])) {
+                if (!isset($fields[$key]) || empty($fields[$key])) {
                     if ($this->inRules('required', $rules)) {
                         $this->addError($key, 'required', $params);
                     }
                     break;
                 }
-                if(empty($fields[$key])){
-                     break;
+                if (empty($fields[$key])) {
+                    continue;
                 }
 
                 if (isset($this->rules[$ruleName])) {
