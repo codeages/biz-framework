@@ -932,7 +932,7 @@ class SimpleValidatorTest extends TestCase
         $this->assertCount(1, $v->errors());
     }
 
-    public function testValidate_Optional_Pass()
+    public function testValidate_String_Pass()
     {
         $v = new SimpleValidator();
 
@@ -941,46 +941,13 @@ class SimpleValidatorTest extends TestCase
             'foo2' => 'bar2',
         ];
         $rules = array(
-            'foo1' => 'optional',
+            'foo1' => 'string',
         );
 
         $vd = $v->validate($td, $rules);
 
         $this->assertEquals($td['foo1'], $vd['foo1']);
         $this->assertFalse(isset($vd['foo2']));
-    }
-
-    public function testValidate_Optional_Pass_MultiRules()
-    {
-        $v = new SimpleValidator();
-
-        $td = [
-            'foo1' => 'test@example.com',
-            'foo2' => 'bar2',
-        ];
-        $rules = array(
-            'foo1' => 'optional|email',
-        );
-
-        $vd = $v->validate($td, $rules);
-
-        $this->assertEquals($td['foo1'], $vd['foo1']);
-    }
-
-    public function testValidate_Optional_NotPass_MultiRules()
-    {
-        $v = new SimpleValidator();
-        $td = [
-            'foo1' => 'bar',
-            'foo2' => 'bar2',
-        ];
-        $rules = array(
-            'foo1' => 'optional|email',
-        );
-
-        $vd = $v->validate($td, $rules, false);
-        $this->assertNull($vd);
-        $this->assertCount(1, $v->errors());
     }
 
     public function testValidate_Date_Pass()
