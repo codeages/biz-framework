@@ -163,6 +163,8 @@ class DaoProxy
         $row = $this->callRealDao($method, $arguments);
         $this->unserialize($row);
 
+        $this->arrayStorage && $this->arrayStorage->flush();
+
         $strategy = $this->buildCacheStrategy();
         if ($strategy) {
             $this->buildCacheStrategy()->afterCreate($this->dao, $method, $arguments, $row);
@@ -208,6 +210,8 @@ class DaoProxy
     {
         $result = $this->callRealDao($method, $arguments);
 
+        $this->arrayStorage && $this->arrayStorage->flush();
+
         $strategy = $this->buildCacheStrategy();
         if ($strategy) {
             $this->buildCacheStrategy()->afterWave($this->dao, $method, $arguments, $result);
@@ -244,6 +248,8 @@ class DaoProxy
             throw new DaoException('update method return value must be array type or int type');
         }
 
+        $this->arrayStorage && $this->arrayStorage->flush();
+
         $strategy = $this->buildCacheStrategy();
         if ($strategy) {
             $this->buildCacheStrategy()->afterUpdate($this->dao, $method, $arguments, $row);
@@ -255,6 +261,8 @@ class DaoProxy
     protected function delete($method, $arguments)
     {
         $result = $this->callRealDao($method, $arguments);
+
+        $this->arrayStorage && $this->arrayStorage->flush();
 
         $strategy = $this->buildCacheStrategy();
         if ($strategy) {
