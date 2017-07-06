@@ -110,6 +110,11 @@ class AccountServiceImpl extends BaseService implements AccountService
         $lock->release("set_security_answers_{$userId}");
     }
 
+    public function findSecurityAnswersByUserId($userId)
+    {
+        return $this->getSecurityAnswerDao()->findByUserId($userId);
+    }
+
     protected function deleteAllSecurityAnswers($userId)
     {
         $savedAnswers = $this->getSecurityAnswerDao()->findByUserId($userId);
