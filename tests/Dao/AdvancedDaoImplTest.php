@@ -19,6 +19,8 @@ class AdvancedDaoImplTest extends IntegrationTestCase
 
     public function testBatchUpdate()
     {
+
+        $this->biz['dao.cache.enabled'] = true;
         $count = 1000;
 
         $this->createBatchRecord($count);
