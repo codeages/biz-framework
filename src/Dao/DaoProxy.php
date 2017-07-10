@@ -53,7 +53,7 @@ class DaoProxy
 
     protected function getProxyMethod($method)
     {
-        foreach (array('get', 'find', 'search', 'count', 'create', 'batchCreate', 'update', 'wave', 'delete') as $prefix) {
+        foreach (array('get', 'find', 'search', 'count', 'create', 'batchCreate', 'batchUpdate', 'update', 'wave', 'delete') as $prefix) {
             if (strpos($method, $prefix) === 0) {
                 return $prefix;
             }
@@ -203,7 +203,36 @@ class DaoProxy
 
         $arguments[$lastKey] = $rows;
 
-        return $this->callRealDao($method, $arguments);
+        $result = $this->callRealDao($method, $arguments);
+
+        $this->flushTableCache();
+
+        return $result;
+    }
+
+    protected function batchUpdate($method, $arguments)
+    {
+        $declares = $this->dao->declares();
+
+        $time = time();
+        $rows = $arguments[1];
+
+        foreach ($rows as &$row) {
+
+            if (isset($declares['timestamps'][1])) {
+                $row[$declares['timestamps'][1]] = $time;
+            }
+
+            $this->serialize($row);
+        }
+
+        $arguments[1] = $rows;
+
+        $result = $this->callRealDao($method, $arguments);
+
+        $this->flushTableCache();
+
+        return $result;
     }
 
     protected function wave($method, $arguments)
@@ -313,6 +342,16 @@ class DaoProxy
             }
 
             $row[$key] = $this->serializer->serialize($method, $row[$key]);
+        }
+    }
+
+    private function flushTableCache()
+    {
+        $this->arrayStorage && ($this->arrayStorage->flush());
+
+        $strategy = $this->buildCacheStrategy();
+        if ($strategy) {
+            $this->buildCacheStrategy()->flush($this->dao);
         }
     }
 

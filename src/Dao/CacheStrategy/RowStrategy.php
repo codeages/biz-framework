@@ -136,6 +136,11 @@ class RowStrategy implements CacheStrategy
         }
     }
 
+    public function flush(GeneralDaoInterface $dao)
+    {
+        $this->redis->del("dao:{$dao->table()}:*");
+    }
+
     protected function getCacheKey(GeneralDaoInterface $dao, $metadata, $method, $arguments)
     {
         $argumentsForKey = array();
