@@ -81,7 +81,6 @@ class SessionManageTest extends IntegrationTestCase
             'sess_lifetime' => 86400,
         );
         $session = $this->getSessionManage()->createSession($mockedSession);
-
         sleep(2);
         $this->getSessionManage()->refresh($session['sess_id'], 'xxxxxx');
         $session = $this->getSessionManage()->getSessionBySessionId($session['sess_id']);
