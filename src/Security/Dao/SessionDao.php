@@ -12,7 +12,7 @@ interface SessionDao extends GeneralDaoInterface
 
     public function searchBySessionTime($sessionTime, $limit);
 
-    public function deleteByIds($ids);
+    public function deleteByLessThanSessTime($sessTimeLT);
 
     public function updateBySessionId($sessionId, $session);
 }

@@ -12,7 +12,7 @@ interface SessionManage
 
     public function deleteSessionsByUserId($userId);
 
-    public function deleteInvalidSession($sessionTime);
+    public function deleteInvalidSessions($sessionTime);
 
     public function refresh($sessionId, $data);
 

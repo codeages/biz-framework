@@ -28,14 +28,9 @@ class SessionManageImpl extends BaseService implements SessionManage
         return $this->getSessionDao()->deleteByUserId($userId);
     }
 
-    public function deleteInvalidSession($sessionTime)
+    public function deleteInvalidSessions($sessionTime)
     {
-        $sessions = $this->getSessionDao()->search(array(
-            'sess_time_LT' => $sessionTime
-        ), array(), 0, 1000);
-        $ids = ArrayToolkit::column($sessions, 'id');
-
-        return $this->getSessionDao()->deleteByIds($ids);
+        return $this->getSessionDao()->deleteByLessThanSessTime($sessionTime);
     }
 
     public function refresh($sessionId, $data)

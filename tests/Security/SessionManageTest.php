@@ -44,7 +44,7 @@ class SessionManageTest extends IntegrationTestCase
     {
         $session = $this->mockSession();
         sleep(2);
-        $this->getSessionManage()->deleteInvalidSession(time());
+        $this->getSessionManage()->deleteInvalidSessions(time());
 
         $session = $this->getSessionManage()->getSessionBySessionId($session['sess_id']);
         $this->assertEmpty($session);

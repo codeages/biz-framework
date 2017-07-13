@@ -28,16 +28,10 @@ class SessionDaoImpl extends GeneralDaoImpl implements SessionDao
         return $this->db()->fetchAll($sql, array($sessionTime));
     }
 
-    public function deleteByIds($ids)
+    public function deleteByLessThanSessTime($sessTimeLT)
     {
-        if (empty($ids)) {
-            return 0;
-        }
-
-        $marks = str_repeat('?,', count($ids) - 1).'?';
-        $sql = "DELETE FROM {$this->table} WHERE `id` in ( {$marks} );";
-
-        return $this->db()->executeUpdate($sql, $ids);
+        $sql = "DELETE FROM {$this->table} WHERE `sess_time` < ?;";
+        return $this->db()->executeUpdate($sql, array($sessTimeLT));
     }
 
     public function updateBySessionId($sessionId, $session)
