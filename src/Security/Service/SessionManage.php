@@ -14,6 +14,12 @@ interface SessionManage
 
     public function deleteInvalidSession($sessionTime);
 
+    public function refresh($sessionId, $data);
+
+    public function search($condition, $order, $start, $limit);
+
+    public function count($condition);
+
     public function countOnline($retentionTime);
 
     public function countLogin($retentionTime);

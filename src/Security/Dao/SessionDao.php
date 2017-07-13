@@ -9,4 +9,10 @@ interface SessionDao extends GeneralDaoInterface
     public function getBySessionId($sessionId);
 
     public function deleteBySessionId($sessionId);
+
+    public function searchBySessionTime($sessionTime, $limit);
+
+    public function deleteByIds($ids);
+
+    public function updateBySessionId($sessionId, $session);
 }

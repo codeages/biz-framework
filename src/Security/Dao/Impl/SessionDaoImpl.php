@@ -40,9 +40,17 @@ class SessionDaoImpl extends GeneralDaoImpl implements SessionDao
         return $this->db()->executeUpdate($sql, $ids);
     }
 
+    public function updateBySessionId($sessionId, $session)
+    {
+        $session['sess_time'] = time();
+        return $this->updateByConditions(array('sess_id' => $sessionId), $session);
+    }
+
     public function declares()
     {
         return array(
+            'timestamps' => array('created_time', 'updated_time'),
+            'orderbys' => array('id'),
             'conditions' => array(
                 'sess_time > :sess_time_GT',
                 'sess_user_id <> :sess_user_id_NE',

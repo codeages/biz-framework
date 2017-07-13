@@ -20,6 +20,8 @@ class Session extends Migration
               `sess_time` int(10) unsigned NOT NULL,
               `sess_lifetime` mediumint(9) NOT NULL,
               `type` VARCHAR(128) NOT NULL DEFAULT 'normal',
+              `created_time` int(10) unsigned NOT NULL,
+              `updated_time` int(10) unsigned NOT NULL DEFAULT 0,
               PRIMARY KEY (`id`),
               UNIQUE KEY `sess_id` (`sess_id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

@@ -38,6 +38,21 @@ class SessionManageImpl extends BaseService implements SessionManage
         return $this->getSessionDao()->deleteByIds($ids);
     }
 
+    public function refresh($sessionId, $data)
+    {
+        return $this->getSessionDao()->updateBySessionId($sessionId, array('sess_data' => $data));
+    }
+
+    public function search($condition, $order, $start, $limit)
+    {
+        return $this->getSessionDao()->search($condition, $order, $start, $limit);
+    }
+
+    public function count($condition)
+    {
+        return $this->getSessionDao()->count($condition);
+    }
+
     public function countOnline($retentionTime)
     {
         return $this->getSessionDao()->count(array(

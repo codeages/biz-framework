@@ -20,6 +20,8 @@ class SessionManageTest extends IntegrationTestCase
         $this->assertEquals($mockedSession['sess_data'], $session['sess_data']);
         $this->assertEquals($mockedSession['sess_time'], $session['sess_time']);
         $this->assertEquals($mockedSession['sess_lifetime'], $session['sess_lifetime']);
+        $this->assertNotEmpty($session['created_time']);
+        $this->assertNotEmpty($session['updated_time']);
 
         $session = $this->getSessionManage()->getSessionBySessionId($session['sess_id']);
         $this->assertEquals($mockedSession['sess_id'], $session['sess_id']);
@@ -66,6 +68,25 @@ class SessionManageTest extends IntegrationTestCase
 
         $count = $this->getSessionManage()->countOnline(time()-5);
         $this->assertEquals(2, $count);
+    }
+
+    public function testRefresh()
+    {
+        $time = time();
+        $mockedSession = array(
+            'sess_id' => 'rrqwfsfsdvsf',
+            'sess_user_id' => 0,
+            'sess_data' => 'dqeqdass',
+            'sess_time' => $time,
+            'sess_lifetime' => 86400,
+        );
+        $session = $this->getSessionManage()->createSession($mockedSession);
+
+        sleep(2);
+        $this->getSessionManage()->refresh($session['sess_id'], 'xxxxxx');
+        $session = $this->getSessionManage()->getSessionBySessionId($session['sess_id']);
+        $this->assertEquals('xxxxxx', $session['sess_data']);
+        $this->assertNotEquals($time, $session['sess_time']);
     }
 
     protected function getSessionManage()
