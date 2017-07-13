@@ -8,7 +8,7 @@ class SessionTimeoutJob extends AbstractJob
 {
     public function execute()
     {
-        $sessTime = time() - $this->biz['session.manager.timeout'];
+        $sessTime = time() - $this->biz['session.manager.timeout.default'];
         $this->getSessionManager()->deleteInvalidSessions($sessTime);
     }
 
