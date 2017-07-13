@@ -2,11 +2,11 @@
 
 namespace Codeages\Biz\Framework\Security\Service\Impl;
 
-use Codeages\Biz\Framework\Security\Service\SessionManage;
+use Codeages\Biz\Framework\Security\Service\SessionManager;
 use Codeages\Biz\Framework\Service\BaseService;
 use Codeages\Biz\Framework\Util\ArrayToolkit;
 
-class SessionManageImpl extends BaseService implements SessionManage
+class SessionManagerImpl extends BaseService implements SessionManager
 {
     public function createSession($session)
     {

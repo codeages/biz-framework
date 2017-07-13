@@ -2,7 +2,9 @@
 
 namespace Tests;
 
-class SessionManageTest extends IntegrationTestCase
+use Codeages\Biz\Framework\Security\Job\SessionTimeoutJob;
+
+class SessionManagerTest extends IntegrationTestCase
 {
     public function testCreateSession()
     {
@@ -13,7 +15,7 @@ class SessionManageTest extends IntegrationTestCase
             'sess_time' => time(),
             'sess_lifetime' => 86400,
         );
-        $session = $this->getSessionManage()->createSession($mockedSession);
+        $session = $this->getSessionManager()->createSession($mockedSession);
 
         $this->assertEquals($mockedSession['sess_id'], $session['sess_id']);
         $this->assertEquals($mockedSession['sess_user_id'], $session['sess_user_id']);
@@ -23,7 +25,7 @@ class SessionManageTest extends IntegrationTestCase
         $this->assertNotEmpty($session['created_time']);
         $this->assertNotEmpty($session['updated_time']);
 
-        $session = $this->getSessionManage()->getSessionBySessionId($session['sess_id']);
+        $session = $this->getSessionManager()->getSessionBySessionId($session['sess_id']);
         $this->assertEquals($mockedSession['sess_id'], $session['sess_id']);
         $this->assertEquals($mockedSession['sess_user_id'], $session['sess_user_id']);
         $this->assertEquals($mockedSession['sess_data'], $session['sess_data']);
@@ -35,8 +37,8 @@ class SessionManageTest extends IntegrationTestCase
     {
         $session = $this->mockSession();
 
-        $this->getSessionManage()->deleteSessionBySessionId($session['sess_id']);
-        $session = $this->getSessionManage()->getSessionBySessionId($session['sess_id']);
+        $this->getSessionManager()->deleteSessionBySessionId($session['sess_id']);
+        $session = $this->getSessionManager()->getSessionBySessionId($session['sess_id']);
         $this->assertEmpty($session);
     }
 
@@ -44,9 +46,9 @@ class SessionManageTest extends IntegrationTestCase
     {
         $session = $this->mockSession();
         sleep(2);
-        $this->getSessionManage()->deleteInvalidSessions(time());
+        $this->getSessionManager()->deleteInvalidSessions(time());
 
-        $session = $this->getSessionManage()->getSessionBySessionId($session['sess_id']);
+        $session = $this->getSessionManager()->getSessionBySessionId($session['sess_id']);
         $this->assertEmpty($session);
     }
 
@@ -61,13 +63,31 @@ class SessionManageTest extends IntegrationTestCase
             'sess_time' => time(),
             'sess_lifetime' => 86400,
         );
-        $this->getSessionManage()->createSession($mockedSession);
+        $this->getSessionManager()->createSession($mockedSession);
 
-        $count = $this->getSessionManage()->countLogin(time()-5);
+        $count = $this->getSessionManager()->countLogin(time()-5);
         $this->assertEquals(1, $count);
 
-        $count = $this->getSessionManage()->countOnline(time()-5);
+        $count = $this->getSessionManager()->countOnline(time()-5);
         $this->assertEquals(2, $count);
+    }
+
+    public function testSessionTimeoutJob()
+    {
+        $mockedSession = array(
+            'sess_id' => 'rrqwfsfsdvsf',
+            'sess_user_id' => 1,
+            'sess_data' => 'dqeqdass',
+            'sess_time' => time()-86401,
+            'sess_lifetime' => 86400,
+        );
+        $session = $this->getSessionManager()->createSession($mockedSession);
+
+        $job = new SessionTimeoutJob(array(), $this->biz);
+        $job->execute();
+
+        $session = $this->getSessionManager()->getSessionBySessionId($session['sess_id']);
+        $this->assertEmpty($session);
     }
 
     public function testRefresh()
@@ -80,17 +100,17 @@ class SessionManageTest extends IntegrationTestCase
             'sess_time' => $time,
             'sess_lifetime' => 86400,
         );
-        $session = $this->getSessionManage()->createSession($mockedSession);
+        $session = $this->getSessionManager()->createSession($mockedSession);
         sleep(2);
-        $this->getSessionManage()->refresh($session['sess_id'], 'xxxxxx');
-        $session = $this->getSessionManage()->getSessionBySessionId($session['sess_id']);
+        $this->getSessionManager()->refresh($session['sess_id'], 'xxxxxx');
+        $session = $this->getSessionManager()->getSessionBySessionId($session['sess_id']);
         $this->assertEquals('xxxxxx', $session['sess_data']);
         $this->assertNotEquals($time, $session['sess_time']);
     }
 
-    protected function getSessionManage()
+    protected function getSessionManager()
     {
-        return $this->biz->service('Security:SessionManage');
+        return $this->biz->service('Security:SessionManager');
     }
 
     protected function mockSession()
@@ -102,6 +122,6 @@ class SessionManageTest extends IntegrationTestCase
             'sess_time' => time(),
             'sess_lifetime' => 86400,
         );
-        return $this->getSessionManage()->createSession($mockedSession);
+        return $this->getSessionManager()->createSession($mockedSession);
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Codeages\Biz\Framework\Security\Service;
 
-interface SessionManage
+interface SessionManager
 {
     public function createSession($session);
 

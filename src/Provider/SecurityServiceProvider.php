@@ -11,5 +11,7 @@ class SecurityServiceProvider implements ServiceProviderInterface
     {
         $biz['migration.directories'][] = dirname(dirname(__DIR__)).'/migrations/security';
         $biz['autoload.aliases']['Security'] = 'Codeages\Biz\Framework\Security';
+
+        $biz['session.manager.timeout'] = 86400;
     }
 }
