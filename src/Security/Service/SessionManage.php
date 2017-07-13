@@ -8,5 +8,13 @@ interface SessionManage
 
     public function getSessionBySessionId($sessionId);
 
-    public function deleteSession($sessionId);
+    public function deleteSessionBySessionId($sessionId);
+
+    public function deleteSessionsByUserId($userId);
+
+    public function deleteInvalidSession($sessionTime);
+
+    public function countOnline($retentionTime);
+
+    public function countLogin($retentionTime);
 }

@@ -7,20 +7,47 @@ use Codeages\Biz\Framework\Security\Dao\SessionDao;
 
 class SessionDaoImpl extends GeneralDaoImpl implements SessionDao
 {
-    protected $table = 'session';
+    protected $table = 'sessions';
 
     public function deleteBySessionId($sessionId)
     {
-        // TODO: Implement deleteBySessionId() method.
+        $session = $this->getBySessionId($sessionId);
+        return $this->delete($session['id']);
     }
 
     public function getBySessionId($sessionId)
     {
-        // TODO: Implement getBySessionId() method.
+        return $this->getByFields(array('sess_id' => $sessionId));
+    }
+
+    public function searchBySessionTime($sessionTime, $limit)
+    {
+        $limit = (int) $limit;
+        $sql = "SELECT * FROM {$this->table} WHERE `sess_time` < ? LIMIT {$limit};";
+
+        return $this->db()->fetchAll($sql, array($sessionTime));
+    }
+
+    public function deleteByIds($ids)
+    {
+        if (empty($ids)) {
+            return 0;
+        }
+
+        $marks = str_repeat('?,', count($ids) - 1).'?';
+        $sql = "DELETE FROM {$this->table} WHERE `id` in ( {$marks} );";
+
+        return $this->db()->executeUpdate($sql, $ids);
     }
 
     public function declares()
     {
-        // TODO: Implement declares() method.
+        return array(
+            'conditions' => array(
+                'sess_time > :sess_time_GT',
+                'sess_user_id <> :sess_user_id_NE',
+                'sess_time < :sess_time_LT'
+            )
+        );
     }
 }
