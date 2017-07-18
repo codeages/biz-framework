@@ -108,7 +108,7 @@ class SessionManagerTest extends IntegrationTestCase
         $session = $this->getSessionManager()->createSession($mockedSession);
 
         sleep(2);
-        
+
         $job = new SessionTimeoutJob(array(), $this->biz);
         $job->execute();
 

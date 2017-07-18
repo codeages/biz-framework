@@ -16,10 +16,10 @@ class SessionManagerImpl extends BaseService implements SessionManager
         }
 
         if (empty($session['sess_id'])) {
-            if (empty($session['type']) || empty($this->biz['session.manager.sess_id_generator'.$session['type']])) {
+            if (empty($session['type']) || empty($this->biz['session.manager.sess_id_generator.'.$session['type']])) {
                 $generator = $this->biz['session.manager.sess_id_generator.default'];
             } else {
-                $generator = $this->biz['session.manager.sess_id_generator'.$session['type']];
+                $generator = $this->biz['session.manager.sess_id_generator.'.$session['type']];
             }
             $session['sess_id'] = $generator->generate();
         }
