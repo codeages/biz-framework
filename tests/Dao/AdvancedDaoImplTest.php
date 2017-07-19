@@ -7,6 +7,81 @@ use Tests\Example\Dao\AdvancedExampleDao;
 
 class AdvancedDaoImplTest extends IntegrationTestCase
 {
+
+    public function testDeleteWithOtherField()
+    {
+        $dao = $this->getAdvancedExampleDao();
+
+        $dao->create(array(
+            'name' => 'test1',
+        ));
+
+        $dao->create(array(
+            'name' => 'test1',
+        ));
+
+        $dao->create(array(
+            'name' => 'test1',
+        ));
+
+        $deleted = $dao->deleteByConditions(array('name' => 'test1'));
+
+        $this->assertEquals(3, $deleted);
+    }
+
+    public function testDeleteWithIds()
+    {
+        $dao = $this->getAdvancedExampleDao();
+
+        $row1 = $dao->create(array(
+            'name' => 'test1',
+        ));
+
+        $row2 = $dao->create(array(
+            'name' => 'test1',
+        ));
+
+        $row3 = $dao->create(array(
+            'name' => 'test1',
+        ));
+
+        $row4 = $dao->create(array(
+            'name' => 'test1',
+        ));
+
+        $deleted = $dao->deleteByConditions(array('ids' => array($row1['id'], $row2['id'], $row3['id'])));
+
+        $this->assertEquals(3, $deleted);
+    }
+
+    /**
+     * @expectedException \Codeages\Biz\Framework\Dao\DaoException
+     */
+    public function testDeleteWithEmpty()
+    {
+        $dao = $this->getAdvancedExampleDao();
+
+        $row1 = $dao->create(array(
+            'name' => 'test1',
+        ));
+
+        $row2 = $dao->create(array(
+            'name' => 'test1',
+        ));
+
+        $row3 = $dao->create(array(
+            'name' => 'test1',
+        ));
+
+        $row4 = $dao->create(array(
+            'name' => 'test1',
+        ));
+
+        $deleted = $dao->deleteByConditions(array('ids' => array()));
+
+        $this->assertEquals(0, $deleted);
+    }
+
     public function testBatchCreate()
     {
         $count = 10000;

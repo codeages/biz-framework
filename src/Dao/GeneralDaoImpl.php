@@ -54,12 +54,7 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
 
     public function delete($identifier)
     {
-        if (is_array($identifier)) {
-            return $this->db()->delete($this->table(), $identifier);
-        } else {
-            return $this->db()->delete($this->table(), array('id' => $identifier));
-        }
-
+        return $this->db()->delete($this->table(), array('id' => $identifier));
     }
 
     public function wave(array $ids, array $diffs)

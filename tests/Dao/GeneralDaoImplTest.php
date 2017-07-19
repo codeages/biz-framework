@@ -128,27 +128,6 @@ class GeneralDaoImplTest extends IntegrationTestCase
         }
     }
 
-    public function testDeleteWithOtherField()
-    {
-        $dao = $this->biz->dao('Example:ExampleDao');
-
-        $dao->create(array(
-            'name' => 'test1',
-        ));
-
-        $dao->create(array(
-            'name' => 'test1',
-        ));
-
-        $dao->create(array(
-            'name' => 'test1',
-        ));
-
-        $deleted = $dao->delete(array('name' => 'test1'));
-
-        $this->assertEquals(3, $deleted);
-    }
-
     private function delete($dao)
     {
         $dao = $this->biz->dao($dao);
