@@ -169,7 +169,7 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
     {
         $cron = CronExpression::factory($expression);
 
-        return strtotime($cron->getNextRunDate('now', 0, true)->format('Y-m-d H:i:s'));
+        return strtotime($cron->getNextRunDate()->format('Y-m-d H:i:s'));
     }
 
     protected function triggerJob()
@@ -221,7 +221,7 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
 
     protected function updateNextFireTime($job)
     {
-        if ($job['next_fire_time'] > strtotime('+1 minutes')) {
+        if ($job['next_fire_time'] > time()) {
             return $job;
         }
 
@@ -249,7 +249,7 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
             $lock->get($lockName, 20);
             $this->biz['db']->beginTransaction();
 
-            $jobs = $this->getJobDao()->findWaitingJobsByLessThanFireTime(strtotime('+1 minutes'));
+            $jobs = $this->getJobDao()->findWaitingJobsByLessThanFireTime(time());
 
             foreach ($jobs as $job) {
                 $this->updateJobToAcquired($job);
