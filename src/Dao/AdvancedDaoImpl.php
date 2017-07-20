@@ -6,13 +6,29 @@ abstract class AdvancedDaoImpl extends GeneralDaoImpl implements AdvancedDaoInte
 {
     public function deleteByConditions(array $conditions)
     {
+        $declares = $this->declares();
+        $declareConditions = isset($declares['conditions']) ? $declares['conditions'] : array();
+        array_walk($conditions, function (&$condition, $column) use ($declareConditions) {
+            $isInDeclareCondition = false;
+            foreach ($declareConditions as $declareCondition) {
+                if (preg_match('/^'.$column.'/', $declareCondition)) {
+                    $isInDeclareCondition = true;
+                }
+            }
+
+            if (!$isInDeclareCondition) {
+                $condition = null;
+            }
+        });
+
         $conditions = array_filter($conditions);
-        $builder = $this->createQueryBuilder($conditions)
-            ->delete($this->table);
 
         if (empty($conditions)) {
             throw new DaoException('Please make sure at least one restricted condition');
         }
+
+        $builder = $this->createQueryBuilder($conditions)
+            ->delete($this->table);
 
         return $builder->execute();
     }

@@ -61,25 +61,16 @@ class AdvancedDaoImplTest extends IntegrationTestCase
     {
         $dao = $this->getAdvancedExampleDao();
 
-        $row1 = $dao->create(array(
-            'name' => 'test1',
-        ));
+       $dao->deleteByConditions(array('ids' => array()));
+    }
 
-        $row2 = $dao->create(array(
-            'name' => 'test1',
-        ));
-
-        $row3 = $dao->create(array(
-            'name' => 'test1',
-        ));
-
-        $row4 = $dao->create(array(
-            'name' => 'test1',
-        ));
-
-        $deleted = $dao->deleteByConditions(array('ids' => array()));
-
-        $this->assertEquals(0, $deleted);
+    /**
+     * @expectedException \Codeages\Biz\Framework\Dao\DaoException
+     */
+    public function testDeleteWithNotInDeclare()
+    {
+        $dao = $this->getAdvancedExampleDao();
+       $dao->deleteByConditions(array('not-exist-column' => array(1, 2, 3, 4)));
     }
 
     public function testBatchCreate()
