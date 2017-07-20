@@ -61,7 +61,7 @@ class AdvancedDaoImplTest extends IntegrationTestCase
     {
         $dao = $this->getAdvancedExampleDao();
 
-       $dao->deleteByConditions(array('ids' => array()));
+        $dao->deleteByConditions(array('ids' => array()));
     }
 
     /**
@@ -70,7 +70,41 @@ class AdvancedDaoImplTest extends IntegrationTestCase
     public function testDeleteWithNotInDeclare()
     {
         $dao = $this->getAdvancedExampleDao();
-       $dao->deleteByConditions(array('not-exist-column' => array(1, 2, 3, 4)));
+        $dao->deleteByConditions(array('not-exist-column' => array(1, 2, 3, 4)));
+    }
+
+    /**
+     * @expectedException \Codeages\Biz\Framework\Dao\DaoException
+     */
+    public function testDeleteWithNoDeclare()
+    {
+        $dao = $this->getAdvancedExample2Dao();
+        $dao->deleteByConditions(array('not-exist-column' => array(1, 2, 3, 4)));
+    }
+
+    public function testDeleteWithLikeKey()
+    {
+        $dao = $this->getAdvancedExampleDao();
+
+        $row1 = $dao->create(array(
+            'name' => 'test1',
+        ));
+
+        $row2 = $dao->create(array(
+            'name' => 'test2',
+        ));
+
+        $row3 = $dao->create(array(
+            'name' => '3test',
+        ));
+
+        $row4 = $dao->create(array(
+            'name' => '4test1',
+        ));
+
+        $deleted = $dao->deleteByConditions(array('pre_like' => 'test'));
+
+        $this->assertEquals(2, $deleted);
     }
 
     public function testBatchCreate()
@@ -149,6 +183,15 @@ class AdvancedDaoImplTest extends IntegrationTestCase
     private function getAdvancedExampleDao()
     {
         return $this->biz->dao('Example:AdvancedExampleDao');
+    }
+
+
+    /**
+     * @return AdvancedExampleDao
+     */
+    private function getAdvancedExample2Dao()
+    {
+        return $this->biz->dao('Example:AdvancedExample2Dao');
     }
 
 }

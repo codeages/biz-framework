@@ -8,10 +8,10 @@ abstract class AdvancedDaoImpl extends GeneralDaoImpl implements AdvancedDaoInte
     {
         $declares = $this->declares();
         $declareConditions = isset($declares['conditions']) ? $declares['conditions'] : array();
-        array_walk($conditions, function (&$condition, $column) use ($declareConditions) {
+        array_walk($conditions, function (&$condition, $key) use ($declareConditions) {
             $isInDeclareCondition = false;
             foreach ($declareConditions as $declareCondition) {
-                if (preg_match('/^'.$column.'/', $declareCondition)) {
+                if (preg_match('/:'.$key.'/', $declareCondition)) {
                     $isInDeclareCondition = true;
                 }
             }
@@ -23,7 +23,7 @@ abstract class AdvancedDaoImpl extends GeneralDaoImpl implements AdvancedDaoInte
 
         $conditions = array_filter($conditions);
 
-        if (empty($conditions)) {
+        if (empty($conditions) || empty($declareConditions)) {
             throw new DaoException('Please make sure at least one restricted condition');
         }
 
