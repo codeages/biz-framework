@@ -4,7 +4,7 @@ namespace Codeages\Biz\Framework\Dao;
 
 abstract class AdvancedDaoImpl extends GeneralDaoImpl implements AdvancedDaoInterface
 {
-    public function deleteByConditions(array $conditions)
+    public function batchDelete(array $conditions)
     {
         $declares = $this->declares();
         $declareConditions = isset($declares['conditions']) ? $declares['conditions'] : array();

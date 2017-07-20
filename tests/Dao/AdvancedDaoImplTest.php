@@ -24,7 +24,7 @@ class AdvancedDaoImplTest extends IntegrationTestCase
             'name' => 'test1',
         ));
 
-        $deleted = $dao->deleteByConditions(array('name' => 'test1'));
+        $deleted = $dao->batchDelete(array('name' => 'test1'));
 
         $this->assertEquals(3, $deleted);
     }
@@ -49,7 +49,7 @@ class AdvancedDaoImplTest extends IntegrationTestCase
             'name' => 'test1',
         ));
 
-        $deleted = $dao->deleteByConditions(array('ids' => array($row1['id'], $row2['id'], $row3['id'])));
+        $deleted = $dao->batchDelete(array('ids' => array($row1['id'], $row2['id'], $row3['id'])));
 
         $this->assertEquals(3, $deleted);
     }
@@ -61,7 +61,7 @@ class AdvancedDaoImplTest extends IntegrationTestCase
     {
         $dao = $this->getAdvancedExampleDao();
 
-        $dao->deleteByConditions(array('ids' => array()));
+        $dao->batchDelete(array('ids' => array()));
     }
 
     /**
@@ -70,7 +70,7 @@ class AdvancedDaoImplTest extends IntegrationTestCase
     public function testDeleteWithNotInDeclare()
     {
         $dao = $this->getAdvancedExampleDao();
-        $dao->deleteByConditions(array('not-exist-column' => array(1, 2, 3, 4)));
+        $dao->batchDelete(array('not-exist-column' => array(1, 2, 3, 4)));
     }
 
     /**
@@ -79,7 +79,38 @@ class AdvancedDaoImplTest extends IntegrationTestCase
     public function testDeleteWithNoDeclare()
     {
         $dao = $this->getAdvancedExample2Dao();
-        $dao->deleteByConditions(array('not-exist-column' => array(1, 2, 3, 4)));
+        $dao->batchDelete(array('not-exist-column' => array(1, 2, 3, 4)));
+    }
+
+    public function testDeleteWithCache()
+    {
+        $this->biz['dao.cache.enabled'] = true;
+
+        $dao = $this->getAdvancedExampleDao();
+
+        $row1 = $dao->create(array(
+            'name' => 'test1',
+        ));
+
+        $row2 = $dao->create(array(
+            'name' => 'test2',
+        ));
+
+        $row3 = $dao->create(array(
+            'name' => '3test',
+        ));
+
+        $row4 = $dao->create(array(
+            'name' => '4test1',
+        ));
+
+        $this->getAdvancedExampleDao()->get($row1['id']);
+
+        $dao->batchDelete(array('pre_like' => 'test'));
+
+        $newRow1 = $this->getAdvancedExampleDao()->get($row1['id']);
+
+        $this->assertNull($newRow1);
     }
 
     public function testDeleteWithLikeKey()
@@ -102,7 +133,7 @@ class AdvancedDaoImplTest extends IntegrationTestCase
             'name' => '4test1',
         ));
 
-        $deleted = $dao->deleteByConditions(array('pre_like' => 'test'));
+        $deleted = $dao->batchDelete(array('pre_like' => 'test'));
 
         $this->assertEquals(2, $deleted);
     }
@@ -119,7 +150,6 @@ class AdvancedDaoImplTest extends IntegrationTestCase
 
     public function testBatchUpdate()
     {
-
         $this->biz['dao.cache.enabled'] = true;
         $count = 1000;
 
