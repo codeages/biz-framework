@@ -1157,7 +1157,6 @@ class SimpleValidatorTest extends TestCase
         $this->assertEquals($td, $vd);
     }
 
-
     public function test_notRequired_emptyValue()
     {
         $v = new SimpleValidator();
@@ -1169,7 +1168,7 @@ class SimpleValidatorTest extends TestCase
         );
 
         $vd = $v->validate($td, $rules);
-        $this->assertEquals($vd['foo1'],$td['foo1']);
+        $this->assertEquals($vd['foo1'], $td['foo1']);
 
         $v = new SimpleValidator();
         $td = array(
@@ -1180,7 +1179,7 @@ class SimpleValidatorTest extends TestCase
         );
 
         $vd = $v->validate($td, $rules);
-        $this->assertEquals($vd['url'],$td['url']);
+        $this->assertEquals($vd['url'], $td['url']);
         $this->assertTrue(is_null($vd['url']));
 
         $v = new SimpleValidator();
@@ -1192,12 +1191,6 @@ class SimpleValidatorTest extends TestCase
         );
 
         $vd = $v->validate($td, $rules);
-        $this->assertEquals($vd['num1'],$td['num1']);
-
-
-        
+        $this->assertEquals($vd['num1'], $td['num1']);
     }
-
-
-    
 }
