@@ -42,6 +42,11 @@ class SimpleValidator implements Validator
         'date_before_or_equal' => '{key} must be a value before or equal to the given date',
     ];
 
+    private function isEmptyValue($value)
+    {
+        return is_null($value) || (is_string($value) && empty($value));
+    }
+
     public function validate($fields, $fieldRules, $throwException = true)
     {
         $fields = array_intersect_key($fields, array_flip(array_keys($fieldRules)));
@@ -57,13 +62,10 @@ class SimpleValidator implements Validator
                     $params = $rule;
                 }
 
-                if (!isset($fields[$key]) || empty($fields[$key])) {
+                if (!isset($fields[$key]) || $this->isEmptyValue($fields[$key])) {
                     if ($this->inRules('required', $rules)) {
                         $this->addError($key, 'required', $params);
                     }
-                    break;
-                }
-                if (empty($fields[$key])) {
                     break;
                 }
 

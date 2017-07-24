@@ -7,7 +7,7 @@ class RuleParser
     public static function parse($rules)
     {
         $parts = explode('|', $rules);
-        $rules = [];
+        $rules = array();
         foreach ($parts as $rule) {
             if (strpos($rule, ':') !== false) {
                 list($name, $parameters) = explode(':', $rule, 2);
