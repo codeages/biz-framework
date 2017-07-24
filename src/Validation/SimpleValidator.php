@@ -57,7 +57,7 @@ class SimpleValidator implements Validator
                     $params = $rule;
                 }
 
-                if (!isset($fields[$key])) {
+                if (!isset($fields[$key]) || is_null($fields[$key]) || (is_string($fields[$key]) && $fields[$key] == '')) {
                     if ($this->inRules('required', $rules)) {
                         $this->addError($key, 'required', $params);
                     }
