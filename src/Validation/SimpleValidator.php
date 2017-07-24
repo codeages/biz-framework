@@ -148,6 +148,7 @@ class SimpleValidator implements Validator
      *
      * @param $field
      * @param $value
+     *
      * @return bool
      */
     protected function validateRequired($field, $value)
@@ -166,6 +167,7 @@ class SimpleValidator implements Validator
      *
      * @param $field
      * @param $value
+     *
      * @return bool
      */
     protected function validateString($field, $value)
@@ -178,6 +180,7 @@ class SimpleValidator implements Validator
      *
      * @param $field
      * @param $value
+     *
      * @return bool
      */
     protected function validateNumeric($field, $value)
@@ -185,13 +188,13 @@ class SimpleValidator implements Validator
         return is_numeric($value);
     }
 
-
     /**
      * 校验整形
      *
      * @param $field
      * @param $value
      * @param $params
+     *
      * @return bool
      */
     protected function validateInteger($field, $value, $params)
@@ -217,7 +220,7 @@ class SimpleValidator implements Validator
             return true;
         }
 
-        return strlen($value) - ($dotPos+1) <= $params[0];
+        return strlen($value) - ($dotPos + 1) <= $params[0];
     }
 
     protected function validateBoolean($field, $value)
@@ -237,6 +240,7 @@ class SimpleValidator implements Validator
      *
      * @param $field
      * @param $value
+     *
      * @return bool
      */
     protected function validateAlpha($field, $value)
@@ -251,8 +255,10 @@ class SimpleValidator implements Validator
 
     /**
      * 校验
+     *
      * @param $field
      * @param $value
+     *
      * @return bool
      */
     protected function validateAlphaDash($field, $value)
@@ -266,25 +272,28 @@ class SimpleValidator implements Validator
      * @param $field
      * @param $value
      * @param $params
+     *
      * @return bool
      */
     protected function validateDigits($field, $value, $params)
     {
-        return ! preg_match('/[^0-9]/', $value) && strlen((string) $value) == $params[0];
+        return !preg_match('/[^0-9]/', $value) && strlen((string) $value) == $params[0];
     }
 
     /**
      * 校验数字及长度的范围
+     *
      * @param $field
      * @param $value
      * @param $params
+     *
      * @return bool
      */
     protected function validateDigitsBetween($field, $value, $params)
     {
         $length = strlen((string) $value);
 
-        return ! preg_match('/[^0-9]/', $value) && $length >= $params[0] && $length <= $params[1];
+        return !preg_match('/[^0-9]/', $value) && $length >= $params[0] && $length <= $params[1];
     }
 
     protected function validateMin($field, $value, $params)
@@ -381,7 +390,7 @@ class SimpleValidator implements Validator
             return true;
         }
 
-        if ((! is_string($value) && ! is_numeric($value)) || strtotime($value) === false) {
+        if ((!is_string($value) && !is_numeric($value)) || strtotime($value) === false) {
             return false;
         }
 
@@ -392,7 +401,7 @@ class SimpleValidator implements Validator
 
     protected function validateDateFormat($field, $value, $params)
     {
-        if (! is_string($value) && ! is_numeric($value)) {
+        if (!is_string($value) && !is_numeric($value)) {
             return false;
         }
 
@@ -432,5 +441,4 @@ class SimpleValidator implements Validator
 
         return $vtime <= $ptime;
     }
-
 }

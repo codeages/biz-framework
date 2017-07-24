@@ -7,7 +7,6 @@ use Tests\Example\Dao\AdvancedExampleDao;
 
 class AdvancedDaoImplTest extends IntegrationTestCase
 {
-
     public function testDeleteWithOtherField()
     {
         $dao = $this->getAdvancedExampleDao();
@@ -190,11 +189,10 @@ class AdvancedDaoImplTest extends IntegrationTestCase
         $this->assertNotEquals($beforeUpdateExample, $afterUpdateExample);
     }
 
-
     private function createBatchRecord($count)
     {
         $news = array();
-        for ($i=1; $i<=$count; $i++) {
+        for ($i = 1; $i <= $count; ++$i) {
             $fields = array(
                 'name' => 'test'.$i,
                 'content' => 'content',
@@ -215,7 +213,6 @@ class AdvancedDaoImplTest extends IntegrationTestCase
         return $this->biz->dao('Example:AdvancedExampleDao');
     }
 
-
     /**
      * @return AdvancedExampleDao
      */
@@ -223,5 +220,4 @@ class AdvancedDaoImplTest extends IntegrationTestCase
     {
         return $this->biz->dao('Example:AdvancedExample2Dao');
     }
-
 }

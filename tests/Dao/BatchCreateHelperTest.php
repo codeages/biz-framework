@@ -10,7 +10,7 @@ class BatchCreateHelperTest extends IntegrationTestCase
     public function testFlush()
     {
         $helper = new BatchCreateHelper($this->getAdvancedExampleDao());
-        for ($i=1; $i<=1000; $i++) {
+        for ($i = 1; $i <= 1000; ++$i) {
             $row = array(
                 'name' => 'test'.$i,
                 'content' => 'content',
@@ -25,7 +25,6 @@ class BatchCreateHelperTest extends IntegrationTestCase
         $this->assertCount(1000, $examples);
     }
 
-
     /**
      * @return AdvancedExampleDao
      */
@@ -33,5 +32,4 @@ class BatchCreateHelperTest extends IntegrationTestCase
     {
         return $this->biz->dao('Example:AdvancedExampleDao');
     }
-
 }
