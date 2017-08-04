@@ -253,7 +253,7 @@ class PayServiceImpl extends BaseService implements PayService
 
     protected function getSiteCashFlowDao()
     {
-        return $this->biz->dao('Pay:SiteIncomeDao');
+        return $this->biz->dao('Pay:SiteCashflowDao');
     }
 
     protected function generateSn($prefix = '')

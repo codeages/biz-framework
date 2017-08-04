@@ -263,9 +263,9 @@ class PayServiceTest extends IntegrationTestCase
         return 1;
     }
 
-    protected function getSiteIncomeDao()
+    protected function getSiteCashflowDao()
     {
-        return $this->biz->dao('Pay:SiteIncomeDao');
+        return $this->biz->dao('Pay:SiteCashflowDao');
     }
 
     protected function getPaymentTradeDao()
