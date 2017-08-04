@@ -6,6 +6,11 @@ use Codeages\Biz\Framework\Context\Biz;
 
 abstract class AbstractJob implements Job, \ArrayAccess
 {
+
+    const SUCCESS = 'success';
+    const FAIL = 'fail';
+    const ACQUIRED = 'acquired';
+
     private $params = array();
 
     /**

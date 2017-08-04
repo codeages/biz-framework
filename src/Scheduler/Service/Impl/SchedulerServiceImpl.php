@@ -152,7 +152,7 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
             $this->createJobLog($jobFired, $result);
             $this->getJobFiredDao()->update($jobFired['id'], array(
                 'fired_time' => time(),
-                'status' => 'acquired',
+                'status' => $result,
             ));
             $this->createJobLog($jobFired, 'acquired');
         } else {
