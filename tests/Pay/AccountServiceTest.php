@@ -3,6 +3,7 @@
 namespace Tests;
 
 use Codeages\Biz\Framework\Util\RandomToolkit;
+use Biz\User;
 
 class AccountServiceTest extends IntegrationTestCase
 {
@@ -10,9 +11,9 @@ class AccountServiceTest extends IntegrationTestCase
     {
         parent::setUp();
 
-        $currentUser = array(
+        $currentUser = new User(array(
             'id' => 1
-        );
+        ));
         $this->biz['user'] = $currentUser;
     }
 
