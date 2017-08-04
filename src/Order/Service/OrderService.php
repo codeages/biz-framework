@@ -20,6 +20,10 @@ interface OrderService
 
     public function finishOrders();
 
+    public function signSuccessOrder($id, $data);
+
+    public function signFailOrder($id, $data);
+
     public function applyItemRefund($id, $data);
 
     public function applyRefund($orderId, $data);
@@ -39,4 +43,6 @@ interface OrderService
     public function searchOrderItems($conditions, $orderBy, $start, $limit);
 
     public function countOrderItems($conditions);
+
+    public function findOrdersByIds(array $ids);
 }

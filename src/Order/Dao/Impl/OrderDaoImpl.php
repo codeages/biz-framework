@@ -24,6 +24,10 @@ class OrderDaoImpl extends GeneralDaoImpl implements OrderDao
         return $this->db()->fetchAssoc($sql, array($sn));
     }
 
+    public function findByIds(array $ids)
+    {
+        return $this->findInField('id', $ids);
+    }
 
     public function declares()
     {
@@ -31,7 +35,8 @@ class OrderDaoImpl extends GeneralDaoImpl implements OrderDao
             'timestamps' => array('created_time', 'updated_time'),
             'serializes' => array(
                 'pay_data' => 'json',
-                'callback' => 'json'
+                'callback' => 'json',
+                'signed_data' => 'json'
             ),
             'orderbys' => array(
                 'id',

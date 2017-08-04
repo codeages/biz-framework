@@ -32,6 +32,15 @@ class OrderServiceImpl extends BaseService implements OrderService
             $order = $this->saveOrder($order, $orderItems);
             $order = $this->createOrderItems($order, $orderItems);
             $this->commit();
+        } catch (AccessDeniedException $e) {
+            $this->rollback();
+            throw $e;
+        } catch (InvalidArgumentException $e) {
+            $this->rollback();
+            throw $e;
+        } catch (NotFoundException $e) {
+            $this->rollback();
+            throw $e;
         } catch (\Exception $e) {
             $this->rollback();
             throw new ServiceException($e);
@@ -286,7 +295,7 @@ class OrderServiceImpl extends BaseService implements OrderService
         try {
             $this->beginTransaction();
             $order = $this->getOrderDao()->get($id, array('lock'=>true));
-            if ('paid' != $order['status']) {
+            if ('signed' != $order['status']) {
                 throw $this->createAccessDeniedException('status is not paid.');
             }
 
@@ -334,6 +343,61 @@ class OrderServiceImpl extends BaseService implements OrderService
         foreach ($orders as $order) {
             $this->finishOrder($order['id']);
         }
+    }
+
+    public function signSuccessOrder($id, $data)
+    {
+        return $this->signOrder($id, 'signed', $data);
+    }
+
+    public function signFailOrder($id, $data)
+    {
+        return $this->signOrder($id, 'signed_fail', $data);
+    }
+
+    protected function signOrder($id, $status, $data)
+    {
+        try {
+            $this->beginTransaction();
+            $order = $this->getOrderDao()->get($id, array('lock'=>true));
+            if ('paid' != $order['status']) {
+                throw $this->createAccessDeniedException('status is not paid.');
+            }
+
+            $signedTime = time();
+            $order = $this->getOrderDao()->update($id, array(
+                'status' => $status,
+                'signed_time' => $signedTime,
+                'signed_data' => $data
+            ));
+
+            $items = $this->findOrderItemsByOrderId($id);
+            foreach ($items as $item) {
+                $this->getOrderItemDao()->update($item['id'], array(
+                    'status' => $status,
+                    'signed_time' => $signedTime,
+                    'signed_data' => $data
+                ));
+            }
+            $this->commit();
+        } catch (AccessDeniedException $e) {
+            $this->rollback();
+            throw $e;
+        } catch (InvalidArgumentException $e) {
+            $this->rollback();
+            throw $e;
+        } catch (NotFoundException $e) {
+            $this->rollback();
+            throw $e;
+        } catch (\Exception $e) {
+            $this->rollback();
+            throw new ServiceException($e->getMessage());
+        }
+
+        $this->dispatch("order.{$status}", $order);
+
+        $this->getTargetlogService()->log(TargetlogService::INFO, "order.{$status}", $order['sn'], "签收订单{$status}，订单号：{$order['sn']}", $order);
+        return $order;
     }
 
     public function applyItemRefund($id, $data)
@@ -459,6 +523,11 @@ class OrderServiceImpl extends BaseService implements OrderService
     public function countOrderItems($conditions)
     {
         return $this->getOrderItemDao()->count($conditions);
+    }
+
+    public function findOrdersByIds(array $ids)
+    {
+        return $this->getOrderDao()->findByIds($ids);
     }
 
     protected function getOrderDao()
