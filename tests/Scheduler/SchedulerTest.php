@@ -210,7 +210,7 @@ class SchedulerTest extends IntegrationTestCase
 
         $savedJob = $this->getJobDao()->get($job['id']);
         $jobFireds = $this->getSchedulerService()->findJobFiredsByJobId($savedJob['id']);
-        $this->assertEquals('fail', $jobFireds[0]['status']);
+        $this->assertEquals('failure', $jobFireds[0]['status']);
     }
 
     public function testAcquiredJobResult()

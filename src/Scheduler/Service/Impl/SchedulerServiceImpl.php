@@ -148,20 +148,26 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
 
     protected function jobExecuted($jobFired, $result)
     {
-        if ($result != 'success') {
-            $this->createJobLog($jobFired, $result);
-            $this->getJobFiredDao()->update($jobFired['id'], array(
-                'fired_time' => time(),
-                'status' => $result,
-            ));
-            $this->createJobLog($jobFired, 'acquired');
-        } else {
+        if ($result == 'success') {
             $this->getJobFiredDao()->update($jobFired['id'], array(
                 'status' => 'success',
             ));
             $this->createJobLog($jobFired, 'success');
-            $this->dispatch('scheduler.job.executed', $jobFired, array('result' => $result));
+        } elseif ($result == 'retry') {
+            $this->getJobFiredDao()->update($jobFired['id'], array(
+                'fired_time' => time(),
+                'status' => 'acquired',
+            ));
+            $this->createJobLog($jobFired, 'acquired');
+        } else {
+            $this->getJobFiredDao()->update($jobFired['id'], array(
+                'fired_time' => time(),
+                'status' => $result,
+            ));
+            $this->createJobLog($jobFired, $result);
         }
+
+        $this->dispatch('scheduler.job.executed', $jobFired, array('result' => $result));
     }
 
     protected function getNextFireTime($expression)

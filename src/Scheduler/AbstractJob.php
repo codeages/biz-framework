@@ -8,8 +8,8 @@ abstract class AbstractJob implements Job, \ArrayAccess
 {
 
     const SUCCESS = 'success';
-    const FAIL = 'fail';
-    const ACQUIRED = 'acquired';
+    const FAILURE = 'failure';
+    const RETRY = 'retry';
 
     private $params = array();
 
