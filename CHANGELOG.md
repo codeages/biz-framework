@@ -2,6 +2,6 @@
 
 ## [Unreleased]
 
-## [0.6.0] - 2017-07-24
+## [0.5.7] - 2017-08-07
 
-* 新增`Validation`组件。
+* 新增`Scheduler`组件的`job`retry机制。
