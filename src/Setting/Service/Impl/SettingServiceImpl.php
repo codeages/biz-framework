@@ -19,7 +19,7 @@ class SettingServiceImpl extends BaseService implements SettingService
             return $default;
         }
 
-        if ($subName && (!is_array($setting['data']) || !isset($setting['data'][$subName])) ) {
+        if ($subName && (!is_array($setting['data']) || !isset($setting['data'][$subName]))) {
             return $default;
         }
 

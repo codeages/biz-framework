@@ -4,8 +4,6 @@ namespace Codeages\Biz\Framework\Setting\Dao\Impl;
 
 use Codeages\Biz\Framework\Setting\Dao\SettingDao;
 use Codeages\Biz\Framework\Dao\GeneralDaoImpl;
-use Codeages\Biz\Framework\Dao\Annotation\CacheStrategy;
-use Codeages\Biz\Framework\Dao\Annotation\RowCache;
 
 class SettingDaoImpl extends GeneralDaoImpl implements SettingDao
 {
@@ -19,6 +17,7 @@ class SettingDaoImpl extends GeneralDaoImpl implements SettingDao
     public function findAll()
     {
         $sql = "SELECT * FROM {$this->table()}";
+
         return $this->db()->fetchAll($sql);
     }
 
