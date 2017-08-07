@@ -46,7 +46,7 @@ class SettingServiceTest extends IntegrationTestCase
         $this->assertEquals('default value', $value);
     }
 
-    public function testSet()
+    public function testSet_NoDot()
     {
         $this->seed('Tests\\Setting\\SettingSeeder');
 

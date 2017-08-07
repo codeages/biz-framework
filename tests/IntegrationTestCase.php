@@ -82,6 +82,28 @@ class IntegrationTestCase extends TestCase
         $biz->register(new TokenServiceProvider());
         $biz->register(new SchedulerServiceProvider());
         $biz->register(new SettingServiceProvider());
+
+        $cacheEnabled = getenv('CACHE_ENABLED');
+
+        if (getenv('CACHE_ENABLED') === 'true') {
+            $biz['dao.cache.enabled'] = true;
+            $biz['dao.cache.annotation'] = true;
+        }
+
+        if (getenv('CACHE_STRATEGY_DEFAULT')) {
+            if (getenv('CACHE_STRATEGY_DEFAULT') == 'null') {
+                $biz['dao.cache.strategy.default'] = null;
+            } else {
+                $biz['dao.cache.strategy.default'] = getenv('CACHE_STRATEGY_DEFAULT');
+            }
+        }
+
+        if (getenv('CACHE_ARRAY_STORAGE_ENABLED')) {
+            $biz['dao.cache.array_storage'] = function() {
+                return new Codeages\Biz\Framework\Dao\ArrayStorage();
+            };
+        }
+
         $biz->boot();
 
         return $biz;
