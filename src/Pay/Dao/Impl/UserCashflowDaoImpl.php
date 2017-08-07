@@ -7,7 +7,7 @@ use Codeages\Biz\Framework\Dao\GeneralDaoImpl;
 
 class UserCashflowDaoImpl extends GeneralDaoImpl implements UserCashflowDao
 {
-    protected $table = 'user_cashflow';
+    protected $table = 'biz_user_cashflow';
 
     public function findByTradeSn($sn)
     {

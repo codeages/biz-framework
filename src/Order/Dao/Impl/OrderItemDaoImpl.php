@@ -7,7 +7,7 @@ use Codeages\Biz\Framework\Dao\GeneralDaoImpl;
 
 class OrderItemDaoImpl extends GeneralDaoImpl implements OrderItemDao
 {
-    protected $table = 'order_item';
+    protected $table = 'biz_order_item';
 
     public function findByOrderId($orderId)
     {

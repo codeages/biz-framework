@@ -7,7 +7,7 @@ use Codeages\Biz\Framework\Dao\GeneralDaoImpl;
 
 class PaymentTradeDaoImpl extends GeneralDaoImpl implements PaymentTradeDao
 {
-    protected $table = 'payment_trade';
+    protected $table = 'biz_payment_trade';
 
     public function getByOrderSnAndPlatform($orderSn, $platform)
     {

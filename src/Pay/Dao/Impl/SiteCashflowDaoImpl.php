@@ -7,7 +7,7 @@ use Codeages\Biz\Framework\Dao\GeneralDaoImpl;
 
 class SiteCashflowDaoImpl extends GeneralDaoImpl implements SiteCashflowDao
 {
-    protected $table = 'site_cashflow';
+    protected $table = 'biz_site_cashflow';
 
     public function findByTradeSn($tradeSn)
     {

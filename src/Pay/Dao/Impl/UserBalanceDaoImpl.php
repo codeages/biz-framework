@@ -7,7 +7,7 @@ use Codeages\Biz\Framework\Dao\GeneralDaoImpl;
 
 class UserBalanceDaoImpl extends GeneralDaoImpl implements UserBalanceDao
 {
-    protected $table = 'user_balance';
+    protected $table = 'biz_user_balance';
 
     public function getByUserId($userId)
     {

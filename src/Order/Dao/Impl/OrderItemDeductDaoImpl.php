@@ -7,7 +7,7 @@ use Codeages\Biz\Framework\Dao\GeneralDaoInterface;
 
 class OrderItemDeductDaoImpl extends GeneralDaoImpl implements GeneralDaoInterface
 {
-    protected $table = 'order_item_deduct';
+    protected $table = 'biz_order_item_deduct';
 
     public function findByItemId($itemId)
     {

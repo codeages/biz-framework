@@ -7,7 +7,7 @@ use Codeages\Biz\Framework\Dao\GeneralDaoImpl;
 
 class PayAccountDaoImpl extends GeneralDaoImpl implements PayAccountDao
 {
-    protected $table = 'pay_account';
+    protected $table = 'biz_pay_account';
 
     public function getByUserId($userId)
     {

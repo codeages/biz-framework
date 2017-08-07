@@ -7,7 +7,7 @@ use Codeages\Biz\Framework\Dao\GeneralDaoImpl;
 
 class OrderDaoImpl extends GeneralDaoImpl implements OrderDao
 {
-    protected $table = 'orders';
+    protected $table = 'biz_order';
 
     public function getBySn($sn, array $options = array())
     {

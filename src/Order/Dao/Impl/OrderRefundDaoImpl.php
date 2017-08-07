@@ -7,7 +7,7 @@ use Codeages\Biz\Framework\Dao\GeneralDaoImpl;
 
 class OrderRefundDaoImpl extends GeneralDaoImpl implements OrderRefundDao
 {
-    protected $table = 'order_refund';
+    protected $table = 'biz_order_refund';
 
     public function declares()
     {
