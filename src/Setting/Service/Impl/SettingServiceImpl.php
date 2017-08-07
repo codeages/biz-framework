@@ -8,11 +8,13 @@ use Codeages\Biz\Framework\Service\Exception\ServiceException;
 
 class SettingServiceImpl extends BaseService implements SettingService
 {
+    protected $cache = null;
+
     public function get($name, $default = null)
     {
         list($name, $subName) = $this->splitName($name);
 
-        $setting = $this->getSettingDao()->getByName($name);
+        $setting = $this->getByName($name);
         if (!$setting) {
             return $default;
         }
@@ -32,7 +34,7 @@ class SettingServiceImpl extends BaseService implements SettingService
     {
         list($name, $subName) = $this->splitName($name);
 
-        $setting = $this->getSettingDao()->getByName($name);
+        $setting = $this->getByName($name);
         if ($setting) {
             if ($subName && !is_array($setting['data'])) {
                 throw new ServiceException("Setting `{$name}` is not array, so it not support dot syntax.");
@@ -52,13 +54,14 @@ class SettingServiceImpl extends BaseService implements SettingService
                 'data' => $data,
             ));
         }
+        $this->cache = null;
     }
 
     public function remove($name)
     {
         list($name, $subName) = $this->splitName($name);
 
-        $setting = $this->getSettingDao()->getByName($name);
+        $setting = $this->getByName($name);
         if (empty($setting)) {
             throw new ServiceException("Setting {$name} is not exist, delte failed.");
         }
@@ -79,6 +82,24 @@ class SettingServiceImpl extends BaseService implements SettingService
         } else {
             $this->getSettingDao()->delete($setting['id']);
         }
+        $this->cache = null;
+    }
+
+    private function getByName($name)
+    {
+        if (!$this->cache) {
+            $settings = $this->getSettingDao()->findAll();
+            $settings = array_column($settings, null, 'name');
+            $this->cache = $settings;
+        } else {
+            $settings = $this->cache;
+        }
+
+        if (!isset($settings[$name])) {
+            return null;
+        }
+
+        return $settings[$name];
     }
 
     private function splitName($name)

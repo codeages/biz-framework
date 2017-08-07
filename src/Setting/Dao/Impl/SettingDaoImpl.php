@@ -7,25 +7,26 @@ use Codeages\Biz\Framework\Dao\GeneralDaoImpl;
 use Codeages\Biz\Framework\Dao\Annotation\CacheStrategy;
 use Codeages\Biz\Framework\Dao\Annotation\RowCache;
 
-/**
- * @CacheStrategy("Row")
- */
 class SettingDaoImpl extends GeneralDaoImpl implements SettingDao
 {
     protected $table = 'biz_setting';
 
-    /**
-     * @RowCache
-     */
     public function getByName($name)
     {
         return $this->getByFields(array('name' => $name));
+    }
+
+    public function findAll()
+    {
+        $sql = "SELECT * FROM {$this->table()}";
+        return $this->db()->fetchAll($sql);
     }
 
     public function declares()
     {
         return array(
             'serializes' => array('data' => 'php'),
+            'cache' => 'table',
         );
     }
 }

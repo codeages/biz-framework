@@ -8,4 +8,5 @@ interface SettingDao extends GeneralDaoInterface
 {
     public function getByName($name);
 
+    public function findAll();
 }
