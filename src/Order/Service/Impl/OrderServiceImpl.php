@@ -13,23 +13,25 @@ use Codeages\Biz\Framework\Targetlog\Service\TargetlogService;
 
 class OrderServiceImpl extends BaseService implements OrderService
 {
-    public function createOrder($order, $orderItems)
+    public function createOrder($fields, $orderItems)
     {
         $this->validateLogin();
-        $orderItems = $this->validateFields($order, $orderItems);
-        $order = ArrayToolkit::parts($order, array(
+        $orderItems = $this->validateFields($fields, $orderItems);
+        $fields = ArrayToolkit::parts($fields, array(
             'title',
             'callback',
             'source',
             'user_id',
             'created_reason',
             'seller_id',
-            'price_type'
+            'price_type',
+            'deducts'
         ));
 
         try {
             $this->beginTransaction();
-            $order = $this->saveOrder($order, $orderItems);
+            $order = $this->saveOrder($fields, $orderItems);
+            $order = $this->createOrderDeducts($order, $fields);
             $order = $this->createOrderItems($order, $orderItems);
             $this->commit();
         } catch (AccessDeniedException $e) {
@@ -59,6 +61,19 @@ class OrderServiceImpl extends BaseService implements OrderService
         $order['pay_amount'] = $this->countOrderPayAmount($order['price_amount'], $items);
         $order['created_user_id'] = $user['id'];
         $order = $this->getOrderDao()->create($order);
+        return $order;
+    }
+
+    protected function createOrderDeducts($order, $fields)
+    {
+        if(!empty($fields['deducts'])) {
+            $orderInfo = ArrayToolkit::parts($order, array(
+                'user_id',
+                'seller_id',
+            ));
+            $orderInfo['order_id'] = $order['id'];
+            $order['deducts'] = $this->createDeducts($orderInfo, $fields['deducts']);
+        }
         return $order;
     }
 
@@ -98,7 +113,6 @@ class OrderServiceImpl extends BaseService implements OrderService
     protected function createOrderItems($order, $items)
     {
         $savedItems = array();
-        $savedDeducts = array();
         foreach ($items as $item) {
             $deducts = array();
             if (!empty($item['deducts'])) {
@@ -111,12 +125,11 @@ class OrderServiceImpl extends BaseService implements OrderService
             $item['sn'] = $this->generateSn();
             $item['pay_amount'] = $this->countOrderItemPayAmount($item, $deducts);
             $item = $this->getOrderItemDao()->create($item);
-            array_merge($savedDeducts, $this->createOrderItemDeducts($item, $deducts));
+            $item['deducts'] = $this->createDeducts($item, $deducts);
             $savedItems[] = $item;
         }
 
         $order['items'] = $savedItems;
-        $order['deducts'] = $savedDeducts;
         return $order;
     }
 
@@ -131,7 +144,7 @@ class OrderServiceImpl extends BaseService implements OrderService
         return $priceAmount;
     }
 
-    protected function createOrderItemDeducts($item, $deducts)
+    protected function createDeducts($item, $deducts)
     {
         $savedDeducts = array();
         foreach ($deducts as $deduct) {
