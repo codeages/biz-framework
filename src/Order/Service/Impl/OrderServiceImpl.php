@@ -439,26 +439,36 @@ class OrderServiceImpl extends BaseService implements OrderService
 
     public function applyRefund($orderId, $data)
     {
-        $this->validateLogin();
-        $order = $this->getOrderDao()->get($orderId);
-        if (empty($order)) {
-            throw $this->createNotFoundException("order #{$orderId} is not found.");
+        $orderRefund = $this->createOrderRefund($orderId, $data);
+
+        $this->dispatch('order_refund.created', $orderRefund);
+
+        return $orderRefund;
+    }
+
+    public function applyOrderItemsRefund($orderId, $orderItemIds, $data)
+    {
+        $orderRefund = $this->createOrderRefund($orderId, $data);
+        $totalAmount = 0;
+        $orderItemRefunds = array();
+        foreach ($orderItemIds as $orderItemId) {
+            $orderItem = $this->getOrderItemDao()->get($orderItemId);
+            $orderItemRefund = $this->getOrderItemRefundDao()->create(array(
+                'order_refund_id' => $orderRefund['id'],
+                'order_id' => $orderRefund['order_id'],
+                'order_item_id' => $orderItemId,
+                'user_id' => $orderRefund['user_id'],
+                'created_user_id' => $this->biz['user']['id'],
+                'amount' => $orderItem['pay_amount']
+            ));
+
+            $totalAmount = $totalAmount + $orderItem['pay_amount'];
+
+            $orderItemRefunds[] = $orderItemRefund;
         }
 
-        if ($this->biz['user']['id'] != $order['user_id']) {
-            throw $this->createAccessDeniedException("order #{$orderId} can not refund.");
-        }
-
-        $orderRefund = $this->getOrderRefundDao()->create(array(
-            'order_id' => $order['id'],
-            'order_item_id' => 0,
-            'sn' => $this->generateSn(),
-            'user_id' => $order['user_id'],
-            'created_user_id' => $this->biz['user']['id'],
-            'reason' => empty($data['reason']) ? '' : $data['reason'],
-            'amount' => $order['pay_amount']
-        ));
-
+        $orderRefund = $this->getOrderRefundDao()->update($orderRefund['id'], array('amount' => $totalAmount));
+        $orderRefund['orderItemRefunds'] = $orderItemRefunds;
         $this->dispatch('order_refund.created', $orderRefund);
 
         return $orderRefund;
@@ -478,6 +488,13 @@ class OrderServiceImpl extends BaseService implements OrderService
             'deal_reason' => empty($data['deal_reason']) ? '' : $data['deal_reason'],
             'status' => 'finish'
         ));
+
+        $orderItemRefunds = $this->getOrderItemRefundDao()->findByOrderRefundId($orderRefund['id']);
+        foreach ($orderItemRefunds as $orderItemRefund) {
+            $this->getOrderItemRefundDao()->update($orderItemRefund['id'], array(
+                'status' => 'finish'
+            ));
+        }
 
         $this->dispatch('order_refund.finished', $orderRefund);
         return $orderRefund;
@@ -560,5 +577,35 @@ class OrderServiceImpl extends BaseService implements OrderService
     protected function getTargetlogService()
     {
         return $this->biz->service('Targetlog:TargetlogService');
+    }
+
+    protected function getOrderItemRefundDao()
+    {
+        return $this->biz->dao('Order:OrderItemRefundDao');
+    }
+
+    protected function createOrderRefund($orderId, $data)
+    {
+        $this->validateLogin();
+        $order = $this->getOrderDao()->get($orderId);
+        if (empty($order)) {
+            throw $this->createNotFoundException("order #{$orderId} is not found.");
+        }
+
+        if ($this->biz['user']['id'] != $order['user_id']) {
+            throw $this->createAccessDeniedException("order #{$orderId} can not refund.");
+        }
+
+        $orderRefund = $this->getOrderRefundDao()->create(array(
+            'order_id' => $order['id'],
+            'order_item_id' => 0,
+            'sn' => $this->generateSn(),
+            'user_id' => $order['user_id'],
+            'created_user_id' => $this->biz['user']['id'],
+            'reason' => empty($data['reason']) ? '' : $data['reason'],
+            'amount' => $order['pay_amount'],
+        ));
+
+        return $orderRefund;
     }
 }
