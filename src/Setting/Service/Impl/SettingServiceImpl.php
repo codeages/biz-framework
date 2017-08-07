@@ -8,8 +8,6 @@ use Codeages\Biz\Framework\Service\Exception\ServiceException;
 
 class SettingServiceImpl extends BaseService implements SettingService
 {
-    protected $cache = null;
-
     public function get($name, $default = null)
     {
         list($name, $subName) = $this->splitName($name);
@@ -54,7 +52,7 @@ class SettingServiceImpl extends BaseService implements SettingService
                 'data' => $data,
             ));
         }
-        $this->cache = null;
+        $this->clearCache();
     }
 
     public function remove($name)
@@ -82,17 +80,16 @@ class SettingServiceImpl extends BaseService implements SettingService
         } else {
             $this->getSettingDao()->delete($setting['id']);
         }
-        $this->cache = null;
+        $this->clearCache();
     }
 
     private function getByName($name)
     {
-        if (!$this->cache) {
+        $settings = $this->getCache();
+        if (!$settings) {
             $settings = $this->getSettingDao()->findAll();
             $settings = array_column($settings, null, 'name');
-            $this->cache = $settings;
-        } else {
-            $settings = $this->cache;
+            $this->setCache($settings);
         }
 
         if (!isset($settings[$name])) {
@@ -121,5 +118,25 @@ class SettingServiceImpl extends BaseService implements SettingService
     protected function getSettingDao()
     {
         return $this->biz->dao('Setting:SettingDao');
+    }
+
+    protected function getCache()
+    {
+        $storage = $this->biz['array_storage'];
+        if (!isset($storage['setting_service_cache'])) {
+            return null;
+        }
+        return $storage['setting_service_cache'];
+    }
+
+    protected function setCache($data)
+    {
+        $storage = $this->biz['array_storage'];
+        $storage['setting_service_cache'] = $data;
+    }
+
+    protected function clearCache()
+    {
+        $this->biz['array_storage']->flush();
     }
 }
