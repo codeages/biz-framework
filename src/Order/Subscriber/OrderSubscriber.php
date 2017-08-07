@@ -16,9 +16,6 @@ class OrderSubscriber extends EventSubscriber implements EventSubscriberInterfac
         );
     }
 
-    /**
-     * TODO: callback商品中心
-     */
     public function onOrderPaid(Event $event)
     {
         $order = $event->getSubject();
@@ -26,7 +23,6 @@ class OrderSubscriber extends EventSubscriber implements EventSubscriberInterfac
 
     }
 
-    //这里根据不同的orderTargetType 获取不同的OrderProcess
     public function getOrderProcess()
     {
         return $this->getBiz()->service('OrderProcess:CutOrderProcess');

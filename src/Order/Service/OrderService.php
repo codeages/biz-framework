@@ -4,13 +4,13 @@ namespace Codeages\Biz\Framework\Order\Service;
 
 interface OrderService
 {
-    public function createOrder($order, $orderItems); //createOrder($head, $items);
+    public function createOrder($order, $orderItems);
 
     public function setOrderPaid($data);
 
     public function closeOrder($id);
 
-    public function closeOrders(); //关闭过期订单
+    public function closeOrders();
 
     public function findOrderItemsByOrderId($orderId);
 

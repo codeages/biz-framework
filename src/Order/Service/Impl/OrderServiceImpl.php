@@ -170,12 +170,6 @@ class OrderServiceImpl extends BaseService implements OrderService
         return $orderItems;
     }
 
-    /**
-     * 当支付中心完成后，订单状态修改为已支付，调用者可以为：
-     * 1、url
-     * 2、event
-     * @param $data: 'order_sn', 'pay_data', 'pay_cash_flow', 'pay_time'
-     */
     public function setOrderPaid($data)
     {
         $data = ArrayToolkit::parts($data, array(

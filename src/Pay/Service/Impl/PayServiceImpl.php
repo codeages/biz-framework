@@ -9,14 +9,6 @@ use Codeages\Biz\Framework\Targetlog\Service\TargetlogService;
 
 class PayServiceImpl extends BaseService implements PayService
 {
-    /**
-     * 创建交易信息有两种情况
-     * 1、标价为虚拟币
-     * 2、标价为货币
-     *
-     * @param $data
-     * @return mixed
-     */
     public function createTrade($data)
     {
         $data = ArrayToolkit::parts($data, array(
@@ -61,12 +53,6 @@ class PayServiceImpl extends BaseService implements PayService
         return $trade;
     }
 
-    /**
-     * TODO:
-     * 1、虚拟币余额处理
-     * 2、异常订单处理
-     * 3、日志
-     */
     public function notify($payment, $data)
     {
         list($data, $result) = $this->getPayment($payment)->converterNotify($data);
