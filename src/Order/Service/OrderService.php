@@ -28,7 +28,9 @@ interface OrderService
 
     public function applyRefund($orderId, $data);
 
-    public function finishRefund($id, $data);
+    public function finishRefund($id);
+
+    public function adoptRefund($id, $data);
 
     public function refuseRefund($id, $data);
 

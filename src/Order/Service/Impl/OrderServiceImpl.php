@@ -474,7 +474,7 @@ class OrderServiceImpl extends BaseService implements OrderService
         return $orderRefund;
     }
 
-    public function finishRefund($id, $data)
+    public function adoptRefund($id, $data)
     {
         $this->validateLogin();
         $orderRefund = $this->getOrderRefundDao()->get($id);
@@ -486,17 +486,17 @@ class OrderServiceImpl extends BaseService implements OrderService
             'deal_time' => time(),
             'deal_user_id' => $this->biz['user']['id'],
             'deal_reason' => empty($data['deal_reason']) ? '' : $data['deal_reason'],
-            'status' => 'finish'
+            'status' => 'adopt'
         ));
 
         $orderItemRefunds = $this->getOrderItemRefundDao()->findByOrderRefundId($orderRefund['id']);
         foreach ($orderItemRefunds as $orderItemRefund) {
             $this->getOrderItemRefundDao()->update($orderItemRefund['id'], array(
-                'status' => 'finish'
+                'status' => 'adopt'
             ));
         }
 
-        $this->dispatch('order_refund.finished', $orderRefund);
+        $this->dispatch('order_refund.adopted', $orderRefund);
         return $orderRefund;
     }
 
@@ -516,6 +516,28 @@ class OrderServiceImpl extends BaseService implements OrderService
         ));
 
         $this->dispatch('order_refund.refused', $orderRefund);
+        return $orderRefund;
+    }
+
+    public function finishRefund($id)
+    {
+        $orderRefund = $this->getOrderRefundDao()->get($id);
+        if (empty($orderRefund)) {
+            throw $this->createNotFoundException("order_refund #{$id} is not found");
+        }
+
+        $orderRefund = $this->getOrderRefundDao()->update($id, array(
+            'status' => 'finish'
+        ));
+
+        $orderItemRefunds = $this->getOrderItemRefundDao()->findByOrderRefundId($orderRefund['id']);
+        foreach ($orderItemRefunds as $orderItemRefund) {
+            $this->getOrderItemRefundDao()->update($orderItemRefund['id'], array(
+                'status' => 'finish'
+            ));
+        }
+
+        $this->dispatch('order_refund.finished', $orderRefund);
         return $orderRefund;
     }
 

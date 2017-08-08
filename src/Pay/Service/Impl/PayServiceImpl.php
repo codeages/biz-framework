@@ -307,18 +307,31 @@ class PayServiceImpl extends BaseService implements PayService
             throw new AccessDeniedException('can not refund, becourse the paid trade is too old.');
         }
 
+        $paymentGetWay = $this->getPayment($trade['platform']);
+        $paymentGetWay->applyRefund($trade);
+
         $trade = $this->getPaymentTradeDao()->update($trade['id'], array(
             'status' => 'refunding',
             'apply_refund_time' => time()
         ));
-
-
-
+        $this->dispatch('trade.refunding', $trade);
+        return $trade;
     }
 
     public function notifyRefund($payment, $data)
     {
         $paymentGetWay = $this->getPayment($payment);
+        $response = $paymentGetWay->converterRefundNotify($data);
+        $tradeSn = $response['out_trade_no'];
+
+        $trade = $this->getPaymentTradeDao()->getByTradeSn($tradeSn);
+        $trade = $this->getPaymentTradeDao()->update($trade['id'], array(
+            'status' => 'refunded',
+            'refund_success_time' => time()
+        ));
+
+        $this->dispatch('trade.refunded', $trade, $data);
+        return $trade;
     }
 
 

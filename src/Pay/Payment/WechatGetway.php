@@ -99,26 +99,53 @@ class WechatGetway extends AbstractGetway
 
     public function applyRefund($trade)
     {
-        $payType = ucfirst($trade['platform']);
-        $gateway = $this->createGetWay("WechatPay_{$payType}");
+        $gateway = $this->createGetWay("WechatPay");
 
         $response = $gateway->refund([
             'transaction_id' => $trade['platform_sn'],
             'out_refund_no' => $trade['trade_sn'],
             'total_fee' => $trade['cash_amount'],
             'refund_fee' => $trade['cash_amount'],
+            'refund_desc' => empty($trade['refund_reason']) ? '' : $trade['refund_reason']
         ])->send();
 
         if ($response->isSuccessful()) {
             return $response->getData();
         }
-
-
     }
 
     public function converterRefundNotify($data)
     {
-        // TODO: Implement converterRefundNotify() method.
+        $gateway = $this->createGetWay('WechatPay');
+        $request = $gateway->completePurchase(array(
+            'request_params' => $data
+        ));
+        $response = $request->send();
+        $data = $request->getData();
+
+        if ($response->isPaid()) {
+            return array(
+                array(
+                    'status' => 'paid',
+                    'cash_flow' => $data['transaction_id'],
+                    'paid_time' => $this->timeConverter($data['time_end']),
+                    'pay_amount' => $data['cash_fee'],
+                    'cash_type' => $data['fee_type'],
+                    'trade_sn' => $data['out_trade_no'],
+                    'attach' => json_decode($data['attach'], true),
+                    'notify_data' => $data,
+                ),
+                $this->getNotifyResponse()
+            );
+        }
+
+        return array(
+            array(
+                'status' => 'failture',
+                'notify_data' => $data,
+            ),
+            $this->getNotifyResponse()
+        );
     }
 
     protected function createGetWay($type)
