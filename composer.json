@@ -25,7 +25,8 @@
         "symfony/finder": "^2.8.9",
         "webpatser/laravel-uuid": "^2.0",
         "lokielse/omnipay-wechatpay": "^1.0",
-        "lokielse/omnipay-alipay": "^2.3"
+        "lokielse/omnipay-alipay": "^2.3",
+        "symfony/polyfill-php55": "^1.4"
     },
     "require-dev": {
         "mockery/mockery": "^0.9.9",
