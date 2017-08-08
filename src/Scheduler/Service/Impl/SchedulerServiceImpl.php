@@ -107,6 +107,20 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         }
     }
 
+    public function clearJobs()
+    {
+        $runtimeout = $this->getTimeout();
+        $jobs = $this->getJobDao()->search(array(
+            'deleted' => 1,
+            'deleted_time_LT' => time() - $runtimeout,
+        ), array(), 0, 100);
+
+        foreach ($jobs as $job) {
+            $this->getJobDao()->delete($job['id']);
+            $this->createJobLog(array('job' => $job), 'clear');
+        }
+    }
+
     protected function check($jobFired)
     {
         $result = $this->checkExecuting($jobFired);
@@ -374,6 +388,24 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         return $job;
     }
 
+    public function markTimeoutJobs()
+    {
+        $runtimeout = $this->getTimeout();
+        $jobFireds = $this->getJobFiredDao()->search(array(
+            'status' => 'executing',
+            'fired_time_LT' => time() - $runtimeout
+        ),array(),0, 100);
+        foreach ($jobFireds as $jobFired) {
+            $this->markTimout($jobFired);
+        }
+    }
+
+    protected function markTimout($jobFired) {
+        $jobFired = $this->getJobFiredDao()->update($jobFired['id'], array('status' => 'timeout'));
+        $jobFired['job'] = $this->getJobDao()->get($jobFired['job_id']);
+        $this->createJobLog($jobFired, 'timeout');
+    }
+
     protected function mergeCondition($condition)
     {
         $defaultCondition = array(
@@ -409,5 +441,10 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
     protected function getJobPool()
     {
         return new JobPool($this->biz);
+    }
+
+    protected function getTimeout()
+    {
+        return $this->biz['scheduler.options']['timeout'];
     }
 }

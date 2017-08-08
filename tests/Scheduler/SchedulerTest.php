@@ -235,6 +235,64 @@ class SchedulerTest extends IntegrationTestCase
         $this->assertEquals('acquired', $jobFireds[0]['status']);
     }
 
+    public function testClearJobs()
+    {
+        $job = array(
+            'name' => 'test',
+            'source' => 'MAIN',
+            'expression' => time()-2,
+//            'nextFireTime' => time()-1,
+            'class' => 'Tests\\Example\\Job\\ExampleAcquiredJob',
+            'args' => array('courseId' => 1),
+            'priority' => 100,
+            'misfire_threshold' => 3000,
+            'misfire_policy' => 'missed',
+        );
+
+        $job = $this->getSchedulerService()->register($job);
+        sleep(2);
+        $this->getSchedulerService()->execute();
+
+        $options = $this->biz['scheduler.options'];
+        $options['timeout'] = 1;
+        $this->biz['scheduler.options'] = $options;
+
+        $this->getSchedulerService()->clearJobs();
+        $job = $this->getJobDao()->get($job['id']);
+        $this->assertEmpty($job);
+    }
+
+    public function testTimeoutJobs()
+    {
+        $job = array(
+            'name' => 'test',
+            'source' => 'MAIN',
+            'expression' => time()-2,
+//            'nextFireTime' => time()-1,
+            'class' => 'Tests\\Example\\Job\\ExampleAcquiredJob',
+            'args' => array('courseId' => 1),
+            'priority' => 100,
+            'misfire_threshold' => 3000,
+            'misfire_policy' => 'missed',
+        );
+
+        $job = $this->getSchedulerService()->register($job);
+        $this->getSchedulerService()->execute();
+        $this->getJobFiredDao()->update(array('job_id' => $job['id']), array(
+            'status' => 'executing',
+            'fired_time' => time()-2
+        ));
+
+        $options = $this->biz['scheduler.options'];
+        $options['timeout'] = 1;
+        $this->biz['scheduler.options'] = $options;
+
+        $this->getSchedulerService()->markTimeoutJobs();
+        $savedJob = $this->getJobDao()->get($job['id']);
+        $jobFireds = $this->getSchedulerService()->findJobFiredsByJobId($savedJob['id']);
+        $this->assertEquals('timeout', $jobFireds[0]['status']);
+    }
+
     protected function asserts($excepted, $acturel)
     {
         $keys = array_keys($excepted);
@@ -249,6 +307,11 @@ class SchedulerTest extends IntegrationTestCase
     protected function getJobDao()
     {
         return $this->biz->dao('Scheduler:JobDao');
+    }
+
+    protected function getJobFiredDao()
+    {
+        return $this->biz->dao('Scheduler:JobFiredDao');
     }
 
     protected function getSchedulerService()
