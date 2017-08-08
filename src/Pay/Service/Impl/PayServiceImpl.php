@@ -2,6 +2,7 @@
 
 namespace Codeages\Biz\Framework\Pay\Service\Impl;
 
+use Codeages\Biz\Framework\Service\Exception\AccessDeniedException;
 use Codeages\Biz\Framework\Util\ArrayToolkit;
 use Codeages\Biz\Framework\Pay\Service\PayService;
 use Codeages\Biz\Framework\Service\BaseService;
@@ -294,4 +295,31 @@ class PayServiceImpl extends BaseService implements PayService
         unset($data['seller_id']);
         return $this->getPayment($data['platform'])->createTrade($data);
     }
+
+    public function applyRefundByTradeSn($tradeSn)
+    {
+        $trade = $this->getPaymentTradeDao()->getByTradeSn($tradeSn);
+        if ($trade['status'] != 'paid') {
+            throw new AccessDeniedException('can not refund, becourse the trade is not paid');
+        }
+
+        if ((time() - $trade['pay_time']) > 86400) {
+            throw new AccessDeniedException('can not refund, becourse the paid trade is too old.');
+        }
+
+        $trade = $this->getPaymentTradeDao()->update($trade['id'], array(
+            'status' => 'refunding',
+            'apply_refund_time' => time()
+        ));
+
+
+
+    }
+
+    public function notifyRefund($payment, $data)
+    {
+        $paymentGetWay = $this->getPayment($payment);
+    }
+
+
 }

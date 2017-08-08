@@ -9,4 +9,8 @@ interface PayService
     public function createTrade($trade);
 
     public function notify($payment, $data);
+
+    public function applyRefundByTradeSn($tradeSn);
+
+    public function notifyRefund($payment, $data);
 }

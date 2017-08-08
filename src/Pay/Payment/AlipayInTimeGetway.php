@@ -92,4 +92,14 @@ class AlipayInTimeGetway extends AbstractGetway
             'key' => 'fc9dp2m15eamxv3wvdw4l8icdv5un6di',
         );
     }
+
+    public function applyRefund($data)
+    {
+        // TODO: Implement applyRefund() method.
+    }
+
+    public function converterRefundNotify($data)
+    {
+        // TODO: Implement converterRefundNotify() method.
+    }
 }

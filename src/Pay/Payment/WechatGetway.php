@@ -97,6 +97,30 @@ class WechatGetway extends AbstractGetway
         return $response->getData();
     }
 
+    public function applyRefund($trade)
+    {
+        $payType = ucfirst($trade['platform']);
+        $gateway = $this->createGetWay("WechatPay_{$payType}");
+
+        $response = $gateway->refund([
+            'transaction_id' => $trade['platform_sn'],
+            'out_refund_no' => $trade['trade_sn'],
+            'total_fee' => $trade['cash_amount'],
+            'refund_fee' => $trade['cash_amount'],
+        ])->send();
+
+        if ($response->isSuccessful()) {
+            return $response->getData();
+        }
+
+
+    }
+
+    public function converterRefundNotify($data)
+    {
+        // TODO: Implement converterRefundNotify() method.
+    }
+
     protected function createGetWay($type)
     {
         $config = $this->getSetting();
