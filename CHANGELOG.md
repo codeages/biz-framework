@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## [0.6.1] - 2017-08-09
+
+* MigrationBootstrap 支持配置 table name。
+
 ## [0.6.0] - 2017-08-08
 
 * 修复Dao缓存策略 RowStrategy 在查询不存在的记录时的缓存错误。
