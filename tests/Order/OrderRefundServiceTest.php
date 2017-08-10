@@ -83,6 +83,15 @@ class OrderRefundServiceTest extends IntegrationTestCase
     {
         $mockedOrderItems = $this->mockOrderItems();
         $order = $this->getOrderService()->createOrder($this->mockOrder(), $mockedOrderItems);
+        $data = array(
+            'order_sn' => $order['sn'],
+            'trade_sn' => '1234567',
+            'pay_time' => time()
+        );
+        $this->getOrderService()->setOrderPaid($data);
+        $this->getOrderService()->setOrderWaitConsign($order['id'], array());
+        $this->getOrderService()->setOrderConsign($order['id'], array());
+        $this->getOrderService()->setOrderSignedSuccess($order['id'], array('message'=>'已经签收'));
 
         $orderRefund = $this->getOrderRefundService()->applyRefund($order['id'], array('reason' => '对该课程不感兴趣'));
 
@@ -104,8 +113,17 @@ class OrderRefundServiceTest extends IntegrationTestCase
     {
         $mockedOrderItems = $this->mockOrderItems();
         $order = $this->getOrderService()->createOrder($this->mockOrder(), $mockedOrderItems);
-        $orderItemIds = ArrayToolkit::column($order['items'], 'id');
+        $data = array(
+            'order_sn' => $order['sn'],
+            'trade_sn' => '1234567',
+            'pay_time' => time()
+        );
+        $this->getOrderService()->setOrderPaid($data);
+        $this->getOrderService()->setOrderWaitConsign($order['id'], array());
+        $this->getOrderService()->setOrderConsign($order['id'], array());
+        $this->getOrderService()->setOrderSignedSuccess($order['id'], array('message'=>'已经签收'));
 
+        $orderItemIds = ArrayToolkit::column($order['items'], 'id');
         $orderRefund = $this->getOrderRefundService()->applyOrderItemsRefund($order['id'], $orderItemIds, array('reason' => '对该课程不感兴趣'));
 
         $this->assertNotEmpty($orderRefund);

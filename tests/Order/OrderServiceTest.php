@@ -155,6 +155,8 @@ class OrderServiceTest extends IntegrationTestCase
             'pay_time' => time()
         );
         $this->getOrderService()->setOrderPaid($data);
+        $this->getOrderService()->setOrderWaitConsign($order['id'], array());
+        $this->getOrderService()->setOrderConsign($order['id'], array());
         $this->getOrderService()->setOrderSignedSuccess($order['id'], array());
         $order = $this->getOrderService()->finishOrder($order['id']);
 
@@ -191,6 +193,7 @@ class OrderServiceTest extends IntegrationTestCase
     {
         $mockedOrderItems = $this->mockOrderItems();
         $order = $this->getOrderService()->createOrder($this->mockOrder(), $mockedOrderItems);
+
         $this->getOrderService()->setOrderSignedSuccess($order['id'], array());
     }
 
@@ -204,6 +207,8 @@ class OrderServiceTest extends IntegrationTestCase
             'pay_time' => time()
         );
         $this->getOrderService()->setOrderPaid($data);
+        $this->getOrderService()->setOrderWaitConsign($order['id'], array());
+        $this->getOrderService()->setOrderConsign($order['id'], array());
         $this->getOrderService()->setOrderSignedSuccess($order['id'], array('message'=>'已经签收'));
         $order = $this->getOrderService()->getOrder($order['id']);
         $this->assertEquals('signed', $order['status']);
@@ -220,6 +225,8 @@ class OrderServiceTest extends IntegrationTestCase
             'pay_time' => time()
         );
         $this->getOrderService()->setOrderPaid($data);
+        $this->getOrderService()->setOrderWaitConsign($order['id'], array());
+        $this->getOrderService()->setOrderConsign($order['id'], array());
         $this->getOrderService()->setOrderSignedFail($order['id'], array('message'=>'已经签收'));
         $order = $this->getOrderService()->getOrder($order['id']);
         $this->assertEquals('signed_fail', $order['status']);

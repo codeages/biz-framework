@@ -21,6 +21,10 @@ class OrderRefundServiceImpl extends BaseService implements OrderRefundService
             throw $this->createNotFoundException("order #{$orderItem['order_id']} is not found");
         }
 
+        if ($order['status'] != 'signed') {
+            throw $this->createAccessDeniedException("order #${$order['id']} status is not signed.");
+        }
+
         if ($this->biz['user']['id'] != $order['user_id']) {
             throw $this->createAccessDeniedException("order #{$orderItem['order_id']} can not refund.");
         }
@@ -165,6 +169,10 @@ class OrderRefundServiceImpl extends BaseService implements OrderRefundService
         $order = $this->getOrderDao()->get($orderId);
         if (empty($order)) {
             throw $this->createNotFoundException("order #{$orderId} is not found.");
+        }
+
+        if ($order['status'] != 'signed') {
+            throw $this->createAccessDeniedException("order #${$order['id']} status is not signed.");
         }
 
         if ($this->biz['user']['id'] != $order['user_id']) {

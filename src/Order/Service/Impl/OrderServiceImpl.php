@@ -9,7 +9,6 @@ use Codeages\Biz\Framework\Service\Exception\AccessDeniedException;
 use Codeages\Biz\Framework\Service\Exception\InvalidArgumentException;
 use Codeages\Biz\Framework\Service\Exception\NotFoundException;
 use Codeages\Biz\Framework\Service\Exception\ServiceException;
-use Codeages\Biz\Framework\Targetlog\Service\TargetlogService;
 
 class OrderServiceImpl extends BaseService implements OrderService
 {
@@ -48,8 +47,8 @@ class OrderServiceImpl extends BaseService implements OrderService
             throw new ServiceException($e);
         }
 
-        $this->dispatch('order.created', $order);
         $this->createOrderLog($order);
+        $this->dispatch('order.created', $order);
         return $order;
     }
 
@@ -186,7 +185,16 @@ class OrderServiceImpl extends BaseService implements OrderService
 
         try {
             $this->beginTransaction();
-            $order = $this->payOrder($data);
+            $order = $this->getOrderBySn($data['order_sn'], true);
+            if ($order['status'] == 'paid') {
+                return;
+            }
+
+            if ($order['status'] != 'created') {
+                throw $this->createAccessDeniedException('status is not created.');
+            }
+
+            $order = $this->payOrder($order, $data);
             $this->payOrderItems($order);
             $this->commit();
             $this->createOrderLog($order);
@@ -206,9 +214,8 @@ class OrderServiceImpl extends BaseService implements OrderService
         $this->dispatch('order.paid', $order);
     }
 
-    protected function payOrder($data)
+    protected function payOrder($order, $data)
     {
-        $order = $this->getOrderBySn($data['order_sn'], true);
         $data = ArrayToolkit::parts($data, array(
             'trade_sn',
             'pay_time'
@@ -343,10 +350,29 @@ class OrderServiceImpl extends BaseService implements OrderService
         }
     }
 
-    public function setOrderShipping($id, $data)
+    public function setOrderWaitConsign($id, $data)
     {
+        $order = $this->getOrderDao()->get($id);
+        if ($order['status'] != 'paid') {
+            throw $this->createAccessDeniedException("order #{$order['id']} status is not paid.");
+        }
+
         $order = $this->getOrderDao()->update($id, array(
-            'status' => 'shipping',
+            'status' => 'wait_consign',
+        ));
+        $this->createOrderLog($order, $data);
+        return $order;
+    }
+
+    public function setOrderConsign($id, $data)
+    {
+        $order = $this->getOrderDao()->get($id);
+        if ($order['status'] != 'wait_consign') {
+            throw $this->createAccessDeniedException("order #{$order['id']} status is not wait_consign.");
+        }
+
+        $order = $this->getOrderDao()->update($id, array(
+            'status' => 'consign',
         ));
         $this->createOrderLog($order, $data);
         return $order;
@@ -367,8 +393,9 @@ class OrderServiceImpl extends BaseService implements OrderService
         try {
             $this->beginTransaction();
             $order = $this->getOrderDao()->get($id, array('lock'=>true));
-            if ('paid' != $order['status']) {
-                throw $this->createAccessDeniedException('status is not paid.');
+
+            if ('consign' != $order['status']) {
+                throw $this->createAccessDeniedException("order #{$order['id']} status is not consign.");
             }
 
             $signedTime = time();
@@ -377,7 +404,6 @@ class OrderServiceImpl extends BaseService implements OrderService
                 'signed_time' => $signedTime,
                 'signed_data' => $data
             ));
-
             $items = $this->findOrderItemsByOrderId($id);
             foreach ($items as $item) {
                 $this->getOrderItemDao()->update($item['id'], array(
