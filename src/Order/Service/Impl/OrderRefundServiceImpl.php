@@ -22,7 +22,7 @@ class OrderRefundServiceImpl extends BaseService implements OrderRefundService
         }
 
         if ($order['status'] != 'signed') {
-            throw $this->createAccessDeniedException("order #${$order['id']} status is not signed.");
+            throw $this->createAccessDeniedException("order #{$order['id']} status is not signed.");
         }
 
         if ($this->biz['user']['id'] != $order['user_id']) {
@@ -147,7 +147,6 @@ class OrderRefundServiceImpl extends BaseService implements OrderRefundService
         if ($orderRefund['status'] != 'adopt') {
             throw $this->createAccessDeniedException("order_refund #{$id} status is not adopt");
         }
-
         $orderRefund = $this->getOrderRefundDao()->update($id, array(
             'status' => 'finish'
         ));
@@ -158,7 +157,6 @@ class OrderRefundServiceImpl extends BaseService implements OrderRefundService
                 'status' => 'finish'
             ));
         }
-
         $this->dispatch('order_refund.finished', $orderRefund);
         return $orderRefund;
     }
@@ -172,7 +170,7 @@ class OrderRefundServiceImpl extends BaseService implements OrderRefundService
         }
 
         if ($order['status'] != 'signed') {
-            throw $this->createAccessDeniedException("order #${$order['id']} status is not signed.");
+            throw $this->createAccessDeniedException("order #{$order['id']} status is not signed.");
         }
 
         if ($this->biz['user']['id'] != $order['user_id']) {

@@ -3,6 +3,7 @@
 namespace Codeages\Biz\Framework\Order\Service\Impl;
 
 use Codeages\Biz\Framework\Order\Service\OrderService;
+use Codeages\Biz\Framework\Order\Status\StatusFactory;
 use Codeages\Biz\Framework\Util\ArrayToolkit;
 use Codeages\Biz\Framework\Service\BaseService;
 use Codeages\Biz\Framework\Service\Exception\AccessDeniedException;
@@ -353,84 +354,25 @@ class OrderServiceImpl extends BaseService implements OrderService
     public function setOrderWaitConsign($id, $data)
     {
         $order = $this->getOrderDao()->get($id);
-        if ($order['status'] != 'paid') {
-            throw $this->createAccessDeniedException("order #{$order['id']} status is not paid.");
-        }
-
-        $order = $this->getOrderDao()->update($id, array(
-            'status' => 'wait_consign',
-        ));
-        $this->createOrderLog($order, $data);
-        return $order;
+        return StatusFactory::instance($this->biz)->getStatusProcessor($order['status'])->setWaitConsignOrder($id, $data);
     }
 
     public function setOrderConsign($id, $data)
     {
         $order = $this->getOrderDao()->get($id);
-        if ($order['status'] != 'wait_consign') {
-            throw $this->createAccessDeniedException("order #{$order['id']} status is not wait_consign.");
-        }
-
-        $order = $this->getOrderDao()->update($id, array(
-            'status' => 'consign',
-        ));
-        $this->createOrderLog($order, $data);
-        return $order;
+        return StatusFactory::instance($this->biz)->getStatusProcessor($order['status'])->setConsignOrder($id, $data);
     }
 
     public function setOrderSignedSuccess($id, $data)
     {
-        return $this->signOrder($id, 'signed', $data);
+        $order = $this->getOrderDao()->get($id);
+        return StatusFactory::instance($this->biz)->getStatusProcessor($order['status'])->setSignedOrder($id, $data);
     }
 
     public function setOrderSignedFail($id, $data)
     {
-        return $this->signOrder($id, 'signed_fail', $data);
-    }
-
-    protected function signOrder($id, $status, $data)
-    {
-        try {
-            $this->beginTransaction();
-            $order = $this->getOrderDao()->get($id, array('lock'=>true));
-
-            if ('consign' != $order['status']) {
-                throw $this->createAccessDeniedException("order #{$order['id']} status is not consign.");
-            }
-
-            $signedTime = time();
-            $order = $this->getOrderDao()->update($id, array(
-                'status' => $status,
-                'signed_time' => $signedTime,
-                'signed_data' => $data
-            ));
-            $items = $this->findOrderItemsByOrderId($id);
-            foreach ($items as $item) {
-                $this->getOrderItemDao()->update($item['id'], array(
-                    'status' => $status,
-                    'signed_time' => $signedTime,
-                    'signed_data' => $data
-                ));
-            }
-            $this->commit();
-        } catch (AccessDeniedException $e) {
-            $this->rollback();
-            throw $e;
-        } catch (InvalidArgumentException $e) {
-            $this->rollback();
-            throw $e;
-        } catch (NotFoundException $e) {
-            $this->rollback();
-            throw $e;
-        } catch (\Exception $e) {
-            $this->rollback();
-            throw new ServiceException($e->getMessage());
-        }
-
-        $this->createOrderLog($order, $data);
-        $this->dispatch("order.{$status}", $order);
-
-        return $order;
+        $order = $this->getOrderDao()->get($id);
+        return StatusFactory::instance($this->biz)->getStatusProcessor($order['status'])->setSignedFailOrder($id, $data);
     }
 
     public function getOrder($id)
