@@ -20,19 +20,11 @@ interface OrderService
 
     public function finishOrders();
 
-    public function signSuccessOrder($id, $data);
+    public function setOrderShipping($id, $data);
 
-    public function signFailOrder($id, $data);
+    public function setOrderSignedSuccess($id, $data);
 
-    public function applyItemRefund($id, $data);
-
-    public function applyRefund($orderId, $data);
-
-    public function finishRefund($id);
-
-    public function adoptRefund($id, $data);
-
-    public function refuseRefund($id, $data);
+    public function setOrderSignedFail($id, $data);
 
     public function getOrder($id);
 

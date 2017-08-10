@@ -11,15 +11,15 @@ class TradeAddRefund extends Migration
     {
         $biz = $this->getContainer();
         $db = $biz['db'];
-        if (!$this->isFieldExist('payment_trade', 'apply_refund_time')) {
+        if (!$this->isFieldExist('biz_payment_trade', 'apply_refund_time')) {
             $db->exec(
-                "ALTER TABLE `payment_trade` Add column `apply_refund_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '申请退款时间';"
+                "ALTER TABLE `biz_payment_trade` Add column `apply_refund_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '申请退款时间';"
             );
         }
 
-        if (!$this->isFieldExist('payment_trade', 'refund_success_time')) {
+        if (!$this->isFieldExist('biz_payment_trade', 'refund_success_time')) {
             $db->exec(
-                "ALTER TABLE `payment_trade` Add column `refund_success_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '成功退款时间';"
+                "ALTER TABLE `biz_payment_trade` Add column `refund_success_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '成功退款时间';"
             );
         }
     }

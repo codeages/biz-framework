@@ -123,7 +123,7 @@ class WechatGetway extends AbstractGetway
         $response = $request->send();
         $data = $request->getData();
 
-        if ($response->isPaid()) {
+        if ($response->isRefunded()) {
             return array(
                 array(
                     'status' => 'paid',

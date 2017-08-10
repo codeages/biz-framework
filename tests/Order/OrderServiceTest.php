@@ -155,7 +155,7 @@ class OrderServiceTest extends IntegrationTestCase
             'pay_time' => time()
         );
         $this->getOrderService()->setOrderPaid($data);
-        $this->getOrderService()->signSuccessOrder($order['id'], array());
+        $this->getOrderService()->setOrderSignedSuccess($order['id'], array());
         $order = $this->getOrderService()->finishOrder($order['id']);
 
         $this->assertEquals('finish', $order['status']);
@@ -165,67 +165,6 @@ class OrderServiceTest extends IntegrationTestCase
         foreach ($orderItems as $orderItem) {
             $this->assertEquals('finish', $orderItem['status']);
             $this->assertNotEmpty($orderItem['finish_time']);
-        }
-    }
-
-    /**
-     * @expectedException Codeages\Biz\Framework\Service\Exception\AccessDeniedException
-     */
-    public function testFinishOrderRefundWithoutCurrentUser()
-    {
-        $orderRefund = $this->mockOrderRefund();
-        unset($this->biz['user']);
-        $orderRefund = $this->getOrderService()->finishRefund($orderRefund['id'], array('deal_reason' => '对该课程不感兴趣'));
-    }
-
-    /**
-     * @expectedException Codeages\Biz\Framework\Service\Exception\AccessDeniedException
-     */
-    public function testRefuseOrderRefundWithoutCurrentUser()
-    {
-        $orderRefund = $this->mockOrderRefund();
-        unset($this->biz['user']);
-        $orderRefund = $this->getOrderService()->refuseRefund($orderRefund['id'], array('deal_reason' => '对该课程不感兴趣'));
-    }
-
-    public function testFinishOrderRefund()
-    {
-        $orderRefund = $this->mockOrderRefund();
-
-        $orderRefund = $this->getOrderService()->finishRefund($orderRefund['id'], array('deal_reason' => '对该课程不感兴趣'));
-        $this->assertEquals('finish', $orderRefund['status']);
-        $this->assertNotEmpty($orderRefund['deal_time']);
-        $this->assertNotEmpty($orderRefund['deal_reason']);
-        $this->assertEquals($this->biz['user']['id'], $orderRefund['deal_user_id']);
-    }
-
-    public function testRefuseOrderRefund()
-    {
-        $orderRefund = $this->mockOrderRefund();
-
-        $orderRefund = $this->getOrderService()->refuseRefund($orderRefund['id'], array('deal_reason' => '对该课程不感兴趣'));
-        $this->assertEquals('refused', $orderRefund['status']);
-        $this->assertNotEmpty($orderRefund['deal_time']);
-        $this->assertNotEmpty($orderRefund['deal_reason']);
-        $this->assertEquals($this->biz['user']['id'], $orderRefund['deal_user_id']);
-
-        $orderRefundItems = $this->getOrderItemRefundDao()->findByOrderRefundId($orderRefund['id']);
-        $this->assertEmpty($orderRefundItems);
-    }
-
-    public function testFinishOrderItemRefunds()
-    {
-        $orderRefund = $this->mockOrderItemRefunds();
-        $orderRefund = $this->getOrderService()->finishRefund($orderRefund['id'], array('deal_reason' => '对该课程不感兴趣'));
-        $this->assertEquals('finish', $orderRefund['status']);
-        $this->assertNotEmpty($orderRefund['deal_time']);
-        $this->assertNotEmpty($orderRefund['deal_reason']);
-        $this->assertEquals($this->biz['user']['id'], $orderRefund['deal_user_id']);
-
-        $orderRefundItems = $this->getOrderItemRefundDao()->findByOrderRefundId($orderRefund['id']);
-        $this->assertNotEmpty($orderRefundItems);
-        foreach ($orderRefundItems as $orderRefundItem) {
-            $this->assertEquals('finish', $orderRefundItem['status']);
         }
     }
 
@@ -252,7 +191,7 @@ class OrderServiceTest extends IntegrationTestCase
     {
         $mockedOrderItems = $this->mockOrderItems();
         $order = $this->getOrderService()->createOrder($this->mockOrder(), $mockedOrderItems);
-        $this->getOrderService()->signSuccessOrder($order['id'], array());
+        $this->getOrderService()->setOrderSignedSuccess($order['id'], array());
     }
 
     public function testSignOrder()
@@ -265,7 +204,7 @@ class OrderServiceTest extends IntegrationTestCase
             'pay_time' => time()
         );
         $this->getOrderService()->setOrderPaid($data);
-        $this->getOrderService()->signSuccessOrder($order['id'], array('message'=>'已经签收'));
+        $this->getOrderService()->setOrderSignedSuccess($order['id'], array('message'=>'已经签收'));
         $order = $this->getOrderService()->getOrder($order['id']);
         $this->assertEquals('signed', $order['status']);
         $this->assertNotEmpty($order['signed_time']);
@@ -281,7 +220,7 @@ class OrderServiceTest extends IntegrationTestCase
             'pay_time' => time()
         );
         $this->getOrderService()->setOrderPaid($data);
-        $this->getOrderService()->signFailOrder($order['id'], array('message'=>'已经签收'));
+        $this->getOrderService()->setOrderSignedFail($order['id'], array('message'=>'已经签收'));
         $order = $this->getOrderService()->getOrder($order['id']);
         $this->assertEquals('signed_fail', $order['status']);
         $this->assertNotEmpty($order['signed_time']);
@@ -457,46 +396,4 @@ class OrderServiceTest extends IntegrationTestCase
         return $this->biz->dao('Order:OrderItemRefundDao');
     }
 
-    /**
-     * @return mixed
-     */
-    public function mockOrderRefund()
-    {
-        $mockedOrderItems = $this->mockOrderItems();
-        $order = $this->getOrderService()->createOrder($this->mockOrder(), $mockedOrderItems);
-
-        $orderRefund = $this->getOrderService()->applyRefund($order['id'], array('reason' => '对该课程不感兴趣'));
-
-        $this->assertNotEmpty($orderRefund);
-        $this->assertNotEmpty($orderRefund['sn']);
-        $this->assertNotEmpty($orderRefund['created_user_id']);
-        $this->assertEquals($order['id'], $orderRefund['order_id']);
-        $this->assertEquals(0, $orderRefund['order_item_id']);
-        $this->assertEquals($this->biz['user']['id'], $orderRefund['user_id']);
-        $this->assertEquals($order['pay_amount'], $orderRefund['amount']);
-        $this->assertEquals('created', $orderRefund['status']);
-        return $orderRefund;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function mockOrderItemRefunds()
-    {
-        $mockedOrderItems = $this->mockOrderItems();
-        $order = $this->getOrderService()->createOrder($this->mockOrder(), $mockedOrderItems);
-        $orderItemIds = ArrayToolkit::column($order['items'], 'id');
-
-        $orderRefund = $this->getOrderService()->applyOrderItemsRefund($order['id'], $orderItemIds, array('reason' => '对该课程不感兴趣'));
-
-        $this->assertNotEmpty($orderRefund);
-        $this->assertNotEmpty($orderRefund['sn']);
-        $this->assertNotEmpty($orderRefund['created_user_id']);
-        $this->assertEquals($order['id'], $orderRefund['order_id']);
-        $this->assertEquals(0, $orderRefund['order_item_id']);
-        $this->assertEquals($this->biz['user']['id'], $orderRefund['user_id']);
-        $this->assertEquals($order['pay_amount'], $orderRefund['amount']);
-        $this->assertEquals('created', $orderRefund['status']);
-        return $orderRefund;
-    }
 }

@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use Codeages\Biz\Framework\Dao\ArrayStorage;
 use Codeages\Biz\Framework\Dao\Connection;
 use Codeages\Biz\Framework\Provider\OrderServiceProvider;
 use Codeages\Biz\Framework\Provider\PayServiceProvider;
@@ -104,11 +105,10 @@ class IntegrationTestCase extends TestCase
 
         if (getenv('CACHE_ARRAY_STORAGE_ENABLED')) {
             $biz['dao.cache.array_storage'] = function() {
-                return new Codeages\Biz\Framework\Dao\ArrayStorage();
+                return new ArrayStorage();
             };
         }
 
->>>>>>> master
         $biz->boot();
 
         return $biz;

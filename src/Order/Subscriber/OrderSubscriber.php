@@ -12,15 +12,23 @@ class OrderSubscriber extends EventSubscriber implements EventSubscriberInterfac
     {
         return array(
             'pay.success' => 'onPaid',
-            'order.paid' => 'onOrderPaid'
+            'order.paid' => 'onOrderPaid',
+            'trade.refunded' => 'onTradeRefunded'
         );
+    }
+
+    public function onTradeRefunded(Event $event)
+    {
+        $trade = $event->getSubject();
+        $orderSn = $trade['order_sn'];
+        $order = $this->getOrderService()->getOrderBySn($orderSn);
+        $this->getOrderService()->finishRefund($order['id']);
     }
 
     public function onOrderPaid(Event $event)
     {
         $order = $event->getSubject();
         $this->getOrderProcess()->process($order);
-
     }
 
     public function getOrderProcess()

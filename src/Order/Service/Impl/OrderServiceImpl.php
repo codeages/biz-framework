@@ -49,7 +49,7 @@ class OrderServiceImpl extends BaseService implements OrderService
         }
 
         $this->dispatch('order.created', $order);
-        $this->getTargetlogService()->log(TargetlogService::INFO, 'order.created', $order['sn'], "创建订单{$order['sn']}", $order);
+        $this->createOrderLog($order);
         return $order;
     }
 
@@ -157,13 +157,6 @@ class OrderServiceImpl extends BaseService implements OrderService
         return $savedDeducts;
     }
 
-    protected function validateLogin()
-    {
-        if (empty($this->biz['user']['id'])) {
-            throw new AccessDeniedException('user is not login.');
-        }
-    }
-
     protected function validateFields($order, $orderItems)
     {
         if (!ArrayToolkit::requireds($order, array('user_id'))) {
@@ -196,7 +189,7 @@ class OrderServiceImpl extends BaseService implements OrderService
             $order = $this->payOrder($data);
             $this->payOrderItems($order);
             $this->commit();
-            $this->getTargetlogService()->log(TargetlogService::INFO, 'order.paid', $order['sn'], "订单支付成功，订单号：{$order['sn']}，订单状态为{$order['status']}", $order);
+            $this->createOrderLog($order);
         } catch (AccessDeniedException $e) {
             $this->rollback();
             throw $e;
@@ -280,9 +273,9 @@ class OrderServiceImpl extends BaseService implements OrderService
             $this->rollback();
             throw new ServiceException($e->getMessage());
         }
+        $this->createOrderLog($order);
         $this->dispatch('order.closed', $order);
 
-        $this->getTargetlogService()->log(TargetlogService::INFO, 'order.close', $order['sn'], "关闭订单，订单号：{$order['sn']}", $order);
         return $order;
     }
 
@@ -333,10 +326,8 @@ class OrderServiceImpl extends BaseService implements OrderService
             $this->rollback();
             throw new ServiceException($e->getMessage());
         }
-
+        $this->createOrderLog($order);
         $this->dispatch('order.finished', $order);
-
-        $this->getTargetlogService()->log(TargetlogService::INFO, 'order.finish', $order['sn'], "完成订单，订单号：{$order['sn']}", $order);
         return $order;
     }
 
@@ -344,7 +335,7 @@ class OrderServiceImpl extends BaseService implements OrderService
     {
         $orders = $this->getOrderDao()->search(array(
             'pay_time_LT' => time()-2*60*60,
-            'status' => 'paid'
+            'status' => 'signed'
         ), array('id'=>'DESC'), 0, 1000);
 
         foreach ($orders as $order) {
@@ -352,12 +343,21 @@ class OrderServiceImpl extends BaseService implements OrderService
         }
     }
 
-    public function signSuccessOrder($id, $data)
+    public function setOrderShipping($id, $data)
+    {
+        $order = $this->getOrderDao()->update($id, array(
+            'status' => 'shipping',
+        ));
+        $this->createOrderLog($order, $data);
+        return $order;
+    }
+
+    public function setOrderSignedSuccess($id, $data)
     {
         return $this->signOrder($id, 'signed', $data);
     }
 
-    public function signFailOrder($id, $data)
+    public function setOrderSignedFail($id, $data)
     {
         return $this->signOrder($id, 'signed_fail', $data);
     }
@@ -401,144 +401,10 @@ class OrderServiceImpl extends BaseService implements OrderService
             throw new ServiceException($e->getMessage());
         }
 
+        $this->createOrderLog($order, $data);
         $this->dispatch("order.{$status}", $order);
 
-        $this->getTargetlogService()->log(TargetlogService::INFO, "order.{$status}", $order['sn'], "签收订单{$status}，订单号：{$order['sn']}", $order);
         return $order;
-    }
-
-    public function applyItemRefund($id, $data)
-    {
-        $this->validateLogin();
-        $orderItem = $this->getOrderItemDao()->get($id);
-        if (empty($orderItem)) {
-            throw $this->createNotFoundException("order_item #{$id} is not found");
-        }
-
-        $order = $this->getOrderDao()->get($orderItem['order_id']);
-        if (empty($order)) {
-            throw $this->createNotFoundException("order #{$orderItem['order_id']} is not found");
-        }
-
-        if ($this->biz['user']['id'] != $order['user_id']) {
-            throw $this->createAccessDeniedException("order #{$orderItem['order_id']} can not refund.");
-        }
-
-        $orderRefund = $this->getOrderRefundDao()->create(array(
-            'order_id' => $orderItem['order_id'],
-            'order_item_id' => $orderItem['id'],
-            'sn' => $this->generateSn(),
-            'user_id' => $order['user_id'],
-            'created_user_id' => $this->biz['user']['id'],
-            'reason' => empty($data['reason']) ? '' : $data['reason'],
-            'amount' => $order['amount']
-        ));
-        $this->dispatch('order_refund.created', $orderRefund);
-        return $orderRefund;
-    }
-
-    public function applyRefund($orderId, $data)
-    {
-        $orderRefund = $this->createOrderRefund($orderId, $data);
-
-        $this->dispatch('order_refund.created', $orderRefund);
-
-        return $orderRefund;
-    }
-
-    public function applyOrderItemsRefund($orderId, $orderItemIds, $data)
-    {
-        $orderRefund = $this->createOrderRefund($orderId, $data);
-        $totalAmount = 0;
-        $orderItemRefunds = array();
-        foreach ($orderItemIds as $orderItemId) {
-            $orderItem = $this->getOrderItemDao()->get($orderItemId);
-            $orderItemRefund = $this->getOrderItemRefundDao()->create(array(
-                'order_refund_id' => $orderRefund['id'],
-                'order_id' => $orderRefund['order_id'],
-                'order_item_id' => $orderItemId,
-                'user_id' => $orderRefund['user_id'],
-                'created_user_id' => $this->biz['user']['id'],
-                'amount' => $orderItem['pay_amount']
-            ));
-
-            $totalAmount = $totalAmount + $orderItem['pay_amount'];
-
-            $orderItemRefunds[] = $orderItemRefund;
-        }
-
-        $orderRefund = $this->getOrderRefundDao()->update($orderRefund['id'], array('amount' => $totalAmount));
-        $orderRefund['orderItemRefunds'] = $orderItemRefunds;
-        $this->dispatch('order_refund.created', $orderRefund);
-
-        return $orderRefund;
-    }
-
-    public function adoptRefund($id, $data)
-    {
-        $this->validateLogin();
-        $orderRefund = $this->getOrderRefundDao()->get($id);
-        if (empty($orderRefund)) {
-            throw $this->createNotFoundException("order_refund #{$id} is not found");
-        }
-
-        $orderRefund = $this->getOrderRefundDao()->update($id, array(
-            'deal_time' => time(),
-            'deal_user_id' => $this->biz['user']['id'],
-            'deal_reason' => empty($data['deal_reason']) ? '' : $data['deal_reason'],
-            'status' => 'adopt'
-        ));
-
-        $orderItemRefunds = $this->getOrderItemRefundDao()->findByOrderRefundId($orderRefund['id']);
-        foreach ($orderItemRefunds as $orderItemRefund) {
-            $this->getOrderItemRefundDao()->update($orderItemRefund['id'], array(
-                'status' => 'adopt'
-            ));
-        }
-
-        $this->dispatch('order_refund.adopted', $orderRefund);
-        return $orderRefund;
-    }
-
-    public function refuseRefund($id, $data)
-    {
-        $this->validateLogin();
-        $orderRefund = $this->getOrderRefundDao()->get($id);
-        if (empty($orderRefund)) {
-            throw $this->createNotFoundException("order_refund #{$id} is not found");
-        }
-
-        $orderRefund = $this->getOrderRefundDao()->update($id, array(
-            'deal_time' => time(),
-            'deal_user_id' => $this->biz['user']['id'],
-            'deal_reason' => empty($data['deal_reason']) ? '' : $data['deal_reason'],
-            'status' => 'refused'
-        ));
-
-        $this->dispatch('order_refund.refused', $orderRefund);
-        return $orderRefund;
-    }
-
-    public function finishRefund($id)
-    {
-        $orderRefund = $this->getOrderRefundDao()->get($id);
-        if (empty($orderRefund)) {
-            throw $this->createNotFoundException("order_refund #{$id} is not found");
-        }
-
-        $orderRefund = $this->getOrderRefundDao()->update($id, array(
-            'status' => 'finish'
-        ));
-
-        $orderItemRefunds = $this->getOrderItemRefundDao()->findByOrderRefundId($orderRefund['id']);
-        foreach ($orderItemRefunds as $orderItemRefund) {
-            $this->getOrderItemRefundDao()->update($orderItemRefund['id'], array(
-                'status' => 'finish'
-            ));
-        }
-
-        $this->dispatch('order_refund.finished', $orderRefund);
-        return $orderRefund;
     }
 
     public function getOrder($id)
@@ -576,6 +442,28 @@ class OrderServiceImpl extends BaseService implements OrderService
         return $this->getOrderDao()->findByIds($ids);
     }
 
+    public function getOrderRefund($id) {
+        return $this->getOrderRefundDao()->get($id);
+    }
+
+    protected function validateLogin()
+    {
+        if (empty($this->biz['user']['id'])) {
+            throw new AccessDeniedException('user is not login.');
+        }
+    }
+
+    protected function createOrderLog($order, $dealData = array())
+    {
+        $orderLog = array(
+            'status' => $order['status'],
+            'order_id' => $order['id'],
+            'user_id' => $this->biz['user']['id'],
+            'deal_data' => $dealData
+        );
+        return $this->getOrderLogDao()->create($orderLog);
+    }
+
     protected function getOrderDao()
     {
         return $this->biz->dao('Order:OrderDao');
@@ -591,43 +479,18 @@ class OrderServiceImpl extends BaseService implements OrderService
         return $this->biz->dao('Order:OrderItemDao');
     }
 
+    protected function getOrderLogDao()
+    {
+        return $this->biz->dao('Order:OrderLogDao');
+    }
+
     protected function getOrderItemDeductDao()
     {
         return $this->biz->dao('Order:OrderItemDeductDao');
     }
 
-    protected function getTargetlogService()
-    {
-        return $this->biz->service('Targetlog:TargetlogService');
-    }
-
     protected function getOrderItemRefundDao()
     {
         return $this->biz->dao('Order:OrderItemRefundDao');
-    }
-
-    protected function createOrderRefund($orderId, $data)
-    {
-        $this->validateLogin();
-        $order = $this->getOrderDao()->get($orderId);
-        if (empty($order)) {
-            throw $this->createNotFoundException("order #{$orderId} is not found.");
-        }
-
-        if ($this->biz['user']['id'] != $order['user_id']) {
-            throw $this->createAccessDeniedException("order #{$orderId} can not refund.");
-        }
-
-        $orderRefund = $this->getOrderRefundDao()->create(array(
-            'order_id' => $order['id'],
-            'order_item_id' => 0,
-            'sn' => $this->generateSn(),
-            'user_id' => $order['user_id'],
-            'created_user_id' => $this->biz['user']['id'],
-            'reason' => empty($data['reason']) ? '' : $data['reason'],
-            'amount' => $order['pay_amount'],
-        ));
-
-        return $orderRefund;
     }
 }

@@ -304,7 +304,7 @@ class PayServiceImpl extends BaseService implements PayService
         }
 
         if ((time() - $trade['pay_time']) > 86400) {
-            throw new AccessDeniedException('can not refund, becourse the paid trade is too old.');
+            throw new AccessDeniedException('can not refund, becourse the paid trade is expired.');
         }
 
         $paymentGetWay = $this->getPayment($trade['platform']);
