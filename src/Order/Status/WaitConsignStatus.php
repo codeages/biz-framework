@@ -11,10 +11,10 @@ class WaitConsignStatus extends AbstractStatus
         return array('paid');
     }
 
-    public function process($orderId, $data)
+    public function process($orderId, $data = array())
     {
         $order = $this->getOrderDao()->update($orderId, array(
-            'status' => 'wait_consign',
+            'status' => 'wait_consign'
         ));
         return $order;
     }

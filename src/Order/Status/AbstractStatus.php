@@ -20,7 +20,7 @@ abstract class AbstractStatus
 
     abstract public function getPriorStatus();
 
-    abstract public function process($orderId, $data);
+    abstract public function process($orderId, $data = array());
 
     public function __call($method, $arguments)
     {
@@ -32,20 +32,20 @@ abstract class AbstractStatus
         }
 
         try {
-            $this->biz['db']->beginTransaction();
-            $order = call_user_func_array(array($nextStatusProcessor, 'process'), $arguments);
-            $this->biz['db']->commit();
+//            $this->biz['db']->beginTransaction();
+            $order = $nextStatusProcessor->process($arguments[0], $arguments[1]);
+//            $this->biz['db']->commit();
         } catch (AccessDeniedException $e) {
-            $this->biz['db']->rollback();
+//            $this->biz['db']->rollback();
             throw $e;
         } catch (InvalidArgumentException $e) {
-            $this->biz['db']->rollback();
+//            $this->biz['db']->rollback();
             throw $e;
         } catch (NotFoundException $e) {
-            $this->biz['db']->rollback();
+//            $this->biz['db']->rollback();
             throw $e;
         } catch (\Exception $e) {
-            $this->biz['db']->rollback();
+//            $this->biz['db']->rollback();
             throw new ServiceException($e->getMessage());
         }
 

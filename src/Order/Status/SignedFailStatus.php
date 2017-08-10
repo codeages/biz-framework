@@ -11,7 +11,7 @@ class SignedFailStatus extends AbstractStatus
         return array('consign');
     }
 
-    public function process($orderId, $data)
+    public function process($orderId, $data = array())
     {
         $this->getOrderDao()->get($orderId, array('lock'=>true));
 

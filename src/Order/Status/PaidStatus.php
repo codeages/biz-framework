@@ -10,7 +10,7 @@ class PaidStatus extends AbstractStatus
         return array('created');
     }
 
-    public function process($orderId, $data)
+    public function process($orderId, $data = array())
     {
 
     }

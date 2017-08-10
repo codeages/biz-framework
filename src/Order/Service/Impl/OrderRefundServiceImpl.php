@@ -170,7 +170,7 @@ class OrderRefundServiceImpl extends BaseService implements OrderRefundService
         }
 
         if ($order['status'] != 'signed') {
-            throw $this->createAccessDeniedException("order #{$order['id']} status is not signed.");
+            throw $this->createAccessDeniedException("order #${$order['id']} status is not signed.");
         }
 
         if ($this->biz['user']['id'] != $order['user_id']) {

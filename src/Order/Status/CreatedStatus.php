@@ -10,7 +10,7 @@ class CreatedStatus extends AbstractStatus
         return array();
     }
 
-    public function process($orderId, $data)
+    public function process($orderId, $data = array())
     {
 
     }
