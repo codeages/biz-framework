@@ -25,27 +25,27 @@ abstract class AbstractStatus
     public function __call($method, $arguments)
     {
         $status = $this->getNextStatusName($method);
-        $nextStatusProcessor = $this->biz['order_status.factory']->getStatusProcessor($status);
+        $nextStatusProcessor = $this->biz["order_status.{$status}"];
 
         if (!in_array($this->status, $nextStatusProcessor->getPriorStatus())) {
             throw new AccessDeniedException("can't change {$this->status} to {$status}.");
         }
 
         try {
-//            $this->biz['db']->beginTransaction();
+            $this->biz['db']->beginTransaction();
             $order = $nextStatusProcessor->process($arguments[0], $arguments[1]);
-//            $this->biz['db']->commit();
+            $this->biz['db']->commit();
         } catch (AccessDeniedException $e) {
-//            $this->biz['db']->rollback();
+            $this->biz['db']->rollback();
             throw $e;
         } catch (InvalidArgumentException $e) {
-//            $this->biz['db']->rollback();
+            $this->biz['db']->rollback();
             throw $e;
         } catch (NotFoundException $e) {
-//            $this->biz['db']->rollback();
+            $this->biz['db']->rollback();
             throw $e;
         } catch (\Exception $e) {
-//            $this->biz['db']->rollback();
+            $this->biz['db']->rollback();
             throw new ServiceException($e->getMessage());
         }
 
