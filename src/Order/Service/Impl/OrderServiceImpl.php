@@ -354,25 +354,25 @@ class OrderServiceImpl extends BaseService implements OrderService
     public function setOrderWaitConsign($id, $data)
     {
         $order = $this->getOrderDao()->get($id);
-        return StatusFactory::instance($this->biz)->getStatusProcessor($order['status'])->setWaitConsignOrder($id, $data);
+        return $this->biz['order_status.factory']->getStatusProcessor($order['status'])->setWaitConsignOrder($id, $data);
     }
 
     public function setOrderConsign($id, $data)
     {
         $order = $this->getOrderDao()->get($id);
-        return StatusFactory::instance($this->biz)->getStatusProcessor($order['status'])->setConsignOrder($id, $data);
+        return $this->biz['order_status.factory']->getStatusProcessor($order['status'])->setConsignOrder($id, $data);
     }
 
     public function setOrderSignedSuccess($id, $data)
     {
         $order = $this->getOrderDao()->get($id);
-        return StatusFactory::instance($this->biz)->getStatusProcessor($order['status'])->setSignedFailOrder($id, $data);
+        return $this->biz['order_status.factory']->getStatusProcessor($order['status'])->setSignedOrder($id, $data);
     }
 
     public function setOrderSignedFail($id, $data)
     {
         $order = $this->getOrderDao()->get($id);
-        return StatusFactory::instance($this->biz)->getStatusProcessor($order['status'])->setSignedFailOrder($id, $data);
+        return $this->biz['order_status.factory']->getStatusProcessor($order['status'])->setSignedFailOrder($id, $data);
     }
 
     public function getOrder($id)

@@ -12,14 +12,6 @@ class StatusFactory
         $this->biz = $biz;
     }
 
-    public static function instance($biz)
-    {
-        if(empty(self::$factory)) {
-            self::$factory = new StatusFactory($biz);
-        }
-        return self::$factory;
-    }
-
     public function getStatusProcessor($status)
     {
         return $this->biz["order_status.{$status}"];

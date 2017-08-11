@@ -25,7 +25,7 @@ abstract class AbstractStatus
     public function __call($method, $arguments)
     {
         $status = $this->getNextStatusName($method);
-        $nextStatusProcessor = StatusFactory::instance($this->biz)->getStatusProcessor($status);
+        $nextStatusProcessor = $this->biz['order_status.factory']->getStatusProcessor($status);
 
         if (!in_array($this->status, $nextStatusProcessor->getPriorStatus())) {
             throw new AccessDeniedException("can't change {$this->status} to {$status}.");

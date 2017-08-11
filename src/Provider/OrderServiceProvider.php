@@ -8,6 +8,7 @@ use Codeages\Biz\Framework\Order\Status\CreatedStatus;
 use Codeages\Biz\Framework\Order\Status\PaidStatus;
 use Codeages\Biz\Framework\Order\Status\SignedFailStatus;
 use Codeages\Biz\Framework\Order\Status\SignedStatus;
+use Codeages\Biz\Framework\Order\Status\StatusFactory;
 use Codeages\Biz\Framework\Order\Status\WaitConsignStatus;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
@@ -45,6 +46,10 @@ class OrderServiceProvider implements ServiceProviderInterface
 
         $biz['order_status.signed_fail'] = function ($biz) {
             return new SignedFailStatus($biz);
+        };
+
+        $biz['order_status.factory'] = function ($biz) {
+            return new StatusFactory($biz);
         };
     }
 }
