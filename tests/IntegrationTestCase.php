@@ -42,6 +42,7 @@ class IntegrationTestCase extends TestCase
     {
         $this->biz = $this->createBiz();
         $this->db = $this->biz['db'];
+
         $this->redis = $this->biz['redis'];
 
         $this->db->beginTransaction();

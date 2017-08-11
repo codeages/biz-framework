@@ -354,7 +354,6 @@ class OrderServiceImpl extends BaseService implements OrderService
     public function setOrderWaitConsign($id, $data)
     {
         $order = $this->getOrderDao()->get($id);
-        return $this->biz['order_status.consign']->process($id, $data);
         return StatusFactory::instance($this->biz)->getStatusProcessor($order['status'])->setWaitConsignOrder($id, $data);
     }
 
