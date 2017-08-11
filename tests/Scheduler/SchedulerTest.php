@@ -278,10 +278,7 @@ class SchedulerTest extends IntegrationTestCase
 
         $job = $this->getSchedulerService()->register($job);
         $this->getSchedulerService()->execute();
-        $this->getJobFiredDao()->update(array('job_id' => $job['id']), array(
-            'status' => 'executing',
-            'fired_time' => time()-2
-        ));
+        $this->mockUnReleasePool($job);
 
         $options = $this->biz['scheduler.options'];
         $options['timeout'] = 1;
@@ -291,6 +288,18 @@ class SchedulerTest extends IntegrationTestCase
         $savedJob = $this->getJobDao()->get($job['id']);
         $jobFireds = $this->getSchedulerService()->findJobFiredsByJobId($savedJob['id']);
         $this->assertEquals('timeout', $jobFireds[0]['status']);
+    }
+
+    protected function wavePoolNum($id, $diff)
+    {
+        $ids = array($id);
+        $diff = array('num' => $diff);
+        $this->getJobPoolDao()->wave($ids, $diff);
+    }
+
+    protected function getJobPoolDao()
+    {
+        return $this->biz->dao('Scheduler:JobPoolDao');
     }
 
     protected function asserts($excepted, $acturel)
@@ -317,5 +326,19 @@ class SchedulerTest extends IntegrationTestCase
     protected function getSchedulerService()
     {
         return $this->biz->service('Scheduler:SchedulerService');
+    }
+
+    /**
+     * @param $job
+     */
+    protected function mockUnReleasePool($job)
+    {
+        $this->getJobFiredDao()->update(array('job_id' => $job['id']), array(
+            'status' => 'executing',
+            'fired_time' => time() - 2
+        ));
+
+        $jobPool = $this->getJobPoolDao()->getByName($job['pool']);
+        $this->wavePoolNum($jobPool['id'], 1);
     }
 }

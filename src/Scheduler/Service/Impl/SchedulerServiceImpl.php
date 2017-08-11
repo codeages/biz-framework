@@ -401,8 +401,13 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
     }
 
     protected function markTimout($jobFired) {
+
+
         $jobFired = $this->getJobFiredDao()->update($jobFired['id'], array('status' => 'timeout'));
         $jobFired['job'] = $this->getJobDao()->get($jobFired['job_id']);
+
+        $this->getJobPool()->release($jobFired['job']);
+
         $this->createJobLog($jobFired, 'timeout');
     }
 
