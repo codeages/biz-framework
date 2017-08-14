@@ -41,14 +41,6 @@ class OrderServiceProvider implements ServiceProviderInterface
             return new ClosedStatus($biz);
         };
 
-        $biz['order_status.signed'] = function ($biz) {
-            return new SignedStatus($biz);
-        };
-
-        $biz['order_status.signed_fail'] = function ($biz) {
-            return new SignedFailStatus($biz);
-        };
-
         $biz['order_status.finish'] = function ($biz) {
             return new FinishStatus($biz);
         };

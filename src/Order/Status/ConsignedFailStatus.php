@@ -2,13 +2,28 @@
 
 namespace Codeages\Biz\Framework\Order\Status;
 
-class SignedStatus extends AbstractStatus
+class ConsignedFailStatus extends AbstractStatus
 {
-    const NAME = 'signed';
+    const NAME = 'consigned_fail';
 
     public function getPriorStatus()
     {
-        return array(ConsignedStatus::NAME);
+        return array(PaidStatus::NAME);
+    }
+
+    public function consigned()
+    {
+        $order = $this->getOrderDao()->update($this->order['id'], array(
+            'status' => ConsignedStatus::NAME
+        ));
+
+        $items = $this->getOrderItemDao()->findByOrderId($this->order['id']);
+        foreach ($items as $item) {
+            $this->getOrderItemDao()->update($item['id'], array(
+                'status' => ConsignedStatus::NAME,
+            ));
+        }
+        return $order;
     }
 
     public function finish()
@@ -27,10 +42,5 @@ class SignedStatus extends AbstractStatus
             ));
         }
         return $order;
-    }
-
-    protected function getOrderItemDao()
-    {
-        return $this->biz->dao('Order:OrderItemDao');
     }
 }

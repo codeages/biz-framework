@@ -230,14 +230,9 @@ class OrderServiceImpl extends BaseService implements OrderService
         return $this->getOrderContext($id)->consigned();
     }
 
-    public function setOrderSignedSuccess($id, $data)
+    public function setOrderConsignedFail($id, $data)
     {
-        return $this->getOrderContext($id)->signed($data);
-    }
-
-    public function setOrderSignedFail($id, $data)
-    {
-        return $this->getOrderContext($id)->signedFail($data);
+        return $this->getOrderContext($id)->consignedFail($data);
     }
 
     public function getOrder($id)

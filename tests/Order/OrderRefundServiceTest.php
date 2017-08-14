@@ -90,7 +90,7 @@ class OrderRefundServiceTest extends IntegrationTestCase
         );
         $this->getOrderService()->setOrderPaid($data);
         $this->getOrderService()->setOrderConsign($order['id'], array());
-        $this->getOrderService()->setOrderSignedSuccess($order['id'], array('message'=>'已经签收'));
+        $this->getOrderService()->finishOrder($order['id'], array());
         $orderRefund = $this->getOrderRefundService()->applyOrderRefund($order['id'], array('reason' => '对该课程不感兴趣'));
         $this->assertNotEmpty($orderRefund);
         $this->assertNotEmpty($orderRefund['sn']);
@@ -117,8 +117,7 @@ class OrderRefundServiceTest extends IntegrationTestCase
         );
         $this->getOrderService()->setOrderPaid($data);
         $this->getOrderService()->setOrderConsign($order['id'], array());
-        $this->getOrderService()->setOrderSignedSuccess($order['id'], array('message'=>'已经签收'));
-
+        $this->getOrderService()->finishOrder($order['id'], array());
         $orderItemIds = ArrayToolkit::column($order['items'], 'id');
         $orderRefund = $this->getOrderRefundService()->applyOrderItemsRefund($order['id'], $orderItemIds, array('reason' => '对该课程不感兴趣'));
 

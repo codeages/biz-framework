@@ -22,7 +22,7 @@ interface OrderService
 
     public function setOrderConsign($id, $data);
 
-    public function setOrderSignedFail($id, $data);
+    public function setOrderConsignedFail($id, $data);
 
     public function getOrder($id);
 

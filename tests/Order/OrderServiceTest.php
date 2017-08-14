@@ -156,7 +156,6 @@ class OrderServiceTest extends IntegrationTestCase
         );
         $this->getOrderService()->setOrderPaid($data);
         $this->getOrderService()->setOrderConsign($order['id'], array());
-        $this->getOrderService()->setOrderSignedSuccess($order['id'], array());
         $order = $this->getOrderService()->finishOrder($order['id']);
 
         $this->assertEquals('finish', $order['status']);
@@ -183,51 +182,6 @@ class OrderServiceTest extends IntegrationTestCase
         $order = $this->getOrderService()->createOrder($this->mockOrder(), $mockedOrderItems);
         $count = $this->getOrderService()->countOrderItems([]);
         $this->assertEquals(2, $count);
-    }
-
-    /**
-     * @expectedException Codeages\Biz\Framework\Service\Exception\AccessDeniedException
-     */
-    public function testSignOrderWhenNotPaid()
-    {
-        $mockedOrderItems = $this->mockOrderItems();
-        $order = $this->getOrderService()->createOrder($this->mockOrder(), $mockedOrderItems);
-
-        $this->getOrderService()->setOrderSignedSuccess($order['id'], array());
-    }
-
-    public function testSignOrder()
-    {
-        $mockedOrderItems = $this->mockOrderItems();
-        $order = $this->getOrderService()->createOrder($this->mockOrder(), $mockedOrderItems);
-        $data = array(
-            'order_sn' => $order['sn'],
-            'trade_sn' => '1234567',
-            'pay_time' => time()
-        );
-        $this->getOrderService()->setOrderPaid($data);
-        $this->getOrderService()->setOrderConsign($order['id'], array());
-        $this->getOrderService()->setOrderSignedSuccess($order['id'], array('message'=>'已经签收'));
-        $order = $this->getOrderService()->getOrder($order['id']);
-        $this->assertEquals('signed', $order['status']);
-        $this->assertNotEmpty($order['signed_time']);
-    }
-
-    public function testSignFailOrder()
-    {
-        $mockedOrderItems = $this->mockOrderItems();
-        $order = $this->getOrderService()->createOrder($this->mockOrder(), $mockedOrderItems);
-        $data = array(
-            'order_sn' => $order['sn'],
-            'trade_sn' => '1234567',
-            'pay_time' => time()
-        );
-        $this->getOrderService()->setOrderPaid($data);
-        $this->getOrderService()->setOrderConsign($order['id'], array());
-        $this->getOrderService()->setOrderSignedFail($order['id'], array('message'=>'已经签收'));
-        $order = $this->getOrderService()->getOrder($order['id']);
-        $this->assertEquals('signed_fail', $order['status']);
-        $this->assertNotEmpty($order['signed_time']);
     }
 
     protected function assertCreatedOrder($mockOrder, $mockedOrderItems, $order)

@@ -8,6 +8,6 @@ class FinishStatus extends AbstractStatus
 
     public function getPriorStatus()
     {
-        return array(SignedStatus::NAME);
+        return array(ConsignedStatus::NAME);
     }
 }
