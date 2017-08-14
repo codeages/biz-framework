@@ -4,14 +4,18 @@ namespace Codeages\Biz\Framework\Order\Status;
 
 class PaidStatus extends AbstractStatus
 {
-    protected $status = 'paid';
+    public $status = 'paid';
+
     public function getPriorStatus()
     {
         return array('created');
     }
 
-    public function process($orderId, $data = array())
+    public function waitConsign()
     {
-
+        $order = $this->getOrderDao()->update($this->order['id'], array(
+            'status' => 'wait_consign'
+        ));
+        return $order;
     }
 }

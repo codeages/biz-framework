@@ -178,61 +178,8 @@ class OrderServiceImpl extends BaseService implements OrderService
 
     public function setOrderPaid($data)
     {
-        $data = ArrayToolkit::parts($data, array(
-            'order_sn',
-            'trade_sn',
-            'pay_time'
-        ));
-
-        try {
-            $this->beginTransaction();
-            $order = $this->getOrderBySn($data['order_sn'], true);
-            if ($order['status'] == 'paid') {
-                return;
-            }
-
-            if ($order['status'] != 'created') {
-                throw $this->createAccessDeniedException('status is not created.');
-            }
-
-            $order = $this->payOrder($order, $data);
-            $this->payOrderItems($order);
-            $this->commit();
-            $this->createOrderLog($order);
-        } catch (AccessDeniedException $e) {
-            $this->rollback();
-            throw $e;
-        } catch (InvalidArgumentException $e) {
-            $this->rollback();
-            throw $e;
-        } catch (NotFoundException $e) {
-            $this->rollback();
-            throw $e;
-        } catch (\Exception $e) {
-            $this->rollback();
-            throw new ServiceException($e);
-        }
-        $this->dispatch('order.paid', $order);
-    }
-
-    protected function payOrder($order, $data)
-    {
-        $data = ArrayToolkit::parts($data, array(
-            'trade_sn',
-            'pay_time'
-        ));
-        $data['status'] = 'paid';
-        return $this->getOrderDao()->update($order['id'], $data);
-    }
-
-    protected function payOrderItems($order)
-    {
-        $items = $this->getOrderItemDao()->findByOrderId($order['id']);
-        $fields = ArrayToolkit::parts($order, array('status'));
-        $fields['pay_time'] = $order['pay_time'];
-        foreach ($items as $item) {
-            $this->getOrderItemDao()->update($item['id'], $fields);
-        }
+        $order = $this->getOrderDao()->getBySn($data['order_sn']);
+        return $this->getOrderContext($order['id'])->paid($data);
     }
 
     public function findOrderItemsByOrderId($orderId)
@@ -247,44 +194,7 @@ class OrderServiceImpl extends BaseService implements OrderService
 
     public function closeOrder($id)
     {
-        try {
-            $this->beginTransaction();
-            $order = $this->getOrderDao()->get($id, array('lock' => true));
-            if ('created' != $order['status']) {
-                throw $this->createAccessDeniedException('status is not created.');
-            }
-
-            $closeTime = time();
-            $order = $this->getOrderDao()->update($id, array(
-                'status' => 'close',
-                'close_time' => $closeTime
-            ));
-
-            $items = $this->findOrderItemsByOrderId($id);
-            foreach ($items as $item) {
-                $this->getOrderItemDao()->update($item['id'], array(
-                    'status' => 'close',
-                    'close_time' => $closeTime
-                ));
-            }
-            $this->commit();
-        } catch (AccessDeniedException $e) {
-            $this->rollback();
-            throw $e;
-        } catch (InvalidArgumentException $e) {
-            $this->rollback();
-            throw $e;
-        } catch (NotFoundException $e) {
-            $this->rollback();
-            throw $e;
-        } catch (\Exception $e) {
-            $this->rollback();
-            throw new ServiceException($e->getMessage());
-        }
-        $this->createOrderLog($order);
-        $this->dispatch('order.closed', $order);
-
-        return $order;
+        return $this->getOrderContext($id)->closed();
     }
 
     public function closeOrders()
@@ -300,43 +210,7 @@ class OrderServiceImpl extends BaseService implements OrderService
 
     public function finishOrder($id)
     {
-        try {
-            $this->beginTransaction();
-            $order = $this->getOrderDao()->get($id, array('lock'=>true));
-            if ('signed' != $order['status']) {
-                throw $this->createAccessDeniedException('status is not paid.');
-            }
-
-            $finishTime = time();
-            $order = $this->getOrderDao()->update($id, array(
-                'status' => 'finish',
-                'finish_time' => $finishTime
-            ));
-
-            $items = $this->findOrderItemsByOrderId($id);
-            foreach ($items as $item) {
-                $this->getOrderItemDao()->update($item['id'], array(
-                    'status' => 'finish',
-                    'finish_time' => $finishTime
-                ));
-            }
-            $this->commit();
-        } catch (AccessDeniedException $e) {
-            $this->rollback();
-            throw $e;
-        } catch (InvalidArgumentException $e) {
-            $this->rollback();
-            throw $e;
-        } catch (NotFoundException $e) {
-            $this->rollback();
-            throw $e;
-        } catch (\Exception $e) {
-            $this->rollback();
-            throw new ServiceException($e->getMessage());
-        }
-        $this->createOrderLog($order);
-        $this->dispatch('order.finished', $order);
-        return $order;
+        return $this->getOrderContext($id)->finish();
     }
 
     public function finishOrders()
@@ -353,26 +227,22 @@ class OrderServiceImpl extends BaseService implements OrderService
 
     public function setOrderWaitConsign($id, $data)
     {
-        $order = $this->getOrderDao()->get($id);
-        return $this->biz["order_status.{$order['status']}"]->setWaitConsignOrder($id, $data);
+        return $this->getOrderContext($id)->waitConsign();
     }
 
     public function setOrderConsign($id, $data)
     {
-        $order = $this->getOrderDao()->get($id);
-        return $this->biz["order_status.{$order['status']}"]->setConsignOrder($id, $data);
+        return $this->getOrderContext($id)->consigned();
     }
 
     public function setOrderSignedSuccess($id, $data)
     {
-        $order = $this->getOrderDao()->get($id);
-        return $this->biz["order_status.{$order['status']}"]->setSignedOrder($id, $data);
+        return $this->getOrderContext($id)->signed($data);
     }
 
     public function setOrderSignedFail($id, $data)
     {
-        $order = $this->getOrderDao()->get($id);
-        return $this->biz["order_status.{$order['status']}"]->setSignedFailOrder($id, $data);
+        return $this->getOrderContext($id)->signedFail($data);
     }
 
     public function getOrder($id)
@@ -412,6 +282,13 @@ class OrderServiceImpl extends BaseService implements OrderService
 
     public function getOrderRefund($id) {
         return $this->getOrderRefundDao()->get($id);
+    }
+
+    protected function getOrderContext($id)
+    {
+        $orderContext = $this->biz['order_context'];
+        $orderContext->setOrder($this->getOrderDao()->get($id));
+        return $orderContext;
     }
 
     protected function validateLogin()

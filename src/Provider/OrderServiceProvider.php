@@ -3,12 +3,13 @@
 namespace Codeages\Biz\Framework\Provider;
 
 use Codeages\Biz\Framework\Order\Status\CloseStatus;
-use Codeages\Biz\Framework\Order\Status\ConsignStatus;
+use Codeages\Biz\Framework\Order\Status\ConsignedStatus;
 use Codeages\Biz\Framework\Order\Status\CreatedStatus;
+use Codeages\Biz\Framework\Order\Status\FinishStatus;
+use Codeages\Biz\Framework\Order\Status\OrderContext;
 use Codeages\Biz\Framework\Order\Status\PaidStatus;
 use Codeages\Biz\Framework\Order\Status\SignedFailStatus;
 use Codeages\Biz\Framework\Order\Status\SignedStatus;
-use Codeages\Biz\Framework\Order\Status\StatusFactory;
 use Codeages\Biz\Framework\Order\Status\WaitConsignStatus;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
@@ -20,8 +21,12 @@ class OrderServiceProvider implements ServiceProviderInterface
         $biz['migration.directories'][] = dirname(dirname(__DIR__)).'/migrations/order';
         $biz['autoload.aliases']['Order'] = 'Codeages\Biz\Framework\Order';
 
-        $biz['order_status.consign'] = function ($biz) {
-            return new ConsignStatus($biz);
+        $biz['order_context'] = function ($biz) {
+            return new OrderContext($biz);
+        };
+
+        $biz['order_status.consigned'] = function ($biz) {
+            return new ConsignedStatus($biz);
         };
 
         $biz['order_status.wait_consign'] = function ($biz) {
@@ -36,7 +41,7 @@ class OrderServiceProvider implements ServiceProviderInterface
             return new PaidStatus($biz);
         };
 
-        $biz['order_status.close'] = function ($biz) {
+        $biz['order_status.closed'] = function ($biz) {
             return new CloseStatus($biz);
         };
 
@@ -48,8 +53,8 @@ class OrderServiceProvider implements ServiceProviderInterface
             return new SignedFailStatus($biz);
         };
 
-        $biz['order_status.factory'] = function ($biz) {
-            return new StatusFactory($biz);
+        $biz['order_status.finish'] = function ($biz) {
+            return new FinishStatus($biz);
         };
     }
 }

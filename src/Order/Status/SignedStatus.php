@@ -8,25 +8,22 @@ class SignedStatus extends AbstractStatus
 
     public function getPriorStatus()
     {
-        return array('consign');
+        return array('consigned');
     }
 
-    public function process($orderId, $data = array())
+    public function finish()
     {
-        $this->getOrderDao()->get($orderId, array('lock'=>true));
-
-        $signedTime = time();
-        $order = $this->getOrderDao()->update($orderId, array(
-            'status' => 'signed',
-            'signed_time' => $signedTime,
-            'signed_data' => $data
+        $finishTime = time();
+        $order = $this->getOrderDao()->update($this->order['id'], array(
+            'status' => 'finish',
+            'finish_time' => $finishTime
         ));
-        $items = $this->getOrderItemDao()->findByOrderId($orderId);
+
+        $items = $this->getOrderItemDao()->findByOrderId($this->order['id']);
         foreach ($items as $item) {
             $this->getOrderItemDao()->update($item['id'], array(
-                'status' => 'signed',
-                'signed_time' => $signedTime,
-                'signed_data' => $data
+                'status' => 'finish',
+                'finish_time' => $finishTime
             ));
         }
         return $order;

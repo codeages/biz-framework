@@ -2,12 +2,12 @@
 
 namespace Codeages\Biz\Framework\Order\Status;
 
-class CloseStatus extends AbstractStatus
+class FinishStatus extends AbstractStatus
 {
-    protected $status = 'closed';
+    protected $status = 'finish';
 
     public function getPriorStatus()
     {
-        return array('created');
+        return array('signed');
     }
 }
