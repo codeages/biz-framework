@@ -4,10 +4,10 @@ namespace Codeages\Biz\Framework\Order\Status;
 
 class FinishStatus extends AbstractStatus
 {
-    protected $status = 'finish';
+    const NAME = 'finish';
 
     public function getPriorStatus()
     {
-        return array('signed');
+        return array(SignedStatus::NAME);
     }
 }

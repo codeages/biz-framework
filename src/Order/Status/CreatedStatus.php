@@ -6,7 +6,7 @@ use Codeages\Biz\Framework\Util\ArrayToolkit;
 
 class CreatedStatus extends AbstractStatus
 {
-    protected $status = 'created';
+    const NAME = 'created';
 
     public function getPriorStatus()
     {
@@ -17,14 +17,14 @@ class CreatedStatus extends AbstractStatus
     {
         $closeTime = time();
         $order = $this->getOrderDao()->update($this->order['id'], array(
-            'status' => 'close',
+            'status' => ClosedStatus::NAME,
             'close_time' => $closeTime
         ));
 
         $items = $this->getOrderItemDao()->findByOrderId($this->order['id']);
         foreach ($items as $item) {
             $this->getOrderItemDao()->update($item['id'], array(
-                'status' => 'close',
+                'status' => ClosedStatus::NAME,
                 'close_time' => $closeTime
             ));
         }
@@ -52,7 +52,7 @@ class CreatedStatus extends AbstractStatus
             'trade_sn',
             'pay_time'
         ));
-        $data['status'] = 'paid';
+        $data['status'] = PaidStatus::NAME;
         return $this->getOrderDao()->update($order['id'], $data);
     }
 

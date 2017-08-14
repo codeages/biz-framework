@@ -13,6 +13,8 @@ abstract class AbstractStatus
     protected $biz;
     protected $order;
 
+    const NAME = '';
+
     function __construct($biz)
     {
         $this->biz = $biz;

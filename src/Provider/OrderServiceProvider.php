@@ -2,7 +2,7 @@
 
 namespace Codeages\Biz\Framework\Provider;
 
-use Codeages\Biz\Framework\Order\Status\CloseStatus;
+use Codeages\Biz\Framework\Order\Status\ClosedStatus;
 use Codeages\Biz\Framework\Order\Status\ConsignedStatus;
 use Codeages\Biz\Framework\Order\Status\CreatedStatus;
 use Codeages\Biz\Framework\Order\Status\FinishStatus;
@@ -42,7 +42,7 @@ class OrderServiceProvider implements ServiceProviderInterface
         };
 
         $biz['order_status.closed'] = function ($biz) {
-            return new CloseStatus($biz);
+            return new ClosedStatus($biz);
         };
 
         $biz['order_status.signed'] = function ($biz) {

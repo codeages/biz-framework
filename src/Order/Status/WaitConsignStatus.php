@@ -4,17 +4,17 @@ namespace Codeages\Biz\Framework\Order\Status;
 
 class WaitConsignStatus extends AbstractStatus
 {
-    protected $status = 'wait_consign';
+    const NAME = 'wait_consign';
 
     public function getPriorStatus()
     {
-        return array('paid');
+        return array(PaidStatus::NAME);
     }
 
     public function consigned()
     {
         return $this->getOrderDao()->update($this->order['id'], array(
-            'status' => 'consigned',
+            'status' => ConsignedStatus::NAME,
         ));
     }
 }

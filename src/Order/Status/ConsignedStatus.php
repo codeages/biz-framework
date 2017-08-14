@@ -4,25 +4,25 @@ namespace Codeages\Biz\Framework\Order\Status;
 
 class ConsignedStatus extends AbstractStatus
 {
-    protected $status = 'consigned';
+    const NAME = 'consigned';
 
     public function getPriorStatus()
     {
-        return array('wait_consign');
+        return array(WaitConsignStatus::NAME);
     }
 
     public function signed($data = array())
     {
         $signedTime = time();
         $order = $this->getOrderDao()->update($this->order['id'], array(
-            'status' => 'signed',
+            'status' => SignedStatus::NAME,
             'signed_time' => $signedTime,
             'signed_data' => $data
         ));
         $items = $this->getOrderItemDao()->findByOrderId($this->order['id']);
         foreach ($items as $item) {
             $this->getOrderItemDao()->update($item['id'], array(
-                'status' => 'signed',
+                'status' => SignedStatus::NAME,
                 'signed_time' => $signedTime,
                 'signed_data' => $data
             ));
@@ -36,14 +36,14 @@ class ConsignedStatus extends AbstractStatus
 
         $signedTime = time();
         $order = $this->getOrderDao()->update($this->order['id'], array(
-            'status' => 'signed_fail',
+            'status' => SignedFailStatus::NAME,
             'signed_time' => $signedTime,
             'signed_data' => $data
         ));
         $items = $this->getOrderItemDao()->findByOrderId($this->order['id']);
         foreach ($items as $item) {
             $this->getOrderItemDao()->update($item['id'], array(
-                'status' => 'signed_fail',
+                'status' => SignedFailStatus::NAME,
                 'signed_time' => $signedTime,
                 'signed_data' => $data
             ));
