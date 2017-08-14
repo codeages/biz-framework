@@ -11,16 +11,16 @@ class PaidStatus extends AbstractStatus
         return array(CreatedStatus::NAME);
     }
 
-    public function waitConsign()
+    public function consigned()
     {
         $order = $this->getOrderDao()->update($this->order['id'], array(
-            'status' => WaitConsignStatus::NAME
+            'status' => ConsignedStatus::NAME
         ));
 
         $items = $this->getOrderItemDao()->findByOrderId($this->order['id']);
         foreach ($items as $item) {
             $this->getOrderItemDao()->update($item['id'], array(
-                'status' => WaitConsignStatus::NAME,
+                'status' => ConsignedStatus::NAME,
             ));
         }
         return $order;

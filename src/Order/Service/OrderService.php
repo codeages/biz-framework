@@ -20,8 +20,6 @@ interface OrderService
 
     public function finishOrders();
 
-    public function setOrderWaitConsign($id, $data);
-
     public function setOrderConsign($id, $data);
 
     public function setOrderSignedFail($id, $data);

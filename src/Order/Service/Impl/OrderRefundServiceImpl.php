@@ -8,7 +8,7 @@ use Codeages\Biz\Framework\Service\Exception\AccessDeniedException;
 
 class OrderRefundServiceImpl extends BaseService implements OrderRefundService
 {
-    public function applyItemRefund($id, $data)
+    public function applyOrderItemRefund($id, $data)
     {
         $this->validateLogin();
         $orderItem = $this->getOrderItemDao()->get($id);
@@ -42,7 +42,7 @@ class OrderRefundServiceImpl extends BaseService implements OrderRefundService
         return $orderRefund;
     }
 
-    public function applyRefund($orderId, $data)
+    public function applyOrderRefund($orderId, $data)
     {
         $orderRefund = $this->createOrderRefund($orderId, $data);
 

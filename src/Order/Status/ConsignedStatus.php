@@ -8,7 +8,7 @@ class ConsignedStatus extends AbstractStatus
 
     public function getPriorStatus()
     {
-        return array(WaitConsignStatus::NAME);
+        return array(PaidStatus::NAME);
     }
 
     public function signed($data = array())

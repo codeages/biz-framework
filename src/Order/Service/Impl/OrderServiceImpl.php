@@ -225,11 +225,6 @@ class OrderServiceImpl extends BaseService implements OrderService
         }
     }
 
-    public function setOrderWaitConsign($id, $data)
-    {
-        return $this->getOrderContext($id)->waitConsign();
-    }
-
     public function setOrderConsign($id, $data)
     {
         return $this->getOrderContext($id)->consigned();
@@ -287,7 +282,14 @@ class OrderServiceImpl extends BaseService implements OrderService
     protected function getOrderContext($id)
     {
         $orderContext = $this->biz['order_context'];
-        $orderContext->setOrder($this->getOrderDao()->get($id));
+
+        $order = $this->getOrderDao()->get($id);
+        if (empty($order)) {
+            throw $this->createNotFoundException("order #{$order['id']} is not found");
+        }
+
+        $orderContext->setOrder($order);
+
         return $orderContext;
     }
 

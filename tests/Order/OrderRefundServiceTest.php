@@ -89,10 +89,9 @@ class OrderRefundServiceTest extends IntegrationTestCase
             'pay_time' => time()
         );
         $this->getOrderService()->setOrderPaid($data);
-        $this->getOrderService()->setOrderWaitConsign($order['id'], array());
         $this->getOrderService()->setOrderConsign($order['id'], array());
         $this->getOrderService()->setOrderSignedSuccess($order['id'], array('message'=>'已经签收'));
-        $orderRefund = $this->getOrderRefundService()->applyRefund($order['id'], array('reason' => '对该课程不感兴趣'));
+        $orderRefund = $this->getOrderRefundService()->applyOrderRefund($order['id'], array('reason' => '对该课程不感兴趣'));
         $this->assertNotEmpty($orderRefund);
         $this->assertNotEmpty($orderRefund['sn']);
         $this->assertNotEmpty($orderRefund['created_user_id']);
@@ -117,7 +116,6 @@ class OrderRefundServiceTest extends IntegrationTestCase
             'pay_time' => time()
         );
         $this->getOrderService()->setOrderPaid($data);
-        $this->getOrderService()->setOrderWaitConsign($order['id'], array());
         $this->getOrderService()->setOrderConsign($order['id'], array());
         $this->getOrderService()->setOrderSignedSuccess($order['id'], array('message'=>'已经签收'));
 

@@ -4,9 +4,9 @@ namespace Codeages\Biz\Framework\Order\Service;
 
 interface OrderRefundService
 {
-    public function applyItemRefund($id, $data);
+    public function applyOrderItemRefund($id, $data);
 
-    public function applyRefund($orderId, $data);
+    public function applyOrderRefund($orderId, $data);
 
     public function applyOrderItemsRefund($orderId, $orderItemIds, $data);
 

@@ -29,10 +29,6 @@ class OrderServiceProvider implements ServiceProviderInterface
             return new ConsignedStatus($biz);
         };
 
-        $biz['order_status.wait_consign'] = function ($biz) {
-            return new WaitConsignStatus($biz);
-        };
-
         $biz['order_status.created'] = function ($biz) {
             return new CreatedStatus($biz);
         };
