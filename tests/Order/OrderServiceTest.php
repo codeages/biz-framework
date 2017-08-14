@@ -125,12 +125,12 @@ class OrderServiceTest extends IntegrationTestCase
         $mockedOrderItems = $this->mockOrderItems();
         $order = $this->getOrderService()->createOrder($this->mockOrder(), $mockedOrderItems);
         $order = $this->getOrderService()->closeOrder($order['id']);
-        $this->assertEquals('close', $order['status']);
+        $this->assertEquals('closed', $order['status']);
         $this->assertNotEmpty($order['close_time']);
 
         $orderItems = $this->getOrderService()->findOrderItemsByOrderId($order['id']);
         foreach ($orderItems as $orderItem) {
-            $this->assertEquals('close', $orderItem['status']);
+            $this->assertEquals('closed', $orderItem['status']);
             $this->assertNotEmpty($orderItem['close_time']);
         }
     }
