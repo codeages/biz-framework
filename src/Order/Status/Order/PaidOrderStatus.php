@@ -1,26 +1,26 @@
 <?php
 
-namespace Codeages\Biz\Framework\Order\Status;
+namespace Codeages\Biz\Framework\Order\Status\Order;
 
-class RefundingStatus extends AbstractStatus
+class PaidOrderStatus extends AbstractOrderStatus
 {
-    const NAME = 'refunding';
+    const NAME = 'paid';
 
     public function getPriorStatus()
     {
-        return array(FinishStatus::NAME);
+        return array(CreatedOrderStatus::NAME);
     }
 
-    public function refunded()
+    public function consigned()
     {
         $order = $this->getOrderDao()->update($this->order['id'], array(
-            'status' => RefundedStatus::NAME
+            'status' => ConsignedOrderStatus::NAME
         ));
 
         $items = $this->getOrderItemDao()->findByOrderId($this->order['id']);
         foreach ($items as $item) {
             $this->getOrderItemDao()->update($item['id'], array(
-                'status' => RefundedStatus::NAME,
+                'status' => ConsignedOrderStatus::NAME,
             ));
         }
         return $order;

@@ -1,26 +1,26 @@
 <?php
 
-namespace Codeages\Biz\Framework\Order\Status;
+namespace Codeages\Biz\Framework\Order\Status\Order;
 
-class ConsignedFailStatus extends AbstractStatus
+class ConsignedFailOrderStatus extends AbstractOrderStatus
 {
     const NAME = 'consigned_fail';
 
     public function getPriorStatus()
     {
-        return array(PaidStatus::NAME);
+        return array(PaidOrderStatus::NAME);
     }
 
     public function consigned()
     {
         $order = $this->getOrderDao()->update($this->order['id'], array(
-            'status' => ConsignedStatus::NAME
+            'status' => ConsignedOrderStatus::NAME
         ));
 
         $items = $this->getOrderItemDao()->findByOrderId($this->order['id']);
         foreach ($items as $item) {
             $this->getOrderItemDao()->update($item['id'], array(
-                'status' => ConsignedStatus::NAME,
+                'status' => ConsignedOrderStatus::NAME,
             ));
         }
         return $order;
@@ -30,14 +30,14 @@ class ConsignedFailStatus extends AbstractStatus
     {
         $finishTime = time();
         $order = $this->getOrderDao()->update($this->order['id'], array(
-            'status' => FinishStatus::NAME,
+            'status' => FinishOrderStatus::NAME,
             'finish_time' => $finishTime
         ));
 
         $items = $this->getOrderItemDao()->findByOrderId($this->order['id']);
         foreach ($items as $item) {
             $this->getOrderItemDao()->update($item['id'], array(
-                'status' => FinishStatus::NAME,
+                'status' => FinishOrderStatus::NAME,
                 'finish_time' => $finishTime
             ));
         }

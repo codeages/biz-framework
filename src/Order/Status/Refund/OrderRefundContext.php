@@ -1,6 +1,6 @@
 <?php
 
-namespace Codeages\Biz\Framework\Order\Status;
+namespace Codeages\Biz\Framework\Order\Status\Refund;
 
 use Codeages\Biz\Framework\Event\Event;
 use Codeages\Biz\Framework\Service\Exception\AccessDeniedException;
@@ -8,10 +8,10 @@ use Codeages\Biz\Framework\Service\Exception\InvalidArgumentException;
 use Codeages\Biz\Framework\Service\Exception\NotFoundException;
 use Codeages\Biz\Framework\Service\Exception\ServiceException;
 
-class OrderContext
+class OrderRefundContext
 {
     protected $biz;
-    protected $order;
+    protected $orderRefund;
     protected $status;
 
     function __construct($biz)
@@ -19,17 +19,17 @@ class OrderContext
         $this->biz = $biz;
     }
 
-    public function setOrder($order)
+    public function setOrderRefund($orderRefund)
     {
-        $this->order = $order;
-        $this->status = $this->biz["order_status.{$order['status']}"];
+        $this->orderRefund = $orderRefund;
+        $this->status = $this->biz["order_refund_status.{$orderRefund['status']}"];
 
-        $this->status->setOrder($order);
+        $this->status->setOrderRefund($orderRefund);
     }
 
-    public function getOrder()
+    public function getOrderRefund()
     {
-        return $this->order;
+        return $this->orderRefund;
     }
 
     public function getStatus()
@@ -40,15 +40,15 @@ class OrderContext
     function __call($method, $arguments)
     {
         $status = $this->getNextStatusName($method);
-        $nextStatusProcessor = $this->biz["order_status.{$status}"];
+        $nextStatusProcessor = $this->biz["order_refund_status.{$status}"];
 
-        if (!in_array($this->order['status'], $nextStatusProcessor->getPriorStatus())) {
-            throw new AccessDeniedException("can't change {$this->order['status']} to {$status}.");
+        if (!in_array($this->orderRefund['status'], $nextStatusProcessor->getPriorStatus())) {
+            throw new AccessDeniedException("can't change {$this->orderRefund['status']} to {$status}.");
         }
 
         try {
             $this->biz['db']->beginTransaction();
-            $order = call_user_func_array(array($this->status, $method), $arguments);
+            $orderRefund = call_user_func_array(array($this->status, $method), $arguments);
             $this->biz['db']->commit();
         } catch (AccessDeniedException $e) {
             $this->biz['db']->rollback();
@@ -64,9 +64,9 @@ class OrderContext
             throw new ServiceException($e->getMessage());
         }
 
-        $this->createOrderLog($order);
-        $this->dispatch("order.{$status}", $order);
-        return $order;
+        $this->createOrderLog($orderRefund);
+        $this->dispatch("order_refund.{$status}", $orderRefund);
+        return $orderRefund;
     }
 
     private function getNextStatusName($method)
@@ -86,11 +86,12 @@ class OrderContext
         return $str;
     }
 
-    protected function createOrderLog($order, $dealData = array())
+    protected function createOrderLog($orderRefund, $dealData = array())
     {
         $orderLog = array(
-            'status' => $order['status'],
-            'order_id' => $order['id'],
+            'order_refund_id' => $orderRefund['id'],
+            'status' => $orderRefund['status'],
+            'order_id' => $orderRefund['order_id'],
             'user_id' => $this->biz['user']['id'],
             'deal_data' => $dealData
         );

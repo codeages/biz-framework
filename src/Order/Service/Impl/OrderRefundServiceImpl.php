@@ -5,75 +5,28 @@ namespace Codeages\Biz\Framework\Order\Service\Impl;
 use Codeages\Biz\Framework\Order\Service\OrderRefundService;
 use Codeages\Biz\Framework\Service\BaseService;
 use Codeages\Biz\Framework\Service\Exception\AccessDeniedException;
+use Codeages\Biz\Framework\Util\ArrayToolkit;
 
 class OrderRefundServiceImpl extends BaseService implements OrderRefundService
 {
     public function applyOrderItemRefund($id, $data)
     {
-        $this->validateLogin();
         $orderItem = $this->getOrderItemDao()->get($id);
-        if (empty($orderItem)) {
-            throw $this->createNotFoundException("order_item #{$id} is not found");
-        }
-
-        $order = $this->getOrderDao()->get($orderItem['order_id']);
-        if (empty($order)) {
-            throw $this->createNotFoundException("order #{$orderItem['order_id']} is not found");
-        }
-
-        if ($order['status'] != 'signed') {
-            throw $this->createAccessDeniedException("order #{$order['id']} status is not signed.");
-        }
-
-        if ($this->biz['user']['id'] != $order['user_id']) {
-            throw $this->createAccessDeniedException("order #{$orderItem['order_id']} can not refund.");
-        }
-
-        $orderRefund = $this->getOrderRefundDao()->create(array(
-            'order_id' => $orderItem['order_id'],
-            'order_item_id' => $orderItem['id'],
-            'sn' => $this->generateSn(),
-            'user_id' => $order['user_id'],
-            'created_user_id' => $this->biz['user']['id'],
-            'reason' => empty($data['reason']) ? '' : $data['reason'],
-            'amount' => $order['amount']
-        ));
-        $this->dispatch('order_refund.created', $orderRefund);
-        return $orderRefund;
+        return $this->applyOrderItemsRefund($orderItem['order_id'], array($id), $data);
     }
 
     public function applyOrderRefund($orderId, $data)
     {
-        $orderRefund = $this->createOrderRefund($orderId, $data);
-
-        $this->dispatch('order_refund.created', $orderRefund);
-
-        return $orderRefund;
+        $orderItems = $this->getOrderItemDao()->findByOrderId($orderId);
+        $orderItemIds = ArrayToolkit::column($orderItems, 'id');
+        return $this->applyOrderItemsRefund($orderId, $orderItemIds, $data);
     }
 
     public function applyOrderItemsRefund($orderId, $orderItemIds, $data)
     {
         $orderRefund = $this->createOrderRefund($orderId, $data);
-        $totalAmount = 0;
-        $orderItemRefunds = array();
-        foreach ($orderItemIds as $orderItemId) {
-            $orderItem = $this->getOrderItemDao()->get($orderItemId);
-            $orderItemRefund = $this->getOrderItemRefundDao()->create(array(
-                'order_refund_id' => $orderRefund['id'],
-                'order_id' => $orderRefund['order_id'],
-                'order_item_id' => $orderItemId,
-                'user_id' => $orderRefund['user_id'],
-                'created_user_id' => $this->biz['user']['id'],
-                'amount' => $orderItem['pay_amount']
-            ));
+        $orderRefund = $this->createOrderRefundItems($orderItemIds, $orderRefund);
 
-            $totalAmount = $totalAmount + $orderItem['pay_amount'];
-
-            $orderItemRefunds[] = $orderItemRefund;
-        }
-
-        $orderRefund = $this->getOrderRefundDao()->update($orderRefund['id'], array('amount' => $totalAmount));
-        $orderRefund['orderItemRefunds'] = $orderItemRefunds;
         $this->dispatch('order_refund.created', $orderRefund);
 
         return $orderRefund;
@@ -81,84 +34,18 @@ class OrderRefundServiceImpl extends BaseService implements OrderRefundService
 
     public function adoptRefund($id, $data)
     {
-        $this->validateLogin();
-        $orderRefund = $this->getOrderRefundDao()->get($id);
-        if (empty($orderRefund)) {
-            throw $this->createNotFoundException("order_refund #{$id} is not found");
-        }
-
-        if ($orderRefund['status'] != 'created') {
-            throw $this->createAccessDeniedException("order_refund #{$id} status is not created");
-        }
-
-        $orderRefund = $this->getOrderRefundDao()->update($id, array(
-            'deal_time' => time(),
-            'deal_user_id' => $this->biz['user']['id'],
-            'deal_reason' => empty($data['deal_reason']) ? '' : $data['deal_reason'],
-            'status' => 'adopt'
-        ));
-
-        $orderItemRefunds = $this->getOrderItemRefundDao()->findByOrderRefundId($orderRefund['id']);
-        foreach ($orderItemRefunds as $orderItemRefund) {
-            $this->getOrderItemRefundDao()->update($orderItemRefund['id'], array(
-                'status' => 'adopt'
-            ));
-        }
-
-        $this->dispatch('order_refund.adopted', $orderRefund);
-        return $orderRefund;
+        return $this->getOrderRefundContext($id)->refunded($data);
     }
 
     public function refuseRefund($id, $data)
     {
         $this->validateLogin();
-        $orderRefund = $this->getOrderRefundDao()->get($id);
-        if (empty($orderRefund)) {
-            throw $this->createNotFoundException("order_refund #{$id} is not found");
-        }
-
-        if ($orderRefund['status'] != 'created') {
-            throw $this->createAccessDeniedException("order_refund #{$id} status is not created");
-        }
-
-        $orderRefund = $this->getOrderRefundDao()->update($id, array(
-            'deal_time' => time(),
-            'deal_user_id' => $this->biz['user']['id'],
-            'deal_reason' => empty($data['deal_reason']) ? '' : $data['deal_reason'],
-            'status' => 'refused'
-        ));
-
-        $this->dispatch('order_refund.refused', $orderRefund);
-        return $orderRefund;
+        return $this->getOrderRefundContext($id)->closed($data);
     }
 
     public function finishRefund($id)
     {
-        $this->validateLogin();
-        $orderRefund = $this->getOrderRefundDao()->get($id);
-        if (empty($orderRefund)) {
-            throw $this->createNotFoundException("order_refund #{$id} is not found");
-        }
-
-        if ($orderRefund['status'] == 'finish') {
-            return $orderRefund;
-        }
-
-        if ($orderRefund['status'] != 'adopt') {
-            throw $this->createAccessDeniedException("order_refund #{$id} status is not adopt");
-        }
-        $orderRefund = $this->getOrderRefundDao()->update($id, array(
-            'status' => 'finish'
-        ));
-
-        $orderItemRefunds = $this->getOrderItemRefundDao()->findByOrderRefundId($orderRefund['id']);
-        foreach ($orderItemRefunds as $orderItemRefund) {
-            $this->getOrderItemRefundDao()->update($orderItemRefund['id'], array(
-                'status' => 'finish'
-            ));
-        }
-        $this->dispatch('order_refund.finished', $orderRefund);
-        return $orderRefund;
+        return $this->getOrderRefundContext($id)->finish();
     }
 
     protected function createOrderRefund($orderId, $data)
@@ -185,9 +72,24 @@ class OrderRefundServiceImpl extends BaseService implements OrderRefundService
             'created_user_id' => $this->biz['user']['id'],
             'reason' => empty($data['reason']) ? '' : $data['reason'],
             'amount' => $order['pay_amount'],
+            'status' => 'refunding'
         ));
 
         return $orderRefund;
+    }
+
+    protected function getOrderRefundContext($id)
+    {
+        $orderRefundContext = $this->biz['order_refund_context'];
+
+        $orderRefund = $this->getOrderRefundDao()->get($id);
+        if (empty($orderRefund)) {
+            throw $this->createNotFoundException("order #{$orderRefund['id']} is not found");
+        }
+
+        $orderRefundContext->setOrderRefund($orderRefund);
+
+        return $orderRefundContext;
     }
 
     protected function validateLogin()
@@ -220,5 +122,35 @@ class OrderRefundServiceImpl extends BaseService implements OrderRefundService
     protected function getOrderItemRefundDao()
     {
         return $this->biz->dao('Order:OrderItemRefundDao');
+    }
+
+    protected function createOrderRefundItems($orderItemIds, $orderRefund)
+    {
+        $totalAmount = 0;
+        $orderItemRefunds = array();
+        foreach ($orderItemIds as $orderItemId) {
+            $orderItem = $this->getOrderItemDao()->get($orderItemId);
+            $orderItemRefund = $this->getOrderItemRefundDao()->create(array(
+                'order_refund_id' => $orderRefund['id'],
+                'order_id' => $orderRefund['order_id'],
+                'order_item_id' => $orderItemId,
+                'user_id' => $orderRefund['user_id'],
+                'created_user_id' => $this->biz['user']['id'],
+                'amount' => $orderItem['pay_amount']
+            ));
+
+            $orderItem = $this->getOrderItemDao()->update($orderItem['id'], array(
+                'refund_id' => $orderRefund['id'],
+                'refund_status' => 'refunding'
+            ));
+
+            $totalAmount = $totalAmount + $orderItem['pay_amount'];
+
+            $orderItemRefunds[] = $orderItemRefund;
+        }
+
+        $orderRefund = $this->getOrderRefundDao()->update($orderRefund['id'], array('amount' => $totalAmount));
+        $orderRefund['orderItemRefunds'] = $orderItemRefunds;
+        return $orderRefund;
     }
 }

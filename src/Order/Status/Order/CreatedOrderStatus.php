@@ -1,10 +1,10 @@
 <?php
 
-namespace Codeages\Biz\Framework\Order\Status;
+namespace Codeages\Biz\Framework\Order\Status\Order;
 
 use Codeages\Biz\Framework\Util\ArrayToolkit;
 
-class CreatedStatus extends AbstractStatus
+class CreatedOrderStatus extends AbstractOrderStatus
 {
     const NAME = 'created';
 
@@ -17,14 +17,14 @@ class CreatedStatus extends AbstractStatus
     {
         $closeTime = time();
         $order = $this->getOrderDao()->update($this->order['id'], array(
-            'status' => ClosedStatus::NAME,
+            'status' => ClosedOrderStatus::NAME,
             'close_time' => $closeTime
         ));
 
         $items = $this->getOrderItemDao()->findByOrderId($this->order['id']);
         foreach ($items as $item) {
             $this->getOrderItemDao()->update($item['id'], array(
-                'status' => ClosedStatus::NAME,
+                'status' => ClosedOrderStatus::NAME,
                 'close_time' => $closeTime
             ));
         }
@@ -52,7 +52,7 @@ class CreatedStatus extends AbstractStatus
             'trade_sn',
             'pay_time'
         ));
-        $data['status'] = PaidStatus::NAME;
+        $data['status'] = PaidOrderStatus::NAME;
         return $this->getOrderDao()->update($order['id'], $data);
     }
 

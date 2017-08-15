@@ -32,7 +32,7 @@ class OrderRefundServiceTest extends IntegrationTestCase
     {
         $orderRefund = $this->mockOrderRefund();
         unset($this->biz['user']);
-        $orderRefund = $this->getOrderRefundService()->refuseRefund($orderRefund['id'], array('deal_reason' => '对该课程不感兴趣'));
+        $this->getOrderRefundService()->refuseRefund($orderRefund['id'], array('deal_reason' => '对该课程不感兴趣'));
     }
 
     public function testFinishOrderRefund()
@@ -50,13 +50,10 @@ class OrderRefundServiceTest extends IntegrationTestCase
     {
         $orderRefund = $this->mockOrderRefund();
         $orderRefund = $this->getOrderRefundService()->refuseRefund($orderRefund['id'], array('deal_reason' => '对该课程不感兴趣'));
-        $this->assertEquals('refused', $orderRefund['status']);
+        $this->assertEquals('closed', $orderRefund['status']);
         $this->assertNotEmpty($orderRefund['deal_time']);
         $this->assertNotEmpty($orderRefund['deal_reason']);
         $this->assertEquals($this->biz['user']['id'], $orderRefund['deal_user_id']);
-
-        $orderRefundItems = $this->getOrderItemRefundDao()->findByOrderRefundId($orderRefund['id']);
-        $this->assertEmpty($orderRefundItems);
     }
 
     public function testFinishOrderItemRefunds()
@@ -99,7 +96,7 @@ class OrderRefundServiceTest extends IntegrationTestCase
         $this->assertEquals(0, $orderRefund['order_item_id']);
         $this->assertEquals($this->biz['user']['id'], $orderRefund['user_id']);
         $this->assertEquals($order['pay_amount'], $orderRefund['amount']);
-        $this->assertEquals('created', $orderRefund['status']);
+        $this->assertEquals('refunding', $orderRefund['status']);
         return $orderRefund;
     }
 
@@ -128,7 +125,7 @@ class OrderRefundServiceTest extends IntegrationTestCase
         $this->assertEquals(0, $orderRefund['order_item_id']);
         $this->assertEquals($this->biz['user']['id'], $orderRefund['user_id']);
         $this->assertEquals($order['pay_amount'], $orderRefund['amount']);
-        $this->assertEquals('created', $orderRefund['status']);
+        $this->assertEquals('refunding', $orderRefund['status']);
         return $orderRefund;
     }
 
