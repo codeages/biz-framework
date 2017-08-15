@@ -8,6 +8,6 @@ class FinishStatus extends AbstractRefundStatus
 
     public function getPriorStatus()
     {
-        return array(RefundedStatus::NAME);
+        return array(AdoptStatus::NAME);
     }
 }

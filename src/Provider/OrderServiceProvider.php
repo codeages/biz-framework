@@ -12,7 +12,7 @@ use Codeages\Biz\Framework\Order\Status\Refund\ClosedStatus;
 use Codeages\Biz\Framework\Order\Status\Refund\CreatedStatus;
 use Codeages\Biz\Framework\Order\Status\Refund\FinishStatus;
 use Codeages\Biz\Framework\Order\Status\Refund\OrderRefundContext;
-use Codeages\Biz\Framework\Order\Status\Refund\RefundedStatus;
+use Codeages\Biz\Framework\Order\Status\Refund\AdoptStatus;
 use Codeages\Biz\Framework\Order\Status\Refund\RefundingStatus;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
@@ -36,7 +36,7 @@ class OrderServiceProvider implements ServiceProviderInterface
 
         $orderRefundStatusArray = array(
             RefundingStatus::class,
-            RefundedStatus::class,
+            AdoptStatus::class,
             ClosedStatus::class,
             FinishStatus::class
         );

@@ -11,24 +11,24 @@ class RefundingStatus extends AbstractRefundStatus
         return array();
     }
 
-    public function refunded($data)
+    public function adopt($data)
     {
         $orderRefund = $this->getOrderRefundDao()->update($this->orderRefund['id'], array(
             'deal_time' => time(),
             'deal_user_id' => $this->biz['user']['id'],
             'deal_reason' => empty($data['deal_reason']) ? '' : $data['deal_reason'],
-            'status' => RefundedStatus::NAME
+            'status' => AdoptStatus::NAME
         ));
 
         $orderItemRefunds = $this->getOrderItemRefundDao()->findByOrderRefundId($orderRefund['id']);
         $updatedOrderItemRefunds = array();
         foreach ($orderItemRefunds as $orderItemRefund) {
             $updatedOrderItemRefunds[] = $this->getOrderItemRefundDao()->update($orderItemRefund['id'], array(
-                'status' => RefundedStatus::NAME
+                'status' => AdoptStatus::NAME
             ));
 
             $this->getOrderItemDao()->update($orderItemRefund['order_item_id'], array(
-                'refund_status' => RefundedStatus::NAME
+                'refund_status' => AdoptStatus::NAME
             ));
         }
 

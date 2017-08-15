@@ -2,9 +2,9 @@
 
 namespace Codeages\Biz\Framework\Order\Status\Refund;
 
-class RefundedStatus extends AbstractRefundStatus
+class AdoptStatus extends AbstractRefundStatus
 {
-    const NAME = 'refunded';
+    const NAME = 'adopt';
 
     public function getPriorStatus()
     {
@@ -16,6 +16,8 @@ class RefundedStatus extends AbstractRefundStatus
         $orderRefund = $this->getOrderRefundDao()->update($this->orderRefund['id'], array(
             'status' => FinishStatus::NAME
         ));
+
+
 
         $orderItemRefunds = $this->getOrderItemRefundDao()->findByOrderRefundId($orderRefund['id']);
         $updatedOrderItemRefunds = array();

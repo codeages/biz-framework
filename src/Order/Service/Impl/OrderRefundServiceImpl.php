@@ -34,7 +34,7 @@ class OrderRefundServiceImpl extends BaseService implements OrderRefundService
 
     public function adoptRefund($id, $data)
     {
-        return $this->getOrderRefundContext($id)->refunded($data);
+        return $this->getOrderRefundContext($id)->adopt($data);
     }
 
     public function refuseRefund($id, $data)

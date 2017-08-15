@@ -23,18 +23,6 @@ class AddRefundStatusOrderItem extends Migration
                 "ALTER TABLE `biz_order_item` Add column `refund_id` INT(10) unsigned NOT NULL DEFAULT 0 COMMENT '最新退款id';"
             );
         }
-
-        if (!$this->isFieldExist('biz_order', 'refund_id')) {
-            $connection->exec(
-                "ALTER TABLE `biz_order` Add column `refund_id` INT(10) unsigned NOT NULL DEFAULT 0 COMMENT '最新退款id';"
-            );
-        }
-
-        if (!$this->isFieldExist('biz_order', 'refund_status')) {
-            $connection->exec(
-                "ALTER TABLE `biz_order` Add column `refund_status` VARCHAR(32) NOT NULL DEFAULT '' COMMENT '退款状态';"
-            );
-        }
     }
 
     protected function isFieldExist($table, $filedName)
