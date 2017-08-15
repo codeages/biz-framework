@@ -8,7 +8,7 @@ class RefundingStatus extends AbstractRefundStatus
 
     public function getPriorStatus()
     {
-        return array(CreatedStatus::NAME);
+        return array();
     }
 
     public function refunded($data)
@@ -17,16 +17,22 @@ class RefundingStatus extends AbstractRefundStatus
             'deal_time' => time(),
             'deal_user_id' => $this->biz['user']['id'],
             'deal_reason' => empty($data['deal_reason']) ? '' : $data['deal_reason'],
-            'status' => 'refunded'
+            'status' => RefundedStatus::NAME
         ));
 
         $orderItemRefunds = $this->getOrderItemRefundDao()->findByOrderRefundId($orderRefund['id']);
+        $updatedOrderItemRefunds = array();
         foreach ($orderItemRefunds as $orderItemRefund) {
-            $this->getOrderItemRefundDao()->update($orderItemRefund['id'], array(
-                'status' => 'refunded'
+            $updatedOrderItemRefunds[] = $this->getOrderItemRefundDao()->update($orderItemRefund['id'], array(
+                'status' => RefundedStatus::NAME
+            ));
+
+            $this->getOrderItemDao()->update($orderItemRefund['order_item_id'], array(
+                'refund_status' => RefundedStatus::NAME
             ));
         }
 
+        $orderRefund['orderItemRefunds'] = $updatedOrderItemRefunds;
         return $orderRefund;
     }
 
@@ -36,16 +42,22 @@ class RefundingStatus extends AbstractRefundStatus
             'deal_time' => time(),
             'deal_user_id' => $this->biz['user']['id'],
             'deal_reason' => empty($data['deal_reason']) ? '' : $data['deal_reason'],
-            'status' => 'closed'
+            'status' => ClosedStatus::NAME
         ));
 
         $orderItemRefunds = $this->getOrderItemRefundDao()->findByOrderRefundId($orderRefund['id']);
+        $updatedOrderItemRefunds = array();
         foreach ($orderItemRefunds as $orderItemRefund) {
-            $this->getOrderItemRefundDao()->update($orderItemRefund['id'], array(
-                'status' => 'closed'
+            $updatedOrderItemRefunds[] = $this->getOrderItemRefundDao()->update($orderItemRefund['id'], array(
+                'status' => ClosedStatus::NAME
+            ));
+
+            $this->getOrderItemDao()->update($orderItemRefund['order_item_id'], array(
+                'refund_status' => ClosedStatus::NAME
             ));
         }
 
+        $orderRefund['orderItemRefunds'] = $updatedOrderItemRefunds;
         return $orderRefund;
     }
 }

@@ -14,15 +14,22 @@ class RefundedStatus extends AbstractRefundStatus
     public function finish()
     {
         $orderRefund = $this->getOrderRefundDao()->update($this->orderRefund['id'], array(
-            'status' => 'finish'
+            'status' => FinishStatus::NAME
         ));
 
         $orderItemRefunds = $this->getOrderItemRefundDao()->findByOrderRefundId($orderRefund['id']);
+        $updatedOrderItemRefunds = array();
         foreach ($orderItemRefunds as $orderItemRefund) {
-            $this->getOrderItemRefundDao()->update($orderItemRefund['id'], array(
-                'status' => 'finish'
+            $updatedOrderItemRefunds[] = $this->getOrderItemRefundDao()->update($orderItemRefund['id'], array(
+                'status' => FinishStatus::NAME
+            ));
+
+            $this->getOrderItemDao()->update($orderItemRefund['order_item_id'], array(
+                'refund_status' => FinishStatus::NAME
             ));
         }
+
+        $orderRefund['orderItemRefunds'] = $updatedOrderItemRefunds;
         return $orderRefund;
     }
 }

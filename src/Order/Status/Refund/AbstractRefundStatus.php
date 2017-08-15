@@ -20,4 +20,9 @@ abstract class AbstractRefundStatus extends \Codeages\Biz\Framework\Order\Status
     {
         return $this->biz->dao('Order:OrderItemRefundDao');
     }
+
+    protected function getOrderItemDao()
+    {
+        return $this->biz->dao('Order:OrderItemDao');
+    }
 }
