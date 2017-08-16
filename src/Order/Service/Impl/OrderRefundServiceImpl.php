@@ -56,10 +56,6 @@ class OrderRefundServiceImpl extends BaseService implements OrderRefundService
             throw $this->createNotFoundException("order #{$orderId} is not found.");
         }
 
-        if ($order['status'] != 'finish') {
-            throw $this->createAccessDeniedException("order #${$order['id']} status is not finish.");
-        }
-
         if ($this->biz['user']['id'] != $order['user_id']) {
             throw $this->createAccessDeniedException("order #{$orderId} can not refund.");
         }
