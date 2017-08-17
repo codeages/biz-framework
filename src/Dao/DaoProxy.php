@@ -164,6 +164,7 @@ class DaoProxy
         $this->serialize($arguments[0]);
         $row = $this->callRealDao($method, $arguments);
         $this->decrypt($row);
+
         $this->unserialize($row);
 
         $this->arrayStorage && $this->arrayStorage->flush();
@@ -379,7 +380,7 @@ class DaoProxy
             // 当前只支持base64
             // @TODO: 未来支持多种加密方式，biz注入encrypteClass，encrypteInterface 
 
-            $row[$key] = base64_encode($row[$key]);
+             $row[$key] = base64_encode($row[$key]);
         }
     }
 

@@ -42,6 +42,7 @@ class GeneralDaoImplTest extends IntegrationTestCase
             'Example:ExampleDao',
             'Example:Example2Dao',
             'Example:Example3Dao',
+            'Example:Example4Dao'
         );
     }
 
