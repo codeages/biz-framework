@@ -1,5 +1,4 @@
 <?php
-
 namespace Codeages\Biz\Framework\Dao;
 
 use Codeages\Biz\Framework\Dao\Annotation\MetadataReader;
@@ -45,7 +44,8 @@ class DaoProxy
         $proxyMethod = $this->getProxyMethod($method);
         if ($proxyMethod) {
             return $this->$proxyMethod($method, $arguments);
-        } else {
+        }
+        else {
             return $this->callRealDao($method, $arguments);
         }
     }
@@ -69,6 +69,7 @@ class DaoProxy
         // lock模式下，因为需要借助mysql的锁，不走cache
         if (is_array($lastArgument) && isset($lastArgument['lock']) && $lastArgument['lock'] === true) {
             $row = $this->callRealDao($method, $arguments);
+            $this->decrypt($row);
             $this->unserialize($row);
 
             return $row;
@@ -90,6 +91,7 @@ class DaoProxy
         }
 
         $row = $this->callRealDao($method, $arguments);
+        $this->decrypt($row);
         $this->unserialize($row);
         $this->arrayStorage && ($this->arrayStorage[$this->getCacheKey($this->dao, $method, $arguments)] = $row);
 
@@ -116,8 +118,8 @@ class DaoProxy
         }
 
         $rows = $this->callRealDao($method, $arguments);
+        $this->decrypts($rows);
         $this->unserializes($rows);
-
         if ($strategy) {
             $strategy->afterQuery($this->dao, $method, $arguments, $rows);
         }
@@ -158,8 +160,10 @@ class DaoProxy
             $arguments[0][$declares['timestamps'][1]] = $time;
         }
 
+        $this->encrypt($arguments[0]);
         $this->serialize($arguments[0]);
         $row = $this->callRealDao($method, $arguments);
+        $this->decrypt($row);
         $this->unserialize($row);
 
         $this->arrayStorage && $this->arrayStorage->flush();
@@ -196,6 +200,7 @@ class DaoProxy
                 $row[$declares['timestamps'][1]] = $time;
             }
 
+            $this->encrypt($row);
             $this->serialize($row);
             unset($row);
         }
@@ -221,6 +226,7 @@ class DaoProxy
                 $row[$declares['timestamps'][1]] = $time;
             }
 
+            $this->encrypt($row);
             $this->serialize($row);
         }
 
@@ -272,11 +278,12 @@ class DaoProxy
             $arguments[$lastKey][$declares['timestamps'][1]] = time();
         }
 
+        $this->encrypt($arguments[$lastKey]);
         $this->serialize($arguments[$lastKey]);
-
         $row = $this->callRealDao($method, $arguments);
 
         if (is_array($row)) {
+            $this->decrypt($row);
             $this->unserialize($row);
         }
 
@@ -352,6 +359,49 @@ class DaoProxy
         }
     }
 
+    protected function decrypts(array &$rows)
+    {
+        foreach ($rows as &$row) {
+            $this->decrypt($row);
+        }
+    }
+
+    protected function encrypt(&$row)
+    {
+        $declares = $this->dao->declares();
+        $encryptes = empty($declares['encrypt']) ? array() : $declares['encrypt'];
+
+        foreach ($encryptes as $key => $method) {
+            if (!array_key_exists($key, $row)) {
+                continue;
+            }
+
+            // 当前只支持base64
+            // @TODO: 未来支持多种加密方式，biz注入encrypteClass，encrypteInterface 
+
+            $row[$key] = base64_encode($row[$key]);
+        }
+    }
+
+    protected function decrypt(&$row)
+    {
+        if (empty($row)) {
+            return;
+        }
+        $declares = $this->dao->declares();
+        $encryptes = empty($declares['encrypt']) ? array() : $declares['encrypt'];
+        foreach ($encryptes as $key => $method) {
+            if (!array_key_exists($key, $row)) {
+                continue;
+            }
+
+            // 当前只支持base64
+            // @TODO: 未来支持多种解密方式，biz注入encrypteClass，encrypteInterface 
+
+            $row[$key] = base64_decode($row[$key]);
+        }
+    }
+
     private function flushTableCache()
     {
         $this->arrayStorage && ($this->arrayStorage->flush());
@@ -388,7 +438,7 @@ class DaoProxy
         }
 
         if (!empty($declares['cache'])) {
-            return $this->container['dao.cache.strategy.'.$declares['cache']];
+            return $this->container['dao.cache.strategy.' . $declares['cache']];
         }
 
         if (isset($this->container['dao.cache.strategy.default'])) {
@@ -405,7 +455,7 @@ class DaoProxy
             return null;
         }
 
-        return $this->container['dao.cache.strategy.'.strtolower($metadata['strategy'])];
+        return $this->container['dao.cache.strategy.' . strtolower($metadata['strategy'])];
     }
 
     private function getCacheKey(GeneralDaoInterface $dao, $method, $arguments)
