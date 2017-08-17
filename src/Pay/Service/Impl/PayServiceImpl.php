@@ -299,6 +299,11 @@ class PayServiceImpl extends BaseService implements PayService
     public function applyRefundByTradeSn($tradeSn)
     {
         $trade = $this->getPaymentTradeDao()->getByTradeSn($tradeSn);
+
+        if (in_array($trade['status'], array('refunding', 'refunded'))) {
+            return $trade;
+        }
+
         if ($trade['status'] != 'paid') {
             throw new AccessDeniedException('can not refund, becourse the trade is not paid');
         }
@@ -308,13 +313,18 @@ class PayServiceImpl extends BaseService implements PayService
         }
 
         $paymentGetWay = $this->getPayment($trade['platform']);
-        $paymentGetWay->applyRefund($trade);
+        $response = $paymentGetWay->applyRefund($trade);
+
+        if (!$response->isSuccessful()) {
+            return $trade;
+        }
 
         $trade = $this->getPaymentTradeDao()->update($trade['id'], array(
             'status' => 'refunding',
             'apply_refund_time' => time()
         ));
         $this->dispatch('trade.refunding', $trade);
+
         return $trade;
     }
 
@@ -322,7 +332,7 @@ class PayServiceImpl extends BaseService implements PayService
     {
         $paymentGetWay = $this->getPayment($payment);
         $response = $paymentGetWay->converterRefundNotify($data);
-        $tradeSn = $response['out_trade_no'];
+        $tradeSn = $response[0]['notify_data']['trade_sn'];
 
         $trade = $this->getPaymentTradeDao()->getByTradeSn($tradeSn);
         $trade = $this->getPaymentTradeDao()->update($trade['id'], array(

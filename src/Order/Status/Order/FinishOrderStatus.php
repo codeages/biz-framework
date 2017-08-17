@@ -8,6 +8,6 @@ class FinishOrderStatus extends AbstractOrderStatus
 
     public function getPriorStatus()
     {
-        return array(ConsignedOrderStatus::NAME);
+        return array(ConsignedOrderStatus::NAME, PaidOrderStatus::NAME);
     }
 }

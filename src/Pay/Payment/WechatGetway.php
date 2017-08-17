@@ -103,21 +103,20 @@ class WechatGetway extends AbstractGetway
 
         $response = $gateway->refund([
             'transaction_id' => $trade['platform_sn'],
-            'out_refund_no' => $trade['trade_sn'],
+            'out_trade_no' => $trade['trade_sn'],
+            'out_refund_no' => time(),
             'total_fee' => $trade['cash_amount'],
             'refund_fee' => $trade['cash_amount'],
             'refund_desc' => empty($trade['refund_reason']) ? '' : $trade['refund_reason']
         ])->send();
 
-        if ($response->isSuccessful()) {
-            return $response->getData();
-        }
+        return $response;
     }
 
     public function converterRefundNotify($data)
     {
         $gateway = $this->createGetWay('WechatPay');
-        $request = $gateway->completePurchase(array(
+        $request = $gateway->completeRefund(array(
             'request_params' => $data
         ));
         $response = $request->send();
@@ -155,6 +154,8 @@ class WechatGetway extends AbstractGetway
         $gateway->setAppId($config['appid']);
         $gateway->setMchId($config['mch_id']);
         $gateway->setApiKey($config['key']);
+        $gateway->setCertPath($config['cert_path']);
+        $gateway->setKeyPath($config['key_path']);
         return $gateway;
     }
 
@@ -164,6 +165,8 @@ class WechatGetway extends AbstractGetway
             'appid' => $this->biz['wx_app_id'],
             'mch_id' => $this->biz['wx_mch_id'],
             'key' => $this->biz['wx_mch_secret'],
+            'cert_path' => $this->biz['wx_cert_path'],
+            'key_path' => $this->biz['wx_key_path'],
         );
     }
 }

@@ -4,6 +4,7 @@ namespace Codeages\Biz\Framework\Order\Subscriber;
 
 use Codeages\Biz\Framework\Event\Event;
 use Codeages\Biz\Framework\Event\EventSubscriber;
+use Codeages\Biz\Framework\Order\AbstractPaidProcessor;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class OrderSubscriber extends EventSubscriber implements EventSubscriberInterface
@@ -20,20 +21,29 @@ class OrderSubscriber extends EventSubscriber implements EventSubscriberInterfac
     public function onTradeRefunded(Event $event)
     {
         $trade = $event->getSubject();
-        $orderSn = $trade['order_sn'];
-        $order = $this->getOrderService()->getOrderBySn($orderSn);
-        $this->getOrderService()->finishRefund($order['id']);
+        $data = $event->getArguments();
+        $this->getOrderRefundService()->finishRefund($trade['refund_id']);
     }
 
     public function onOrderPaid(Event $event)
     {
         $order = $event->getSubject();
-        $this->getOrderProcess()->process($order);
+        $processor = $this->getOrderProcess($order);
+        if (!empty($processor)) {
+            $result = $processor->process($order);
+            if (AbstractPaidProcessor::SUCCESS == $result) {
+                $this->getOrderService()->finishOrder($order['id']);
+            }
+        }
     }
 
-    public function getOrderProcess()
+    public function getOrderProcess($order)
     {
-        return $this->getBiz()->service('OrderProcess:CutOrderProcess');
+        $biz = $this->getBiz();;
+        if (empty($biz["order_paid_processor.{$order['type']}"])) {
+            return null;
+        }
+        return $biz["order_paid_processor.{$order['type']}"];
     }
 
     public function onPaid(Event $event)
@@ -51,5 +61,10 @@ class OrderSubscriber extends EventSubscriber implements EventSubscriberInterfac
     protected function getOrderService()
     {
         return $this->getBiz()->service('Order:OrderService');
+    }
+
+    protected function getOrderRefundService()
+    {
+        return $this->getBiz()->service('Order:OrderRefundService');
     }
 }

@@ -25,4 +25,22 @@ class PaidOrderStatus extends AbstractOrderStatus
         }
         return $order;
     }
+
+    public function finish()
+    {
+        $finishTime = time();
+        $order = $this->getOrderDao()->update($this->order['id'], array(
+            'status' => FinishOrderStatus::NAME,
+            'finish_time' => $finishTime
+        ));
+
+        $items = $this->getOrderItemDao()->findByOrderId($this->order['id']);
+        foreach ($items as $item) {
+            $this->getOrderItemDao()->update($item['id'], array(
+                'status' => FinishOrderStatus::NAME,
+                'finish_time' => $finishTime
+            ));
+        }
+        return $order;
+    }
 }
