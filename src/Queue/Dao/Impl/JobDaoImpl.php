@@ -13,15 +13,9 @@ class JobDaoImpl extends GeneralDaoImpl implements JobDao
     {
         return array(
             'timestamps' => array('created_time'),
-            'serializes' => array('context' => 'json'),
+            'serializes' => array('body' => 'json'),
             'orderbys' => array('created_time'),
             'conditions' => array(
-                'level = :level',
-                'target_type = :target_type',
-                'target_id = :target_id',
-                'action = :action',
-                'user_id = :user_id',
-                'ip = :ip',
             ),
         );
     }

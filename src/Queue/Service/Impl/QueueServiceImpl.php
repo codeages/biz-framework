@@ -8,9 +8,9 @@ use Codeages\Biz\Framework\Queue\Job;
 
 class QueueServiceImpl extends BaseService implements QueueService
 {
-    public function pushJob(Job $job, $queue = 'default')
+    public function pushJob(Job $job)
     {
-        $queue = $this->biz['queue.connection.'.$job->getConnection()];
+        $queue = $this->biz['queue.connection.'.$job->getConnectionName()];
         return $queue->push($job, $queue);
     }
     
@@ -19,7 +19,7 @@ class QueueServiceImpl extends BaseService implements QueueService
 
     }
 
-    public function popJob(Job $job, $queue = 'default')
+    public function popJob($queue = null)
     {
         
     }

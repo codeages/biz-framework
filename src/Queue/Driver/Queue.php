@@ -4,9 +4,9 @@ use Codeages\Biz\Framework\Queue\Job;
 
 interface Queue
 {
-    public function push(Job $job, $queue);
+    public function push(Job $job);
 
     public function release();
 
-    public function pop(Job $job, $queue); 
+    public function pop($queue = null); 
 }

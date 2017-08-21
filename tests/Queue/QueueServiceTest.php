@@ -20,6 +20,19 @@ class QueueServiceTest extends IntegrationTestCase
         $this->assertEquals($body, $job->getBody());
     }
 
+    public function testPushJob_Database()
+    {
+        $this->biz['queue.connection.default'] = function ($biz) {
+            return $biz['queue.connection.database'];
+        };
+
+        $body = array('name' => 'example 1');
+        $job = new ExampleJob1($body);
+        $job = $this->getQueueService()->pushJob($job);
+
+        $this->assertEquals($body, $job->getBody());
+    }
+
     protected function getQueueService()
     {
         return $this->biz->service('Queue:QueueService');

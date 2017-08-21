@@ -12,7 +12,7 @@ class SyncQueue implements Queue
         $this->container = $container;
     }
 
-    public function push(Job $job, $queue)
+    public function push(Job $job)
     {
         $job->setContainer($this->container);
         $job->execute();
@@ -23,7 +23,7 @@ class SyncQueue implements Queue
     {
     }
 
-    public function pop(Job $job, $queue)
+    public function pop($queue = null)
     {
     }
 }

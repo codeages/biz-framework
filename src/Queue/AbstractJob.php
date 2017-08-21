@@ -10,9 +10,9 @@ abstract class AbstractJob implements Job
 
     protected $queue;
 
-    protected $connectionName = 'default';
+    protected $connectionName;
 
-    public function __construct($body, $queue = 'default', $connectionName = 'default', $container = null)
+    public function __construct($body, $queue = null, $connectionName = null, $container = null)
     {
         $this->body = $body;
         $this->queue = $queue;
@@ -30,13 +30,13 @@ abstract class AbstractJob implements Job
         $this->container = $container;
     }
 
-    public function setConnection($connectionName)
+    public function getQueue()
     {
-        $this->connectionName = $connectionName;
-    }
+        return $this->queue ? $this->queue : 'default';
+    } 
 
-    public function getConnection()
+    public function getConnectionName()
     {
-        return $this->connectionName;
+        return $this->connectionName ? $this->connectionName : 'default';
     }
 }

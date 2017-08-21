@@ -3,7 +3,7 @@ namespace Codeages\Biz\Framework\Queue\Dao;
 
 use Codeages\Biz\Framework\Dao\GeneralDaoInterface;
 
-interface Job extends GeneralDaoInterface
+interface JobDao extends GeneralDaoInterface
 {
 
 }
