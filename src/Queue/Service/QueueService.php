@@ -9,4 +9,6 @@ interface QueueService
     public function releaseJob();
 
     public function popJob($queue = null); 
+
+    // public function getNextJob();
 }

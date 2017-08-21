@@ -1,7 +1,6 @@
 <?php
 namespace Tests\Queue;
 
-use Codeages\Biz\Framework\TargetLog\Service\TargetlogService;
 use Tests\IntegrationTestCase;
 use Tests\Fixtures\QueueJob\ExampleJob1;
 

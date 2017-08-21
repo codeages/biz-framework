@@ -19,6 +19,7 @@ class DatabaseQueue implements Queue
             'queue' => $job->getQueue(),
             'body' => $job->getBody(),
             'available_time' => time(),
+            'expired_time' => time() + $job->getTimeout(),
         ));
 
         return $job;
@@ -30,5 +31,26 @@ class DatabaseQueue implements Queue
 
     public function pop($queue = null)
     {
+        $queue = $queue ? $queue : 'default';
+
+        $this->biz['db']->beginTransaction();
+        $jobRow = $this->getJobDao()->getNextJob($queue);
+        if ($jobRow) {
+            $this->getJobDao()->update($jobRow['id'], array(
+                'reserved_time' => time(),
+                'attempts' => $jobRow['attempts'] + 1,
+            ));
+        }
+
+        $this->biz['db']->commit();
+
+        $job = new $jobRow['class']($jobRow['body'], $jobRow['queue']);
+
+        return $job;
+    }
+
+    protected function getJobDao()
+    {
+        return $this->biz->dao('Queue:JobDao');
     }
 }
