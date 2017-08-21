@@ -8,6 +8,7 @@ use Codeages\Biz\Framework\Provider\SchedulerServiceProvider;
 use Codeages\Biz\Framework\Provider\TargetlogServiceProvider;
 use Codeages\Biz\Framework\Provider\TokenServiceProvider;
 use Codeages\Biz\Framework\Provider\SettingServiceProvider;
+use Codeages\Biz\Framework\Provider\QueueServiceProvider;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
 use Codeages\Biz\Framework\Context\Biz;
@@ -82,6 +83,7 @@ class IntegrationTestCase extends TestCase
         $biz->register(new TokenServiceProvider());
         $biz->register(new SchedulerServiceProvider());
         $biz->register(new SettingServiceProvider());
+        $biz->register(new QueueServiceProvider());
 
         $cacheEnabled = getenv('CACHE_ENABLED');
 
