@@ -1,6 +1,7 @@
 <?php
-
 namespace Codeages\Biz\Framework\Queue;
+
+use Codeages\Biz\Framework\Context\Biz;
 
 abstract class AbstractJob implements Job
 {
@@ -8,18 +9,23 @@ abstract class AbstractJob implements Job
 
     protected $body;
 
-    protected $queue;
+    protected $id;
 
-    protected $connectionName;
+    protected $biz;
 
-    protected $timeout = 60;
-
-    public function __construct($body, $queue = null, $connectionName = null, $container = null)
+    public function __construct($body)
     {
         $this->body = $body;
-        $this->queue = $queue;
-        $this->connectionName = $connectionName;
-        $this->container = $container;
+    }
+
+    public function getId()
+    {
+        return $this->id;
+    }
+    
+    public function setId($id)
+    {
+        $this->id = $id;
     }
 
     public function getBody()
@@ -27,29 +33,13 @@ abstract class AbstractJob implements Job
         return $this->body;
     }
 
-    public function setContainer($container)
+    public function setBody($body)
     {
-        $this->container = $container;
+        $this->body = $body;
     }
 
-    public function getTimeout()
+    public function setBiz(Biz $biz)
     {
-        return $this->timeout;
-    }
-    
-    public function setTimeout($timeout)
-    {
-        $this->timeout = $timeout;
-        return $this;
-    }
-
-    public function getQueue()
-    {
-        return $this->queue ? $this->queue : 'default';
-    } 
-
-    public function getConnectionName()
-    {
-        return $this->connectionName ? $this->connectionName : 'default';
+        $this->biz = $biz;
     }
 }

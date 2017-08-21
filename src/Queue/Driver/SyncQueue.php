@@ -3,27 +3,49 @@ namespace Codeages\Biz\Framework\Queue\Driver;
 use Pimple\Container;
 use Codeages\Biz\Framework\Queue\Job;
 
-class SyncQueue implements Queue
+class SyncQueue extends AbstractQueue implements Queue
 {
-    protected $container;
+    protected $jobs = array();
 
-    public function __construct(Container $container)
+    public function push(Job $job, array $options = array())
     {
-        $this->container = $container;
+        if (!empty($this->options['async_execute'])) {
+            $this->jobs[] = $job;
+            return ;
+        }
+        
+        $job->setBiz($this->biz);
+        $job->execute();
     }
 
-    public function push(Job $job)
+    public function pop(array $options = array())
     {
-        $job->setContainer($this->container);
-        $job->execute();
+        $job = array_shift($this->jobs);
+        if (empty($job)) {
+            return null;
+        }
+        $job->setBiz($this->biz);
+
         return $job;
     }
 
-    public function release()
+    public function delete(Job $job)
     {
+
     }
 
-    public function pop($queue = null)
+    public function release(Job $job, array $options = array())
     {
+
+    }
+
+    public function bury(Job $job, array $options = array())
+    {
+
+    }
+
+    public function peek($id)
+    {
+
     }
 }

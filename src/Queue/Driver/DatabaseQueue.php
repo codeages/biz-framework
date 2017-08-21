@@ -3,33 +3,48 @@ namespace Codeages\Biz\Framework\Queue\Driver;
 use Codeages\Biz\Framework\Queue\Job;
 use Codeages\Biz\Framework\Queue\Dao\JobDao;
 use Codeages\Biz\Framework\Context\Biz;
+use Codeages\Biz\Framework\Queue\QueueException;
+use Doctrine\DBAL\Types\Type;
 
-class DatabaseQueue implements Queue
+class DatabaseQueue extends AbstractQueue implements Queue
 {
-    protected $biz;
+    protected $table;
 
-    public function __construct(Biz $biz)
+    public function __construct($name, Biz $biz, array $options = array())
     {
-        $this->biz = $biz;
+        $options = array_merge(array(
+            'table' => 'biz_queue_job',
+        ), $options);
+
+        parent::__construct($name, $biz, $options);
     }
 
-    public function push(Job $job)
+    public function push(Job $job, array $options = array())
     {
-        $jobRow = $this->biz->dao('Queue:JobDao')->create(array(
-            'queue' => $job->getQueue(),
-            'body' => $job->getBody(),
-            'available_time' => time(),
-            'expired_time' => time() + $job->getTimeout(),
-        ));
+        $options = $this->mergeJobOptions($options);
 
-        return $job;
+        try {
+            $this->biz['db']->insert($this->options['table'], array(
+                'queue' => $this->name,
+                'class' => get_class($job),
+                'body' => serialize($job->getBody()),
+                'available_time' => time(),
+                'expired_time' => time() + $options['timeout']
+            ), array(
+                Type::STRING,
+                Type::STRING,
+                Type::TEXT,
+                Type::INTEGER,
+                Type::INTEGER,
+            ));
+            $id = $this->biz['db']->lastInsertId();
+            $job->setId($id);
+        } catch (\Exception $e) {
+            throw new QueueException("Push job failed", 0, $e);
+        }
     }
 
-    public function release()
-    {
-    }
-
-    public function pop($queue = null)
+    public function pop(array $options = array())
     {
         $queue = $queue ? $queue : 'default';
 
@@ -49,8 +64,18 @@ class DatabaseQueue implements Queue
         return $job;
     }
 
-    protected function getJobDao()
+    public function delete(Job $job)
     {
-        return $this->biz->dao('Queue:JobDao');
+
+    }
+    
+    public function release(Job $job, array $options = array())
+    {
+
+    }
+
+    public function bury(Job $job, array $options = array())
+    {
+
     }
 }

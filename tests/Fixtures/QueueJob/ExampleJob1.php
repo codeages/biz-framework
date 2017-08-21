@@ -7,6 +7,7 @@ class ExampleJob1 extends AbstractJob
 {
     public function execute()
     {
-        echo "example job 1.";
+        $body = $this->getBody();
+        echo $body['name'];
     }
 }

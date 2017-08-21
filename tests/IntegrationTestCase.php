@@ -13,6 +13,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
 use Codeages\Biz\Framework\Context\Biz;
 use Codeages\Biz\Framework\Provider\DoctrineServiceProvider;
+use Tests\Assert\InDatabase;
 
 class IntegrationTestCase extends TestCase
 {
@@ -122,5 +123,11 @@ class IntegrationTestCase extends TestCase
         $seeder = new $seeder($this->db);
 
         return $seeder->run($isRun);
+    }
+
+    protected function assertInDatabase($table, array $criteria = array(), $message = '')
+    {
+        $constraint = new InDatabase($this->biz['db'], $table, $criteria);
+        static::assertThat(null, $constraint, $message);
     }
 }

@@ -21,7 +21,6 @@ class Queue extends Migration
                 `reserved_time` int(10) unsigned DEFAULT '0',
                 `available_time` int(10) unsigned NOT NULL DEFAULT '0',
                 `expired_time` int(10) unsigned NOT NULL DEFAULT '0',
-                `created_time` int(10) unsigned NOT NULL,
                 PRIMARY KEY (`id`),
                 KEY `idx_queue_reserved_time` (`queue`,`reserved_time`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;

@@ -1,13 +1,18 @@
 <?php
 namespace Codeages\Biz\Framework\Queue;
+use Codeages\Biz\Framework\Context\Biz;
 
 interface Job
 {
     public function execute();
 
-    public function getTimeout();
+    public function getId();
 
-    public function getQueue();
+    public function setId($id);
 
-    public function getConnectionName();
+    public function getBody();
+
+    public function setBody($body);
+
+    public function setBiz(Biz $biz);
 }
