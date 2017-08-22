@@ -15,11 +15,11 @@ class Queue extends Migration
             CREATE TABLE `biz_queue_job` (
                 `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
                 `queue` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
-                `class` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-                `body` longtext COLLATE utf8_unicode_ci NOT NULL,
-                `attempts` tinyint(3) unsigned NOT NULL DEFAULT '0',
-                `reserved_time` int(10) unsigned DEFAULT '0',
+                `payload` longtext COLLATE utf8_unicode_ci NOT NULL,
+                `priority` int(10) unsigned NOT NULL DEFAULT '0',
+                `attempts` int(10) unsigned NOT NULL DEFAULT '0',
                 `available_time` int(10) unsigned NOT NULL DEFAULT '0',
+                `reserved_time` int(10) unsigned DEFAULT '0',
                 `expired_time` int(10) unsigned NOT NULL DEFAULT '0',
                 PRIMARY KEY (`id`),
                 KEY `idx_queue_reserved_time` (`queue`,`reserved_time`)

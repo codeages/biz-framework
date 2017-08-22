@@ -26,12 +26,16 @@ class DatabaseQueue extends AbstractQueue implements Queue
         try {
             $this->biz['db']->insert($this->options['table'], array(
                 'queue' => $this->name,
-                'class' => get_class($job),
-                'body' => serialize($job->getBody()),
+                'payload' => serialize(array(
+                    'body' => $job->getBody(),
+                    'metadata' => array(
+                        'class' => get_class($job),
+                        'timeout' => $options['timeout'],
+                    ),
+                )),
                 'available_time' => time(),
                 'expired_time' => time() + $options['timeout']
             ), array(
-                Type::STRING,
                 Type::STRING,
                 Type::TEXT,
                 Type::INTEGER,
@@ -68,8 +72,13 @@ class DatabaseQueue extends AbstractQueue implements Queue
 
         $this->biz['db']->commit();
 
-        $job = new $record['class'](unserialize($record['body']));
+        $payload = unserialize($record['payload']);
+        $class = $payload['metadata']['class'];
+
+        $job = new $class();
         $job->setId($record['id']);
+        $job->setBody($payload['body']);
+        $job->setMetadata($payload['metadata']);
         $job->setBiz($this->biz);
 
         return $job;

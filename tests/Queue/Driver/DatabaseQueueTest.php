@@ -18,9 +18,9 @@ class DatabaseQueueTest extends IntegrationTestCase
         $body = array('name' => 'example job 1');
         $job = new ExampleJob1($body);
         $queue->push($job);
-        
+
         $this->assertGreaterThan(0, $job->getId());
-        $this->assertInDatabase($queueOptions['table'], array('queue' => self::TEST_QUEUE, 'class' => get_class($job)));
+        $this->assertInDatabase($queueOptions['table'], array('queue' => self::TEST_QUEUE));
     }
 
     public function testPop()

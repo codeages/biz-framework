@@ -14,5 +14,9 @@ interface Job
 
     public function setBody($body);
 
+    public function getMetadata($key = null, $default = null);
+
+    public function setMetadata($spec = null, $value = null);
+
     public function setBiz(Biz $biz);
 }
