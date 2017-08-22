@@ -14,6 +14,7 @@ use PHPUnit\Framework\TestCase;
 use Codeages\Biz\Framework\Context\Biz;
 use Codeages\Biz\Framework\Provider\DoctrineServiceProvider;
 use Tests\Assert\InDatabase;
+use PHPUnit\Framework\Constraint\LogicalNot;
 
 class IntegrationTestCase extends TestCase
 {
@@ -133,7 +134,10 @@ class IntegrationTestCase extends TestCase
 
     protected function assertNotInDatabase($table, array $criteria = array(), $message = '')
     {
-
+        $constraint = new LogicalNot(
+            new InDatabase($this->biz['db'], $table, $criteria)
+        );
+        static::assertThat(null, $constraint, $message);
     }
 
     protected function assertDatabaseRecordsNum($expectedNumber, array $criteria = array(), $message = '')

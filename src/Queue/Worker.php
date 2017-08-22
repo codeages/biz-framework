@@ -19,6 +19,9 @@ class Worker
     {
         while(true) {
             $job = $this->queue->pop();
+
+            $timeout = $job->getMetadata('timeout', $this->options['job_timeout']);
+
             $job->execute();
             $this->queue->delete($job);
         }

@@ -86,7 +86,11 @@ class DatabaseQueue extends AbstractQueue implements Queue
 
     public function delete(Job $job)
     {
-
+        $this->biz['db']->delete($this->options['table'], array(
+            'id' => $job->getId(),
+        ), array(
+            Type::INTEGER,
+        ));
     }
     
     public function release(Job $job, array $options = array())

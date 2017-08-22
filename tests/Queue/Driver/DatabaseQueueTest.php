@@ -38,6 +38,20 @@ class DatabaseQueueTest extends IntegrationTestCase
         $this->assertGreaterThan(0, $job->getId());
     }
 
+    public function testDelete()
+    {
+        $queueOptions = $this->getQueueOptions();
+        $queue = new DatabaseQueue(self::TEST_QUEUE, $this->biz, $queueOptions);
+
+        $body = array('name' => 'example job 1');
+        $job = new ExampleJob1($body);
+        $queue->push($job);
+
+        $queue->delete($job);
+
+        $this->assertNotInDatabase($queueOptions['table'], array('queue' => self::TEST_QUEUE));
+    }
+
     protected function getQueueOptions()
     {
         return  array(
