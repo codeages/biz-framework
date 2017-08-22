@@ -2,9 +2,9 @@
 
 namespace Codeages\Biz\Framework\Order\Status\Refund;
 
-class ClosedStatus extends AbstractRefundStatus
+class RefundedStatus extends AbstractRefundStatus
 {
-    const NAME = 'closed';
+    const NAME = 'refunded';
 
     public function getPriorStatus()
     {

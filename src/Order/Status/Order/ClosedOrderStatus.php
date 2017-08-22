@@ -8,6 +8,6 @@ class ClosedOrderStatus extends AbstractOrderStatus
 
     public function getPriorStatus()
     {
-        return array(CreatedOrderStatus::NAME);
+        return array(CreatedOrderStatus::NAME, PayingOrderStatus::NAME);
     }
 }

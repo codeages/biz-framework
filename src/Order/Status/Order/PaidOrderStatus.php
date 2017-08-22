@@ -8,39 +8,16 @@ class PaidOrderStatus extends AbstractOrderStatus
 
     public function getPriorStatus()
     {
-        return array(CreatedOrderStatus::NAME);
+        return array(PayingOrderStatus::NAME);
     }
 
-    public function consigned()
+    public function success($data = array())
     {
-        $order = $this->getOrderDao()->update($this->order['id'], array(
-            'status' => ConsignedOrderStatus::NAME
-        ));
-
-        $items = $this->getOrderItemDao()->findByOrderId($this->order['id']);
-        foreach ($items as $item) {
-            $this->getOrderItemDao()->update($item['id'], array(
-                'status' => ConsignedOrderStatus::NAME,
-            ));
-        }
-        return $order;
+        return $this->changeStatus(SuccessOrderStatus::NAME);
     }
 
-    public function finish()
+    public function fail($data = array())
     {
-        $finishTime = time();
-        $order = $this->getOrderDao()->update($this->order['id'], array(
-            'status' => FinishOrderStatus::NAME,
-            'finish_time' => $finishTime
-        ));
-
-        $items = $this->getOrderItemDao()->findByOrderId($this->order['id']);
-        foreach ($items as $item) {
-            $this->getOrderItemDao()->update($item['id'], array(
-                'status' => FinishOrderStatus::NAME,
-                'finish_time' => $finishTime
-            ));
-        }
-        return $order;
+        return $this->changeStatus(FailOrderStatus::NAME);
     }
 }

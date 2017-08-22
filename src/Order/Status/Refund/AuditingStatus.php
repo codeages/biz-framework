@@ -2,30 +2,43 @@
 
 namespace Codeages\Biz\Framework\Order\Status\Refund;
 
-class RefundingStatus extends AbstractRefundStatus
+class AuditingStatus extends AbstractRefundStatus
 {
-    const NAME = 'refunding';
+    const NAME = 'auditing';
 
     public function getPriorStatus()
     {
-        return array(AuditingStatus::NAME);
+        return array();
     }
 
-    public function refunded($data = array())
+    public function refunding($data)
+    {
+        return $this->changeStatusWithData(RefundingStatus::NAME, $data);
+    }
+
+    public function refused($data)
+    {
+        return $this->changeStatusWithData(RefusedStatus::NAME, $data);
+    }
+
+    protected function changeStatusWithData($name, $data)
     {
         $orderRefund = $this->getOrderRefundDao()->update($this->orderRefund['id'], array(
-            'status' => RefundedStatus::NAME
+            'deal_time' => time(),
+            'deal_user_id' => $this->biz['user']['id'],
+            'deal_reason' => empty($data['deal_reason']) ? '' : $data['deal_reason'],
+            'status' => $name
         ));
 
         $orderItemRefunds = $this->getOrderItemRefundDao()->findByOrderRefundId($orderRefund['id']);
         $updatedOrderItemRefunds = array();
         foreach ($orderItemRefunds as $orderItemRefund) {
             $updatedOrderItemRefunds[] = $this->getOrderItemRefundDao()->update($orderItemRefund['id'], array(
-                'status' => RefundedStatus::NAME
+                'status' => $name
             ));
 
             $this->getOrderItemDao()->update($orderItemRefund['order_item_id'], array(
-                'refund_status' => RefundedStatus::NAME
+                'refund_status' => $name
             ));
         }
 

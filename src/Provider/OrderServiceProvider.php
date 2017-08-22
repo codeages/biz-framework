@@ -3,16 +3,20 @@
 namespace Codeages\Biz\Framework\Provider;
 
 use Codeages\Biz\Framework\Order\Status\Order\ClosedOrderStatus;
+use Codeages\Biz\Framework\Order\Status\Order\FailOrderStatus;
 use Codeages\Biz\Framework\Order\Status\Order\ConsignedOrderStatus;
 use Codeages\Biz\Framework\Order\Status\Order\CreatedOrderStatus;
-use Codeages\Biz\Framework\Order\Status\Order\FinishOrderStatus;
+use Codeages\Biz\Framework\Order\Status\Order\RefundedOrderStatus;
+use Codeages\Biz\Framework\Order\Status\Order\RefundingOrderStatus;
+use Codeages\Biz\Framework\Order\Status\Order\SuccessOrderStatus;
 use Codeages\Biz\Framework\Order\Status\Order\OrderContext;
 use Codeages\Biz\Framework\Order\Status\Order\PaidOrderStatus;
-use Codeages\Biz\Framework\Order\Status\Refund\ClosedStatus;
+use Codeages\Biz\Framework\Order\Status\Order\PayingOrderStatus;
+use Codeages\Biz\Framework\Order\Status\Refund\RefusedStatus;
 use Codeages\Biz\Framework\Order\Status\Refund\CreatedStatus;
-use Codeages\Biz\Framework\Order\Status\Refund\FinishStatus;
+use Codeages\Biz\Framework\Order\Status\Refund\RefundedStatus;
 use Codeages\Biz\Framework\Order\Status\Refund\OrderRefundContext;
-use Codeages\Biz\Framework\Order\Status\Refund\AdoptStatus;
+use Codeages\Biz\Framework\Order\Status\Refund\AuditingStatus;
 use Codeages\Biz\Framework\Order\Status\Refund\RefundingStatus;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
@@ -36,9 +40,9 @@ class OrderServiceProvider implements ServiceProviderInterface
 
         $orderRefundStatusArray = array(
             RefundingStatus::class,
-            AdoptStatus::class,
-            ClosedStatus::class,
-            FinishStatus::class
+            AuditingStatus::class,
+            RefusedStatus::class,
+            RefundedStatus::class
         );
 
         foreach ($orderRefundStatusArray as $orderRefundStatus) {
@@ -56,10 +60,13 @@ class OrderServiceProvider implements ServiceProviderInterface
 
         $orderStatusArray = array(
             CreatedOrderStatus::class,
-            ConsignedOrderStatus::class,
+            PayingOrderStatus::class,
             PaidOrderStatus::class,
+            FailOrderStatus::class,
+            SuccessOrderStatus::class,
             ClosedOrderStatus::class,
-            FinishOrderStatus::class
+            RefundingOrderStatus::class,
+            RefundedOrderStatus::class,
         );
 
         foreach ($orderStatusArray as $orderStatus) {
