@@ -8,15 +8,43 @@ use PHPUnit\DbUnit\TestCaseTrait;
 
 class DatabaseQueueTest extends IntegrationTestCase
 {
+    const TEST_QUEUE = 'test_queue';
+
     public function testPush_PushExampleJob_JobInserted()
     {
-        $queue = new DatabaseQueue('default', $this->biz);
-        $job = new ExampleJob1(array('name' => 'example job 1'));
-        $queue->push($job);
-        // $this->assertGreaterThan(0, $job->getId());
+        $queueOptions = $this->getQueueOptions();
+        $queue = new DatabaseQueue(self::TEST_QUEUE, $this->biz, $queueOptions);
 
-        $this->assertInDatabase('biz_queue_job', array('queue' => 'default'));
+        $body = array('name' => 'example job 1');
+        $job = new ExampleJob1($body);
+        $queue->push($job);
+        
+        $this->assertGreaterThan(0, $job->getId());
+        $this->assertInDatabase($queueOptions['table'], array('queue' => self::TEST_QUEUE, 'class' => get_class($job)));
     }
+
+    public function testPop()
+    {
+        $queueOptions = $this->getQueueOptions();
+        $queue = new DatabaseQueue(self::TEST_QUEUE, $this->biz, $queueOptions);
+
+        $body = array('name' => 'example job 1');
+        $job = new ExampleJob1($body);
+
+        $queue->push($job);
+        $job = $queue->pop();
+
+        $this->assertEquals($body, $job->getBody());
+        $this->assertGreaterThan(0, $job->getId());
+    }
+
+    protected function getQueueOptions()
+    {
+        return  array(
+            'table' => 'biz_queue_job',
+        );
+    }
+
 
     // public function testPop_WithNewJobs()
     // {

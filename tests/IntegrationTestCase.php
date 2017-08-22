@@ -130,4 +130,24 @@ class IntegrationTestCase extends TestCase
         $constraint = new InDatabase($this->biz['db'], $table, $criteria);
         static::assertThat(null, $constraint, $message);
     }
+
+    protected function assertNotInDatabase($table, array $criteria = array(), $message = '')
+    {
+
+    }
+
+    protected function assertDatabaseRecordsNum($expectedNumber, array $criteria = array(), $message = '')
+    {
+
+    }
+
+    protected function grabAllFromDatabase($table, $column, array $criteria = array())
+    {
+
+    }
+
+    protected function grabSingleFromDatabase($table, $column, array $criteria = array())
+    {
+
+    }
 }

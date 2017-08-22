@@ -46,20 +46,31 @@ class DatabaseQueue extends AbstractQueue implements Queue
 
     public function pop(array $options = array())
     {
-        $queue = $queue ? $queue : 'default';
-
         $this->biz['db']->beginTransaction();
-        $jobRow = $this->getJobDao()->getNextJob($queue);
-        if ($jobRow) {
-            $this->getJobDao()->update($jobRow['id'], array(
-                'reserved_time' => time(),
-                'attempts' => $jobRow['attempts'] + 1,
-            ));
+
+        $sql = "SELECT * FROM {$this->options['table']} WHERE queue = ? AND (reserved_time = 0 AND available_time <= ?) OR (reserved_time > 0 AND expired_time <= ?) ORDER BY id ASC FOR UPDATE;";
+        $now = time();
+        $record = $this->biz['db']->fetchAssoc($sql, array($this->name, $now, $now)) ?: null;
+        if (empty($record)) {
+            $this->biz['db']->commit();
+            return null;
         }
+
+        $this->biz['db']->update($this->options['table'], array(
+            'reserved_time' => time(),
+            'attempts' => $record['attempts'] + 1,
+        ), array(
+            'id' => $record['id'],
+        ), array(
+            Type::INTEGER,
+            Type::INTEGER,
+        ));
 
         $this->biz['db']->commit();
 
-        $job = new $jobRow['class']($jobRow['body'], $jobRow['queue']);
+        $job = new $record['class'](unserialize($record['body']));
+        $job->setId($record['id']);
+        $job->setBiz($this->biz);
 
         return $job;
     }
