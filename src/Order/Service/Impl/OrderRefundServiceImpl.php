@@ -35,7 +35,9 @@ class OrderRefundServiceImpl extends BaseService implements OrderRefundService
     public function setRefunding($id, $data = array())
     {
         $this->validateLogin();
-        return $this->getOrderRefundContext($id)->refunding($data);
+        $orderRefund = $this->getOrderRefundContext($id)->refunding($data);
+        $this->getOrderService()->setOrderRefunding($orderRefund['order_id']);
+        return $orderRefund;
     }
 
     public function setRefused($id, $data = array())
@@ -46,7 +48,9 @@ class OrderRefundServiceImpl extends BaseService implements OrderRefundService
 
     public function setRefunded($id, $data = array())
     {
-        return $this->getOrderRefundContext($id)->refunded($data);
+        $orderRefund = $this->getOrderRefundContext($id)->refunded($data);
+        $this->getOrderService()->setOrderRefunded($orderRefund['order_id']);
+        return $orderRefund;
     }
 
     protected function createOrderRefund($orderId, $data)
@@ -119,6 +123,11 @@ class OrderRefundServiceImpl extends BaseService implements OrderRefundService
     protected function getOrderItemRefundDao()
     {
         return $this->biz->dao('Order:OrderItemRefundDao');
+    }
+
+    protected function getOrderService()
+    {
+        return $this->biz->service('Order:OrderService');
     }
 
     protected function createOrderRefundItems($orderItemIds, $orderRefund)

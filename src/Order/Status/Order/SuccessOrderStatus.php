@@ -10,4 +10,9 @@ class SuccessOrderStatus extends AbstractOrderStatus
     {
         return array(FailOrderStatus::NAME, PaidOrderStatus::NAME);
     }
+
+    public function refunding($data = array())
+    {
+        return $this->changeStatus(RefundingOrderStatus::NAME);
+    }
 }
