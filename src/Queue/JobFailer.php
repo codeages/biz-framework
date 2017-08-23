@@ -16,8 +16,8 @@ class JobFailer
             'queue' => $queue,
             'body' => $job->getBody(),
             'class' => $job->getMetadata('class'),
-            'timeout' => $job->getMetadata('timeout'),
-            'priority' => $job->getMetadata('priority'),
+            'timeout' => $job->getMetadata('timeout', 0),
+            'priority' => $job->getMetadata('priority', 0),
             'reason' => $message,
         );
 

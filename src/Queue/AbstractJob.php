@@ -14,10 +14,13 @@ abstract class AbstractJob implements Job
 
     protected $biz;
 
-    public function __construct($body = null, array $metadata = array())
+    protected $queueName;
+
+    public function __construct($body = null, array $metadata = array(), $queueName = null)
     {
         $this->setBody($body);
         $this->setMetadata($metadata);
+        $this->queueName = empty($queueName) ? 'default' : (string) $queueName;
     }
 
     public function getId()
@@ -73,6 +76,11 @@ abstract class AbstractJob implements Job
             $this->metadata[$key] = $value;
         }
         return $this;
+    }
+
+    public function getQueueName()
+    {
+        return $this->queueName;
     }
 
     public function setBiz(Biz $biz)

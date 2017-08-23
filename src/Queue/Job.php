@@ -34,5 +34,7 @@ interface Job
 
     public function setMetadata($spec = null, $value = null);
 
+    public function getQueueName();
+
     public function setBiz(Biz $biz);
 }
