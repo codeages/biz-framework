@@ -14,7 +14,7 @@ class FailedJobDaoImpl extends GeneralDaoImpl implements JobDao
         return array(
             'timestamps' => array('failed_time'),
             'serializes' => array('body' => 'php'),
-            'orderbys' => array('created_time'),
+            'orderbys' => array('failed_time'),
             'conditions' => array(
             ),
         );

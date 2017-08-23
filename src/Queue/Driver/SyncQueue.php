@@ -14,6 +14,7 @@ class SyncQueue extends AbstractQueue implements Queue
             return ;
         }
         
+        $job->setId(uniqid());
         $job->setBiz($this->biz);
         $job->execute();
     }

@@ -4,11 +4,11 @@ use Codeages\Biz\Framework\Queue\Job;
 
 interface QueueService
 {
-    public function pushJob(Job $job);
-    
-    public function releaseJob();
+    public function pushJob(Job $job, $queue = null);
 
-    public function popJob($queue = null); 
+    public function getFailedJob($id);
 
-    // public function getNextJob();
+    public function countFailedJobs($conditions);
+
+    public function searchFailedJobs($conditions, $orderBys, $start, $limit);
 }

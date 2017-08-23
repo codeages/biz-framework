@@ -15,11 +15,11 @@ class QueueServiceProvider implements ServiceProviderInterface
         $biz['migration.directories'][] = dirname(dirname(__DIR__)).'/migrations/Queue';
         $biz['autoload.aliases']['Queue'] = 'Codeages\Biz\Framework\Queue';
 
-        $biz['queue.connection.sync'] = function ($biz) {
-            return new SyncQueue($biz);
+        $biz['queue.default'] = function ($biz) {
+            return new SyncQueue('default', $biz);
         };
 
-        $biz['queue.connection.database'] = function ($biz) {
+        $biz['queue.driver.database'] = function ($biz) {
             return new DatabaseQueue($biz);
         };
     }
