@@ -18,7 +18,13 @@ class RefundingOrderStatus extends AbstractOrderStatus
 
     public function process($data = array())
     {
-        return $this->changeStatus(self::NAME);
+        $order = $this->changeStatus(self::NAME);
+        if(empty($order['trade_sn'])) {
+            return $order;
+        }
+
+        $this->getPayService()->applyRefundByTradeSn($order['trade_sn']);
+        return $order;
     }
 
     public function refunded($data = array())
@@ -29,5 +35,10 @@ class RefundingOrderStatus extends AbstractOrderStatus
     public function success($data = array())
     {
         return $this->getOrderStatus(SuccessOrderStatus::NAME)->process($data);
+    }
+
+    protected function getPayService()
+    {
+        return $this->biz->service('Pay:PayService');
     }
 }

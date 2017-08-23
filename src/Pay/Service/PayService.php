@@ -14,7 +14,7 @@ interface PayService
 
     public function notifyPaid($payment, $data);
 
-    public function notifyRefund($payment, $data);
+    public function notifyRefunded($payment, $data);
 
     public function notifyClosed($data);
 }

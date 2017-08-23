@@ -32,15 +32,13 @@ class OrderRefundServiceImpl extends BaseService implements OrderRefundService
         return $orderRefund;
     }
 
-    public function setRefunding($id, $data = array())
+    public function adoptRefund($id, $data = array())
     {
         $this->validateLogin();
-        $orderRefund = $this->getOrderRefundContext($id)->refunding($data);
-        $this->getOrderService()->setOrderRefunding($orderRefund['order_id']);
-        return $orderRefund;
+        return $this->getOrderRefundContext($id)->refunding($data);
     }
 
-    public function setRefused($id, $data = array())
+    public function refuseRefund($id, $data = array())
     {
         $this->validateLogin();
         return $this->getOrderRefundContext($id)->refused($data);
@@ -48,9 +46,7 @@ class OrderRefundServiceImpl extends BaseService implements OrderRefundService
 
     public function setRefunded($id, $data = array())
     {
-        $orderRefund = $this->getOrderRefundContext($id)->refunded($data);
-        $this->getOrderService()->setOrderRefunded($orderRefund['order_id']);
-        return $orderRefund;
+        return $this->getOrderRefundContext($id)->refunded($data);
     }
 
     protected function createOrderRefund($orderId, $data)

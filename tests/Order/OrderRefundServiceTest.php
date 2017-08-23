@@ -22,7 +22,7 @@ class OrderRefundServiceTest extends IntegrationTestCase
     {
         $orderRefund = $this->mockOrderRefund();
         unset($this->biz['user']);
-        $this->getOrderRefundService()->setRefunding($orderRefund['id'], array('deal_reason' => '通过'));
+        $this->getOrderRefundService()->adoptRefund($orderRefund['id'], array('deal_reason' => '通过'));
         $this->getOrderRefundService()->setRefunded($orderRefund['id']);
     }
 
@@ -33,13 +33,13 @@ class OrderRefundServiceTest extends IntegrationTestCase
     {
         $orderRefund = $this->mockOrderRefund();
         unset($this->biz['user']);
-        $this->getOrderRefundService()->setRefused($orderRefund['id'], array('deal_reason' => '拒绝'));
+        $this->getOrderRefundService()->refuseRefund($orderRefund['id'], array('deal_reason' => '拒绝'));
     }
 
     public function testFinishOrderRefund()
     {
         $orderRefund = $this->mockOrderRefund();
-        $this->getOrderRefundService()->setRefunding($orderRefund['id'], array('deal_reason' => '通过'));
+        $this->getOrderRefundService()->adoptRefund($orderRefund['id'], array('deal_reason' => '通过'));
         $orderRefund = $this->getOrderRefundService()->setRefunded($orderRefund['id']);
         $this->assertEquals('refunded', $orderRefund['status']);
         $this->assertNotEmpty($orderRefund['deal_time']);
@@ -50,7 +50,7 @@ class OrderRefundServiceTest extends IntegrationTestCase
     public function testSetRefusedOrderRefund()
     {
         $orderRefund = $this->mockOrderRefund();
-        $orderRefund = $this->getOrderRefundService()->setRefused($orderRefund['id'], array('deal_reason' => '拒绝'));
+        $orderRefund = $this->getOrderRefundService()->refuseRefund($orderRefund['id'], array('deal_reason' => '拒绝'));
         $this->assertEquals('refused', $orderRefund['status']);
         $this->assertNotEmpty($orderRefund['deal_time']);
         $this->assertNotEmpty($orderRefund['deal_reason']);
@@ -60,7 +60,7 @@ class OrderRefundServiceTest extends IntegrationTestCase
     public function testSetRefundedOrderItemRefunds()
     {
         $orderRefund = $this->mockOrderItemRefunds();
-        $this->getOrderRefundService()->setRefunding($orderRefund['id'], array('deal_reason' => '对该课程不感兴趣'));
+        $this->getOrderRefundService()->adoptRefund($orderRefund['id'], array('deal_reason' => '对该课程不感兴趣'));
         $orderRefund = $this->getOrderRefundService()->setRefunded($orderRefund['id']);
         $this->assertEquals('refunded', $orderRefund['status']);
         $this->assertNotEmpty($orderRefund['deal_time']);
@@ -83,7 +83,7 @@ class OrderRefundServiceTest extends IntegrationTestCase
         $order = $this->getOrderService()->createOrder($this->mockOrder(), $mockedOrderItems);
         $data = array(
             'order_sn' => $order['sn'],
-            'trade_sn' => '1234567',
+            'trade_sn' => '',
             'pay_time' => time()
         );
         $this->getOrderService()->setOrderPaying($order['id']);
@@ -110,7 +110,7 @@ class OrderRefundServiceTest extends IntegrationTestCase
         $order = $this->getOrderService()->createOrder($this->mockOrder(), $mockedOrderItems);
         $data = array(
             'order_sn' => $order['sn'],
-            'trade_sn' => '1234567',
+            'trade_sn' => '',
             'pay_time' => time()
         );
         $this->getOrderService()->setOrderPaying($order['id']);

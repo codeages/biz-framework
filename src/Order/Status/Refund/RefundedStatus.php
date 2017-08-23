@@ -18,6 +18,13 @@ class RefundedStatus extends AbstractRefundStatus
 
     public function process($data = array())
     {
-        return $this->changeStatus(self::NAME);
+        $orderRefund = $this->changeStatus(self::NAME);
+        $this->getOrderService()->setOrderRefunded($orderRefund['order_id']);
+        return $orderRefund;
+    }
+
+    protected function getOrderService()
+    {
+        return $this->biz->service('Order:OrderService');
     }
 }

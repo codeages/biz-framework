@@ -30,5 +30,4 @@ class PayingOrderStatus extends AbstractOrderStatus
     {
         return $this->getOrderStatus(ClosedOrderStatus::NAME)->process($data);
     }
-
 }

@@ -14,15 +14,14 @@ class OrderSubscriber extends EventSubscriber implements EventSubscriberInterfac
         return array(
             'pay.success' => 'onPaid',
             'order.paid' => 'onOrderPaid',
-            'trade.refunded' => 'onTradeRefunded'
+            'payment_trade.refunded' => 'onTradeRefunded'
         );
     }
 
     public function onTradeRefunded(Event $event)
     {
         $trade = $event->getSubject();
-        $data = $event->getArguments();
-        $this->getOrderRefundService()->finishRefund($trade['refund_id']);
+        $this->getOrderRefundService()->setRefunded($trade['refund_id']);
     }
 
     public function onOrderPaid(Event $event)
@@ -32,7 +31,9 @@ class OrderSubscriber extends EventSubscriber implements EventSubscriberInterfac
         if (!empty($processor)) {
             $result = $processor->process($order);
             if (AbstractPaidProcessor::SUCCESS == $result) {
-                $this->getOrderService()->finishOrder($order['id']);
+                $this->getOrderService()->setOrderSuccess($order['id']);
+            } else {
+                $this->getOrderService()->setOrderFail($order['id']);
             }
         }
     }

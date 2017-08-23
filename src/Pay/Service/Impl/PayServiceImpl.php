@@ -176,10 +176,12 @@ class PayServiceImpl extends BaseService implements PayService
         ));
         $this->dispatch('trade.refunding', $trade);
 
+        // TODO: 当支付宝时，直接修改状态为refunded
+
         return $trade;
     }
 
-    public function notifyRefund($payment, $data)
+    public function notifyRefunded($payment, $data)
     {
         $paymentGetWay = $this->getPayment($payment);
         $response = $paymentGetWay->converterRefundNotify($data);
