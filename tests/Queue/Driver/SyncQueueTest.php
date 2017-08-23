@@ -1,7 +1,6 @@
 <?php
 namespace Tests\Queue\Driver;
 
-
 use PHPUnit\DbUnit\TestCaseTrait;
 use Tests\Queue\QueueBaseTestCase;
 use Codeages\Biz\Framework\Queue\Driver\SyncQueue;

@@ -3,6 +3,7 @@
 namespace Tests;
 
 use Codeages\Biz\Framework\Dao\Connection;
+use Codeages\Biz\Framework\Provider\DoctrineServiceProvider;
 use Codeages\Biz\Framework\Provider\RedisServiceProvider;
 use Codeages\Biz\Framework\Provider\SchedulerServiceProvider;
 use Codeages\Biz\Framework\Provider\TargetlogServiceProvider;
@@ -12,7 +13,7 @@ use Codeages\Biz\Framework\Provider\QueueServiceProvider;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
 use Codeages\Biz\Framework\Context\Biz;
-use Codeages\Biz\Framework\Provider\DoctrineServiceProvider;
+
 use Tests\Assert\InDatabase;
 use PHPUnit\Framework\Constraint\LogicalNot;
 use Monolog\Logger;
@@ -64,7 +65,7 @@ class IntegrationTestCase extends TestCase
     {
         $defaultOptions = array(
             'db.options' => array(
-                'dbname' => getenv('DB_NAME') ?: 'biz-target-test',
+                'dbname' => getenv('DB_NAME') ?: 'biz-framework-test',
                 'user' => getenv('DB_USER') ?: 'root',
                 'password' => getenv('DB_PASSWORD') ?: '',
                 'host' => getenv('DB_HOST') ?: '127.0.0.1',

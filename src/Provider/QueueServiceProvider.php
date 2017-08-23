@@ -8,6 +8,7 @@ use Codeages\Biz\Framework\Queue\Driver\SyncQueue;
 use Codeages\Biz\Framework\Context\Biz;
 use Codeages\Biz\Framework\Queue\Driver\DatabaseQueue;
 use Codeages\Biz\Framework\Queue\JobFailer;
+use Codeages\Biz\Framework\Queue\WorkerCommand;
 
 class QueueServiceProvider implements ServiceProviderInterface
 {
@@ -15,6 +16,9 @@ class QueueServiceProvider implements ServiceProviderInterface
     {
         $biz['migration.directories'][] = dirname(dirname(__DIR__)).'/migrations/Queue';
         $biz['autoload.aliases']['Queue'] = 'Codeages\Biz\Framework\Queue';
+        $biz['console.commands'][] = function () use ($biz) {
+            return new WorkerCommand();
+        };
 
         $biz['queue.failer'] = function ($biz) {
             return new JobFailer($biz->dao('Queue:FailedJobDao'));
