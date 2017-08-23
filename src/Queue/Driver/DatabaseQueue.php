@@ -19,30 +19,31 @@ class DatabaseQueue extends AbstractQueue implements Queue
         parent::__construct($name, $biz, $options);
     }
 
-    public function push(Job $job, array $options = array())
+    public function push(Job $job)
     {
-        $options = $this->mergeJobOptions($options);
-
         try {
-            $this->biz['db']->insert($this->options['table'], array(
+            $jobRecord = array(
                 'queue' => $this->name,
-                'payload' => serialize(array(
-                    'body' => $job->getBody(),
-                    'metadata' => array(
-                        'class' => get_class($job),
-                        'timeout' => $options['timeout'],
-                    ),
-                )),
-                'available_time' => time(),
-                'expired_time' => time() + $options['timeout']
-            ), array(
+                'body' => serialize($job->getBody()),
+                'class' => get_class($job),
+                'timeout' => $job->getMetadata('timeout', $this->options['job_timeout']),
+                'priority' => $job->getMetadata('priority', Job::PRI_DEFAULT),
+                'available_time' => time() + $job->getMetadata('delay', 0),
+            );
+            $jobRecord['expired_time'] = time() + $jobRecord['timeout'];
+
+            $this->biz['db']->insert($this->options['table'], $jobRecord, array(
                 Type::STRING,
                 Type::TEXT,
+                Type::STRING,
+                Type::INTEGER,
+                Type::INTEGER,
                 Type::INTEGER,
                 Type::INTEGER,
             ));
             $id = $this->biz['db']->lastInsertId();
             $job->setId($id);
+            $job->setBiz($this->biz);
         } catch (\Exception $e) {
             throw new QueueException("Push job failed", 0, $e);
         }
@@ -62,7 +63,7 @@ class DatabaseQueue extends AbstractQueue implements Queue
 
         $this->biz['db']->update($this->options['table'], array(
             'reserved_time' => time(),
-            'attempts' => $record['attempts'] + 1,
+            'executions' => $record['executions'] + 1,
         ), array(
             'id' => $record['id'],
         ), array(
@@ -72,13 +73,15 @@ class DatabaseQueue extends AbstractQueue implements Queue
 
         $this->biz['db']->commit();
 
-        $payload = unserialize($record['payload']);
-        $class = $payload['metadata']['class'];
-
+        $class = $record['class'];
         $job = new $class();
         $job->setId($record['id']);
-        $job->setBody($payload['body']);
-        $job->setMetadata($payload['metadata']);
+        $job->setBody(unserialize($record['body']));
+        $job->setMetadata(array(
+            'timeout' => $record['timeout'],
+            'priority' => $record['priority'],
+            'executions' => $record['executions'] + 1,
+        ));
         $job->setBiz($this->biz);
 
         return $job;
@@ -93,12 +96,7 @@ class DatabaseQueue extends AbstractQueue implements Queue
         ));
     }
     
-    public function release(Job $job, array $options = array())
-    {
-
-    }
-
-    public function bury(Job $job, array $options = array())
+    public function release(Job $job)
     {
 
     }

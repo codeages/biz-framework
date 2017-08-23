@@ -19,13 +19,8 @@ abstract class AbstractQueue implements Queue
     {
         $this->name = $name;
         $this->biz = $biz;
-        $this->options = $options;
-    }
-
-    protected function mergeJobOptions(array $options = array())
-    {
-        return array_merge(array(
-            'timeout' => empty($this->options['execute_timeout']) ? 60 : $this->options['execute_timeout'],
+        $this->options = array_merge(array(
+            'job_timeout' => 60,
         ), $options);
     }
 }

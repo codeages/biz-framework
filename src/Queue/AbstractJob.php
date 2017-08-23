@@ -14,9 +14,10 @@ abstract class AbstractJob implements Job
 
     protected $biz;
 
-    public function __construct($body = null)
+    public function __construct($body = null, array $metadata = array())
     {
-        $this->body = $body;
+        $this->setBody($body);
+        $this->setMetadata($metadata);
     }
 
     public function getId()
