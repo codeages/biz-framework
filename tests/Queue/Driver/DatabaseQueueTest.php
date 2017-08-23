@@ -2,7 +2,7 @@
 namespace Tests\Queue\Driver;
 
 use Codeages\Biz\Framework\Queue\Driver\DatabaseQueue;
-use Tests\Fixtures\QueueJob\ExampleJob1;
+use Tests\Fixtures\QueueJob\ExampleFinishedJob;
 use PHPUnit\DbUnit\TestCaseTrait;
 use Tests\Queue\QueueBaseTestCase;
 
@@ -13,8 +13,8 @@ class DatabaseQueueTest extends QueueBaseTestCase
         $queueOptions = $this->getQueueOptions();
         $queue = new DatabaseQueue(self::TEST_QUEUE, $this->biz, $queueOptions);
 
-        $body = array('name' => 'example job 1');
-        $job = new ExampleJob1($body);
+        $body = array('name' => 'example job');
+        $job = new ExampleFinishedJob($body);
         $queue->push($job);
 
         $this->assertGreaterThan(0, $job->getId());
@@ -26,8 +26,8 @@ class DatabaseQueueTest extends QueueBaseTestCase
         $queueOptions = $this->getQueueOptions();
         $queue = new DatabaseQueue(self::TEST_QUEUE, $this->biz, $queueOptions);
 
-        $body = array('name' => 'example job 1');
-        $job = new ExampleJob1($body);
+        $body = array('name' => 'example job');
+        $job = new ExampleFinishedJob($body);
 
         $queue->push($job);
         $job = $queue->pop();
@@ -41,8 +41,8 @@ class DatabaseQueueTest extends QueueBaseTestCase
         $queueOptions = $this->getQueueOptions();
         $queue = new DatabaseQueue(self::TEST_QUEUE, $this->biz, $queueOptions);
 
-        $body = array('name' => 'example job 1');
-        $job = new ExampleJob1($body);
+        $body = array('name' => 'example job');
+        $job = new ExampleFinishedJob($body);
         $queue->push($job);
 
         $queue->delete($job);
@@ -55,8 +55,8 @@ class DatabaseQueueTest extends QueueBaseTestCase
         $queueOptions = $this->getQueueOptions();
         $queue = new DatabaseQueue(self::TEST_QUEUE, $this->biz, $queueOptions);
 
-        $body = array('name' => 'example job 1');
-        $job = new ExampleJob1($body);
+        $body = array('name' => 'example job');
+        $job = new ExampleFinishedJob($body);
         $queue->push($job);
 
         $job = $queue->pop();
@@ -80,6 +80,6 @@ class DatabaseQueueTest extends QueueBaseTestCase
     //     $queue = new DatabaseQueue($this->biz);
     //     $job = $queue->push();
 
-    //     $this->assertInstanceOf('Tests\\Fixtures\\QueueJob\\ExampleJob1', $job);
+    //     $this->assertInstanceOf('Tests\\Fixtures\\QueueJob\\ExampleFinishedJob', $job);
     // }
 }

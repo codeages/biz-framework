@@ -8,6 +8,7 @@ use Codeages\Biz\Framework\Queue\Driver\DatabaseQueue;
 use Tests\Fixtures\QueueJob\ExampleFinishedJob;
 use Tests\Fixtures\QueueJob\ExampleFailedJob;
 use Tests\Fixtures\QueueJob\ExampleFailedRetryJob;
+use Tests\Fixtures\QueueJob\ExampleTimeoutJob;
 
 class WorkerTest extends QueueBaseTestCase
 {

@@ -5,6 +5,12 @@ use Codeages\Biz\Framework\Queue\Driver\Queue;
 
 class Worker
 {
+    const EXIT_CODE_MEMORY_EXCEEDED = 1;
+
+    const EXIT_CODE_TIMEOUT = 2;
+
+    const EXIT_CODE_EXCEPTION =3 ;
+
     protected $queue;
 
     protected $options;
@@ -20,7 +26,7 @@ class Worker
         $this->options = array_merge(array(
             'job_timeout' => 60,
             'memory_limit' => 256,
-            'sleep' => 1,
+            'sleep' => 2,
             'tries' => 0,
             'once' => false,
         ), $options);
@@ -29,8 +35,7 @@ class Worker
     public function run()
     {
         while(true) {
-
-
+            $this->runNextJob();
             $this->stopIfNecessary();
         }
     }
@@ -39,7 +44,6 @@ class Worker
     {
         $job = $this->getNextJob();
         if ($job) {
-            $timeout = $job->getMetadata('timeout', $this->options['job_timeout']);
             $this->executeJob($job);
         } else {
             sleep($this->options['sleep']);
@@ -59,6 +63,8 @@ class Worker
 
     protected function executeJob($job)
     {
+        $this->registerTimeoutHandler($job);
+        
         try {
             $result = $job->execute();
         } catch(\Exception $e) {
@@ -93,10 +99,42 @@ class Worker
         $this->queue->delete($job);
     }
 
+    protected function registerTimeoutHandler($job)
+    {
+        $timeout = $job->getMetadata('timeout', 0);
+        if (empty($timeout)) {
+            return ;
+        }
+
+        if ($this->isSupportAsyncSignal()) {
+            pcntl_async_signals(true);
+            pcntl_signal(SIGALRM, function () {
+                $this->kill(self::EXIT_CODE_TIMEOUT);
+            });
+
+            pcntl_alarm($timeout);
+        }
+    }
+
+    protected function isSupportAsyncSignal()
+    {
+        return version_compare(PHP_VERSION, '7.1.0') >= 0 &&
+               extension_loaded('pcntl');
+    }
+
+    public function kill($status = 0)
+    {
+        if (extension_loaded('posix')) {
+            posix_kill(getmypid(), SIGKILL);
+        }
+
+        exit($status);
+    }
+
     protected function stopIfNecessary()
     {
         if ($this->shouldQuit) {
-            exit();
+            exit(self::EXIT_CODE_EXCEPTION);
         }
 
         if ($this->options['once'] == true) {
@@ -104,22 +142,12 @@ class Worker
         }
 
         if ($this->isMemoryExceeded($this->options['memory_limit'])) {
-            exit();
+            exit(self::EXIT_CODE_MEMORY_EXCEEDED);
         }
     }
 
     protected function isMemoryExceeded($memoryLimit)
     {
         return (memory_get_usage() / 1024 / 1024) >= $memoryLimit;
-    }
-
-    protected function getJobTimeout($job, $options)
-    {
-
-    }
-
-    protected function getQueueService()
-    {
-
     }
 }
