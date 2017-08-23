@@ -30,13 +30,11 @@ class DatabaseQueue extends AbstractQueue implements Queue
                 'priority' => $job->getMetadata('priority', Job::PRI_DEFAULT),
                 'available_time' => time() + $job->getMetadata('delay', 0),
             );
-            $jobRecord['expired_time'] = time() + $jobRecord['timeout'];
 
             $this->biz['db']->insert($this->options['table'], $jobRecord, array(
                 Type::STRING,
                 Type::TEXT,
                 Type::STRING,
-                Type::INTEGER,
                 Type::INTEGER,
                 Type::INTEGER,
                 Type::INTEGER,
@@ -55,7 +53,15 @@ class DatabaseQueue extends AbstractQueue implements Queue
 
         $sql = "SELECT * FROM {$this->options['table']} WHERE queue = ? AND (reserved_time = 0 AND available_time <= ?) OR (reserved_time > 0 AND expired_time <= ?) ORDER BY id ASC FOR UPDATE;";
         $now = time();
-        $record = $this->biz['db']->fetchAssoc($sql, array($this->name, $now, $now)) ?: null;
+        $record = $this->biz['db']->fetchAssoc($sql, array(
+            $this->name,
+            $now,
+            $now
+        ), array(
+            Type::STRING,
+            Type::INTEGER,
+            Type::INTEGER,
+        ));
         if (empty($record)) {
             $this->biz['db']->commit();
             return null;
@@ -64,9 +70,11 @@ class DatabaseQueue extends AbstractQueue implements Queue
         $this->biz['db']->update($this->options['table'], array(
             'reserved_time' => time(),
             'executions' => $record['executions'] + 1,
+            'expired_time' => time() + $record['timeout'],
         ), array(
             'id' => $record['id'],
         ), array(
+            Type::INTEGER,
             Type::INTEGER,
             Type::INTEGER,
         ));
@@ -78,6 +86,7 @@ class DatabaseQueue extends AbstractQueue implements Queue
         $job->setId($record['id']);
         $job->setBody(unserialize($record['body']));
         $job->setMetadata(array(
+            'class' => $class,
             'timeout' => $record['timeout'],
             'priority' => $record['priority'],
             'executions' => $record['executions'] + 1,
@@ -98,6 +107,15 @@ class DatabaseQueue extends AbstractQueue implements Queue
     
     public function release(Job $job)
     {
-
+        $this->biz['db']->update($this->options['table'], array(
+            'reserved_time' => 0,
+            'expired_time' => 0,
+        ), array(
+            'id' => $job->getId(),
+        ), array(
+            Type::INTEGER,
+            Type::INTEGER,
+            Type::INTEGER,
+        ));
     }
 }

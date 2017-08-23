@@ -11,4 +11,6 @@ interface Queue
     public function delete(Job $job);
 
     public function release(Job $job);
+
+    public function getName();
 }

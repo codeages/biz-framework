@@ -23,4 +23,9 @@ abstract class AbstractQueue implements Queue
             'job_timeout' => 60,
         ), $options);
     }
+
+    public function getName()
+    {
+        return $this->name;
+    }
 }

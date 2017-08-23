@@ -1,15 +1,13 @@
 <?php
-namespace Tests\Queue;
+namespace Tests\Queue\Driver;
 
-use Tests\IntegrationTestCase;
 use Codeages\Biz\Framework\Queue\Driver\DatabaseQueue;
 use Tests\Fixtures\QueueJob\ExampleJob1;
 use PHPUnit\DbUnit\TestCaseTrait;
+use Tests\Queue\QueueBaseTestCase;
 
-class DatabaseQueueTest extends IntegrationTestCase
+class DatabaseQueueTest extends QueueBaseTestCase
 {
-    const TEST_QUEUE = 'test_queue';
-
     public function testPush_PushExampleJob_JobInserted()
     {
         $queueOptions = $this->getQueueOptions();
@@ -52,12 +50,27 @@ class DatabaseQueueTest extends IntegrationTestCase
         $this->assertNotInDatabase($queueOptions['table'], array('queue' => self::TEST_QUEUE));
     }
 
-    protected function getQueueOptions()
+    public function testRelease()
     {
-        return  array(
-            'table' => 'biz_queue_job',
-        );
+        $queueOptions = $this->getQueueOptions();
+        $queue = new DatabaseQueue(self::TEST_QUEUE, $this->biz, $queueOptions);
+
+        $body = array('name' => 'example job 1');
+        $job = new ExampleJob1($body);
+        $queue->push($job);
+
+        $job = $queue->pop();
+        $queue->release($job);
+
+        $this->assertInDatabase($queueOptions['table'], array(
+            'queue' => self::TEST_QUEUE,
+            'executions' => 1,
+            'reserved_time' => 0,
+            'expired_time' => 0,
+        ));
     }
+
+
 
 
     // public function testPop_WithNewJobs()

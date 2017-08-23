@@ -15,6 +15,8 @@ use Codeages\Biz\Framework\Context\Biz;
 use Codeages\Biz\Framework\Provider\DoctrineServiceProvider;
 use Tests\Assert\InDatabase;
 use PHPUnit\Framework\Constraint\LogicalNot;
+use Monolog\Logger;
+use Monolog\Handler\TestHandler;
 
 class IntegrationTestCase extends TestCase
 {
@@ -107,6 +109,16 @@ class IntegrationTestCase extends TestCase
                 return new Codeages\Biz\Framework\Dao\ArrayStorage();
             };
         }
+
+        $biz['logger.test_handler'] = function () {
+            return new TestHandler();
+        };
+
+        $biz['logger'] = function($biz) {
+            $logger = new Logger('phpunit');
+            $logger->pushHandler($biz['logger.test_handler'] );
+            return $logger;
+        };
 
         $biz->boot();
 

@@ -3,10 +3,10 @@ namespace Tests\Fixtures\QueueJob;
 
 use Codeages\Biz\Framework\Queue\AbstractJob;
 
-class ExampleJob2 extends AbstractJob
+class ExampleFinishedJob extends AbstractJob
 {
     public function execute()
     {
-        echo "example job 2.";
+        $this->biz['logger']->info("ExampleFinishedJob executed.");
     }
 }
