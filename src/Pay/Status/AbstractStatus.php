@@ -18,4 +18,9 @@ abstract class AbstractStatus
     }
 
     abstract public function getPriorStatus();
+
+    protected function getPaymentTradeDao()
+    {
+        return $this->biz->dao('Pay:PaymentTradeDao');
+    }
 }
