@@ -73,20 +73,23 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
     public function execute()
     {
         $this->updateWaitingJobsToAcquired();
-        $this->runAcquiredJobs();
+        do {
+            $result = $this->runAcquiredJobs();
+        } while ($result);
     }
 
     protected function runAcquiredJobs()
     {
         $jobFired = $this->triggerJob();
         if (empty($jobFired)) {
-            return;
+            return false;
         }
 
         $jobInstance = $this->createJobInstance($jobFired);
         $result = $this->getJobPool()->execute($jobInstance);
 
         $this->jobExecuted($jobFired, $result);
+        return true;
     }
 
     public function findJobFiredsByJobId($jobId)
@@ -173,11 +176,21 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
             ));
             $this->createJobLog($jobFired, 'success');
         } elseif ($result == 'retry') {
-            $this->getJobFiredDao()->update($jobFired['id'], array(
-                'fired_time' => time(),
-                'status' => 'acquired',
-            ));
-            $this->createJobLog($jobFired, 'acquired');
+            if ($jobFired['retry_num'] < $this->getMaxRetryNum()) {
+                $this->getJobFiredDao()->update($jobFired['id'], array(
+                    'retry_num' => $jobFired['retry_num'] + 1,
+                    'fired_time' => time(),
+                    'status' => 'acquired',
+                ));
+                $this->createJobLog($jobFired, 'acquired');
+            } else {
+                $result = 'failure';
+                $this->getJobFiredDao()->update($jobFired['id'], array(
+                    'fired_time' => time(),
+                    'status' => $result,
+                ));
+                $this->createJobLog($jobFired, $result);
+            }
         } else {
             $this->getJobFiredDao()->update($jobFired['id'], array(
                 'fired_time' => time(),
@@ -456,5 +469,10 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
     protected function getTimeout()
     {
         return $this->biz['scheduler.options']['timeout'];
+    }
+
+    protected function getMaxRetryNum()
+    {
+        return $this->biz['scheduler.options']['max_retry_num'];
     }
 }
