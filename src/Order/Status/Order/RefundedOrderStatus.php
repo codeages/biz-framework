@@ -10,4 +10,14 @@ class RefundedOrderStatus extends AbstractOrderStatus
     {
         return array(RefundingOrderStatus::NAME);
     }
+
+    public function getName()
+    {
+        return self::NAME;
+    }
+
+    public function process($data = array())
+    {
+        return $this->changeStatus(self::NAME);
+    }
 }

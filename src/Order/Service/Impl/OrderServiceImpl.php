@@ -210,9 +210,7 @@ class OrderServiceImpl extends BaseService implements OrderService
 
     public function setOrderClosed($id, $data = array())
     {
-        $order = $this->getOrderContext($id)->closed($data);
-        $this->getPayService()->closeTradesByOrderSn($order['sn']);
-        return $order;
+        return $this->getOrderContext($id)->closed($data);
     }
 
     public function setOrderSuccess($id, $data = array())
@@ -336,8 +334,4 @@ class OrderServiceImpl extends BaseService implements OrderService
         return $this->biz->dao('Order:OrderItemRefundDao');
     }
 
-    protected function getPayService()
-    {
-        return $this->biz->service('Pay:PayService');
-    }
 }

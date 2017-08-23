@@ -6,6 +6,11 @@ class CreatedOrderStatus extends AbstractOrderStatus
 {
     const NAME = 'created';
 
+    public function getName()
+    {
+        return self::NAME;
+    }
+
     public function getPriorStatus()
     {
         return array();
@@ -13,25 +18,11 @@ class CreatedOrderStatus extends AbstractOrderStatus
 
     public function closed($data = array())
     {
-        $closeTime = time();
-        $order = $this->getOrderDao()->update($this->order['id'], array(
-            'status' => ClosedOrderStatus::NAME,
-            'close_time' => $closeTime
-        ));
-
-        $items = $this->getOrderItemDao()->findByOrderId($this->order['id']);
-        foreach ($items as $item) {
-            $this->getOrderItemDao()->update($item['id'], array(
-                'status' => ClosedOrderStatus::NAME,
-                'close_time' => $closeTime
-            ));
-        }
-
-        return $order;
+        return $this->getOrderStatus(ClosedOrderStatus::NAME)->process($data);
     }
 
     public function paying($data = array())
     {
-        return $this->changeStatus(PayingOrderStatus::NAME);
+        return $this->getOrderStatus(PayingOrderStatus::NAME)->process($data);
     }
 }

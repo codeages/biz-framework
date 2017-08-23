@@ -32,6 +32,13 @@ abstract class AbstractOrderStatus extends \Codeages\Biz\Framework\Order\Status\
         $this->order = $order;
     }
 
+    public function getOrderStatus($name)
+    {
+        $orderStatus = $this->biz['order_status.'.$name];
+        $orderStatus->setOrder($this->order);
+        return $orderStatus;
+    }
+
     protected function getOrderDao()
     {
         return $this->biz->dao('Order:OrderDao');

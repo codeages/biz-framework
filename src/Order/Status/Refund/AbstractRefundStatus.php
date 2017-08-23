@@ -33,6 +33,13 @@ abstract class AbstractRefundStatus extends \Codeages\Biz\Framework\Order\Status
         return $orderRefund;
     }
 
+    public function getOrderRefundStatus($name)
+    {
+        $status = $this->biz['order_refund_status.'.$name];
+        $status->setOrderRefund($this->orderRefund);
+        return $status;
+    }
+
     protected function getOrderRefundDao()
     {
         return $this->biz->dao('Order:OrderRefundDao');

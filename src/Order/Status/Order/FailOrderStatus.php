@@ -6,6 +6,16 @@ class FailOrderStatus extends AbstractOrderStatus
 {
     const NAME = 'fail';
 
+    public function getName()
+    {
+        return self::NAME;
+    }
+
+    public function process($data = array())
+    {
+        return $this->changeStatus(self::NAME);
+    }
+
     public function getPriorStatus()
     {
         return array(PaidOrderStatus::NAME);
@@ -13,6 +23,6 @@ class FailOrderStatus extends AbstractOrderStatus
 
     public function success($data = array())
     {
-        return $this->changeStatus(SuccessOrderStatus::NAME);
+        return $this->getOrderStatus(SuccessOrderStatus::NAME)->process($data);
     }
 }

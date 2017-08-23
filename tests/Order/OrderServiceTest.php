@@ -104,7 +104,7 @@ class OrderServiceTest extends IntegrationTestCase
     /**
      * @expectedException Codeages\Biz\Framework\Service\Exception\AccessDeniedException
      */
-    public function testCloseOrderWhenCreateStatus()
+    public function testCloseOrderWhenPaidStatus()
     {
         $mockedOrderItems = $this->mockOrderItems();
         $order = $this->getOrderService()->createOrder($this->mockOrder(), $mockedOrderItems);
@@ -113,7 +113,9 @@ class OrderServiceTest extends IntegrationTestCase
             'trade_sn' => '1234567',
             'pay_time' => time()
         );
+        $this->getOrderService()->setOrderPaying($order['id']);
         $this->getOrderService()->setOrderPaid($data);
+
         $this->getOrderService()->setOrderClosed($order['id']);
     }
 
