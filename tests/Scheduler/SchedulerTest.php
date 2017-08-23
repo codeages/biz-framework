@@ -115,7 +115,6 @@ class SchedulerTest extends IntegrationTestCase
         );
 
         $savedJob = $this->getSchedulerService()->register($job);
-
         $this->getSchedulerService()->execute();
         $this->assertEquals($time - $time % 60, $savedJob['next_fire_time']);
 
@@ -134,9 +133,6 @@ class SchedulerTest extends IntegrationTestCase
 
     public function testBeforeNowRun()
     {
-        $this->testCreateJob();
-        $this->getSchedulerService()->execute();
-
         $time = time() - 50000;
 
         $job = array(
@@ -151,7 +147,6 @@ class SchedulerTest extends IntegrationTestCase
         );
 
         $savedJob = $this->getSchedulerService()->register($job);
-
         $this->getSchedulerService()->execute();
         $this->assertEquals($time - $time % 60, $savedJob['next_fire_time']);
 
@@ -192,7 +187,6 @@ class SchedulerTest extends IntegrationTestCase
 
     public function testFailJobResult()
     {
-
         $job = array(
             'name' => 'test',
             'source' => 'MAIN',
@@ -207,7 +201,6 @@ class SchedulerTest extends IntegrationTestCase
 
         $job = $this->getSchedulerService()->register($job);
         $this->getSchedulerService()->execute();
-
         $savedJob = $this->getJobDao()->get($job['id']);
         $jobFireds = $this->getSchedulerService()->findJobFiredsByJobId($savedJob['id']);
         $this->assertEquals('failure', $jobFireds[0]['status']);
@@ -226,7 +219,6 @@ class SchedulerTest extends IntegrationTestCase
             'misfire_threshold' => 3000,
             'misfire_policy' => 'missed',
         );
-
         $job = $this->getSchedulerService()->register($job);
         $this->getSchedulerService()->execute();
 
@@ -248,7 +240,6 @@ class SchedulerTest extends IntegrationTestCase
             'misfire_threshold' => 3000,
             'misfire_policy' => 'missed',
         );
-
         $job = $this->getSchedulerService()->register($job);
         sleep(2);
         $this->getSchedulerService()->execute();
@@ -275,7 +266,6 @@ class SchedulerTest extends IntegrationTestCase
             'misfire_threshold' => 3000,
             'misfire_policy' => 'missed',
         );
-
         $job = $this->getSchedulerService()->register($job);
         $this->getSchedulerService()->execute();
         $this->mockUnReleasePool($job);

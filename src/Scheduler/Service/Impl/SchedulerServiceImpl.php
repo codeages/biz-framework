@@ -73,25 +73,20 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
     public function execute()
     {
         $this->updateWaitingJobsToAcquired();
-
-        do {
-            $runResult = $this->runAcquiredJobs();
-        } while ($runResult);
+        $this->runAcquiredJobs();
     }
 
     protected function runAcquiredJobs()
     {
         $jobFired = $this->triggerJob();
         if (empty($jobFired)) {
-            return false;
+            return;
         }
 
         $jobInstance = $this->createJobInstance($jobFired);
         $result = $this->getJobPool()->execute($jobInstance);
 
         $this->jobExecuted($jobFired, $result);
-
-        return true;
     }
 
     public function findJobFiredsByJobId($jobId)
