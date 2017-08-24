@@ -30,14 +30,18 @@ class Worker
             'sleep' => 2,
             'tries' => 0,
             'once' => false,
+            'stop_when_idle' => false,
         ), $options);
     }
 
     public function run()
     {
         while (true) {
-            $this->runNextJob();
-            $this->stopIfNecessary();
+            $job = $this->runNextJob();
+            if (empty($job)) {
+                sleep($this->options['sleep']);
+            }
+            $this->stopIfNecessary($job);
         }
     }
 
@@ -46,8 +50,7 @@ class Worker
         $job = $this->getNextJob();
         if ($job) {
             $this->executeJob($job);
-        } else {
-            sleep($this->options['sleep']);
+            return $job;
         }
     }
 
@@ -134,10 +137,14 @@ class Worker
         exit($status);
     }
 
-    protected function stopIfNecessary()
+    protected function stopIfNecessary($job)
     {
         if ($this->shouldQuit) {
             exit(self::EXIT_CODE_EXCEPTION);
+        }
+
+        if (empty($job) && $this->options['stop_when_idle']) {
+            exit();
         }
 
         if ($this->options['once'] == true) {
