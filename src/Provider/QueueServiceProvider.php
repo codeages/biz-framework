@@ -22,7 +22,7 @@ class QueueServiceProvider implements ServiceProviderInterface
             return new JobFailer($biz->dao('Queue:FailedJobDao'));
         };
 
-        $biz['queue.default'] = function ($biz) {
+        $biz['queue.connection.default'] = function ($biz) {
             return new SyncQueue('default', $biz, $biz['queue.failer']);
         };
     }

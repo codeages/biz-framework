@@ -11,7 +11,7 @@ class QueueServiceImpl extends BaseService implements QueueService
     public function pushJob(Job $job, $queue = null)
     {
         $queueName = empty($queue) ? 'default' : (string) $queue;
-        $queue = $this->biz['queue.'.$queueName];
+        $queue = $this->biz['queue.connection.'.$queueName];
         $queue->push($job);
     }
 

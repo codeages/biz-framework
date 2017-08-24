@@ -25,7 +25,7 @@ class WorkerCommand extends AbstractCommand
     {
         $queueName = $input->getArgument('name') ?: 'default';
 
-        $queue = $this->biz['queue.'.$queueName];
+        $queue = $this->biz['queue.connection.'.$queueName];
 
         $options = array(
             'once' => $input->getOption('once'),
