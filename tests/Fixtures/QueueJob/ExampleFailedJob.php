@@ -10,6 +10,6 @@ class ExampleFailedJob extends AbstractJob
     {
         $this->biz['logger']->info('ExampleFailedJob executed.');
 
-        return [self::FAILED, 'ExampleFailedJob execute failed.'];
+        return array(self::FAILED, 'ExampleFailedJob execute failed.');
     }
 }

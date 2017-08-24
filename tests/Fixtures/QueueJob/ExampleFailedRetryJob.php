@@ -10,6 +10,6 @@ class ExampleFailedRetryJob extends AbstractJob
     {
         $this->biz['logger']->info('ExampleFailedRetryJob executed.');
 
-        return [self::FAILED_RETRY, 'ExampleFailedRetryJob execute failed, try again.'];
+        return array(self::FAILED_RETRY, 'ExampleFailedRetryJob execute failed, try again.');
     }
 }
