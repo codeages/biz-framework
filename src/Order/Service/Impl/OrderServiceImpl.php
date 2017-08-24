@@ -17,7 +17,7 @@ class OrderServiceImpl extends BaseService implements OrderService
     {
         $this->validateLogin();
         $orderItems = $this->validateFields($fields, $orderItems);
-        $fields = ArrayToolkit::parts($fields, array(
+        $order = ArrayToolkit::parts($fields, array(
             'title',
             'callback',
             'source',
@@ -25,12 +25,11 @@ class OrderServiceImpl extends BaseService implements OrderService
             'created_reason',
             'seller_id',
             'price_type',
-            'deducts'
         ));
 
         try {
             $this->beginTransaction();
-            $order = $this->saveOrder($fields, $orderItems);
+            $order = $this->saveOrder($order, $orderItems);
             $order = $this->createOrderDeducts($order, $fields);
             $order = $this->createOrderItems($order, $orderItems);
             $this->commit();
