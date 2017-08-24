@@ -4,8 +4,6 @@ namespace Tests\Assert;
 
 use PHPUnit\Framework\Constraint\Constraint;
 
-use ArrayAccess;
-
 class InDatabase extends Constraint
 {
     protected $db;
@@ -31,7 +29,7 @@ class InDatabase extends Constraint
         foreach ($this->criteria as $key => $value) {
             $builder->andWhere("{$key} = ?");
             $builder->setParameter($index, $value);
-            $index ++;
+            ++$index ;
         }
 
         $count = $builder->execute()->fetch(\PDO::FETCH_COLUMN);

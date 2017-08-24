@@ -1,7 +1,7 @@
 <?php
+
 namespace Codeages\Biz\Framework\Queue\Driver;
-use Pimple\Container;
-use Codeages\Biz\Framework\Queue\Job;
+
 use Codeages\Biz\Framework\Context\Biz;
 
 abstract class AbstractQueue implements Queue

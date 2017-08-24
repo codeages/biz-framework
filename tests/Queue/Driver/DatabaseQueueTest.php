@@ -1,9 +1,9 @@
 <?php
+
 namespace Tests\Queue\Driver;
 
 use Codeages\Biz\Framework\Queue\Driver\DatabaseQueue;
 use Tests\Fixtures\QueueJob\ExampleFinishedJob;
-use PHPUnit\DbUnit\TestCaseTrait;
 use Tests\Queue\QueueBaseTestCase;
 
 class DatabaseQueueTest extends QueueBaseTestCase
@@ -69,9 +69,6 @@ class DatabaseQueueTest extends QueueBaseTestCase
             'expired_time' => 0,
         ));
     }
-
-
-
 
     // public function testPop_WithNewJobs()
     // {

@@ -1,4 +1,5 @@
 <?php
+
 namespace Tests\Queue;
 
 use Tests\IntegrationTestCase;
@@ -19,13 +20,14 @@ class QueueBaseTestCase extends IntegrationTestCase
     protected function createExampleFinishedJob()
     {
         $body = array('name' => 'example job');
+
         return new ExampleFinishedJob($body, array(), self::TEST_QUEUE);
     }
 
     protected function createExampleFailedJob()
     {
         $body = array('name' => 'example job');
+
         return new ExampleFailedJob($body, array(), self::TEST_QUEUE);
     }
-
 }

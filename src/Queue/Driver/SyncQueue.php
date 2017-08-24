@@ -1,6 +1,7 @@
 <?php
+
 namespace Codeages\Biz\Framework\Queue\Driver;
-use Pimple\Container;
+
 use Codeages\Biz\Framework\Queue\Job;
 use Codeages\Biz\Framework\Context\Biz;
 use Codeages\Biz\Framework\Queue\JobFailer;
@@ -24,7 +25,8 @@ class SyncQueue extends AbstractQueue implements Queue
 
         if (!empty($this->options['async_execute'])) {
             $this->jobs[$job->getId()] = $job;
-            return ;
+
+            return;
         }
         $job->setBiz($this->biz);
         $result = $job->execute();

@@ -1,7 +1,8 @@
 <?php
+
 namespace Codeages\Biz\Framework\Queue\Driver;
+
 use Codeages\Biz\Framework\Queue\Job;
-use Codeages\Biz\Framework\Queue\Dao\JobDao;
 use Codeages\Biz\Framework\Context\Biz;
 use Codeages\Biz\Framework\Queue\QueueException;
 use Doctrine\DBAL\Types\Type;
@@ -43,7 +44,7 @@ class DatabaseQueue extends AbstractQueue implements Queue
             $job->setId($id);
             $job->setBiz($this->biz);
         } catch (\Exception $e) {
-            throw new QueueException("Push job failed", 0, $e);
+            throw new QueueException('Push job failed', 0, $e);
         }
     }
 
@@ -56,7 +57,7 @@ class DatabaseQueue extends AbstractQueue implements Queue
         $record = $this->biz['db']->fetchAssoc($sql, array(
             $this->name,
             $now,
-            $now
+            $now,
         ), array(
             Type::STRING,
             Type::INTEGER,
@@ -64,6 +65,7 @@ class DatabaseQueue extends AbstractQueue implements Queue
         ));
         if (empty($record)) {
             $this->biz['db']->commit();
+
             return null;
         }
 
@@ -104,7 +106,7 @@ class DatabaseQueue extends AbstractQueue implements Queue
             Type::INTEGER,
         ));
     }
-    
+
     public function release(Job $job)
     {
         $this->biz['db']->update($this->options['table'], array(

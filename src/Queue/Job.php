@@ -1,5 +1,7 @@
 <?php
+
 namespace Codeages\Biz\Framework\Queue;
+
 use Codeages\Biz\Framework\Context\Biz;
 
 interface Job

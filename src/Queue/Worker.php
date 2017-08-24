@@ -1,4 +1,5 @@
 <?php
+
 namespace Codeages\Biz\Framework\Queue;
 
 use Codeages\Biz\Framework\Queue\Driver\Queue;
@@ -9,7 +10,7 @@ class Worker
 
     const EXIT_CODE_TIMEOUT = 2;
 
-    const EXIT_CODE_EXCEPTION =3 ;
+    const EXIT_CODE_EXCEPTION = 3;
 
     protected $queue;
 
@@ -34,7 +35,7 @@ class Worker
 
     public function run()
     {
-        while(true) {
+        while (true) {
             $this->runNextJob();
             $this->stopIfNecessary();
         }
@@ -54,9 +55,9 @@ class Worker
     {
         try {
             return $job = $this->queue->pop();
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             $this->shouldQuit = true;
-        } catch(\Throwable $e) {
+        } catch (\Throwable $e) {
             $this->shouldQuit = true;
         }
     }
@@ -64,12 +65,12 @@ class Worker
     protected function executeJob($job)
     {
         $this->registerTimeoutHandler($job);
-        
+
         try {
             $result = $job->execute();
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             $this->shouldQuit = true;
-        } catch(\Throwable $e) {
+        } catch (\Throwable $e) {
             $this->shouldQuit = true;
         }
 
@@ -81,17 +82,19 @@ class Worker
             $code = $result;
             $message = '';
         }
-        
+
         if (empty($code) || $code === Job::FINISHED) {
             $this->queue->delete($job);
-            return ;
+
+            return;
         }
 
         if ($code == Job::FAILED_RETRY) {
             $executions = $job->getMetadata('executions', 1);
-            if ($executions -1 < $this->options['tries']) {
+            if ($executions - 1 < $this->options['tries']) {
                 $this->queue->release($job);
-                return ;
+
+                return;
             }
         }
 
@@ -103,7 +106,7 @@ class Worker
     {
         $timeout = $job->getMetadata('timeout', 0);
         if (empty($timeout)) {
-            return ;
+            return;
         }
 
         if ($this->isSupportAsyncSignal()) {

@@ -13,7 +13,6 @@ use Codeages\Biz\Framework\Provider\QueueServiceProvider;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
 use Codeages\Biz\Framework\Context\Biz;
-
 use Tests\Assert\InDatabase;
 use PHPUnit\Framework\Constraint\LogicalNot;
 use Monolog\Logger;
@@ -106,7 +105,7 @@ class IntegrationTestCase extends TestCase
         }
 
         if (getenv('CACHE_ARRAY_STORAGE_ENABLED')) {
-            $biz['dao.cache.array_storage'] = function() {
+            $biz['dao.cache.array_storage'] = function () {
                 return new Codeages\Biz\Framework\Dao\ArrayStorage();
             };
         }
@@ -115,9 +114,10 @@ class IntegrationTestCase extends TestCase
             return new TestHandler();
         };
 
-        $biz['logger'] = function($biz) {
+        $biz['logger'] = function ($biz) {
             $logger = new Logger('phpunit');
-            $logger->pushHandler($biz['logger.test_handler'] );
+            $logger->pushHandler($biz['logger.test_handler']);
+
             return $logger;
         };
 
@@ -155,16 +155,13 @@ class IntegrationTestCase extends TestCase
 
     protected function assertDatabaseRecordsNum($expectedNumber, array $criteria = array(), $message = '')
     {
-
     }
 
     protected function grabAllFromDatabase($table, $column, array $criteria = array())
     {
-
     }
 
     protected function grabSingleFromDatabase($table, $column, array $criteria = array())
     {
-
     }
 }

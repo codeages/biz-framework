@@ -1,14 +1,13 @@
 <?php
+
 namespace Tests\Queue;
 
-use Tests\IntegrationTestCase;
 use Codeages\Biz\Framework\Queue\Worker;
 use Codeages\Biz\Framework\Queue\JobFailer;
 use Codeages\Biz\Framework\Queue\Driver\DatabaseQueue;
 use Tests\Fixtures\QueueJob\ExampleFinishedJob;
 use Tests\Fixtures\QueueJob\ExampleFailedJob;
 use Tests\Fixtures\QueueJob\ExampleFailedRetryJob;
-use Tests\Fixtures\QueueJob\ExampleTimeoutJob;
 
 class WorkerTest extends QueueBaseTestCase
 {
@@ -29,7 +28,7 @@ class WorkerTest extends QueueBaseTestCase
         $worker = new Worker($queue, $failer, $options);
         $worker->runNextJob();
 
-        $this->assertTrue($this->biz['logger.test_handler']->hasInfo("ExampleFinishedJob executed."));
+        $this->assertTrue($this->biz['logger.test_handler']->hasInfo('ExampleFinishedJob executed.'));
         $this->assertNotInDatabase($queueOptions['table'], array('queue' => self::TEST_QUEUE));
     }
 
@@ -50,11 +49,11 @@ class WorkerTest extends QueueBaseTestCase
         $worker = new Worker($queue, $failer, $options);
         $worker->runNextJob();
 
-        $this->assertTrue($this->biz['logger.test_handler']->hasInfo("ExampleFailedJob executed."));
+        $this->assertTrue($this->biz['logger.test_handler']->hasInfo('ExampleFailedJob executed.'));
         $this->assertNotInDatabase($queueOptions['table'], array('queue' => self::TEST_QUEUE));
         $this->assertInDatabase('biz_queue_failed_job', array(
             'queue' => self::TEST_QUEUE,
-            'reason' => 'ExampleFailedJob execute failed.'
+            'reason' => 'ExampleFailedJob execute failed.',
         ));
     }
 
@@ -75,7 +74,7 @@ class WorkerTest extends QueueBaseTestCase
         $worker = new Worker($queue, $failer, $options);
         $worker->runNextJob();
 
-        $this->assertTrue($this->biz['logger.test_handler']->hasInfo("ExampleFailedRetryJob executed."));
+        $this->assertTrue($this->biz['logger.test_handler']->hasInfo('ExampleFailedRetryJob executed.'));
         $this->assertNotInDatabase($queueOptions['table'], array(
             'queue' => self::TEST_QUEUE,
             'executions' => 1,

@@ -1,4 +1,5 @@
 <?php
+
 namespace Codeages\Biz\Framework\Queue;
 
 use Codeages\Biz\Framework\Context\AbstractCommand;
@@ -18,9 +19,8 @@ class WorkerCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $queueName = $input->getArgument('name') ? : 'default';
+        $queueName = $input->getArgument('name') ?: 'default';
 
         $queue = $this->biz['queue.'.$queueName];
-
     }
 }
