@@ -164,4 +164,34 @@ class IntegrationTestCase extends TestCase
     protected function grabSingleFromDatabase($table, $column, array $criteria = array())
     {
     }
+
+    protected function fetchFromDatabase($table, array $criteria = array())
+    {
+        $builder = $this->biz['db']->createQueryBuilder();
+        $builder->select('*')->from($table);
+
+        $index = 0;
+        foreach ($criteria as $key => $value) {
+            $builder->andWhere("{$key} = ?");
+            $builder->setParameter($index, $value);
+            ++$index ;
+        }
+
+        return $builder->execute()->fetch(\PDO::FETCH_ASSOC);
+    }
+
+    protected function fetchAllFromDatabase($table, array $criteria = array())
+    {
+        $builder = $this->biz['db']->createQueryBuilder();
+        $builder->select('*')->from($this->table);
+
+        $index = 0;
+        foreach ($criteria as $key => $value) {
+            $builder->andWhere("{$key} = ?");
+            $builder->setParameter($index, $value);
+            ++$index ;
+        }
+
+        return $builder->execute()->fetchAll(\PDO::FETCH_ASSOC);
+    }
 }

@@ -18,7 +18,16 @@ class DatabaseQueueTest extends QueueBaseTestCase
         $queue->push($job);
 
         $this->assertGreaterThan(0, $job->getId());
-        $this->assertInDatabase($queueOptions['table'], array('queue' => self::TEST_QUEUE));
+
+        $savedJob = $this->fetchFromDatabase($queueOptions['table'], array(
+            'id' => $job->getId(),
+        ));
+
+        $this->assertEquals($queue->getName(), $savedJob['queue']);
+        $this->assertEquals(get_class($job), $savedJob['class']);
+        $this->assertEquals(ExampleFinishedJob::DEFAULT_TIMEOUT, $savedJob['timeout']);
+        $this->assertEquals(ExampleFinishedJob::DEFAULT_PRIORITY, $savedJob['priority']);
+
     }
 
     public function testPop()

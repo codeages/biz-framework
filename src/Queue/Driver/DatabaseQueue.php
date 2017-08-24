@@ -27,8 +27,8 @@ class DatabaseQueue extends AbstractQueue implements Queue
                 'queue' => $this->name,
                 'body' => serialize($job->getBody()),
                 'class' => get_class($job),
-                'timeout' => $job->getMetadata('timeout', $this->options['job_timeout']),
-                'priority' => $job->getMetadata('priority', Job::PRI_DEFAULT),
+                'timeout' => $job->getMetadata('timeout', Job::DEFAULT_TIMEOUT),
+                'priority' => $job->getMetadata('priority', Job::DEFAULT_PRIORITY),
                 'available_time' => time() + $job->getMetadata('delay', 0),
             );
 

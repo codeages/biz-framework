@@ -20,7 +20,6 @@ abstract class AbstractQueue implements Queue
         $this->name = $name;
         $this->biz = $biz;
         $this->options = array_merge(array(
-            'job_timeout' => 60,
         ), $options);
     }
 

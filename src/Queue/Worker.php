@@ -25,7 +25,6 @@ class Worker
         $this->queue = $queue;
         $this->failer = $failer;
         $this->options = array_merge(array(
-            'job_timeout' => 60,
             'memory_limit' => 256,
             'sleep' => 2,
             'tries' => 0,
