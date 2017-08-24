@@ -174,7 +174,7 @@ class IntegrationTestCase extends TestCase
         foreach ($criteria as $key => $value) {
             $builder->andWhere("{$key} = ?");
             $builder->setParameter($index, $value);
-            ++$index ;
+            ++$index;
         }
 
         return $builder->execute()->fetch(\PDO::FETCH_ASSOC);
@@ -189,7 +189,7 @@ class IntegrationTestCase extends TestCase
         foreach ($criteria as $key => $value) {
             $builder->andWhere("{$key} = ?");
             $builder->setParameter($index, $value);
-            ++$index ;
+            ++$index;
         }
 
         return $builder->execute()->fetchAll(\PDO::FETCH_ASSOC);

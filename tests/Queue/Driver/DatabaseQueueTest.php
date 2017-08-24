@@ -54,8 +54,8 @@ class DatabaseQueueTest extends QueueBaseTestCase
 
         $this->assertEquals(99, $savedJob['timeout']);
         $this->assertEquals(ExampleFinishedJob::HIGHEST_PRIORITY, $savedJob['priority']);
-        $this->assertGreaterThanOrEqual($startTime+10, $savedJob['available_time']);
-        $this->assertLessThanOrEqual($endTime+10, $savedJob['available_time']);
+        $this->assertGreaterThanOrEqual($startTime + 10, $savedJob['available_time']);
+        $this->assertLessThanOrEqual($endTime + 10, $savedJob['available_time']);
     }
 
     public function testPop_OnEmptyQueue()

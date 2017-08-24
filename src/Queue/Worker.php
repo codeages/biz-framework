@@ -49,6 +49,7 @@ class Worker
         $job = $this->getNextJob();
         if ($job) {
             $this->executeJob($job);
+
             return $job;
         }
     }

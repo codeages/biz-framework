@@ -29,7 +29,7 @@ class InDatabase extends Constraint
         foreach ($this->criteria as $key => $value) {
             $builder->andWhere("{$key} = ?");
             $builder->setParameter($index, $value);
-            ++$index ;
+            ++$index;
         }
 
         $count = $builder->execute()->fetch(\PDO::FETCH_COLUMN);
