@@ -27,10 +27,9 @@ class PayServiceProvider implements ServiceProviderInterface
 
     protected function registerPayments($biz)
     {
-        $paymentPlatforms = array(
+        $paymentDefaultPlatforms = array(
             'wechat' => array(
                 'class' => WechatGetway::class,
-                'icon' => '',
                 'appid' => '',
                 'mch_id' => '',
                 'key' => '',
@@ -39,14 +38,13 @@ class PayServiceProvider implements ServiceProviderInterface
             ),
             'alipay.in_time' => array(
                 'class' => AlipayInTimeGetway::class,
-                'icon' => '',
                 'seller_email' => '',
                 'partner' => '',
                 'key' => '',
             ),
         );
 
-        $biz['payment.platforms'] = $paymentPlatforms;
+        $biz['payment.platforms'] = $paymentDefaultPlatforms;
 
         foreach ($biz['payment.platforms'] as $key => $platform) {
             $biz["payment.{$key}"] = function () use ($platform) {

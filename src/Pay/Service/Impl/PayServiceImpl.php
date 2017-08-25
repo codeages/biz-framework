@@ -129,16 +129,7 @@ class PayServiceImpl extends BaseService implements PayService
 
     public function findEnabledPayments()
     {
-        $payments = $this->biz['payment.platforms'];
-
-        $enabledPayments = array();
-        foreach ($payments as $key => $payment) {
-            $setting = $this->getPaymentSetting($key);
-            if (!empty($setting['enable']) && $setting['enable']) {
-                $enabledPayments[$key] = $payment;
-            }
-        }
-        return $enabledPayments;
+        return $this->biz['payment.platforms'];
     }
 
     public function notifyClosed($data)
