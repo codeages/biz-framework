@@ -70,6 +70,19 @@ class SessionServiceTest extends IntegrationTestCase
         $this->assertEquals(1, $count);
     }
 
+    public function testDeleteByInvalid()
+    {
+        $mockedSession = $this->mockSession();
+        $mockedSession['sess_user_id'] = 0;
+        $this->getSessionService()->createSession($mockedSession);
+
+        sleep(1);
+
+        $this->getSessionService()->deleteByInvalid();
+        $count = $this->getSessionService()->countTotal(time()-400);
+        $this->assertEquals(0, $count);
+    }
+
     protected function mockSession()
     {
         return array(
@@ -78,7 +91,7 @@ class SessionServiceTest extends IntegrationTestCase
             'sess_data' => 'ababa',
             'sess_time' => time(),
             'created_time' => time(),
-            'sess_lifetime' => 3600,
+            'sess_lifetime' => 1,
             'source' => 'web',
         );
     }

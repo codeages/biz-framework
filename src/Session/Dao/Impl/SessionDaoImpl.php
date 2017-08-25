@@ -13,9 +13,11 @@ class SessionDaoImpl extends GeneralDaoImpl implements SessionDao
     {
         return array(
             'timestamps' => array('created_time', 'sess_time'),
+            'orderbys' => array('created_time', 'id', 'sess_time'),
             'serializes' => array(
             ),
             'conditions' => array(
+                'sess_time < :gt_sess_time',
             ),
         );
     }
