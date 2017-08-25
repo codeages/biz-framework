@@ -36,7 +36,7 @@ class SessionDaoImpl extends GeneralDaoImpl implements SessionDao
         return $this->db()->executeUpdate($sql, array($sessId));
     }
 
-    public function gc()
+    public function deleteByInvalid()
     {
         $sql = "DELETE FROM {$this->table} WHERE sess_time < (? - sess_lifetime) ";
         return $this->db()->executeUpdate($sql, array(time()));

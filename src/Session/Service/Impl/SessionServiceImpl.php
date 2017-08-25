@@ -44,7 +44,7 @@ class SessionServiceImpl extends BaseService implements SessionService
 
     public function gc()
     {
-        return $this->getSessionDao()->gc();
+        return $this->getSessionDao()->deleteByInvalid();
     }
 
     public function getSessionBySessId($sessId)

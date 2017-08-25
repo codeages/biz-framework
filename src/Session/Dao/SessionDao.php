@@ -12,7 +12,7 @@ interface SessionDao extends GeneralDaoInterface
 
     public function deleteBySessId($sessId);
 
-    public function gc();
+    public function deleteByInvalid();
 
     public function countLogined($gtSessTime);
 
