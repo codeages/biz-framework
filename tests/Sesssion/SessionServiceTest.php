@@ -70,15 +70,14 @@ class SessionServiceTest extends IntegrationTestCase
         $this->assertEquals(1, $count);
     }
 
-    public function testDeleteByInvalid()
+    public function testGc()
     {
         $mockedSession = $this->mockSession();
-        $mockedSession['sess_user_id'] = 0;
         $this->getSessionService()->createSession($mockedSession);
 
-        sleep(1);
+        sleep(2);
 
-        $this->getSessionService()->deleteByInvalid();
+        $this->getSessionService()->gc();
         $count = $this->getSessionService()->countTotal(time()-400);
         $this->assertEquals(0, $count);
     }
