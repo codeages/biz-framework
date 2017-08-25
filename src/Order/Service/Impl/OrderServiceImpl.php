@@ -205,6 +205,9 @@ class OrderServiceImpl extends BaseService implements OrderService
     public function setOrderPaid($data)
     {
         $order = $this->getOrderDao()->getBySn($data['order_sn']);
+        if (empty($order)) {
+            return $order;
+        }
         return $this->getOrderContext($order['id'])->paid($data);
     }
 

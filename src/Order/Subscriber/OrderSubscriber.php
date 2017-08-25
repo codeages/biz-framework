@@ -27,24 +27,29 @@ class OrderSubscriber extends EventSubscriber implements EventSubscriberInterfac
     public function onOrderPaid(Event $event)
     {
         $order = $event->getSubject();
-        $processor = $this->getOrderProcess($order);
-        if (!empty($processor)) {
-            $result = $processor->process($order);
-            if (AbstractPaidProcessor::SUCCESS == $result) {
-                $this->getOrderService()->setOrderSuccess($order['id']);
-            } else {
-                $this->getOrderService()->setOrderFail($order['id']);
+        $orderItems = $this->getOrderService()->findOrderItemsByOrderId($order['id']);
+
+        foreach ($orderItems as $orderItem) {
+            $processor = $this->getOrderProcess($orderItem);
+            if (!empty($processor)) {
+                $result = $processor->process($orderItem);
+                if (AbstractPaidProcessor::SUCCESS == $result) {
+                    $this->getOrderService()->setOrderSuccess($order['id']);
+                } else {
+                    $this->getOrderService()->setOrderFail($order['id']);
+                }
             }
         }
     }
 
-    public function getOrderProcess($order)
+    public function getOrderProcess($orderItem)
     {
-        $biz = $this->getBiz();;
-        if (empty($biz["order_paid_processor.{$order['type']}"])) {
+        $biz = $this->getBiz();
+
+        if (empty($biz["order_paid_processor.{$orderItem['target_type']}"])) {
             return null;
         }
-        return $biz["order_paid_processor.{$order['type']}"];
+        return $biz["order_paid_processor.{$orderItem['target_type']}"];
     }
 
     public function onPaid(Event $event)
