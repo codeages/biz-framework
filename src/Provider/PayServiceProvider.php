@@ -2,6 +2,8 @@
 
 namespace Codeages\Biz\Framework\Provider;
 
+use Codeages\Biz\Framework\Pay\Payment\AlipayInTimeGetway;
+use Codeages\Biz\Framework\Pay\Payment\WechatGetway;
 use Codeages\Biz\Framework\Pay\Status\ClosedStatus;
 use Codeages\Biz\Framework\Pay\Status\ClosingStatus;
 use Codeages\Biz\Framework\Pay\Status\PaidStatus;
@@ -20,7 +22,39 @@ class PayServiceProvider implements ServiceProviderInterface
         $biz['autoload.aliases']['Pay'] = 'Codeages\Biz\Framework\Pay';
 
         $this->registerStatus($biz);
+        $this->registerPayments($biz);
     }
+
+    protected function registerPayments($biz)
+    {
+        $paymentPlatforms = array(
+            'wechat' => array(
+                'class' => WechatGetway::class,
+                'icon' => '',
+                'appid' => '',
+                'mch_id' => '',
+                'key' => '',
+                'cert_path' => '',
+                'key_path' => '',
+            ),
+            'alipay.in_time' => array(
+                'class' => AlipayInTimeGetway::class,
+                'icon' => '',
+                'seller_email' => '',
+                'partner' => '',
+                'key' => '',
+            ),
+        );
+
+        $biz['payment.platforms'] = $paymentPlatforms;
+
+        foreach ($biz['payment.platforms'] as $key => $platform) {
+            $biz["payment.{$key}"] = function () use ($platform) {
+                return new $platform['class']($this);
+            };
+        }
+    }
+
 
     private function registerStatus($biz)
     {
