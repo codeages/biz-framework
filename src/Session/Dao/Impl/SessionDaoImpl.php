@@ -20,11 +20,6 @@ class SessionDaoImpl extends GeneralDaoImpl implements SessionDao
         );
     }
 
-    public function updateBySessId($sessId, $session)
-    {
-        return $this->update(array('sess_id' => $sessId), $session);
-    }
-
     public function getBySessId($sessId)
     {
         return $this->getByFields(array('sess_id' => $sessId));
@@ -44,13 +39,13 @@ class SessionDaoImpl extends GeneralDaoImpl implements SessionDao
 
     public function countLogined($gtSessTime)
     {
-        $sql = "SELECT count(*) FROM {$this->table} WHERE sess_time > ? ";
+        $sql = "SELECT count(*) FROM {$this->table} WHERE sess_time > ? AND sess_user_id > 0 ";
         return $this->db()->fetchColumn($sql, array($gtSessTime));
     }
 
     public function countTotal($gtSessTime)
     {
-        $sql = "SELECT count(*) FROM {$this->table} WHERE sess_time > ? AND sess_user_id > 0 ";
+        $sql = "SELECT count(*) FROM {$this->table} WHERE sess_time > ? ";
         return $this->db()->fetchColumn($sql, array($gtSessTime));
     }
 }

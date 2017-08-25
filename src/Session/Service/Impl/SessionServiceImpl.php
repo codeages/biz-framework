@@ -19,7 +19,8 @@ class SessionServiceImpl extends BaseService implements SessionService
 
     public function updateSessionBySessId($sessId, $session)
     {
-        return $this->getSessionDao()->updateBySessId($sessId, $session);
+        $savedSession = $this->getSessionDao()->getBySessId($sessId);
+        return $this->getSessionDao()->update($savedSession['id'], $session);
     }
 
     public function searchSessions($condition, $orderBy, $start, $limit)
