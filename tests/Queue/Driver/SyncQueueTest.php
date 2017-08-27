@@ -27,9 +27,10 @@ class SyncQueueTest extends QueueBaseTestCase
 
         $this->assertGreaterThan(0, $job->getId());
         $this->assertTrue($this->biz['logger.test_handler']->hasInfo('ExampleFailedJob executed.'));
-        $this->assertInDatabase('biz_queue_failed_job', array(
+
+        $this->assertCount(1, $this->fetchAllFromDatabase('biz_queue_failed_job', array(
             'queue' => self::TEST_QUEUE,
             'reason' => 'ExampleFailedJob execute failed.',
-        ));
+        )));
     }
 }

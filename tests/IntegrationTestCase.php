@@ -141,29 +141,11 @@ class IntegrationTestCase extends TestCase
         return $seeder->run($isRun);
     }
 
-    protected function assertInDatabase($table, array $criteria = array(), $message = '')
-    {
-        $constraint = new InDatabase($this->biz['db'], $table, $criteria);
-        static::assertThat(null, $constraint, $message);
-    }
-
-    protected function assertNotInDatabase($table, array $criteria = array(), $message = '')
-    {
-        $constraint = new LogicalNot(
-            new InDatabase($this->biz['db'], $table, $criteria)
-        );
-        static::assertThat(null, $constraint, $message);
-    }
-
-    protected function assertDatabaseRecordsNum($expectedNumber, array $criteria = array(), $message = '')
-    {
-    }
-
     protected function grabAllFromDatabase($table, $column, array $criteria = array())
     {
     }
 
-    protected function grabSingleFromDatabase($table, $column, array $criteria = array())
+    protected function grabFromDatabase($table, $column, array $criteria = array())
     {
     }
 
@@ -185,7 +167,7 @@ class IntegrationTestCase extends TestCase
     protected function fetchAllFromDatabase($table, array $criteria = array())
     {
         $builder = $this->biz['db']->createQueryBuilder();
-        $builder->select('*')->from($this->table);
+        $builder->select('*')->from($table);
 
         $index = 0;
         foreach ($criteria as $key => $value) {
