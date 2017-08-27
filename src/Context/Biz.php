@@ -109,7 +109,7 @@ class Biz extends Container
             return new \Symfony\Component\Lock\Store\FlockStore($biz['lock.flock.directory']);
         };
 
-        $biz['lock.factory'] = function($biz) {
+        $biz['lock.factory'] = function ($biz) {
             return new \Symfony\Component\Lock\Factory($biz['lock.store']);
         };
 

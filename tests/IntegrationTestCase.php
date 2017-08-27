@@ -13,8 +13,6 @@ use Codeages\Biz\Framework\Provider\QueueServiceProvider;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
 use Codeages\Biz\Framework\Context\Biz;
-use Tests\Assert\InDatabase;
-use PHPUnit\Framework\Constraint\LogicalNot;
 use Monolog\Logger;
 use Monolog\Handler\TestHandler;
 
