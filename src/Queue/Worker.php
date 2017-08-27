@@ -3,6 +3,7 @@
 namespace Codeages\Biz\Framework\Queue;
 
 use Codeages\Biz\Framework\Queue\Driver\Queue;
+use Symfony\Component\Lock\LockInterface;
 
 class Worker
 {
@@ -12,6 +13,8 @@ class Worker
 
     const EXIT_CODE_EXCEPTION = 3;
 
+    const EXIT_CODE_RUNNING = 4;
+
     protected $queue;
 
     protected $options;
@@ -20,10 +23,13 @@ class Worker
 
     protected $failer;
 
-    public function __construct(Queue $queue, JobFailer $failer, array $options = array())
+    protected $lock;
+
+    public function __construct(Queue $queue, JobFailer $failer, LockInterface $lock, array $options = array())
     {
         $this->queue = $queue;
         $this->failer = $failer;
+        $this->lock = $lock;
         $this->options = array_merge(array(
             'memory_limit' => 256,
             'sleep' => 2,
@@ -35,6 +41,11 @@ class Worker
 
     public function run()
     {
+        $acquired = $this->lock->acquire();
+        if (!$acquired) {
+            $this->stop(self::EXIT_CODE_RUNNING);
+        }
+
         while (true) {
             $job = $this->runNextJob();
             if (empty($job)) {
@@ -42,6 +53,8 @@ class Worker
             }
             $this->stopIfNecessary($job);
         }
+
+        $this->lock->release();
     }
 
     public function runNextJob()
@@ -134,25 +147,31 @@ class Worker
             posix_kill(getmypid(), SIGKILL);
         }
 
+        $this->stop($status);
+    }
+
+    protected function stop($status = 0)
+    {
+        $this->lock->release();
         exit($status);
     }
 
     protected function stopIfNecessary($job)
     {
         if ($this->shouldQuit) {
-            exit(self::EXIT_CODE_EXCEPTION);
+            $this->stop(self::EXIT_CODE_EXCEPTION);
         }
 
         if (empty($job) && $this->options['stop_when_idle']) {
-            exit();
+            $this->stop();
         }
 
         if ($this->options['once'] == true) {
-            exit();
+            $this->stop();
         }
 
         if ($this->isMemoryExceeded($this->options['memory_limit'])) {
-            exit(self::EXIT_CODE_MEMORY_EXCEEDED);
+            $this->stop(self::EXIT_CODE_MEMORY_EXCEEDED);
         }
     }
 

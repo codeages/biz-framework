@@ -30,4 +30,9 @@ class QueueBaseTestCase extends IntegrationTestCase
 
         return new ExampleFailedJob($body, $metadata);
     }
+
+    protected function createLock()
+    {
+        return $this->biz['lock.factory']->createLock('queue-for-phpunit');
+    }
 }

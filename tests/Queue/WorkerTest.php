@@ -25,7 +25,7 @@ class WorkerTest extends QueueBaseTestCase
             'once' => true,
         );
 
-        $worker = new Worker($queue, $failer, $options);
+        $worker = new Worker($queue, $failer, $this->createLock(), $options);
         $worker->runNextJob();
 
         $this->assertTrue($this->biz['logger.test_handler']->hasInfo('ExampleFinishedJob executed.'));
@@ -46,7 +46,7 @@ class WorkerTest extends QueueBaseTestCase
             'once' => true,
         );
 
-        $worker = new Worker($queue, $failer, $options);
+        $worker = new Worker($queue, $failer,  $this->createLock(), $options);
         $worker->runNextJob();
 
         $this->assertTrue($this->biz['logger.test_handler']->hasInfo('ExampleFailedJob executed.'));
@@ -71,7 +71,7 @@ class WorkerTest extends QueueBaseTestCase
             'once' => true,
         );
 
-        $worker = new Worker($queue, $failer, $options);
+        $worker = new Worker($queue, $failer,  $this->createLock(), $options);
         $worker->runNextJob();
 
         $this->assertTrue($this->biz['logger.test_handler']->hasInfo('ExampleFailedRetryJob executed.'));

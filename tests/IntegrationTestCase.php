@@ -121,6 +121,8 @@ class IntegrationTestCase extends TestCase
             return $logger;
         };
 
+        $biz['lock.flock.directory'] = sys_get_temp_dir();
+
         $biz->boot();
 
         return $biz;
