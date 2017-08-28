@@ -11,6 +11,7 @@ use Codeages\Biz\Framework\Pay\Status\PayingStatus;
 use Codeages\Biz\Framework\Pay\Status\PaymentTradeContext;
 use Codeages\Biz\Framework\Pay\Status\RefundedStatus;
 use Codeages\Biz\Framework\Pay\Status\RefundingStatus;
+use function foo\func;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
 
@@ -44,9 +45,18 @@ class PayServiceProvider implements ServiceProviderInterface
             ),
         );
 
-        $biz['payment.platforms'] = $paymentDefaultPlatforms;
+        $biz['payment.platforms'] = function ($biz) use ($paymentDefaultPlatforms) {
+            if (!empty($biz['payment.platforms.options'])) {
+                foreach ($paymentDefaultPlatforms as $key => $platform) {
+                    if (!empty($biz['payment.platforms.options'][$key])) {
+                        $paymentDefaultPlatforms[$key] = array_merge($paymentDefaultPlatforms[$key], $biz['payment.platforms.options'][$key]);
+                    }
+                }
+            }
+            return $paymentDefaultPlatforms;
+        };
 
-        foreach ($biz['payment.platforms'] as $key => $platform) {
+        foreach ($paymentDefaultPlatforms as $key => $platform) {
             $biz["payment.{$key}"] = function () use ($platform) {
                 return new $platform['class']($this);
             };

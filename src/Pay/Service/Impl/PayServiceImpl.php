@@ -339,11 +339,6 @@ class PayServiceImpl extends BaseService implements PayService
         return 'money';
     }
 
-    protected function getPaymentSetting($paymentType)
-    {
-        return array('enable' => 1);
-    }
-
     protected function getPayment($payment)
     {
         return $this->biz["payment.{$payment}"];
