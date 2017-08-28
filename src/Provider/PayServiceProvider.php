@@ -11,7 +11,6 @@ use Codeages\Biz\Framework\Pay\Status\PayingStatus;
 use Codeages\Biz\Framework\Pay\Status\PaymentTradeContext;
 use Codeages\Biz\Framework\Pay\Status\RefundedStatus;
 use Codeages\Biz\Framework\Pay\Status\RefundingStatus;
-use function foo\func;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
 
