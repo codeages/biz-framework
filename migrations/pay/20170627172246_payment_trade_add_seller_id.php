@@ -16,7 +16,7 @@ class PaymentTradeAddSellerId extends Migration
                 "ALTER TABLE `biz_payment_trade` Add column `seller_id` int(10) unsigned not null  COMMENT '卖家Id' after `platform_created_result`;"
             );
         }
-        if (!$this->isFieldExist('payment_trade', 'user_id')) {
+        if (!$this->isFieldExist('biz_payment_trade', 'user_id')) {
             $db->exec(
                 "ALTER TABLE `biz_payment_trade` Add column `user_id` int(10) unsigned not null  COMMENT '卖家Id' after `seller_id`;"
             );

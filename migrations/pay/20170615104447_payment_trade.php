@@ -46,6 +46,6 @@ class PaymentTrade extends Migration
     {
         $biz = $this->getContainer();
         $connection = $biz['db'];
-        $connection->exec("drop table `payment_trade`;");
+        $connection->exec("drop table `biz_payment_trade`;");
     }
 }

@@ -12,7 +12,7 @@ class Order extends Migration
         $biz = $this->getContainer();
         $connection = $biz['db'];
         $connection->exec("
-            CREATE TABLE `biz_orders` (
+            CREATE TABLE `biz_order` (
               `id` INT(10) unsigned NOT NULL AUTO_INCREMENT,
               `title` VARCHAR(1024) NOT NULL DEFAULT '' COMMENT '订单标题',
               `sn` VARCHAR(64) NOT NULL COMMENT '订单号',
@@ -105,7 +105,7 @@ class Order extends Migration
         $biz = $this->getContainer();
         $connection = $biz['db'];
         $connection->exec("
-            DROP TABLE `biz_orders`;
+            DROP TABLE `biz_order`;
             DROP TABLE `biz_order_item`;
             DROP TABLE `biz_order_item_deduct`;
             DROP TABLE `biz_order_refund`;
