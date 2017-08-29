@@ -25,6 +25,7 @@ class OrderServiceImpl extends BaseService implements OrderService
             'created_reason',
             'seller_id',
             'price_type',
+            'refund_deadline'
         ));
 
         try {
