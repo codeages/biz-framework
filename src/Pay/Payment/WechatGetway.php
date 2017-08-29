@@ -44,7 +44,7 @@ class WechatGetway extends AbstractGetway
 
     public function queryTrade($trade)
     {
-        $response = $this->createGetWay("WechatPay")->query(array('out_trade_no' => $trade['out_trade_no']));
+        $response = $this->createGetWay("WechatPay")->query(array('out_trade_no' => $trade['out_trade_no']))->send();
         if ($response->isSuccessful()) {
             return $response->getData();
         }
