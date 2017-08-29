@@ -42,6 +42,14 @@ class WechatGetway extends AbstractGetway
         );
     }
 
+    public function queryTrade($trade)
+    {
+        $response = $this->createGetWay("WechatPay")->query(array('out_trade_no' => $trade['out_trade_no']));
+        if ($response->isSuccessful()) {
+            return $response->getData();
+        }
+    }
+
     protected function timeConverter($time)
     {
         $year = substr($time, 0, 4);
