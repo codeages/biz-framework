@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## [0.7.0] - 2017-08-29
+
+* 新增 Queue 组件。
+
 ## [0.6.2] - 2017-08-14
 
 * 表名 `target_log` 重命名为 `biz_targetlog`。
