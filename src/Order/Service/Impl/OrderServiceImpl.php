@@ -53,6 +53,11 @@ class OrderServiceImpl extends BaseService implements OrderService
         return $order;
     }
 
+    public function findOrderItemDeductsByOrderId($orderId)
+    {
+        return $this->getOrderItemDeductDao()->findByOrderId($orderId);
+    }
+
     protected function saveOrder($order, $items)
     {
         $user = $this->biz['user'];
