@@ -1,6 +1,6 @@
 <?php
 
-namespace Codeages\Biz\Framework\Order;
+namespace Codeages\Biz\Framework\Order\Callback;
 
 interface PaidCallback
 {
