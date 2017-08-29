@@ -2,7 +2,7 @@
 
 namespace Codeages\Biz\Framework\Order;
 
-interface AbstractPaidProcessor
+interface PaidCallback
 {
     const SUCCESS = 'success';
 
