@@ -4,6 +4,10 @@ namespace Codeages\Biz\Framework\Queue;
 
 use Codeages\Biz\Framework\Queue\Driver\Queue;
 use Symfony\Component\Lock\LockInterface;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Lock\Exception\LockAcquiringException;
+use Symfony\Component\Lock\Exception\LockConflictedException;
+use Symfony\Component\Lock\Exception\LockReleasingException;
 
 class Worker
 {
@@ -25,11 +29,14 @@ class Worker
 
     protected $lock;
 
-    public function __construct(Queue $queue, JobFailer $failer, LockInterface $lock, array $options = array())
+    protected $logger;
+
+    public function __construct(Queue $queue, JobFailer $failer, LockInterface $lock, LoggerInterface $logger, array $options = array())
     {
         $this->queue = $queue;
         $this->failer = $failer;
         $this->lock = $lock;
+        $this->logger = $logger;
         $this->options = array_merge(array(
             'memory_limit' => 256,
             'sleep' => 2,
@@ -41,8 +48,16 @@ class Worker
 
     public function run()
     {
-        $acquired = $this->lock->acquire();
+        try {
+            $acquired = $this->lock->acquire();
+        } catch (LockConflictedException $e) {
+            $this->logger->error($this->createMessage("Acquire lock error: {$e->getMessage()}"));
+        } catch (LockAcquiringException $e) {
+            $this->logger->error($this->createMessage("Acquire lock error: {$e->getMessage()}"));
+        }
+        
         if (!$acquired) {
+            $this->logger->warning($this->createMessage('Acquire lock failed, because other process is running.'));
             $this->stop(self::EXIT_CODE_RUNNING);
         }
 
@@ -61,9 +76,13 @@ class Worker
     {
         $job = $this->getNextJob();
         if ($job) {
+            $this->logger->info($this->createMessage("Start execute job #{$job->getId()}."));
             $this->executeJob($job);
+            $this->logger->info($this->createMessage("End execute job #{$job->getId()}."));
 
             return $job;
+        } else {
+            $this->logger->info($this->createMessage("No job."));
         }
     }
 
@@ -72,8 +91,10 @@ class Worker
         try {
             return $job = $this->queue->pop();
         } catch (\Exception $e) {
+            $this->logger->error($this->createMessage("Pop job #{$job->getId()} error: {$e->getMessage()}"));
             $this->shouldQuit = true;
         } catch (\Throwable $e) {
+            $this->logger->error($this->createMessage("Pop job #{$job->getId()} error: {$e->getMessage()}"));
             $this->shouldQuit = true;
         }
     }
@@ -85,8 +106,10 @@ class Worker
         try {
             $result = $job->execute();
         } catch (\Exception $e) {
+            $this->logger->error($this->createMessage("Execute job #{$job->getId()} error: {$e->getMessage()}"));
             $this->shouldQuit = true;
         } catch (\Throwable $e) {
+            $this->logger->error($this->createMessage("Execute job #{$job->getId()} error: {$e->getMessage()}"));
             $this->shouldQuit = true;
         }
 
@@ -109,6 +132,7 @@ class Worker
             $executions = $job->getMetadata('executions', 1);
             if ($executions - 1 < $this->options['tries']) {
                 $this->queue->release($job);
+                $this->logger->warning($this->createMessage("Execute job #{$job->getId()} failed, retry {$executions} times."));
 
                 return;
             }
@@ -116,6 +140,8 @@ class Worker
 
         $this->failer->log($job, $this->queue->getName(), $message);
         $this->queue->delete($job);
+
+        $this->logger->warning($this->createMessage("Execute job #{$job->getId()} failed, drop it."));
     }
 
     protected function registerTimeoutHandler($job)
@@ -152,6 +178,11 @@ class Worker
 
     protected function stop($status = 0)
     {
+        if ($status > 0) {
+            $this->logger->warning($this->createMessage("Worker stopped. (exit code: {$status})"));
+        } else {
+            $this->logger->info($this->createMessage("Wroker stopped."));
+        }
         $this->lock->release();
         exit($status);
     }
@@ -178,5 +209,10 @@ class Worker
     protected function isMemoryExceeded($memoryLimit)
     {
         return (memory_get_usage() / 1024 / 1024) >= $memoryLimit;
+    }
+
+    protected function createMessage($message)
+    {
+        return sprintf('[Queue Worker - %s] %s', $this->queue->getName(), $message);
     }
 }

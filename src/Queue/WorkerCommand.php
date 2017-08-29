@@ -37,7 +37,7 @@ class WorkerCommand extends AbstractCommand
 
         $lock = $this->biz['lock.factory']->createLock(sprintf('queue-worker-%s-%s', $queueName, $input->getArgument('process-no')));
 
-        $worker = new Worker($queue, $this->biz['queue.failer'], $lock, $options);
+        $worker = new Worker($queue, $this->biz['queue.failer'], $lock, $this->biz['logger'], $options);
         $worker->run();
     }
 }

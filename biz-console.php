@@ -4,6 +4,8 @@ use Codeages\Biz\Framework\Context\Biz;
 
 use Codeages\Biz\Framework\Provider\DoctrineServiceProvider;
 use Codeages\Biz\Framework\Provider\QueueServiceProvider;
+use Codeages\Biz\Framework\Provider\MonologServiceProvider;
+use Codeages\Biz\Framework\Queue\Driver\DatabaseQueue;
 
 $options = array(
     'db.options' => array(
@@ -19,6 +21,7 @@ $options = array(
         'host' => getenv('REDIS_HOST'),
     ),
     'debug' => true,
+    'log_dir' => __DIR__ . '/var/logs',
     'run_dir' => __DIR__ . '/var/run',
     'lock.flock.directory' => __DIR__ . '/var/run',
 );
@@ -26,6 +29,15 @@ $options = array(
 $biz = new Biz($options);
 $biz->register(new DoctrineServiceProvider());
 $biz->register(new QueueServiceProvider());
+$biz->register(new MonologServiceProvider(), [
+    'monolog.logfile' => $biz['log_dir'].'/biz.log',
+]);
+
+$biz['queue.connection.default'] = function ($biz) {
+    return new DatabaseQueue('default', $biz);
+};
+
+
 
 $biz->boot();
 
