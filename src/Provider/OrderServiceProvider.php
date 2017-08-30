@@ -18,7 +18,6 @@ use Codeages\Biz\Framework\Order\Status\Refund\RefundedStatus;
 use Codeages\Biz\Framework\Order\Status\Refund\OrderRefundContext;
 use Codeages\Biz\Framework\Order\Status\Refund\AuditingStatus;
 use Codeages\Biz\Framework\Order\Status\Refund\RefundingStatus;
-use Codeages\Biz\Framework\Order\Subscriber\OrderSubscriber;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
 
@@ -31,12 +30,6 @@ class OrderServiceProvider implements ServiceProviderInterface
 
         $this->registerOrderStatus($biz);
         $this->registerOrderRefundStatus($biz);
-        $this->registerEventSubscribers($biz);
-    }
-
-    protected function registerEventSubscribers($biz)
-    {
-        $biz['dispatcher']->addSubscriber(new OrderSubscriber($biz));
     }
 
     private function registerOrderRefundStatus($biz)
