@@ -1,6 +1,6 @@
 <?php
 
-namespace Codeages\Biz\Framework\Queue;
+namespace Codeages\Biz\Framework\Queue\Command;
 
 use Codeages\Biz\Framework\Context\AbstractCommand;
 use Symfony\Component\Console\Input\InputInterface;
