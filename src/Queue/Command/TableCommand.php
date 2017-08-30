@@ -1,13 +1,11 @@
 <?php
+
 namespace Codeages\Biz\Framework\Queue\Command;
 
 use Codeages\Biz\Framework\Context\AbstractCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Filesystem\Filesystem;
-
 
 class TableCommand extends AbstractCommand
 {
@@ -32,6 +30,6 @@ class TableCommand extends AbstractCommand
         $filepath = $this->generateMigrationPath($directory, 'biz_queue_failed_job');
         file_put_contents($filepath, file_get_contents(__DIR__.'/stub/failed_job.migration.stub'));
 
-        $output->writeln("<info>Migration created successfully!</info>");
+        $output->writeln('<info>Migration created successfully!</info>');
     }
 }

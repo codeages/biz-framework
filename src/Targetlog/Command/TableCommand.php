@@ -1,13 +1,11 @@
 <?php
+
 namespace Codeages\Biz\Framework\Targetlog\Command;
 
 use Codeages\Biz\Framework\Context\AbstractCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Filesystem\Filesystem;
-
 
 class TableCommand extends AbstractCommand
 {
@@ -28,6 +26,6 @@ class TableCommand extends AbstractCommand
         $filepath = $this->generateMigrationPath($directory, 'biz_targetlog');
         file_put_contents($filepath, file_get_contents(__DIR__.'/stub/targetlog.migration.stub'));
 
-        $output->writeln("<info>Migration created successfully!</info>");
+        $output->writeln('<info>Migration created successfully!</info>');
     }
 }

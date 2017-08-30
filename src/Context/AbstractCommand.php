@@ -18,7 +18,8 @@ class AbstractCommand extends Command
     protected function generateMigrationPath($directory, $name)
     {
         sleep(1);
-        return $directory. DIRECTORY_SEPARATOR . date('YmdHis') . '_' . $name . '.php';
+
+        return $directory.DIRECTORY_SEPARATOR.date('YmdHis').'_'.$name.'.php';
     }
 
     protected function ensureMigrationDoseNotExist($directory, $name)
@@ -28,7 +29,7 @@ class AbstractCommand extends Command
 
         foreach ($finder as $file) {
             $path = $file->getRelativePathname();
-            if (substr($path, -strlen($name)-4, -4) == $name) {
+            if (substr($path, -strlen($name) - 4, -4) == $name) {
                 throw new \InvalidArgumentException("Migration `{$name}` is already exist.");
             }
         }

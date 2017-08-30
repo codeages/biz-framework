@@ -7,7 +7,6 @@ use Symfony\Component\Lock\LockInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
-use Symfony\Component\Lock\Exception\LockReleasingException;
 
 class Worker
 {
@@ -55,7 +54,7 @@ class Worker
         } catch (LockAcquiringException $e) {
             $this->logger->error($this->createMessage("Acquire lock error: {$e->getMessage()}"));
         }
-        
+
         if (!$acquired) {
             $this->logger->warning($this->createMessage('Acquire lock failed, because other process is running.'));
             $this->stop(self::EXIT_CODE_RUNNING);
@@ -82,7 +81,7 @@ class Worker
 
             return $job;
         } else {
-            $this->logger->info($this->createMessage("No job."));
+            $this->logger->info($this->createMessage('No job.'));
         }
     }
 
@@ -181,7 +180,7 @@ class Worker
         if ($status > 0) {
             $this->logger->warning($this->createMessage("Worker stopped. (exit code: {$status})"));
         } else {
-            $this->logger->info($this->createMessage("Wroker stopped."));
+            $this->logger->info($this->createMessage('Wroker stopped.'));
         }
         $this->lock->release();
         exit($status);
