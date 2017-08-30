@@ -5,6 +5,7 @@ use Codeages\Biz\Framework\Context\Biz;
 use Codeages\Biz\Framework\Provider\DoctrineServiceProvider;
 use Codeages\Biz\Framework\Provider\QueueServiceProvider;
 use Codeages\Biz\Framework\Provider\MonologServiceProvider;
+use Codeages\Biz\Framework\Provider\TargetlogServiceProvider;
 use Codeages\Biz\Framework\Queue\Driver\DatabaseQueue;
 
 $options = array(
@@ -30,6 +31,7 @@ $options = array(
 $biz = new Biz($options);
 $biz->register(new DoctrineServiceProvider());
 $biz->register(new QueueServiceProvider());
+$biz->register(new TargetlogServiceProvider());
 $biz->register(new MonologServiceProvider(), [
     'monolog.logfile' => $biz['log_dir'].'/biz.log',
 ]);
