@@ -16,10 +16,9 @@ class CancelStatus extends AbstractRefundStatus
         return array(AuditingStatus::NAME);
     }
 
-    public function process()
+    public function process($data = array())
     {
         $orderRefund = $this->changeStatus(self::NAME);
-        $this->getOrderService()->setOrderRefunded($orderRefund['order_id']);
         return $orderRefund;
     }
 
