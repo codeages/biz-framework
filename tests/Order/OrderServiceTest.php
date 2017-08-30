@@ -160,7 +160,6 @@ class OrderServiceTest extends IntegrationTestCase
         $this->assertEquals($mockOrder['source'], $order['source']);
         $this->assertEquals($mockOrder['callback'], $order['callback']);
         $this->assertEquals($mockOrder['created_reason'], $order['created_reason']);
-        $this->assertEquals($mockOrder['refund_deadline'], $order['refund_deadline']);
         $this->assertEquals($this->sumOrderPriceAmount($mockedOrderItems), $order['price_amount']);
         $this->assertEquals($this->sumOrderPayAmount($mockedOrderItems), $order['pay_amount']);
         $this->assertEquals($this->biz['user']['id'], $order['user_id']);
@@ -286,7 +285,6 @@ class OrderServiceTest extends IntegrationTestCase
             'price_type' => 'coin',
             'user_id' => $this->biz['user']['id'],
             'created_reason' => '购买',
-            'refund_deadline'=>time()
         );
     }
 
