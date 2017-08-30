@@ -12,10 +12,6 @@ class TokenServiceProvider implements ServiceProviderInterface
         $biz['token_service.impl'] = isset($biz['token_service.impl']) ? $biz['token_service.impl'] : 'database';
         $biz['token_service.gc_divisor'] = isset($biz['token_service.gc_divisor']) ? intval($biz['token_service.gc_divisor']) : 1000;
 
-        if ($biz['token_service.impl'] == 'database') {
-            $biz['migration.directories'][] = dirname(dirname(__DIR__)).'/migrations/token';
-        }
-
         $biz['@Token:TokenService'] = function ($biz) {
             $class = 'Codeages\\Biz\\Framework\\Token\\Service\\Impl\\'.ucfirst($biz['token_service.impl']).'TokenServiceImpl';
 

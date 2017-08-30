@@ -10,7 +10,6 @@ class TargetlogServiceProvider implements ServiceProviderInterface
 {
     public function register(Container $biz)
     {
-        $biz['migration.directories'][] = dirname(dirname(__DIR__)).'/migrations/targetlog';
         $biz['autoload.aliases']['Targetlog'] = 'Codeages\Biz\Framework\Targetlog';
 
         $biz['console.commands'][] = function () use ($biz) {
