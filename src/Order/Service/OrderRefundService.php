@@ -18,4 +18,8 @@ interface OrderRefundService
 
     public function cancelRefund($id);
 
+    public function searchRefunds($conditions, $orderby, $start, $limit);
+
+    public function countRefunds($conditions);
+
 }
