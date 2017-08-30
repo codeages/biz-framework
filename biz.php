@@ -36,8 +36,6 @@ $biz['queue.connection.default'] = function ($biz) {
     return new \Codeages\Biz\Framework\Queue\Driver\DatabaseQueue('default', $biz);
 };
 
-
-
 $biz->boot();
 
 return $biz;

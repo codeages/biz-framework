@@ -5,7 +5,7 @@ if (!$autoloader()) {
     die('class autoloader not found.');
 }
 
-$biz = require getcwd().'/biz-console.php';
+$biz = require getcwd().'/biz.php';
 
 use Symfony\Component\Console\Application;
 
