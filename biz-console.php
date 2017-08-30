@@ -19,7 +19,6 @@ $options = array(
     'log_dir' => __DIR__ . '/var/logs',
     'run_dir' => __DIR__ . '/var/run',
     'lock.flock.directory' => __DIR__ . '/var/run',
-    'migration.base_directory' => __DIR__ . '/migrations',
 );
 
 $biz = new Biz($options);
