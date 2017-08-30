@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+## [0.8.0] - 2017-08-29
+
+* 新增 Console 组件，`bin/biz`。
+* 各个组件的 migration 不再自动注册，需调用命令 `bin/biz {...}:table` 系列命令，主动创建各个组件的 migration。
+
 ## [0.7.0] - 2017-08-29
 
 * 新增 Queue 组件。
