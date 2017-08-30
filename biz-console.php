@@ -2,14 +2,6 @@
 
 use Codeages\Biz\Framework\Context\Biz;
 
-use Codeages\Biz\Framework\Provider\DoctrineServiceProvider;
-use Codeages\Biz\Framework\Provider\QueueServiceProvider;
-use Codeages\Biz\Framework\Provider\MonologServiceProvider;
-use Codeages\Biz\Framework\Provider\TokenServiceProvider;
-use Codeages\Biz\Framework\Provider\SettingServiceProvider;
-use Codeages\Biz\Framework\Provider\TargetlogServiceProvider;
-use Codeages\Biz\Framework\Queue\Driver\DatabaseQueue;
-
 $options = array(
     'db.options' => array(
         'dbname' => getenv('DB_NAME') ?: 'biz-framework',
@@ -31,17 +23,18 @@ $options = array(
 );
 
 $biz = new Biz($options);
-$biz->register(new DoctrineServiceProvider());
-$biz->register(new QueueServiceProvider());
-$biz->register(new TokenServiceProvider());
-$biz->register(new SettingServiceProvider());
-$biz->register(new TargetlogServiceProvider());
-$biz->register(new MonologServiceProvider(), [
+$biz->register(new \Codeages\Biz\Framework\Provider\DoctrineServiceProvider());
+$biz->register(new \Codeages\Biz\Framework\Provider\QueueServiceProvider());
+$biz->register(new \Codeages\Biz\Framework\Provider\TokenServiceProvider());
+$biz->register(new \Codeages\Biz\Framework\Provider\SchedulerServiceProvider());
+$biz->register(new \Codeages\Biz\Framework\Provider\SettingServiceProvider());
+$biz->register(new \Codeages\Biz\Framework\Provider\TargetlogServiceProvider());
+$biz->register(new \Codeages\Biz\Framework\Provider\MonologServiceProvider(), [
     'monolog.logfile' => $biz['log_dir'].'/biz.log',
 ]);
 
 $biz['queue.connection.default'] = function ($biz) {
-    return new DatabaseQueue('default', $biz);
+    return new \Codeages\Biz\Framework\Queue\Driver\DatabaseQueue('default', $biz);
 };
 
 

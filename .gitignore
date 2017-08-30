@@ -1,3 +1,4 @@
+/migrations
 /app/cache
 /vendor
 /composer.lock
