@@ -212,36 +212,36 @@ class WorkflowServiceImpl extends BaseService implements WorkflowService
         return $this->getOrderContext($order['id'])->paid($data);
     }
 
-    public function close($id, $data = array())
+    public function close($orderId, $data = array())
     {
-        return $this->getOrderContext($id)->closed($data);
+        return $this->getOrderContext($orderId)->closed($data);
     }
 
-    public function finish($id, $data = array())
+    public function finish($orderId, $data = array())
     {
-        return $this->getOrderContext($id)->success($data);
+        return $this->getOrderContext($orderId)->success($data);
     }
 
-    public function fail($id, $data = array())
+    public function fail($orderId, $data = array())
     {
-        return $this->getOrderContext($id)->fail($data);
+        return $this->getOrderContext($orderId)->fail($data);
     }
 
-    public function refunding($id, $data = array())
+    public function refunding($orderId, $data = array())
     {
-        return $this->getOrderContext($id)->refunding($data);
+        return $this->getOrderContext($orderId)->refunding($data);
     }
 
-    public function refunded($id, $data = array())
+    public function refunded($orderId, $data = array())
     {
-        return $this->getOrderContext($id)->refunded($data);
+        return $this->getOrderContext($orderId)->refunded($data);
     }
 
-    protected function getOrderContext($id)
+    protected function getOrderContext($orderId)
     {
         $orderContext = $this->biz['order_context'];
 
-        $order = $this->getOrderDao()->get($id);
+        $order = $this->getOrderDao()->get($orderId);
         if (empty($order)) {
             throw $this->createNotFoundException("order #{$order['id']} is not found");
         }

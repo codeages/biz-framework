@@ -6,17 +6,19 @@ interface WorkflowService
 {
     public function start($order, $orderItems);
 
-    public function close($id, $data = array());
+    public function close($orderId, $data = array());
 
-    public function paying($id, $data = array());
+    public function paying($orderId, $data = array());
 
     public function paid($data);
 
-    public function finish($id, $data = array());
+    public function finish($orderId, $data = array());
 
-    public function fail($id, $data = array());
+    public function fail($orderId, $data = array());
 
-    public function refunding($id, $data = array());
+    public function refunding($orderId, $data = array());
 
-    public function refunded($id, $data = array());
+    public function refunded($orderId, $data = array());
+
+
 }
