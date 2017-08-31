@@ -57,4 +57,9 @@ class SessionServiceImpl extends BaseService implements SessionService
     {
         return $this->biz->dao('Session:SessionDao');
     }
+
+    protected function getOnlineDao()
+    {
+        return $this->biz->dao('Session:OnlineDao');
+    }
 }
