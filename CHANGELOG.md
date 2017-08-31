@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## [0.8.1] - 2017-08-31
+
+* RedisCache 新增 incr 方法。
+
 ## [0.8.0] - 2017-08-29
 
 * 新增 Console 组件，`bin/biz`。
