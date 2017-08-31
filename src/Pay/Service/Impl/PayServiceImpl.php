@@ -389,6 +389,7 @@ class PayServiceImpl extends BaseService implements PayService
         $data['trade_sn'] = $trade['trade_sn'];
         unset($data['user_id']);
         unset($data['seller_id']);
+        $data['amount'] = $trade['cash_amount'];
         return $this->getPayment($data['platform'])->createTrade($data);
     }
 
