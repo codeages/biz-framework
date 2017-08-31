@@ -7,21 +7,21 @@ use Pimple\ServiceProviderInterface;
 
 class TokenServiceProvider implements ServiceProviderInterface
 {
-    public function register(Container $biz)
+    public function register(Container $container)
     {
-        $biz['token_service.impl'] = isset($biz['token_service.impl']) ? $biz['token_service.impl'] : 'database';
-        $biz['token_service.gc_divisor'] = isset($biz['token_service.gc_divisor']) ? intval($biz['token_service.gc_divisor']) : 1000;
+        $container['token_service.impl'] = isset($container['token_service.impl']) ? $container['token_service.impl'] : 'database';
+        $container['token_service.gc_divisor'] = isset($container['token_service.gc_divisor']) ? intval($container['token_service.gc_divisor']) : 1000;
 
-        $biz['@Token:TokenService'] = function ($biz) {
-            $class = 'Codeages\\Biz\\Framework\\Token\\Service\\Impl\\'.ucfirst($biz['token_service.impl']).'TokenServiceImpl';
+        if ($container['token_service.impl'] == 'database') {
+            $container['migration.directories'][] = dirname(dirname(__DIR__)).'/migrations/token';
+        }
 
-            return new $class($biz);
+        $container['@Token:TokenService'] = function ($container) {
+            $class = 'Codeages\\Biz\\Framework\\Token\\Service\\Impl\\'.ucfirst($container['token_service.impl']).'TokenServiceImpl';
+
+            return new $class($container);
         };
 
-        $biz['autoload.aliases']['Token'] = 'Codeages\\Biz\\Framework\\Token';
-
-        $biz['console.commands'][] = function () use ($biz) {
-            return new \Codeages\Biz\Framework\Token\Command\TableCommand($biz);
-        };
+        $container['autoload.aliases']['Token'] = 'Codeages\\Biz\\Framework\\Token';
     }
 }

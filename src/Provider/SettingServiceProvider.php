@@ -7,12 +7,9 @@ use Pimple\ServiceProviderInterface;
 
 class SettingServiceProvider implements ServiceProviderInterface
 {
-    public function register(Container $biz)
+    public function register(Container $container)
     {
-        $biz['autoload.aliases']['Setting'] = 'Codeages\Biz\Framework\Setting';
-
-        $biz['console.commands'][] = function () use ($biz) {
-            return new \Codeages\Biz\Framework\Setting\Command\TableCommand($biz);
-        };
+        $container['migration.directories'][] = dirname(dirname(__DIR__)).'/migrations/setting';
+        $container['autoload.aliases']['Setting'] = 'Codeages\Biz\Framework\Setting';
     }
 }

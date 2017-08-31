@@ -27,7 +27,6 @@ class Biz extends Container
         $biz['debug'] = false;
         $biz['logger'] = null;
         $biz['migration.directories'] = new \ArrayObject();
-        $biz['console.commands'] = new \ArrayObject();
 
         $biz['autoload.aliases'] = new \ArrayObject(array('' => 'Biz'));
 
@@ -101,16 +100,6 @@ class Biz extends Container
 
         $biz['dao.cache.strategy.row'] = function ($biz) {
             return new CacheStrategy\RowStrategy($biz['dao.cache.redis_wrapper'], $biz['dao.metadata_reader']);
-        };
-
-        $biz['lock.flock.directory'] = null;
-
-        $biz['lock.store'] = function ($biz) {
-            return new \Symfony\Component\Lock\Store\FlockStore($biz['lock.flock.directory']);
-        };
-
-        $biz['lock.factory'] = function ($biz) {
-            return new \Symfony\Component\Lock\Factory($biz['lock.store']);
         };
 
         foreach ($values as $key => $value) {
