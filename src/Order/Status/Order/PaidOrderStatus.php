@@ -18,7 +18,8 @@ class PaidOrderStatus extends AbstractOrderStatus
         $data = ArrayToolkit::parts($data, array(
             'order_sn',
             'trade_sn',
-            'pay_time'
+            'pay_time',
+            'payment',
         ));
 
         $order = $this->getOrderDao()->getBySn($data['order_sn'], array('lock' => true));
@@ -31,7 +32,8 @@ class PaidOrderStatus extends AbstractOrderStatus
     {
         $data = ArrayToolkit::parts($data, array(
             'trade_sn',
-            'pay_time'
+            'pay_time',
+            'payment',
         ));
         $data['status'] = PaidOrderStatus::NAME;
         return $this->getOrderDao()->update($order['id'], $data);
