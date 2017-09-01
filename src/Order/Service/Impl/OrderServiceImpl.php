@@ -23,7 +23,7 @@ class OrderServiceImpl extends BaseService implements OrderService
         return $this->getOrderItemDao()->findByOrderId($orderId);
     }
 
-    public function findOrderItemsByorderIds($orderIds)
+    public function findOrderItemsByOrderIds($orderIds)
     {
         return $this->getOrderItemDao()->findByOrderIds($orderIds);
     }
