@@ -26,7 +26,8 @@ class PayServiceImpl extends BaseService implements PayService
             'open_id',
             'device_info',
             'seller_id',
-            'user_id'
+            'user_id',
+            'type'
         ));
 
         $lock = $this->biz['lock'];
