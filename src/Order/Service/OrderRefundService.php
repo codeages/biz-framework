@@ -8,4 +8,7 @@ interface OrderRefundService
 
     public function countRefunds($conditions);
 
+    public function findRefundItemsByRefundIds($refundIds);
+
+    public function getById($id);
 }
