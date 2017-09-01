@@ -33,7 +33,7 @@ class OrderSubscriber extends EventSubscriber implements EventSubscriberInterfac
         foreach ($deducts as $deduct) {
             $processor = $this->getDeductPaidCallback($deduct);
             if (!empty($processor)) {
-                $results[] = $processor->paidCallback($deduct);
+                $processor->paidCallback($deduct);
             }
         }
 
