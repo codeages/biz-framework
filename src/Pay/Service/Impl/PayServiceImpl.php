@@ -268,7 +268,11 @@ class PayServiceImpl extends BaseService implements PayService
     protected function createCashFlow($trade, $notifyData)
     {
         if ('refund' == $trade['type']) {
-            $this->createSiteFlow($trade, array(), 'outflow');
+            $flow = $this->createSiteFlow($trade, array(), 'outflow');
+            if (!empty($trade['coin_amount'])) {
+                $flow = $this->createSiteFlow($trade, $flow, 'outflow', true);
+                $this->createUserFlow($trade, $flow, 'inflow', true);
+            }
             return;
         }
         $inflow = $this->createUserFlow($trade, array('amount' => $notifyData['pay_amount']), 'inflow');
