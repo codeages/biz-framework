@@ -14,6 +14,12 @@ class PayServiceTest extends IntegrationTestCase
             'id' => 1
         );
         $this->biz['user'] = $currentUser;
+
+        $this->biz['payment.platforms.options'] = array(
+            'wechat' => array(
+                'appid'=>'aaa'
+            )
+        );
     }
 
     public function testCreateTrade()
@@ -161,7 +167,9 @@ class PayServiceTest extends IntegrationTestCase
     public function testFindPaymentPlatforms()
     {
         $this->biz['payment.platforms.options'] = array(
-            'wechat' => array('appid'=>'aaa')
+            'wechat' => array(
+                'appid'=>'bcbc'
+            )
         );
 
         $payments = $this->getPayService()->findEnabledPayments();
