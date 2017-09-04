@@ -18,9 +18,7 @@ interface OrderService
 
     public function countOrders($conditions);
 
-    public function analysisPaidCourseOrderDataByTime($startTime, $endTime);
-
-    public function analysisPaidClassroomOrderDataByTime($startTime, $endTime);
+    public function countGroupByDate($startTime, $endTime, $status, $targetType);
 
     public function searchOrderItems($conditions, $orderBy, $start, $limit);
 

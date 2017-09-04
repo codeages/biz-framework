@@ -58,7 +58,7 @@ class OrderDaoImpl extends GeneralDaoImpl implements OrderDao
         return $builder->execute()->fetchAll();
     }
 
-    public function analysisOrderDataByTimeAndStatusAndTargetType($startTime, $endTime, $status, $targetType)
+    public function countGroupByDate($startTime, $endTime, $status, $targetType)
     {
         $sql = "SELECT count(id) AS count, from_unixtime(pay_time,'%Y-%m-%d') AS date FROM `{$this->table}` 
                 WHERE pay_time > ? 

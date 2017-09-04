@@ -53,14 +53,9 @@ class OrderServiceImpl extends BaseService implements OrderService
         return $this->getOrderDao()->count($conditions);
     }
 
-    public function analysisPaidCourseOrderDataByTime($startTime, $endTime)
+    public function countGroupByDate($startTime, $endTime, $status, $targetType)
     {
-        return $this->getOrderDao()->analysisOrderDataByTimeAndStatusAndTargetType($startTime, $endTime, 'paid', 'course');
-    }
-
-    public function analysisPaidClassroomOrderDataByTime($startTime, $endTime)
-    {
-        return $this->getOrderDao()->analysisOrderDataByTimeAndStatusAndTargetType($startTime, $endTime, 'paid', 'classroom');
+        return $this->getOrderDao()->countGroupByDate($startTime, $endTime, $status, $targetType);
     }
 
     public function searchOrderItems($conditions, $orderBy, $start, $limit)
