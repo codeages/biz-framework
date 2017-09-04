@@ -185,7 +185,7 @@ class PayServiceTest extends IntegrationTestCase
     {
         return array(
             'goods_title' => 'java基础课程',
-            'goods_desc' => 'java基础课程，适合初学者',
+            'goods_detail' => 'java基础课程，适合初学者',
             'attach' => array(
                 'user_id' => 1
             ),
