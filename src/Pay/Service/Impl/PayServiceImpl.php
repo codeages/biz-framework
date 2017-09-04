@@ -52,8 +52,7 @@ class PayServiceImpl extends BaseService implements PayService
                     'trade_sn' => $trade['trade_sn'],
                     'pay_amount' => '0',
                 );
-                var_dump($trade);
-                $this->getTradeContext($trade['id'])->paying();
+
                 $this->updateTradeToPaid($mockNotify);
                 $trade = $this->getPaymentTradeDao()->get($trade['id']);
             }
@@ -247,6 +246,7 @@ class PayServiceImpl extends BaseService implements PayService
             'rate' => $this->getCoinRate(),
             'seller_id' => empty($data['seller_id']) ? 0 : $data['seller_id'],
             'user_id' => $this->biz['user']['id'],
+            'status' => 'paying'
         );
 
         if (!empty($data['type'])) {
