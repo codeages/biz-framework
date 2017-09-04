@@ -13,7 +13,7 @@ class OrderSubscriber extends EventSubscriber implements EventSubscriberInterfac
     public static function getSubscribedEvents()
     {
         return array(
-            'pay.success' => 'onPaid',
+            'payment_trade.paid' => 'onPaid',
             'order.paid' => 'onOrderPaid',
             'payment_trade.refunded' => 'onTradeRefunded'
         );
