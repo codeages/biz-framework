@@ -197,7 +197,8 @@ class PayServiceTest extends IntegrationTestCase
             'pay_type' => 'Native',
             'price_type' => 'money',
             'platform' => 'wechat',
-            'seller_id' => '12'
+            'seller_id' => '12',
+            'type' => 'purchase'
         );
 
     }
