@@ -70,14 +70,14 @@ class PayServiceProvider implements ServiceProviderInterface
                 }
             }
 
-            foreach ($platforms as $key => $platform) {
-                $biz["payment.{$key}"] = function () use ($platform, $biz) {
-                    return new $platform['class']($biz);
-                };
-            }
-
             return $platforms;
         });
+
+        foreach ($paymentDefaultPlatforms as $key => $platform) {
+            $biz["payment.{$key}"] = function () use ($platform, $biz) {
+                return new $platform['class']($biz);
+            };
+        }
     }
 
 

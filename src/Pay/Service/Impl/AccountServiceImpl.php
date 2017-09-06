@@ -187,6 +187,16 @@ class AccountServiceImpl extends BaseService implements AccountService
         return $this->getUserBalanceDao()->getByUserId($userId);
     }
 
+    public function decreaseLockCoin($userId, $amount)
+    {
+        $userBalance = $this->getUserBalanceDao()->getByUserId($userId);
+        $this->getUserBalanceDao()->wave(array($userBalance['id']), array(
+            'locked_amount' => 0 - $amount
+        ));
+
+        return $this->getUserBalanceDao()->getByUserId($userId);
+    }
+
     public function releaseCoin($userId, $coinAmount)
     {
         $userBalance = $this->getUserBalanceDao()->getByUserId($userId);

@@ -55,8 +55,7 @@ class PayServiceImpl extends BaseService implements PayService
                     'pay_amount' => '0',
                 );
 
-                $this->updateTradeToPaid($mockNotify);
-                $trade = $this->getPaymentTradeDao()->get($trade['id']);
+                $trade = $this->updateTradeToPaid($mockNotify);
             }
 
             $this->lockCoin($trade);
@@ -141,6 +140,7 @@ class PayServiceImpl extends BaseService implements PayService
             }
 
             $this->dispatch('payment_trade.paid', $trade, $data);
+            return $trade;
         }
     }
 
@@ -153,7 +153,6 @@ class PayServiceImpl extends BaseService implements PayService
     {
         try {
             $this->beginTransaction();
-            $this->createCashFlows($trade, $data);
             $trade = $this->getPaymentTradeDao()->update($trade['id'], array(
                 'status' => $data['status'],
                 'pay_time' => $data['paid_time'],
@@ -161,6 +160,7 @@ class PayServiceImpl extends BaseService implements PayService
                 'notify_data' => $data,
                 'currency' => $data['cash_type'],
             ));
+            $this->createCashFlows($trade, $data);
             $this->getTargetlogService()->log(TargetlogService::INFO, 'trade.paid', $data['trade_sn'], "交易号{$data['trade_sn']}，账目流水处理成功", $data);
             $this->commit();
             return $trade;
@@ -297,17 +297,18 @@ class PayServiceImpl extends BaseService implements PayService
 
     protected function createCashFlows($trade, $notifyData)
     {
-        $inflow = $this->createUserFlow($trade, array('amount' => $notifyData['pay_amount']), 'inflow');
-        $outflow = $this->createUserFlow($trade, $inflow, 'outflow');
-        $this->createSiteFlow($trade, $outflow, 'inflow');
+        $flow = $this->createUserFlow($trade, array('amount' => $notifyData['pay_amount']), 'inflow');
+        $flow = $this->createUserFlow($trade, $flow, 'outflow');
+
+        $flow = $this->createSiteFlow($trade, $flow, 'inflow');
 
         if ('recharge' == $trade['type']) {
-            $outflow = $this->createSiteFlow($trade, $outflow, 'outflow', true);
-            $this->createUserFlow($trade, $outflow, 'inflow', true);
+            $flow = $this->createSiteFlow($trade, $flow, 'outflow', true);
+            $this->createUserFlow($trade, $flow, 'inflow', true);
         } elseif ('purchase' == $trade['type']) {
             if (!empty($trade['coin_amount'])) {
-                $outflow = $this->createUserFlow($trade, $outflow, 'outflow', true);
-                $this->createSiteFlow($trade, $outflow, 'inflow', true);
+                $flow = $this->createUserFlow($trade, $flow, 'outflow', true);
+                $this->createSiteFlow($trade, $flow, 'inflow', true);
             }
         }
     }
@@ -323,18 +324,22 @@ class PayServiceImpl extends BaseService implements PayService
             'platform' => $trade['platform'],
             'price_type' => $trade['price_type'],
             'currency' => $isCoin ? 'coin': $trade['currency'],
-            'amount' => empty($flow) ? 0 : ($isCoin && $flowType == 'outflow' ? $flow['amount'] * $this->getCoinRate() : $flow['amount']),
             'pay_time' => $trade['pay_time'],
             'user_cashflow' => empty($flow['sn']) ? '' : $flow['sn'],
             'type' => $flowType,
             'seller_id' => $trade['seller_id']
         );
 
-        if ($siteFlow['amount'] == 0) {
+        if ($isCoin) {
+            $siteFlow['amount'] = $trade['coin_amount'];
+        } else {
+            $siteFlow['amount'] = $trade['cash_amount'];
+        }
+
+        if ($siteFlow['amount'] <= 0) {
             return array();
         }
 
-        $siteFlow = $this->getSiteCashFlowDao()->create($siteFlow);
         $amount = $flowType == 'inflow' ? $siteFlow['amount'] : 0 - $siteFlow['amount'];
         if ($isCoin) {
             $this->getAccountService()->waveAmount($siteFlow['seller_id'], $amount);
@@ -342,7 +347,7 @@ class PayServiceImpl extends BaseService implements PayService
             $this->getAccountService()->waveCashAmount($siteFlow['seller_id'], $amount);
         }
 
-        return $siteFlow;
+        return $this->getSiteCashFlowDao()->create($siteFlow);
     }
 
     protected function createUserFlow($trade, $parentFlow, $flowType, $isCoin = false)
@@ -361,23 +366,24 @@ class PayServiceImpl extends BaseService implements PayService
         if ($isCoin && $flowType == 'inflow') {
             $userFlow['amount'] = $trade['cash_amount'] * $this->getCoinRate();
         } else if ($isCoin && $flowType == 'outflow') {
-            $userFlow['amount'] = $trade['coin_amount'] + $trade['cash_amount'] * $this->getCoinRate();
+            $userFlow['amount'] = $trade['coin_amount'];
         } else {
             $userFlow['amount'] = $trade['cash_amount'];
         }
 
-        if ($userFlow['amount'] == 0) {
+        if ($userFlow['amount'] <= 0) {
             return array();
         }
 
-        $userFlow = $this->getUserCashflowDao()->create($userFlow);
         $amount = $flowType == 'inflow' ? $userFlow['amount'] : 0 - $userFlow['amount'];
         if ($isCoin) {
-            $this->getAccountService()->waveAmount($userFlow['user_id'], $amount);
+            $userBalance = $this->getAccountService()->waveAmount($userFlow['user_id'], $amount);
+            $siteFlow['user_balance'] = $userBalance['amount'];
         } else {
             $this->getAccountService()->waveCashAmount($userFlow['user_id'], $amount);
         }
-        return $userFlow;
+
+        return $this->getUserCashflowDao()->create($userFlow);
     }
 
     protected function getSiteCashFlowDao()
@@ -422,9 +428,7 @@ class PayServiceImpl extends BaseService implements PayService
 
     protected function getPayment($payment)
     {
-        $payments = $this->findEnabledPayments();
-//        return $this->biz['payment.'.$payment];
-        return new $payments[$payment]['class']($this->biz);
+        return $this->biz['payment.'.$payment];
     }
 
     protected function createPaymentPlatformTrade($data, $trade)

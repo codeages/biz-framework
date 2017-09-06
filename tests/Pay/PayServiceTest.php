@@ -37,7 +37,7 @@ class PayServiceTest extends IntegrationTestCase
     {
         $this->assertNotEmpty($trade);
         $this->assertNotEmpty($trade['trade_sn']);
-        $this->assertEquals('created', $trade['status']);
+        $this->assertEquals('paying', $trade['status']);
         $this->assertEquals($data['order_sn'], $trade['order_sn']);
         $this->assertEquals($data['price_type'], $trade['price_type']);
         $this->assertEquals($data['amount'], $trade['amount']);
@@ -69,6 +69,29 @@ class PayServiceTest extends IntegrationTestCase
 
         $trade = $this->getPaymentTradeDao()->get($trade['id']);
         $this->assertPaidTrade($notifyData, $trade);
+    }
+
+    public function testLockedAmount()
+    {
+        $user = array(
+            'user_id' => $this->biz['user']['id']
+        );
+
+        $this->getAccountService()->createUserBalance($user);
+
+        $userBalance = $this->getAccountService()->waveAmount($user['user_id'], 100);
+        $this->assertEquals(100, $userBalance['amount']);
+
+        $this->biz['payment.wechat'] = $this->mockCreateTradeResult();
+
+        $data = $this->mockTrade();
+        $data['coin_amount'] = 20;
+        $trade = $this->getPayService()->createTrade($data);
+
+
+        $userBalance = $this->getAccountService()->getUserBalanceByUserId($this->biz['user']['id']);
+        $this->assertEquals(80, $userBalance['amount']);
+        $this->assertEquals(20, $userBalance['locked_amount']);
     }
 
     public function testCreateZeroTrade()
@@ -129,7 +152,7 @@ class PayServiceTest extends IntegrationTestCase
                 }
 
                 if($cashFlow['currency'] == 'coin' && $cashFlow['type'] == 'outflow') {
-                    $this->assertEquals($trade['coin_amount'] + $trade['cash_amount'] * $this->getCoinRate(), $cashFlow['amount']);
+                    $this->assertEquals($trade['coin_amount'], $cashFlow['amount']);
                 }
 
                 if($cashFlow['currency'] == 'coin' && $cashFlow['type'] == 'inflow') {
@@ -149,7 +172,7 @@ class PayServiceTest extends IntegrationTestCase
                 $this->assertTrue(in_array($siteCashflow['currency'], array('CNY', 'coin')));
 
                 if ('coin' == $siteCashflow['currency']) {
-                    $this->assertEquals($trade['coin_amount'] + $trade['cash_amount'] * $this->getCoinRate(), $siteCashflow['amount']);
+                    $this->assertEquals($trade['coin_amount'], $siteCashflow['amount']);
                 } else {
                     $this->assertEquals($trade['cash_amount'], $siteCashflow['amount']);
                 }
@@ -312,5 +335,10 @@ class PayServiceTest extends IntegrationTestCase
     protected function getPayService()
     {
         return $this->biz->service('Pay:PayService');
+    }
+
+    protected function getAccountService()
+    {
+        return $this->biz->service('Pay:AccountService');
     }
 }
