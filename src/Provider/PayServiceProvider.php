@@ -21,9 +21,20 @@ class PayServiceProvider implements ServiceProviderInterface
         $biz['migration.directories'][] = dirname(dirname(__DIR__)).'/migrations/pay';
         $biz['autoload.aliases']['Pay'] = 'Codeages\Biz\Framework\Pay';
 
+        $biz['payment.options'] = function () {
+            return array(
+                'refund.wait_notify' => false
+            );
+        };
+
         $biz['console.commands'][] = function () use ($biz) {
             return new \Codeages\Biz\Framework\Pay\Command\TableCommand($biz);
         };
+
+        $biz['console.commands'][] = function () use ($biz) {
+            return new \Codeages\Biz\Framework\Pay\Command\AddLockedAmountCommand($biz);
+        };
+
         $this->registerStatus($biz);
         $this->registerPayments($biz);
     }

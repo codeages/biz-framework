@@ -59,12 +59,17 @@ class PayServiceImpl extends BaseService implements PayService
                 $trade = $this->getPaymentTradeDao()->get($trade['id']);
             }
 
+            $this->lockCoin($trade);
+
             $this->commit();
+
+            $this->dispatch('payment_trade.paying', $trade, $data);
+
             $lock->release("trade_create_{$data['order_sn']}");
         } catch (\Exception $e) {
             $this->rollback();
-            throw $e;
             $lock->release("trade_create_{$data['order_sn']}");
+            throw $e;
         }
         return $trade;
     }
@@ -203,9 +208,7 @@ class PayServiceImpl extends BaseService implements PayService
             'status' => 'refunding',
             'apply_refund_time' => time()
         ));
-        $this->dispatch('trade.refunding', $trade);
-
-        // TODO: 当支付宝时，直接修改状态为refunded
+        $this->dispatch('payment_trade.refunding', $trade);
 
         return $trade;
     }
@@ -284,6 +287,14 @@ class PayServiceImpl extends BaseService implements PayService
         return $this->getUserCashflowDao()->findByTradeSn($sn);
     }
 
+    protected function lockCoin($trade)
+    {
+        if ($trade['coin_amount']>0) {
+            $user = $this->biz['user'];
+            $this->getAccountService()->lockCoin($user['id'], $trade['coin_amount']);
+        }
+    }
+
     protected function createCashFlows($trade, $notifyData)
     {
         $inflow = $this->createUserFlow($trade, array('amount' => $notifyData['pay_amount']), 'inflow');
@@ -326,9 +337,9 @@ class PayServiceImpl extends BaseService implements PayService
         $siteFlow = $this->getSiteCashFlowDao()->create($siteFlow);
         $amount = $flowType == 'inflow' ? $siteFlow['amount'] : 0 - $siteFlow['amount'];
         if ($isCoin) {
-            $this->getAccountService()->waveCashAmount($siteFlow['seller_id'], $amount);
-        } else {
             $this->getAccountService()->waveAmount($siteFlow['seller_id'], $amount);
+        } else {
+            $this->getAccountService()->waveCashAmount($siteFlow['seller_id'], $amount);
         }
 
         return $siteFlow;
@@ -362,9 +373,9 @@ class PayServiceImpl extends BaseService implements PayService
         $userFlow = $this->getUserCashflowDao()->create($userFlow);
         $amount = $flowType == 'inflow' ? $userFlow['amount'] : 0 - $userFlow['amount'];
         if ($isCoin) {
-            $this->getAccountService()->waveCashAmount($userFlow['user_id'], $amount);
-        } else {
             $this->getAccountService()->waveAmount($userFlow['user_id'], $amount);
+        } else {
+            $this->getAccountService()->waveCashAmount($userFlow['user_id'], $amount);
         }
         return $userFlow;
     }
