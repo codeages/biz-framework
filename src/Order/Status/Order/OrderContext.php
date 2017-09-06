@@ -82,6 +82,7 @@ class OrderContext
         $indexedOrderItems = ArrayToolkit::index($orderItems, 'id');
 
         $results = array();
+        $method = ucfirst($status);
         foreach ($deducts as $deduct) {
             $deduct['order'] = $order;
             if (!empty($indexedOrderItems[$deduct['item_id']])) {
@@ -89,8 +90,8 @@ class OrderContext
             }
 
             $processor = $this->getDeductCallback($deduct);
-            if (!empty($processor) && $processor instanceof OrderStatusCallback && method_exists($processor, $status)) {
-                $results[] = $processor->$status($deduct);
+            if (!empty($processor) && $processor instanceof OrderStatusCallback && method_exists($processor, $method)) {
+                $results[] = $processor->$method($deduct);
             }
         }
 
@@ -98,8 +99,8 @@ class OrderContext
             $orderItem['order'] = $order;
 
             $processor = $this->getProductCallback($orderItem);
-            if (!empty($processor) && $processor instanceof OrderStatusCallback && method_exists($processor, $status)) {
-                $results[] = $processor->$status($orderItem);
+            if (!empty($processor) && $processor instanceof OrderStatusCallback && method_exists($processor, $method)) {
+                $results[] = $processor->$method($orderItem);
             }
         }
 
