@@ -134,55 +134,43 @@ class PayServiceTest extends IntegrationTestCase
         $this->assertEquals($notifyData['fee_type'], $trade['currency']);
         $this->assertNotEmpty($trade['notify_data']);
         $this->assertEquals($notifyData['transaction_id'], $trade['platform_sn']);
+        $cashFlows = $this->getUserCashflowDao()->findByTradeSn($trade['trade_sn']);
+        $this->assertEquals(5,count($cashFlows));
 
-        if (in_array($trade['type'], array('purchase', 'recharge')))  {
-            $cashFlows = $this->getUserCashflowDao()->findByTradeSn($trade['trade_sn']);
-
-            $this->assertEquals(3,count($cashFlows));
-            foreach ($cashFlows as $cashFlow) {
-                $this->assertNotEmpty($cashFlow['sn']);
-                $this->assertTrue(in_array($cashFlow['type'], array('inflow', 'outflow')));
+        foreach ($cashFlows as $cashFlow) {
+            $this->assertNotEmpty($cashFlow['sn']);
+            $this->assertTrue(in_array($cashFlow['type'], array('inflow', 'outflow')));
+            if ('buyer' == $cashFlow['user_type']) {
                 $this->assertEquals($this->biz['user']['id'], $cashFlow['user_id']);
-                $this->assertEquals($trade['order_sn'], $cashFlow['order_sn']);
-                $this->assertEquals($trade['trade_sn'], $cashFlow['trade_sn']);
-                $this->assertEquals($trade['platform'], $cashFlow['platform']);
+            } else if ('seller' == $cashFlow['user_type']) {
+                $this->assertEquals($trade['seller_id'], $cashFlow['user_id']);
+            }
+            $this->assertEquals($trade['order_sn'], $cashFlow['order_sn']);
+            $this->assertEquals($trade['trade_sn'], $cashFlow['trade_sn']);
+            $this->assertEquals($trade['platform'], $cashFlow['platform']);
 
-                if ($cashFlow['type'] == 'outflow') {
-                    $this->assertNotEmpty($cashFlow['parent_sn']);
-                }
+            if ($cashFlow['type'] == 'outflow') {
+                $this->assertNotEmpty($cashFlow['parent_sn']);
+            }
+        }
 
-                if($cashFlow['currency'] == 'coin' && $cashFlow['type'] == 'outflow') {
-                    $this->assertEquals($trade['coin_amount'], $cashFlow['amount']);
-                }
-
-                if($cashFlow['currency'] == 'coin' && $cashFlow['type'] == 'inflow') {
+        if ($trade['type'] == 'recharge') {
+            foreach ($cashFlows as $cashFlow) {
+                if($cashFlow['currency'] == 'coin') {
                     $this->assertEquals($trade['cash_amount'] * $this->getCoinRate(), $cashFlow['amount']);
-                }
-
-                if($cashFlow['currency'] != 'coin') {
-                    $this->assertEquals($trade['currency'], $cashFlow['currency']);
+                } else {
                     $this->assertEquals($trade['cash_amount'], $cashFlow['amount']);
                 }
             }
+        }
 
-            $siteCashflows = $this->getSiteCashflowDao()->findByTradeSn($trade['trade_sn']);
-            foreach ($siteCashflows as $index => $siteCashflow) {
-                $this->assertNotEmpty($siteCashflow['sn']);
-                $this->assertEquals($trade['trade_sn'], $siteCashflow['trade_sn']);
-                $this->assertTrue(in_array($siteCashflow['currency'], array('CNY', 'coin')));
-
-                if ('coin' == $siteCashflow['currency']) {
-                    $this->assertEquals($trade['coin_amount'], $siteCashflow['amount']);
+        if ($trade['type'] == 'purchase')  {
+            foreach ($cashFlows as $cashFlow) {
+                if($cashFlow['currency'] == 'coin') {
+                    $this->assertEquals($trade['coin_amount'], $cashFlow['amount']);
                 } else {
-                    $this->assertEquals($trade['cash_amount'], $siteCashflow['amount']);
+                    $this->assertEquals($trade['cash_amount'], $cashFlow['amount']);
                 }
-
-                $this->assertEquals($trade['platform'], $siteCashflow['platform']);
-                $this->assertEquals($trade['title'], $siteCashflow['title']);
-                $this->assertEquals($trade['order_sn'], $siteCashflow['order_sn']);
-                $this->assertEquals($trade['platform_sn'], $siteCashflow['platform_sn']);
-                $this->assertEquals($trade['price_type'], $siteCashflow['price_type']);
-                $this->assertEquals($trade['pay_time'], $siteCashflow['pay_time']);
             }
         }
     }

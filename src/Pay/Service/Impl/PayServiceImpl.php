@@ -297,75 +297,41 @@ class PayServiceImpl extends BaseService implements PayService
 
     protected function createCashFlows($trade, $notifyData)
     {
-        $flow = $this->createUserFlow($trade, array('amount' => $notifyData['pay_amount']), 'inflow');
-        $flow = $this->createUserFlow($trade, $flow, 'outflow');
+        $flow = $this->createUserFlow('buyer', $trade, array('amount' => $notifyData['pay_amount']), 'inflow');
+        $flow = $this->createUserFlow('buyer', $trade, $flow, 'outflow');
 
-        $flow = $this->createSiteFlow($trade, $flow, 'inflow');
+        $flow = $this->createUserFlow('seller', $trade, $flow, 'inflow');
 
         if ('recharge' == $trade['type']) {
-            $flow = $this->createSiteFlow($trade, $flow, 'outflow', true);
-            $this->createUserFlow($trade, $flow, 'inflow', true);
+            $flow = $this->createUserFlow('seller', $trade, $flow, 'outflow', true);
+            $this->createUserFlow('buyer', $trade, $flow, 'inflow', true);
         } elseif ('purchase' == $trade['type']) {
             if (!empty($trade['coin_amount'])) {
-                $flow = $this->createUserFlow($trade, $flow, 'outflow', true);
-                $this->createSiteFlow($trade, $flow, 'inflow', true);
+                $flow = $this->createUserFlow('buyer', $trade, $flow, 'outflow', true);
+                $this->createUserFlow('seller', $trade, $flow, 'inflow', true);
             }
         }
     }
 
-    protected function createSiteFlow($trade, $flow = array(), $flowType, $isCoin = false)
-    {
-        $siteFlow = array(
-            'sn' => $this->generateSn(),
-            'title' => $trade['title'],
-            'trade_sn' => $trade['trade_sn'],
-            'order_sn' => $trade['order_sn'],
-            'platform_sn' => $trade['platform_sn'],
-            'platform' => $trade['platform'],
-            'price_type' => $trade['price_type'],
-            'currency' => $isCoin ? 'coin': $trade['currency'],
-            'pay_time' => $trade['pay_time'],
-            'user_cashflow' => empty($flow['sn']) ? '' : $flow['sn'],
-            'type' => $flowType,
-            'seller_id' => $trade['seller_id']
-        );
-
-        if ($isCoin) {
-            $siteFlow['amount'] = $trade['coin_amount'];
-        } else {
-            $siteFlow['amount'] = $trade['cash_amount'];
-        }
-
-        if ($siteFlow['amount'] <= 0) {
-            return array();
-        }
-
-        $amount = $flowType == 'inflow' ? $siteFlow['amount'] : 0 - $siteFlow['amount'];
-        if ($isCoin) {
-            $this->getAccountService()->waveAmount($siteFlow['seller_id'], $amount);
-        } else {
-            $this->getAccountService()->waveCashAmount($siteFlow['seller_id'], $amount);
-        }
-
-        return $this->getSiteCashFlowDao()->create($siteFlow);
-    }
-
-    protected function createUserFlow($trade, $parentFlow, $flowType, $isCoin = false)
+    protected function createUserFlow($userType, $trade, $parentFlow, $flowType, $isCoin = false)
     {
         $userFlow = array(
             'sn' => $this->generateSn(),
             'type' => $flowType,
             'parent_sn' => empty($parentFlow['sn']) ? '' : $parentFlow['sn'],
             'currency' => $isCoin ? 'coin': $trade['currency'],
-            'user_id' => $trade['user_id'],
+            'amount_type' => $isCoin ? 'coin': 'money',
+            'user_id' => $userType == 'buyer' ? $trade['user_id'] : $trade['seller_id'],
             'trade_sn' => $trade['trade_sn'],
             'order_sn' => $trade['order_sn'],
             'platform' => $trade['platform'],
+            'user_type' => $userType
         );
 
-        if ($isCoin && $flowType == 'inflow') {
+        if ($this->isRechargeCoin($isCoin, $userType, $flowType)
+            || $this->isDischargeCoin($isCoin, $userType, $flowType)) {
             $userFlow['amount'] = $trade['cash_amount'] * $this->getCoinRate();
-        } else if ($isCoin && $flowType == 'outflow') {
+        } else if ($isCoin) {
             $userFlow['amount'] = $trade['coin_amount'];
         } else {
             $userFlow['amount'] = $trade['cash_amount'];
@@ -376,14 +342,25 @@ class PayServiceImpl extends BaseService implements PayService
         }
 
         $amount = $flowType == 'inflow' ? $userFlow['amount'] : 0 - $userFlow['amount'];
-        if ($isCoin) {
-            $userBalance = $this->getAccountService()->waveAmount($userFlow['user_id'], $amount);
-            $siteFlow['user_balance'] = $userBalance['amount'];
-        } else {
-            $this->getAccountService()->waveCashAmount($userFlow['user_id'], $amount);
-        }
 
+        if ($isCoin) {
+            $userBalance = $this->getAccountService()->waveAmount($userFlow['user_id'], 0 - $userFlow['amount']);
+            $userFlow['user_balance'] = empty($userBalance['amount']) ? 0 : $userBalance['amount'];
+        } else {
+            $userBalance = $this->getAccountService()->waveCashAmount($userFlow['user_id'], $amount);
+            $userFlow['user_balance'] = empty($userBalance['cash_amount']) ? 0 : $userBalance['cash_amount'];
+        }
         return $this->getUserCashflowDao()->create($userFlow);
+    }
+
+    protected function isRechargeCoin($isCoin, $userType, $flowType)
+    {
+        return $isCoin && $userType == 'buyer' && $flowType == 'inflow';
+    }
+
+    protected function isDischargeCoin($isCoin, $userType, $flowType)
+    {
+        return $isCoin && $userType == 'seller' && $flowType == 'outflow';
     }
 
     protected function getSiteCashFlowDao()
