@@ -8,7 +8,7 @@ use Codeages\Biz\Framework\Pay\Service\PayService;
 use Codeages\Biz\Framework\Service\BaseService;
 use Codeages\Biz\Framework\Targetlog\Service\TargetlogService;
 
-class PayServiceImpl extends BaseService implements PayService
+class Codeages\Biz\Framework\Pay extends BaseService implements PayService
 {
     public function createTrade($data)
     {

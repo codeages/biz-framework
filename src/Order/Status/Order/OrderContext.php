@@ -88,7 +88,7 @@ class OrderContext
                 $deduct['item'] = $indexedOrderItems[$deduct['item_id']];
             }
 
-            $processor = $this->getDeductPaidCallback($deduct);
+            $processor = $this->getDeductCallback($deduct);
             if (!empty($processor) && $processor instanceof OrderStatusCallback) {
                 $results[] = $processor->$status($deduct);
             }
@@ -97,7 +97,7 @@ class OrderContext
         foreach ($orderItems as $orderItem) {
             $orderItem['order'] = $order;
 
-            $processor = $this->getProductPaidCallback($orderItem);
+            $processor = $this->getProductCallback($orderItem);
             if (!empty($processor) && $processor instanceof OrderStatusCallback) {
                 $results[] = $processor->$status($orderItem);
             }
@@ -113,7 +113,7 @@ class OrderContext
         }
     }
 
-    protected function getProductPaidCallback($orderItem)
+    protected function getProductCallback($orderItem)
     {
         $biz = $this->biz;
 
@@ -123,7 +123,7 @@ class OrderContext
         return $biz["order.product.{$orderItem['target_type']}"];
     }
 
-    protected function getDeductPaidCallback($deduct)
+    protected function getDeductCallback($deduct)
     {
         $biz = $this->biz;
 
