@@ -4,12 +4,7 @@ namespace Codeages\Biz\Framework\Order\Service\Impl;
 
 use Codeages\Biz\Framework\Order\Service\OrderService;
 use Codeages\Biz\Framework\Order\Status\StatusFactory;
-use Codeages\Biz\Framework\Util\ArrayToolkit;
 use Codeages\Biz\Framework\Service\BaseService;
-use Codeages\Biz\Framework\Service\Exception\AccessDeniedException;
-use Codeages\Biz\Framework\Service\Exception\InvalidArgumentException;
-use Codeages\Biz\Framework\Service\Exception\NotFoundException;
-use Codeages\Biz\Framework\Service\Exception\ServiceException;
 
 class OrderServiceImpl extends BaseService implements OrderService
 {
