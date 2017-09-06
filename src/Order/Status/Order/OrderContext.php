@@ -39,6 +39,35 @@ class OrderContext
         return $this->status;
     }
 
+    public function created($data)
+    {
+        $this->status = $this->biz["order_status.created"];
+
+        try {
+            $this->biz['db']->beginTransaction();
+            $order = $this->status->process($data);
+            $this->biz['db']->commit();
+        } catch (AccessDeniedException $e) {
+            $this->biz['db']->rollback();
+            throw $e;
+        } catch (InvalidArgumentException $e) {
+            $this->biz['db']->rollback();
+            throw $e;
+        } catch (NotFoundException $e) {
+            $this->biz['db']->rollback();
+            throw $e;
+        } catch (\Exception $e) {
+            $this->biz['db']->rollback();
+            throw new ServiceException($e->getMessage());
+        }
+
+        $this->createOrderLog($order);
+        $order = $this->dispatch('created', $order);
+        $this->onOrderStatusChange('created', $order);
+
+        return $order;
+    }
+
     function __call($method, $arguments)
     {
         $status = $this->getNextStatusName($method);
