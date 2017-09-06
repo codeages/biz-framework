@@ -363,11 +363,6 @@ class PayServiceImpl extends BaseService implements PayService
         return $isCoin && $userType == 'seller' && $flowType == 'outflow';
     }
 
-    protected function getSiteCashFlowDao()
-    {
-        return $this->biz->dao('Pay:SiteCashflowDao');
-    }
-
     protected function generateSn($prefix = '')
     {
         return $prefix.date('YmdHis', time()).mt_rand(10000, 99999);

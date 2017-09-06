@@ -94,6 +94,39 @@ class PayServiceTest extends IntegrationTestCase
         $this->assertEquals(20, $userBalance['locked_amount']);
     }
 
+    public function testReleaseAmount()
+    {
+        $user = array(
+            'user_id' => $this->biz['user']['id']
+        );
+
+        $this->getAccountService()->createUserBalance($user);
+
+        $userBalance = $this->getAccountService()->waveAmount($user['user_id'], 100);
+        $this->assertEquals(100, $userBalance['amount']);
+
+        $this->biz['payment.wechat'] = $this->mockCreateTradeResult();
+
+        $data = $this->mockTrade();
+        $data['coin_amount'] = 20;
+        $trade = $this->getPayService()->createTrade($data);
+
+
+        $userBalance = $this->getAccountService()->getUserBalanceByUserId($this->biz['user']['id']);
+        $this->assertEquals(80, $userBalance['amount']);
+        $this->assertEquals(20, $userBalance['locked_amount']);
+
+        $this->getPayService()->closeTradesByOrderSn($trade['order_sn']);
+        $data = array(
+            'sn' => $trade['trade_sn']
+        );
+        $this->getPayService()->notifyClosed($data);
+
+        $userBalance = $this->getAccountService()->getUserBalanceByUserId($this->biz['user']['id']);
+        $this->assertEquals(100, $userBalance['amount']);
+        $this->assertEquals(0, $userBalance['locked_amount']);
+    }
+
     public function testCreateZeroTrade()
     {
         $this->biz['payment.wechat'] = $this->mockCreateTradeResult();
