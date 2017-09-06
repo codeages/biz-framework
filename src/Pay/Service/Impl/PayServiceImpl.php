@@ -3,12 +3,13 @@
 namespace Codeages\Biz\Framework\Pay\Service\Impl;
 
 use Codeages\Biz\Framework\Service\Exception\AccessDeniedException;
+use Codeages\Biz\Framework\Service\Exception\InvalidArgumentException;
 use Codeages\Biz\Framework\Util\ArrayToolkit;
 use Codeages\Biz\Framework\Pay\Service\PayService;
 use Codeages\Biz\Framework\Service\BaseService;
 use Codeages\Biz\Framework\Targetlog\Service\TargetlogService;
 
-class Codeages\Biz\Framework\Pay extends BaseService implements PayService
+class PayServiceImpl extends BaseService implements PayService
 {
     public function createTrade($data)
     {
@@ -30,6 +31,17 @@ class Codeages\Biz\Framework\Pay extends BaseService implements PayService
             'type'
         ));
 
+        if ('recharge' == $data['type']) {
+            return $this->createRechargeTrade($data);
+        } else if ('purchase' == $data['type']) {
+            return $this->createPurchaseTrade($data);
+        } else {
+            throw new InvalidArgumentException("can't create the type of {$data['type']} trade");
+        }
+    }
+
+    protected function createPurchaseTrade($data)
+    {
         $lock = $this->biz['lock'];
 
         try {
@@ -58,16 +70,39 @@ class Codeages\Biz\Framework\Pay extends BaseService implements PayService
                 $trade = $this->updateTradeToPaid($mockNotify);
             }
 
-            $this->lockCoin($trade);
-
             $this->commit();
-
-            $this->dispatch('payment_trade.paying', $trade, $data);
 
             $lock->release("trade_create_{$data['order_sn']}");
         } catch (\Exception $e) {
             $this->rollback();
             $lock->release("trade_create_{$data['order_sn']}");
+            throw $e;
+        }
+
+        return $trade;
+    }
+
+    protected function createRechargeTrade($data)
+    {
+        $lock = $this->biz['lock'];
+
+        try {
+            $lockName = 'trade_create_recharge_trade_'.$this->biz['user']['id'];
+
+            $lock->get($lockName);
+            $this->beginTransaction();
+            $trade = $this->createPaymentTrade($data);
+
+            $result = $this->createPaymentPlatformTrade($data, $trade);
+            $trade = $this->getPaymentTradeDao()->update($trade['id'], array(
+                'platform_created_result' => $result
+            ));
+
+            $this->commit();
+            $lock->release($lockName);
+        } catch (\Exception $e) {
+            $this->rollback();
+            $lock->release($lockName);
             throw $e;
         }
         return $trade;
@@ -276,7 +311,9 @@ class Codeages\Biz\Framework\Pay extends BaseService implements PayService
 
         $savedTrade = $this->getPaymentTradeDao()->getByOrderSnAndPlatform($data['order_sn'], $data['platform']);
         if (empty($savedTrade)) {
-            return $this->getPaymentTradeDao()->create($trade);
+            $trade = $this->getPaymentTradeDao()->create($trade);
+            $this->lockCoin($trade);
+            return $trade;
         } else {
             return $this->getPaymentTradeDao()->update($savedTrade['id'], $trade);
         }
