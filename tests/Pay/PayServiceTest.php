@@ -141,6 +141,16 @@ class PayServiceTest extends IntegrationTestCase
 
     public function testRechargeNotify()
     {
+        $user = array(
+            'user_id' => $this->biz['user']['id']
+        );
+        $this->getAccountService()->createUserBalance($user);
+
+        $seller = array(
+            'user_id' => 12
+        );
+        $this->getAccountService()->createUserBalance($seller);
+
         $this->biz['payment.wechat'] = $this->mockCreateTradeResult();
 
         $data = $this->mockTrade();
@@ -156,6 +166,9 @@ class PayServiceTest extends IntegrationTestCase
 
         $trade = $this->getPaymentTradeDao()->get($trade['id']);
         $this->assertPaidTrade($notifyData, $trade);
+
+        $userBalance = $this->getAccountService()->getUserBalanceByUserId($this->biz['user']['id']);
+        $this->assertEquals('80', $userBalance['amount']);
     }
 
     protected function assertPaidTrade($notifyData, $trade)

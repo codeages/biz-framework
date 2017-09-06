@@ -20,7 +20,7 @@ class CashFlow extends Migration
               `type` enum('inflow','outflow') NOT NULL COMMENT '流水类型',
               `amount` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '金额',
               `currency` VARCHAR(32) NOT NULL COMMENT '支付的货币: coin, CNY...',
-              `user_balance` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '账单生成后的对应账户的余额，若amount_type为coin，对应的是虚拟币账户，amount_type为money，对应的是现金庄户余额',
+              `user_balance` int(10) NOT NULL DEFAULT '0' COMMENT '账单生成后的对应账户的余额，若amount_type为coin，对应的是虚拟币账户，amount_type为money，对应的是现金庄户余额',
               `order_sn` varchar(64) NOT NULL COMMENT '订单号',
               `trade_sn` varchar(64) NOT NULL COMMENT '交易号',
               `platform` VARCHAR(32) NOT NULL DEFAULT 'none' COMMENT '支付平台：none, alipay, wxpay...',
