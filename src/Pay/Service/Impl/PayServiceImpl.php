@@ -421,7 +421,7 @@ class PayServiceImpl extends BaseService implements PayService
 
         if ($isCoin) {
             if ($userType == 'buyer' && $flowType == 'outflow') {
-                $userBalance = $this->getAccountService()->decreaseLockCoin($userFlow['user_id'], $userFlow['amount']);
+                $userBalance = $this->getAccountService()->decreaseLockedCoin($userFlow['user_id'], $userFlow['amount']);
             } else {
                 $userBalance = $this->getAccountService()->waveAmount($userFlow['user_id'], $amount);
             }

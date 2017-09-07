@@ -25,7 +25,7 @@ class BizPay extends Migration
               `trade_sn` varchar(64) NOT NULL COMMENT '交易号',
               `platform` VARCHAR(32) NOT NULL DEFAULT 'none' COMMENT '支付平台：none, alipay, wxpay...',
               `user_type` VARCHAR(32) NOT NULL COMMENT '用户类型：seller, buyer',
-              `amount_type` VARCHAR(32) NOT NULL COMMENT 'ammount的类型：coin, money',
+              `amount_type` VARCHAR(32) NOT NULL COMMENT 'ammount的类型：coin, money, locked_amount',
               `created_time` int(10) unsigned NOT NULL,
               PRIMARY KEY (`id`),
               UNIQUE(`sn`)

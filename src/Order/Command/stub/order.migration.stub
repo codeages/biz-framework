@@ -128,9 +128,9 @@ class BizOrder extends Migration
               `status` VARCHAR(32) NOT NULL COMMENT '订单状态',
               `user_id` INT(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建用户',
               `deal_data` TEXT COMMENT '处理数据',
+              `order_refund_id` INT(10) unsigned NOT NULL DEFAULT 0 COMMENT '退款id',
               `created_time` INT(10) unsigned NOT NULL DEFAULT '0',
               `updated_time` INT(10) unsigned NOT NULL DEFAULT '0',
-              `order_refund_id` INT(10) unsigned NOT NULL DEFAULT 0 COMMENT '退款id',
               PRIMARY KEY (`id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
         ");
