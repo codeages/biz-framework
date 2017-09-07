@@ -2,7 +2,7 @@
 
 use Phpmig\Migration\Migration;
 
-class CashFlow extends Migration
+class BizPay extends Migration
 {
     /**
      * Do the migration
@@ -24,23 +24,13 @@ class CashFlow extends Migration
               `order_sn` varchar(64) NOT NULL COMMENT '订单号',
               `trade_sn` varchar(64) NOT NULL COMMENT '交易号',
               `platform` VARCHAR(32) NOT NULL DEFAULT 'none' COMMENT '支付平台：none, alipay, wxpay...',
+              `user_type` VARCHAR(32) NOT NULL COMMENT '用户类型：seller, buyer',
+              `amount_type` VARCHAR(32) NOT NULL COMMENT 'ammount的类型：coin, money',
               `created_time` int(10) unsigned NOT NULL,
               PRIMARY KEY (`id`),
               UNIQUE(`sn`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='帐目流水';
         ");
-
-        if (!$this->isFieldExist('biz_user_cashflow', 'user_type')) {
-            $connection->exec(
-                "ALTER TABLE `biz_user_cashflow` Add column `user_type` VARCHAR(32) NOT NULL COMMENT '用户类型：seller, buyer';"
-            );
-        }
-
-        if (!$this->isFieldExist('biz_user_cashflow', 'amount_type')) {
-            $connection->exec(
-                "ALTER TABLE `biz_user_cashflow` Add column `amount_type` VARCHAR(32) NOT NULL COMMENT 'ammount的类型：coin, money';"
-            );
-        }
 
         $connection->exec("
             CREATE TABLE `biz_user_balance` (
@@ -48,6 +38,7 @@ class CashFlow extends Migration
               `user_id` int(10) unsigned NOT NULL COMMENT '用户',
               `amount` int(10) NOT NULL DEFAULT '0' COMMENT '账户余额',
               `cash_amount` int(10) NOT NULL DEFAULT '0' COMMENT '现金余额',
+              `locked_amount` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '冻结虚拟币金额',
               `updated_time` int(10) unsigned NOT NULL DEFAULT '0',
               `created_time` int(10) unsigned NOT NULL DEFAULT '0',
               PRIMARY KEY (`id`)
@@ -75,6 +66,8 @@ class CashFlow extends Migration
               `user_id` INT(10) unsigned NOT NULL COMMENT '买家id',
               `notify_data` text,
               `platform_created_result` text,
+              `apply_refund_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '申请退款时间',
+              `refund_success_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '成功退款时间',
               `updated_time` int(10) unsigned NOT NULL DEFAULT '0',
               `created_time` int(10) unsigned NOT NULL DEFAULT '0',
               PRIMARY KEY (`id`)
@@ -106,29 +99,6 @@ class CashFlow extends Migration
               UNIQUE (`user_id`, `question_key`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
         ");
-
-        if (!$this->isFieldExist('biz_payment_trade', 'seller_id')) {
-            $connection->exec(
-                "ALTER TABLE `biz_payment_trade` Add column `seller_id` int(10) unsigned not null  COMMENT '卖家Id' after `platform_created_result`;"
-            );
-        }
-        if (!$this->isFieldExist('biz_payment_trade', 'user_id')) {
-            $connection->exec(
-                "ALTER TABLE `biz_payment_trade` Add column `user_id` int(10) unsigned not null  COMMENT '卖家Id' after `seller_id`;"
-            );
-        }
-
-        if (!$this->isFieldExist('biz_payment_trade', 'apply_refund_time')) {
-            $connection->exec(
-                "ALTER TABLE `biz_payment_trade` Add column `apply_refund_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '申请退款时间';"
-            );
-        }
-
-        if (!$this->isFieldExist('biz_payment_trade', 'refund_success_time')) {
-            $connection->exec(
-                "ALTER TABLE `biz_payment_trade` Add column `refund_success_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '成功退款时间';"
-            );
-        }
     }
 
     protected function isFieldExist($table, $filedName)
@@ -151,6 +121,10 @@ class CashFlow extends Migration
         $connection = $biz['db'];
         $connection->exec("
             DROP TABLE `biz_user_cashflow`;
+            DROP TABLE `biz_user_balance`;
+            DROP TABLE `biz_payment_trade`;
+            DROP TABLE `biz_pay_account`;
+            DROP TABLE `biz_security_answer`;
         ");
     }
 }

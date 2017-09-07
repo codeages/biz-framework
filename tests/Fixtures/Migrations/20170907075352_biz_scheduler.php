@@ -54,6 +54,7 @@ class BizScheduler extends Migration
               `job_id` int(10) NOT NULL COMMENT 'jobId',
               `fired_time` int(10) unsigned NOT NULL COMMENT '触发时间',
               `priority` int(10) unsigned NOT NULL DEFAULT 50 COMMENT '优先级',
+              `retry_num` INT(10) unsigned NOT NULL DEFAULT 0 COMMENT '重试次数',
               `status` varchar(32) NOT NULL DEFAULT 'acquired' COMMENT '状态：acquired, executing, success, missed, ignore, failure',
               `failure_msg` text,
               `updated_time` int(10) unsigned NOT NULL COMMENT '修改时间',

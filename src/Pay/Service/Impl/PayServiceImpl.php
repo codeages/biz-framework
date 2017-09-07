@@ -28,7 +28,8 @@ class PayServiceImpl extends BaseService implements PayService
             'device_info',
             'seller_id',
             'user_id',
-            'type'
+            'type',
+            'rate'
         ));
 
         if ('recharge' == $data['type']) {
@@ -312,7 +313,7 @@ class PayServiceImpl extends BaseService implements PayService
 
     protected function createPaymentTrade($data)
     {
-        $rate = $this->getCoinRate();
+        $rate = $this->getDefaultCoinRate();
 
         $trade = array(
             'title' => $data['goods_title'],
@@ -321,7 +322,7 @@ class PayServiceImpl extends BaseService implements PayService
             'platform' => $data['platform'],
             'price_type' => $this->getCurrencyType(),
             'amount' => $data['amount'],
-            'rate' => $this->getCoinRate(),
+            'rate' => empty($data['rate']) ? $rate : $data['rate'],
             'seller_id' => empty($data['seller_id']) ? 0 : $data['seller_id'],
             'user_id' => $this->biz['user']['id'],
             'status' => 'paying'
@@ -405,7 +406,7 @@ class PayServiceImpl extends BaseService implements PayService
 
         if ($this->isRechargeCoin($isCoin, $userType, $flowType)
             || $this->isDischargeCoin($isCoin, $userType, $flowType)) {
-            $userFlow['amount'] = $trade['cash_amount'] * $this->getCoinRate();
+            $userFlow['amount'] = $trade['cash_amount'] * $this->getDefaultCoinRate();
         } else if ($isCoin) {
             $userFlow['amount'] = $trade['coin_amount'];
         } else {
@@ -468,7 +469,7 @@ class PayServiceImpl extends BaseService implements PayService
         return $this->biz->service('Pay:AccountService');
     }
 
-    protected function getCoinRate()
+    protected function getDefaultCoinRate()
     {
         return 1;
     }

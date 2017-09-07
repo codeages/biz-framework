@@ -2,7 +2,7 @@
 
 use Phpmig\Migration\Migration;
 
-class Order extends Migration
+class BizOrder extends Migration
 {
     /**
      * Do the migration
@@ -26,25 +26,31 @@ class Order extends Migration
               `trade_sn` VARCHAR(64) COMMENT '支付的交易号',
               `status` VARCHAR(32) NOT NULL DEFAULT 'created' COMMENT '订单状态',
               `pay_time` INT(10) unsigned NOT NULL DEFAULT '0' COMMENT '支付时间',
+              `payment` VARCHAR(32) NOT NULL DEFAULT '' COMMENT '支付类型',
               `finish_time` INT(10) unsigned NOT NULL DEFAULT '0' COMMENT '交易成功时间，交易成功后不得退款',
               `close_time` INT(10) unsigned NOT NULL DEFAULT '0' COMMENT '交易关闭时间',
               `close_data` TEXT COMMENT '交易关闭描述',
               `close_user_id` INT(10) unsigned DEFAULT '0' COMMENT '关闭交易的用户',
               `seller_id` INT(10) unsigned DEFAULT '0' COMMENT '卖家id',
               `created_user_id` INT(10) unsigned NOT NULL DEFAULT '0' COMMENT '订单的创建者',
+              `create_extra` text COMMENT '创建时的自定义字段，json方式存储',
               `created_time` INT(10) unsigned NOT NULL DEFAULT '0',
               `updated_time` INT(10) unsigned NOT NULL DEFAULT '0',
               PRIMARY KEY (`id`),
               UNIQUE(`sn`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-            
+
             CREATE TABLE `biz_order_item` (
               `id` INT(10) unsigned NOT NULL AUTO_INCREMENT,
               `order_id` INT(10) unsigned NOT NULL COMMENT '订单id',
               `sn` VARCHAR(64) NOT NULL COMMENT '编号',
               `title` VARCHAR(1024) NOT NULL COMMENT '商品名称',
               `detail` TEXT COMMENT '商品描述',
+              `num` int(10) unsigned NOT NULL DEFAULT '1' COMMENT '数量',
+              `unit` varchar(16) COMMENT '单位',
               `status` VARCHAR(32) NOT NULL DEFAULT 'created' COMMENT '商品状态',
+              `refund_id` INT(10) unsigned NOT NULL DEFAULT 0 COMMENT '最新退款id',
+              `refund_status` VARCHAR(32) NOT NULL DEFAULT '' COMMENT '退款状态',
               `price_amount` INT(10) unsigned NOT NULL COMMENT '商品价格',
               `pay_amount` INT(10) unsigned NOT NULL COMMENT '商品应付金额',
               `target_id` INT(10) unsigned NOT NULL COMMENT '商品id',
@@ -54,12 +60,13 @@ class Order extends Migration
               `close_time` INT(10) unsigned NOT NULL DEFAULT '0' COMMENT '交易关闭时间',
               `user_id` INT(10) unsigned NOT NULL COMMENT '购买者',
               `seller_id` INT(10) unsigned DEFAULT '0' COMMENT '卖家id',
+              `create_extra` text COMMENT '创建时的自定义字段，json方式存储',
               `created_time` INT(10) unsigned NOT NULL DEFAULT '0',
               `updated_time` INT(10) unsigned NOT NULL DEFAULT '0',
               PRIMARY KEY (`id`),
               UNIQUE(`sn`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-            
+
             CREATE TABLE `biz_order_item_deduct` (
               `id` INT(10) unsigned NOT NULL AUTO_INCREMENT,
               `order_id` INT(10) unsigned NOT NULL COMMENT '订单id',
@@ -75,7 +82,7 @@ class Order extends Migration
               `updated_time` INT(10) unsigned NOT NULL DEFAULT '0',
               PRIMARY KEY (`id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-            
+
             CREATE TABLE `biz_order_refund` (
               `id` INT(10) unsigned NOT NULL AUTO_INCREMENT,
               `order_id` INT(10) unsigned NOT NULL COMMENT '订单id',
@@ -114,18 +121,6 @@ class Order extends Migration
           ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
         ");
 
-        if (!$this->isFieldExist('biz_order_item_refund', 'coin_amount')) {
-            $connection->exec(
-                "ALTER TABLE `biz_order_item_refund` Add column `coin_amount` INT(10) unsigned NOT NULL COMMENT '涉及虚拟币金额';"
-            );
-        }
-
-        if ($this->isFieldExist('biz_order_item_refund', 'currency')) {
-            $connection->exec(
-                "ALTER TABLE `biz_order_item_refund` drop column `currency`;"
-            );
-        }
-
         $connection->exec("
             CREATE TABLE `biz_order_log` (
               `id` INT(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -135,33 +130,10 @@ class Order extends Migration
               `deal_data` TEXT COMMENT '处理数据',
               `created_time` INT(10) unsigned NOT NULL DEFAULT '0',
               `updated_time` INT(10) unsigned NOT NULL DEFAULT '0',
+              `order_refund_id` INT(10) unsigned NOT NULL DEFAULT 0 COMMENT '退款id',
               PRIMARY KEY (`id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
         ");
-
-        if (!$this->isFieldExist('biz_order_log', 'order_refund_id')) {
-            $connection->exec(
-                "ALTER TABLE `biz_order_log` Add column `order_refund_id` INT(10) unsigned NOT NULL DEFAULT 0 COMMENT '退款id';"
-            );
-        }
-
-        if (!$this->isFieldExist('biz_order_item', 'refund_status')) {
-            $connection->exec(
-                "ALTER TABLE `biz_order_item` Add column `refund_status` VARCHAR(32) NOT NULL DEFAULT '' COMMENT '退款状态';"
-            );
-        }
-
-        if (!$this->isFieldExist('biz_order_item', 'refund_id')) {
-            $connection->exec(
-                "ALTER TABLE `biz_order_item` Add column `refund_id` INT(10) unsigned NOT NULL DEFAULT 0 COMMENT '最新退款id';"
-            );
-        }
-
-        if (!$this->isFieldExist('biz_order', 'payment')) {
-            $connection->exec(
-                "ALTER TABLE `biz_order` ADD COLUMN `payment` VARCHAR(32) NOT NULL DEFAULT '' COMMENT '支付类型' AFTER `pay_time`;"
-            );
-        }
     }
 
     protected function isFieldExist($table, $filedName)
@@ -187,6 +159,8 @@ class Order extends Migration
             DROP TABLE `biz_order_item`;
             DROP TABLE `biz_order_item_deduct`;
             DROP TABLE `biz_order_refund`;
+            DROP TABLE `biz_order_item_refund`;
+            DROP TABLE `biz_order_log`;
         ");
     }
 }

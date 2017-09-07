@@ -32,10 +32,6 @@ class PayServiceProvider implements ServiceProviderInterface
             return new \Codeages\Biz\Framework\Pay\Command\TableCommand($biz);
         };
 
-        $biz['console.commands'][] = function () use ($biz) {
-            return new \Codeages\Biz\Framework\Pay\Command\AddLockedAmountCommand($biz);
-        };
-
         $this->registerStatus($biz);
         $this->registerPayments($biz);
     }
