@@ -21,6 +21,7 @@ class PayServiceImpl extends BaseService implements PayService
             'amount',
             'coin_amount',
             'notify_url',
+            'return_url',
             'create_ip',
             'pay_type',
             'platform',
@@ -322,10 +323,10 @@ class PayServiceImpl extends BaseService implements PayService
             'platform' => $data['platform'],
             'price_type' => $this->getCurrencyType(),
             'amount' => $data['amount'],
-            'rate' => empty($data['rate']) ? $rate : $data['rate'],
+            'rate' => $this->getDefaultCoinRate(),
             'seller_id' => empty($data['seller_id']) ? 0 : $data['seller_id'],
             'user_id' => $this->biz['user']['id'],
-            'status' => 'paying'
+            'status' => 'paying',
         );
 
         if (!empty($data['type'])) {
