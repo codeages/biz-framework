@@ -9,11 +9,7 @@ use Codeages\Biz\Framework\Util\ArrayToolkit;
 
 class OrderRefundServiceImpl extends BaseService implements OrderRefundService
 {
-<<<<<<< HEAD
-    public function getById($id)
-=======
     public function getOrderRefundById($id)
->>>>>>> b25661c6a11085df0643f7a396c769d13c3090af
     {
         return $this->getOrderRefundDao()->get($id);
     }
