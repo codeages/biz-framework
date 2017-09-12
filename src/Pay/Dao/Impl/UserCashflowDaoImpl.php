@@ -17,7 +17,7 @@ class UserCashflowDaoImpl extends GeneralDaoImpl implements UserCashflowDao
 
     public function sumColumnByConditions($column, $conditions)
     {
-        if (!$this->isSumAllow($column)) {
+        if (!$this->isSumColumnAllow($column)) {
             throw new DaoException('column is not allowed');
         }
         $builder = $this->createQueryBuilder($conditions)
@@ -30,7 +30,7 @@ class UserCashflowDaoImpl extends GeneralDaoImpl implements UserCashflowDao
         return array('amount');
     }
 
-    protected function isSumAllow($column)
+    protected function isSumColumnAllow($column)
     {
         $whiteList = $this->sumColumnWhiteList();
 
