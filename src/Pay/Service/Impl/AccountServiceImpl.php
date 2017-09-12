@@ -143,8 +143,18 @@ class AccountServiceImpl extends BaseService implements AccountService
             throw $this->createInvalidArgumentException('user_id is required.');
         }
 
+        $savedUser = $this->getUserBalanceDao()->getByUserId($user['user_id']);
+        if (!empty($savedUser)) {
+            return $savedUser;
+        }
+
         $user = ArrayToolkit::parts($user, array('user_id'));
         return $this->getUserBalanceDao()->create($user);
+    }
+
+    public function getUserBalanceByUserId($userId)
+    {
+        return $this->getUserBalanceDao()->getByUserId($userId);
     }
 
     public function waveAmount($userId, $amount)
@@ -157,17 +167,44 @@ class AccountServiceImpl extends BaseService implements AccountService
         return $this->getUserBalanceDao()->getByUserId($userId);
     }
 
-    public function getUserBalanceByUserId($userId)
-    {
-        return $this->getUserBalanceDao()->getByUserId($userId);
-    }
-
     public function waveCashAmount($userId, $amount)
     {
         $userBalance = $this->getUserBalanceDao()->getByUserId($userId);
         $this->getUserBalanceDao()->wave(array($userBalance['id']), array(
             'cash_amount' => $amount
         ));
+        return $this->getUserBalanceDao()->getByUserId($userId);
+    }
+
+    public function lockCoin($userId, $coinAmount)
+    {
+        $userBalance = $this->getUserBalanceDao()->getByUserId($userId);
+        $this->getUserBalanceDao()->wave(array($userBalance['id']), array(
+            'amount' => (0 - $coinAmount),
+            'locked_amount' => $coinAmount
+        ));
+
+        return $this->getUserBalanceDao()->getByUserId($userId);
+    }
+
+    public function decreaseLockedCoin($userId, $amount)
+    {
+        $userBalance = $this->getUserBalanceDao()->getByUserId($userId);
+        $this->getUserBalanceDao()->wave(array($userBalance['id']), array(
+            'locked_amount' => 0 - $amount
+        ));
+
+        return $this->getUserBalanceDao()->getByUserId($userId);
+    }
+
+    public function releaseCoin($userId, $coinAmount)
+    {
+        $userBalance = $this->getUserBalanceDao()->getByUserId($userId);
+        $this->getUserBalanceDao()->wave(array($userBalance['id']), array(
+            'amount' => $coinAmount,
+            'locked_amount' => 0 - $coinAmount
+        ));
+
         return $this->getUserBalanceDao()->getByUserId($userId);
     }
 

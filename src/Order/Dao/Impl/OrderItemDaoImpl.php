@@ -30,10 +30,12 @@ class OrderItemDaoImpl extends GeneralDaoImpl implements OrderItemDao
                 'created_time'
             ),
             'serializes' => array(
-                'signed_data' => 'json'
+                'create_extra' => 'json'
             ),
             'conditions' => array(
+                'order_id IN (:order_ids)',
                 'status = :status',
+                'target_id IN (:target_ids)',
                 'target_id = :target_id',
                 'target_type = :target_type',
                 'created_time >= :start_time',

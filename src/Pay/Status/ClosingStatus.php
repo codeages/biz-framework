@@ -6,15 +6,20 @@ class ClosingStatus extends AbstractStatus
 {
     const NAME = 'closing';
 
-    public function getPriorStatus()
+    public function getName()
     {
-        return array(PayingStatus::NAME);
+        return self::NAME;
+    }
+
+    public function process($data = array())
+    {
+        return $this->getPaymentTradeDao()->update($this->paymentTrade['id'], array(
+            'status' => self::NAME,
+        ));
     }
 
     public function closed()
     {
-        return $this->getPaymentTradeDao()->update($this->trade['id'], array(
-            'status' => ClosedStatus::NAME,
-        ));
+        return $this->getPayStatus(ClosedStatus::NAME)->process();
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Codeages\Biz\Framework\Pay\Payment;
 
+
 abstract class AbstractGetway
 {
     protected $biz;
@@ -10,6 +11,13 @@ abstract class AbstractGetway
     {
         $this->biz = $biz;
     }
+
+
+    abstract public function createTrade($data);
+
+    abstract public function applyRefund($data);
+
+    abstract public function queryTrade($trade);
 
     /**
      * @param $data 第三方支付平台的通知信息
@@ -30,11 +38,6 @@ abstract class AbstractGetway
      */
     abstract public function converterNotify($data);
 
-    abstract public function createTrade($data);
-
-    abstract public function applyRefund($data);
-
     abstract public function converterRefundNotify($data);
 
-    abstract public function queryTrade($trade);
 }

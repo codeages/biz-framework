@@ -23,4 +23,10 @@ interface AccountService
     public function waveCashAmount($userId, $amount);
 
     public function getUserBalanceByUserId($userId);
+
+    public function lockCoin($userId, $coinAmount);
+
+    public function releaseCoin($userId, $coinAmount);
+
+    public function decreaseLockedCoin($userId, $amount);
 }

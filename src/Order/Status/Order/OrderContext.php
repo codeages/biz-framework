@@ -3,10 +3,12 @@
 namespace Codeages\Biz\Framework\Order\Status\Order;
 
 use Codeages\Biz\Framework\Event\Event;
+use Codeages\Biz\Framework\Order\Status\OrderStatusCallback;
 use Codeages\Biz\Framework\Service\Exception\AccessDeniedException;
 use Codeages\Biz\Framework\Service\Exception\InvalidArgumentException;
 use Codeages\Biz\Framework\Service\Exception\NotFoundException;
 use Codeages\Biz\Framework\Service\Exception\ServiceException;
+use Codeages\Biz\Framework\Util\ArrayToolkit;
 
 class OrderContext
 {
@@ -37,12 +39,40 @@ class OrderContext
         return $this->status;
     }
 
+    public function created($data)
+    {
+        $this->status = $this->biz["order_status.created"];
+
+        try {
+            $this->biz['db']->beginTransaction();
+            $order = $this->status->process($data);
+            $this->biz['db']->commit();
+        } catch (AccessDeniedException $e) {
+            $this->biz['db']->rollback();
+            throw $e;
+        } catch (InvalidArgumentException $e) {
+            $this->biz['db']->rollback();
+            throw $e;
+        } catch (NotFoundException $e) {
+            $this->biz['db']->rollback();
+            throw $e;
+        } catch (\Exception $e) {
+            $this->biz['db']->rollback();
+            throw new ServiceException($e->getMessage());
+        }
+
+        $this->createOrderLog($order);
+        $order = $this->dispatch('created', $order);
+        $this->onOrderStatusChange('created', $order);
+
+        return $order;
+    }
+
     function __call($method, $arguments)
     {
         $status = $this->getNextStatusName($method);
-        $nextStatusProcessor = $this->biz["order_status.{$status}"];
 
-        if (!in_array($this->order['status'], $nextStatusProcessor->getPriorStatus())) {
+        if (!method_exists($this->status, $method)) {
             throw new AccessDeniedException("can't change {$this->order['status']} to {$status}.");
         }
 
@@ -65,8 +95,72 @@ class OrderContext
         }
 
         $this->createOrderLog($order);
-        $this->dispatch("order.{$status}", $order);
+        $order = $this->dispatch($status, $order);
+        $this->onOrderStatusChange($status, $order);
+
         return $order;
+    }
+
+    public function onOrderStatusChange($status, $order)
+    {
+        $orderItems = $order['items'];
+        $deducts = $order['deducts'];
+        unset($order['items']);
+        unset($order['deducts']);
+
+        $indexedOrderItems = ArrayToolkit::index($orderItems, 'id');
+
+        $results = array();
+        $method = 'on'.ucfirst($status);
+        foreach ($deducts as $deduct) {
+            $deduct['order'] = $order;
+            if (!empty($indexedOrderItems[$deduct['item_id']])) {
+                $deduct['item'] = $indexedOrderItems[$deduct['item_id']];
+            }
+
+            $processor = $this->getDeductCallback($deduct);
+            if (!empty($processor) && $processor instanceof OrderStatusCallback && method_exists($processor, $method)) {
+                $results[] = $processor->$method($deduct);
+            }
+        }
+
+        foreach ($orderItems as $orderItem) {
+            $orderItem['order'] = $order;
+
+            $processor = $this->getProductCallback($orderItem);
+            if (!empty($processor) && $processor instanceof OrderStatusCallback && method_exists($processor, $method)) {
+                $results[] = $processor->$method($orderItem);
+            }
+        }
+
+        $results = array_unique($results);
+        if ($status == PaidOrderStatus::NAME) {
+            if (in_array(OrderStatusCallback::SUCCESS, $results) && count($results) == 1) {
+                $this->getWorkflowService()->finish($order['id']);
+            } else if (count($results) > 0) {
+                $this->getWorkflowService()->fail($order['id']);
+            }
+        }
+    }
+
+    protected function getProductCallback($orderItem)
+    {
+        $biz = $this->biz;
+
+        if (empty($biz["order.product.{$orderItem['target_type']}"])) {
+            return null;
+        }
+        return $biz["order.product.{$orderItem['target_type']}"];
+    }
+
+    protected function getDeductCallback($deduct)
+    {
+        $biz = $this->biz;
+
+        if (empty($biz["order.deduct.{$deduct['deduct_type']}"])) {
+            return null;
+        }
+        return $biz["order.deduct.{$deduct['deduct_type']}"];
     }
 
     private function getNextStatusName($method)
@@ -102,19 +196,43 @@ class OrderContext
         return $this->biz['dispatcher'];
     }
 
-    protected function dispatch($eventName, $subject, $arguments = array())
+    protected function dispatch($status, $order)
     {
-        if ($subject instanceof Event) {
-            $event = $subject;
-        } else {
-            $event = new Event($subject, $arguments);
+        $orderItems = $this->getOrderService()->findOrderItemsByOrderId($order['id']);
+        $indexedOrderItems = ArrayToolkit::index($orderItems, 'id');
+        foreach ($orderItems as $orderItem) {
+            $orderItem['order'] = $order;
+            $this->getDispatcher()->dispatch("order.item.{$orderItem['target_type']}.{$status}", new Event($orderItem));
         }
 
-        return $this->getDispatcher()->dispatch($eventName, $event);
+        $deducts = $this->getOrderService()->findOrderItemDeductsByOrderId($order['id']);
+        foreach ($deducts as $deduct) {
+            $deduct['order'] = $order;
+            if (!empty($indexedOrderItems[$deduct['item_id']])) {
+                $deduct['item'] = $indexedOrderItems[$deduct['item_id']];
+            }
+            $this->getDispatcher()->dispatch("order.deduct.{$deduct['deduct_type']}.{$status}", new Event($deduct));
+        }
+
+        $order['items'] = $orderItems;
+        $order['deducts'] = $deducts;
+        $this->getDispatcher()->dispatch("order.{$status}", new Event($order));
+
+        return $order;
     }
 
     protected function getOrderLogDao()
     {
         return $this->biz->dao('Order:OrderLogDao');
+    }
+
+    protected function getOrderService()
+    {
+        return $this->biz->service('Order:OrderService');
+    }
+
+    protected function getWorkflowService()
+    {
+        return $this->biz->service('Order:WorkflowService');
     }
 }

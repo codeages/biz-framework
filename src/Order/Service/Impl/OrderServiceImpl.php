@@ -4,12 +4,7 @@ namespace Codeages\Biz\Framework\Order\Service\Impl;
 
 use Codeages\Biz\Framework\Order\Service\OrderService;
 use Codeages\Biz\Framework\Order\Status\StatusFactory;
-use Codeages\Biz\Framework\Util\ArrayToolkit;
 use Codeages\Biz\Framework\Service\BaseService;
-use Codeages\Biz\Framework\Service\Exception\AccessDeniedException;
-use Codeages\Biz\Framework\Service\Exception\InvalidArgumentException;
-use Codeages\Biz\Framework\Service\Exception\NotFoundException;
-use Codeages\Biz\Framework\Service\Exception\ServiceException;
 
 class OrderServiceImpl extends BaseService implements OrderService
 {
@@ -53,6 +48,16 @@ class OrderServiceImpl extends BaseService implements OrderService
         return $this->getOrderDao()->count($conditions);
     }
 
+    public function countGroupByDate($conditions, $sort, $dateColumn = 'pay_time')
+    {
+        return $this->getOrderDao()->countGroupByDate($conditions, $sort, $dateColumn);
+    }
+
+    public function sumGroupByDate($column, $conditions, $sort, $dateColumn = 'pay_time')
+    {
+        return $this->getOrderDao()->sumGroupByDate($column, $conditions, $sort, $dateColumn);
+    }
+
     public function searchOrderItems($conditions, $orderBy, $start, $limit)
     {
         return $this->getOrderItemDao()->search($conditions, $orderBy, $start, $limit);
@@ -68,6 +73,11 @@ class OrderServiceImpl extends BaseService implements OrderService
         return $this->getOrderDao()->findByIds($ids);
     }
 
+    public function findOrderLogsByOrderId($orderId)
+    {
+        return $this->getOrderLogDao()->findOrderLogsByOrderId($orderId);
+    }
+    
     public function countOrderLogs($conditions)
     {
         return $this->getOrderLogDao()->count($conditions);

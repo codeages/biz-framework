@@ -85,6 +85,36 @@ class OrderServiceTest extends IntegrationTestCase
         $this->assertCreatedOrder($mockOrder, $mockedOrderItems, $order);
     }
 
+    public function testCreateOrderWhenZeroPayAmount()
+    {
+        $mockedOrderItems = array(
+            array(
+                'title' => '人工智能神经网络',
+                'detail' => '<div>独创的教学</div>',
+                'price_amount' => 100,
+                'target_id' => 1,
+                'target_type' => 'course',
+                'deducts' => array(
+                    array(
+                        'deduct_id' => 1,
+                        'deduct_type' => 'discount',
+                        'deduct_amount' => 20,
+                        'detail' => '打折活动扣除10元'
+                    ),
+                    array(
+                        'deduct_id' => 2,
+                        'deduct_type' => 'coupon',
+                        'deduct_amount' => 80,
+                        'detail' => '使用优惠码扣除8元'
+                    )
+                )
+            )
+        );
+        $mockOrder = $this->mockOrder();
+        $order = $this->getWorkflowService()->start($mockOrder, $mockedOrderItems);
+        $this->assertEquals('paid', $order['status']);
+    }
+
     public function testPay()
     {
         $mockedOrderItems = $this->mockOrderItems();
@@ -160,6 +190,7 @@ class OrderServiceTest extends IntegrationTestCase
         $this->assertEquals($mockOrder['source'], $order['source']);
         $this->assertEquals($mockOrder['callback'], $order['callback']);
         $this->assertEquals($mockOrder['created_reason'], $order['created_reason']);
+        $this->assertEquals($mockOrder['create_extra'], $order['create_extra']);
         $this->assertEquals($this->sumOrderPriceAmount($mockedOrderItems), $order['price_amount']);
         $this->assertEquals($this->sumOrderPayAmount($mockedOrderItems), $order['pay_amount']);
         $this->assertEquals($this->biz['user']['id'], $order['user_id']);
@@ -182,6 +213,7 @@ class OrderServiceTest extends IntegrationTestCase
             $this->assertEquals($this->sumOrderItemPayAmount($mockedItem), $item['pay_amount']);
             $this->assertEquals($mockedItem['target_id'], $item['target_id']);
             $this->assertEquals($mockedItem['target_type'], $item['target_type']);
+            $this->assertEquals($mockedItem['create_extra'], $item['create_extra']);
             $this->assertEquals($order['user_id'], $item['user_id']);
             $this->assertEquals($order['seller_id'], $item['seller_id']);
 
@@ -228,6 +260,9 @@ class OrderServiceTest extends IntegrationTestCase
                 'price_amount' => 100,
                 'target_id' => 1,
                 'target_type' => 'course',
+                'create_extra' => array(
+                    'xxx' => 'xxx'
+                ),
                 'deducts' => array(
                     array(
                         'deduct_id' => 1,
@@ -249,6 +284,9 @@ class OrderServiceTest extends IntegrationTestCase
                 'price_amount' => 110,
                 'target_id' => 2,
                 'target_type' => 'course',
+                'create_extra' => array(
+                    'xxx' => 'xxx'
+                ),
                 'deducts' => array(
                     array(
                         'deduct_id' => 3,
@@ -285,6 +323,9 @@ class OrderServiceTest extends IntegrationTestCase
             'price_type' => 'coin',
             'user_id' => $this->biz['user']['id'],
             'created_reason' => '购买',
+            'create_extra' => array(
+                'xxx' => 'xxx'
+            )
         );
     }
 
