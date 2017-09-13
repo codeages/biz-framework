@@ -75,7 +75,9 @@ class AlipayGetway extends AbstractGetway
 
     public function converterNotify($data)
     {
-        $gateway = $this->createGetWay();
+        $platformType = $data['platform_type'];
+        unset($data['platform_type']);
+        $gateway = $this->createGetWay($platformType);
         $request = $gateway->completePurchase();
         $request->setParams($data);
 
@@ -83,7 +85,7 @@ class AlipayGetway extends AbstractGetway
 
         if ($response->isPaid()) {
 
-            $method = 'getWebPaidNotifyData';
+            $method = "get{$platformType}PaidNotifyData";
 
             return array(
                 $this->$method($data),
@@ -106,10 +108,10 @@ class AlipayGetway extends AbstractGetway
             'status' => 'paid',
             'cash_flow' => $data['trade_no'],
             'paid_time' => $this->getPaidTime($data),
-            'pay_amount' => (int)($data['total_amount']*100),
+            'pay_amount' => (int)($data['total_fee']*100),
             'cash_type' => 'RMB',
             'trade_sn' => $data['out_trade_no'],
-            'attach' => json_decode(urldecode($data['passback_params']), true),
+            'attach' => !empty($data['extra_common_param']) ? json_decode($data['extra_common_param'], true) : array(),
             'notify_data' => $data,
         );
     }
@@ -123,7 +125,7 @@ class AlipayGetway extends AbstractGetway
             'pay_amount' => (int)($data['total_fee']*100),
             'cash_type' => 'RMB',
             'trade_sn' => $data['out_trade_no'],
-            'attach' => !empty($data['extra_common_param']) ? json_decode($data['extra_common_param'], true) : json_decode($data['extra_common_param'], true),
+            'attach' => !empty($data['extra_common_param']) ? json_decode($data['extra_common_param'], true) : array(),
             'notify_data' => $data,
         );
     }
