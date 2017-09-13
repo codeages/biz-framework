@@ -16,7 +16,8 @@ class ClosedOrderStatus extends AbstractOrderStatus
         $closeTime = time();
         $order = $this->getOrderDao()->update($this->order['id'], array(
             'status' => ClosedOrderStatus::NAME,
-            'close_time' => $closeTime
+            'close_time' => $closeTime,
+            'display_status' => 'closed'
         ));
 
         $items = $this->getOrderItemDao()->findByOrderId($this->order['id']);

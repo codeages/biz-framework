@@ -41,7 +41,8 @@ class BizPay extends Migration
               `locked_amount` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '冻结虚拟币金额',
               `updated_time` int(10) unsigned NOT NULL DEFAULT '0',
               `created_time` int(10) unsigned NOT NULL DEFAULT '0',
-              PRIMARY KEY (`id`)
+              PRIMARY KEY (`id`),
+              UNIQUE(`user_id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
         ");
 
@@ -71,6 +72,7 @@ class BizPay extends Migration
               `updated_time` int(10) unsigned NOT NULL DEFAULT '0',
               `created_time` int(10) unsigned NOT NULL DEFAULT '0',
               PRIMARY KEY (`id`)
+              UNIQUE(`trade_sn`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
         ");
 
@@ -83,6 +85,7 @@ class BizPay extends Migration
               `created_time` INT(10) unsigned NOT NULL DEFAULT '0',
               `updated_time` INT(10) unsigned NOT NULL DEFAULT '0',
               PRIMARY KEY (`id`)
+              UNIQUE(`user_id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
         ");
 

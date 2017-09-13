@@ -45,6 +45,7 @@ class PaidOrderStatus extends AbstractOrderStatus
             'payment',
         ));
         $data['status'] = PaidOrderStatus::NAME;
+        $data['display_status'] = 'paid';
         return $this->getOrderDao()->update($order['id'], $data);
     }
 
