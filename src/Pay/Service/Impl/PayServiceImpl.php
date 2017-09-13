@@ -380,6 +380,7 @@ class PayServiceImpl extends BaseService implements PayService
     {
         $userFlow = array(
             'sn' => $this->generateSn(),
+            'title' => $trade['title'],
             'type' => $flowType,
             'parent_sn' => empty($parentFlow['sn']) ? '' : $parentFlow['sn'],
             'currency' => $isCoin ? 'coin': $trade['currency'],
