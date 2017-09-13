@@ -90,6 +90,7 @@ class AlipayInTimeGetway extends AbstractGetway
         $config = $this->getSetting();
         $gateway = Omnipay::create("Alipay_{$ominpayType}");
         $gateway->setSellerEmail($config['seller_email']);
+        $gateway->setSellerId($config['partner']);
         $gateway->setPartner($config['partner']);
         $gateway->setKey($config['key']);
         return $gateway;

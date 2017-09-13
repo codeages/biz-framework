@@ -15,4 +15,27 @@ class RefundedOrderStatus extends AbstractOrderStatus
     {
         return $this->changeStatus(self::NAME);
     }
+
+    protected function changeStatus($name)
+    {
+        $order = $this->getOrderDao()->update($this->order['id'], array(
+            'status' => $name,
+            'display_status' => self::NAME
+        ));
+
+        $items = $this->getOrderItemDao()->findByOrderId($this->order['id']);
+        foreach ($items as $item) {
+            $this->getOrderItemDao()->update($item['id'], array(
+                'status' => $name,
+            ));
+        }
+
+        $deducts = $this->getOrderItemDeductDao()->findByOrderId($this->order['id']);
+        foreach ($deducts as $key => $deduct) {
+            $deducts[$key] = $this->getOrderItemDeductDao()->update($deduct['id'], array(
+                'status' => $name
+            ));
+        }
+        return $order;
+    }
 }
