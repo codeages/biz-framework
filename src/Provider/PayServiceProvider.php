@@ -32,6 +32,10 @@ class PayServiceProvider implements ServiceProviderInterface
             return new \Codeages\Biz\Framework\Pay\Command\PaymentTradeAddCreatedParams($biz);
         };
 
+        $biz['console.commands'][] = function () use ($biz) {
+            return new \Codeages\Biz\Framework\Pay\Command\PaymentTradeAddPlatformType($biz);
+        };
+
         $this->registerStatus($biz);
         $this->registerPayments($biz);
     }
@@ -47,8 +51,8 @@ class PayServiceProvider implements ServiceProviderInterface
                 'cert_path' => '',
                 'key_path' => '',
             ),
-            'alipay.in_time' => array(
-                'class' => '\Codeages\Biz\Framework\Pay\Payment\AlipayInTimeGetway',
+            'alipay' => array(
+                'class' => '\Codeages\Biz\Framework\Pay\Payment\AlipayGetway',
                 'seller_email' => '',
                 'partner' => '',
                 'key' => '',

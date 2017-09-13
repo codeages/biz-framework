@@ -23,7 +23,7 @@ class PayServiceImpl extends BaseService implements PayService
             'notify_url',
             'return_url',
             'create_ip',
-            'pay_type',
+            'platform_type',
             'platform',
             'open_id',
             'device_info',
@@ -313,6 +313,7 @@ class PayServiceImpl extends BaseService implements PayService
             'trade_sn' => $this->generateSn(),
             'order_sn' => $data['order_sn'],
             'platform' => $data['platform'],
+            'platform_type' => $data['platform_type'],
             'price_type' => $this->getCurrencyType(),
             'amount' => $data['amount'],
             'rate' => $this->getDefaultCoinRate(),
@@ -478,6 +479,8 @@ class PayServiceImpl extends BaseService implements PayService
         unset($data['user_id']);
         unset($data['seller_id']);
         $data['amount'] = $trade['cash_amount'];
+        $data['platform_type'] = $trade['platform_type'];
+        $data['platform'] = $trade['platform'];
 
         $result = $this->getPayment($data['platform'])->createTrade($data);
 

@@ -69,7 +69,7 @@ class WechatGetway extends AbstractGetway
     public function createTrade($data)
     {
         if (!ArrayToolkit::requireds($data, array(
-            'pay_type',
+            'platform_type',
             'goods_title',
             'goods_detail',
             'attach',
@@ -81,12 +81,12 @@ class WechatGetway extends AbstractGetway
             throw new InvalidArgumentException('trade args is invalid.');
         }
 
-        if (!empty($data['pay_type']) && 'Js' == $data['pay_type'] && empty($data['open_id'])) {
+        if (!empty($data['platform_type']) && 'Js' == $data['platform_type'] && empty($data['open_id'])) {
             throw new InvalidArgumentException('trade args is invalid.');
         }
 
-        $payType = ucfirst($data['pay_type']);
-        $gateway = $this->createGetWay("WechatPay_{$payType}");
+        $platformType = ucfirst($data['platform_type']);
+        $gateway = $this->createGetWay("WechatPay_{$platformType}");
 
         $order['body'] = $data['goods_title'];
         $order['detail'] = $data['goods_detail'];
@@ -96,7 +96,7 @@ class WechatGetway extends AbstractGetway
         $order['notify_url'] = $data['notify_url'];
         $order['spbill_create_ip'] = $data['create_ip'];
         $order['fee_type'] = 'CNY';
-        if ($data['pay_type'] == 'Js') {
+        if ($data['platform_type'] == 'Js') {
             $order['open_id'] = $data['open_id'];
         }
 
@@ -104,7 +104,7 @@ class WechatGetway extends AbstractGetway
         $response = $request->send();
 
         if ($response->isSuccessful()) {
-            if ($data['pay_type'] == 'Js') {
+            if ($data['platform_type'] == 'Js') {
                 return $response->getJsOrderData();
             } else {
                 return $response->getData();
