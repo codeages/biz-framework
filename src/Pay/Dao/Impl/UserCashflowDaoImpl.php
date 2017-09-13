@@ -75,10 +75,6 @@ class UserCashflowDaoImpl extends GeneralDaoImpl implements UserCashflowDao
         }
 
         $orderByType = $conditions['amount_type'] == 'coin' ? 'amount' : 'cash_amount';
-//        foreach ($conditions as &$key => $value) {
-//            $key = $this->table.'.'.$key;
-//        }
-//        var_dump($conditions);exit();
 
         $builder = $this->createQueryBuilder($conditions)
             ->select("{$this->table}.user_id")
