@@ -20,6 +20,10 @@ class OrderServiceProvider implements ServiceProviderInterface
         $biz['console.commands'][] = function () use ($biz) {
             return new \Codeages\Biz\Framework\Order\Command\TableCommand($biz);
         };
+
+        $biz['console.commands'][] = function () use ($biz) {
+            return new \Codeages\Biz\Framework\Order\Command\OrderAddDisplayStatusCommand($biz);
+        };
     }
 
     private function registerOrderRefundStatus($biz)
