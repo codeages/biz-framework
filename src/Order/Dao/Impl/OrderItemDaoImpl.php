@@ -21,6 +21,15 @@ class OrderItemDaoImpl extends GeneralDaoImpl implements OrderItemDao
         return $this->findInField('order_id', $orderIds);
     }
 
+    public function getOrderItemByOrderIdAndTargetIdAndTargetType($orderId, $targetId, $targetType)
+    {
+        return $this->getByFields(array(
+            'order_id' => $orderId,
+            'target_type' => $targetType,
+            'target_id' => $targetId,
+        ));
+    }
+
     public function declares()
     {
         return array(
