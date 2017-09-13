@@ -23,7 +23,13 @@ class AlipayInTimeGetway extends AbstractGetway
             throw new InvalidArgumentException('trade args is invalid.');
         }
 
-        $gateway = $this->createGetWay();
+        $payType = empty($data['pay_type']) ? 'web' : $data['pay_type'];
+
+        if (!in_array($payType, array('web', 'wap'))) {
+            throw new InvalidArgumentException('trade args is invalid.');
+        }
+
+        $gateway = $this->createGetWay($payType);
         $gateway->setReturnUrl($data['return_url']);
         $gateway->setNotifyUrl($data['notify_url']);
 
@@ -76,10 +82,13 @@ class AlipayInTimeGetway extends AbstractGetway
         );
     }
 
-    protected function createGetWay()
+    protected function createGetWay($payType = 'web')
     {
+
+        $ominpayType = $payType == 'web' ? 'LegacyExpress' : 'LegacyWap';
+
         $config = $this->getSetting();
-        $gateway = Omnipay::create('Alipay_LegacyExpress');
+        $gateway = Omnipay::create("Alipay_{$ominpayType}");
         $gateway->setSellerEmail($config['seller_email']);
         $gateway->setPartner($config['partner']);
         $gateway->setKey($config['key']);
