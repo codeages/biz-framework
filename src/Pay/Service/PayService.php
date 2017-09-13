@@ -27,4 +27,6 @@ interface PayService
     public function searchTrades($conditions, $orderBy, $start, $limit);
 
     public function findUserCashflowsByTradeSn($sn);
+
+    public function getCreateTradeResultByTradeSnFromPlatform($tradeSn);
 }

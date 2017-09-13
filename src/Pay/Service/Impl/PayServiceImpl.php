@@ -49,16 +49,11 @@ class PayServiceImpl extends BaseService implements PayService
         try {
             $lock->get("trade_create_{$data['order_sn']}");
             $this->beginTransaction();
-            $trade = $this->getPaymentTradeDao()->getByOrderSnAndPlatform($data['order_sn'], $data['platform']);
-            if(empty($trade)) {
-                $trade = $this->createPaymentTrade($data);
-            }
+
+            $trade = $this->createPaymentTrade($data);
 
             if ($trade['cash_amount'] != 0) {
-                $result = $this->createPaymentPlatformTrade($data, $trade);
-                $trade = $this->getPaymentTradeDao()->update($trade['id'], array(
-                    'platform_created_result' => $result
-                ));
+                $trade = $this->createPaymentPlatformTrade($data, $trade);
             } else {
                 $mockNotify = array(
                     'status' => 'paid',
@@ -95,10 +90,7 @@ class PayServiceImpl extends BaseService implements PayService
             $this->beginTransaction();
             $trade = $this->createPaymentTrade($data);
 
-            $result = $this->createPaymentPlatformTrade($data, $trade);
-            $trade = $this->getPaymentTradeDao()->update($trade['id'], array(
-                'platform_created_result' => $result
-            ));
+            $trade = $this->createPaymentPlatformTrade($data, $trade);
 
             $this->commit();
             $lock->release($lockName);
@@ -163,7 +155,7 @@ class PayServiceImpl extends BaseService implements PayService
 
     protected function closeByPayment($trade)
     {
-
+        // todo
     }
 
     protected function updateTradeToPaid($data)
@@ -345,18 +337,12 @@ class PayServiceImpl extends BaseService implements PayService
             $trade['cash_amount'] = ceil(($trade['amount'] - $trade['coin_amount']) / $rate); // 标价为虚拟币
         }
 
-        if ('recharge' == $trade['type']) {
-            return $this->getPaymentTradeDao()->create($trade);
+        $trade = $this->getPaymentTradeDao()->create($trade);
+        if ('purchase' == $trade['type']) {
+            $this->lockCoin($trade);
         }
 
-        $savedTrade = $this->getPaymentTradeDao()->getByOrderSnAndPlatform($data['order_sn'], $data['platform']);
-        if (empty($savedTrade)) {
-            $trade = $this->getPaymentTradeDao()->create($trade);
-            $this->lockCoin($trade);
-            return $trade;
-        } else {
-            return $this->getPaymentTradeDao()->update($savedTrade['id'], $trade);
-        }
+        return $trade;
     }
 
     public function findUserCashflowsByTradeSn($sn)
@@ -492,7 +478,25 @@ class PayServiceImpl extends BaseService implements PayService
         unset($data['seller_id']);
         $data['amount'] = $trade['cash_amount'];
 
-        return $this->getPayment($data['platform'])->createTrade($data);
+        $result = $this->getPayment($data['platform'])->createTrade($data);
+
+        return $this->getPaymentTradeDao()->update($trade['id'], array(
+            'platform_created_result' => $result,
+            'platform_created_params' => $data
+        ));
+    }
+
+    public function getCreateTradeResultByTradeSnFromPlatform($tradeSn)
+    {
+        $trade = $this->getPaymentTradeDao()->getByTradeSn($tradeSn);
+
+        $result = $this->getPayment($trade['platform'])->createTrade($trade['platform_created_params']);
+
+        $this->getPaymentTradeDao()->update($trade['id'], array(
+            'platform_created_result' => $result
+        ));
+
+        return $result;
     }
 
     protected function getTradeContext($id)

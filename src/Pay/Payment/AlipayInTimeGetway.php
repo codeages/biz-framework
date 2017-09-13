@@ -37,8 +37,10 @@ class AlipayInTimeGetway extends AbstractGetway
 
         $response = $gateway->purchase($order)->send();
 
-        $url = $response->getRedirectUrl();
-        return $url;
+        return array(
+            'url' => $response->getRedirectUrl(),
+            'data' => $response->getRedirectData()
+        );
     }
 
     public function converterNotify($data)

@@ -42,7 +42,8 @@ class PaymentTradeDaoImpl extends GeneralDaoImpl implements PaymentTradeDao
             'timestamps' => array('created_time', 'updated_time'),
             'serializes' => array(
                 'platform_created_result' => 'json',
-                'notify_data' => 'json'
+                'notify_data' => 'json',
+                'platform_created_params' => 'json'
             ),
             'conditions' => array(
                 'order_sn IN (:order_sns)',
