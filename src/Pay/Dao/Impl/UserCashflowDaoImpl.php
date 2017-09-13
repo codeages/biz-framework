@@ -2,6 +2,7 @@
 
 namespace Codeages\Biz\Framework\Pay\Dao\Impl;
 
+use AppBundle\Common\ArrayToolkit;
 use Codeages\Biz\Framework\Dao\DaoException;
 use Codeages\Biz\Framework\Pay\Dao\UserCashflowDao;
 use Codeages\Biz\Framework\Dao\GeneralDaoImpl;
@@ -15,6 +16,12 @@ class UserCashflowDaoImpl extends GeneralDaoImpl implements UserCashflowDao
         return $this->findByFields(array('trade_sn' => $sn));
     }
 
+    /**
+     * @param $column
+     * @param $conditions
+     * @return bool|string
+     * @throws DaoException
+     */
     public function sumColumnByConditions($column, $conditions)
     {
         if (!$this->isSumColumnAllow($column)) {
@@ -22,6 +29,73 @@ class UserCashflowDaoImpl extends GeneralDaoImpl implements UserCashflowDao
         }
         $builder = $this->createQueryBuilder($conditions)
             ->select("sum({$column})");
+        return $builder->execute()->fetchColumn(0);
+    }
+
+    /**
+     * @param $column
+     * @param $conditions
+     * @param $sort
+     * @param $start
+     * @param $limit
+     * @return array
+     * @throws DaoException
+     * 使用时需要标明type&amount_type
+     */
+    public function searchUserIdsGroupByUserIdOrderBySumColumn($column, $conditions, $sort, $start, $limit)
+    {
+        if (!$this->isSumColumnAllow($column)) {
+            throw new DaoException('column is not allowed');
+        }
+
+        $builder = $this->createQueryBuilder($conditions)
+            ->select("user_id")
+            ->groupBy('user_id')
+            ->addOrderBy("sum({$column})", $sort)
+            ->setFirstResult($start)
+            ->setMaxResults($limit);
+
+        return ArrayToolkit::column($builder->execute()->fetchAll() ? : array(), 'user_id');
+
+    }
+
+    /**
+     * @param $conditions
+     * @param $sort
+     * @param $start
+     * @param $limit
+     * @return array
+     * @throws DaoException
+     * 使用时不区分type,区分amount_type
+     */
+    public function searchUserIdsGroupByUserIdOrderByBalance($conditions, $sort, $start, $limit)
+    {
+        if (!isset($conditions['amount_type']) || !in_array($conditions['amount_type'], array('coin', 'money'))) {
+            throw new DaoException('amount_type value is not allowed');
+        }
+
+        $orderByType = $conditions['amount_type'] == 'coin' ? 'amount' : 'cash_amount';
+//        foreach ($conditions as &$key => $value) {
+//            $key = $this->table.'.'.$key;
+//        }
+//        var_dump($conditions);exit();
+
+        $builder = $this->createQueryBuilder($conditions)
+            ->select("{$this->table}.user_id")
+            ->leftJoin($this->table, 'biz_user_balance', 'b', "{$this->table}.user_id=b.user_id")
+            ->groupBy("{$this->table}.user_id")
+            ->addOrderBy("b.{$orderByType}", $sort)
+            ->setFirstResult($start)
+            ->setMaxResults($limit);
+
+        return ArrayToolkit::column($builder->execute()->fetchAll() ? : array(), 'user_id');
+
+    }
+
+    public function countUsersByConditions($conditions)
+    {
+        $builder = $this->createQueryBuilder($conditions)
+            ->select("count(distinct user_id)");
         return $builder->execute()->fetchColumn(0);
     }
 
@@ -38,6 +112,36 @@ class UserCashflowDaoImpl extends GeneralDaoImpl implements UserCashflowDao
             return true;
         }
         return false;
+    }
+
+    protected function createQueryBuilder($conditions)
+    {
+        $conditions = array_filter(
+            $conditions,
+            function ($value) {
+                if ($value === '' || $value === null) {
+                    return false;
+                }
+
+                if (is_array($value) && empty($value)) {
+                    return false;
+                }
+
+                return true;
+            }
+        );
+
+        $builder = $this->getQueryBuilder($conditions);
+        $builder->from($this->table(), $this->table());
+
+        $declares = $this->declares();
+        $declares['conditions'] = isset($declares['conditions']) ? $declares['conditions'] : array();
+
+        foreach ($declares['conditions'] as $condition) {
+            $builder->andWhere($this->table.'.'.$condition);
+        }
+
+        return $builder;
     }
 
     public function declares()
