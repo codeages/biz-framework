@@ -22,6 +22,7 @@ class PayServiceImpl extends BaseService implements PayService
             'coin_amount',
             'notify_url',
             'return_url',
+            'show_url',
             'create_ip',
             'platform_type',
             'platform',
