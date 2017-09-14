@@ -2,6 +2,9 @@
 
 namespace Codeages\Biz\Framework\Order\Status\Refund;
 
+use Codeages\Biz\Framework\Service\Exception\AccessDeniedException;
+use Codeages\Biz\Framework\Service\Exception\NotFoundException;
+
 class AuditingStatus extends AbstractRefundStatus
 {
     const NAME = 'auditing';
@@ -9,6 +12,72 @@ class AuditingStatus extends AbstractRefundStatus
     public function getName()
     {
         return self::NAME;
+    }
+
+    public function process($data = array())
+    {
+        $orderRefund = $this->createOrderRefund($data['orderId'], $data);
+        return $this->createOrderRefundItems($data['orderItemIds'], $orderRefund);
+    }
+
+    protected function createOrderRefund($orderId, $data)
+    {
+        $order = $this->getOrderDao()->get($orderId);
+        if (empty($order)) {
+            throw new NotFoundException("order #{$orderId} is not found.");
+        }
+
+        if ($this->biz['user']['id'] != $order['user_id']) {
+            throw new AccessDeniedException("order #{$orderId} can not refund.");
+        }
+
+        $orderRefund = $this->getOrderRefundDao()->create(array(
+            'order_id' => $order['id'],
+            'order_item_id' => 0,
+            'sn' => $this->generateSn(),
+            'user_id' => $order['user_id'],
+            'created_user_id' => $this->biz['user']['id'],
+            'reason' => empty($data['reason']) ? '' : $data['reason'],
+            'amount' => $order['pay_amount'],
+            'status' => 'auditing'
+        ));
+
+        return $orderRefund;
+    }
+
+    protected function generateSn()
+    {
+        return date('YmdHis', time()).mt_rand(10000, 99999);
+    }
+
+    protected function createOrderRefundItems($orderItemIds, $orderRefund)
+    {
+        $totalAmount = 0;
+        $orderItemRefunds = array();
+        foreach ($orderItemIds as $orderItemId) {
+            $orderItem = $this->getOrderItemDao()->get($orderItemId);
+            $orderItemRefund = $this->getOrderItemRefundDao()->create(array(
+                'order_refund_id' => $orderRefund['id'],
+                'order_id' => $orderRefund['order_id'],
+                'order_item_id' => $orderItemId,
+                'user_id' => $orderRefund['user_id'],
+                'created_user_id' => $this->biz['user']['id'],
+                'amount' => $orderItem['pay_amount']
+            ));
+
+            $orderItem = $this->getOrderItemDao()->update($orderItem['id'], array(
+                'refund_id' => $orderRefund['id'],
+                'refund_status' => 'auditing'
+            ));
+
+            $totalAmount = $totalAmount + $orderItem['pay_amount'];
+
+            $orderItemRefunds[] = $orderItemRefund;
+        }
+
+        $orderRefund = $this->getOrderRefundDao()->update($orderRefund['id'], array('amount' => $totalAmount));
+        $orderRefund['orderItemRefunds'] = $orderItemRefunds;
+        return $orderRefund;
     }
 
     public function refunding($data)
