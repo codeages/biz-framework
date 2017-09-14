@@ -103,7 +103,7 @@ class OrderRefundContext
         $orderRefundItems = $orderRefund['orderItemRefunds'];
         unset($orderRefund['orderItemRefunds']);
 
-        $method = 'on'.ucfirst($status);
+        $method = 'onOrderRefund'.ucfirst($status);
         foreach ($orderRefundItems as $orderRefundItem) {
             $orderRefundItem['order_refund'] = $orderRefund;
             $orderRefundItem['order_item'] = $this->getOrderService()->getOrderItem($orderRefundItem['order_item_id']);
