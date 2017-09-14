@@ -256,7 +256,7 @@ class PayServiceTest extends IntegrationTestCase
             'coin_amount' => 20,
             'notify_url' => 'http://try6.edusoho.cn/',
             'create_ip' => '127.0.0.1',
-            'pay_type' => 'Native',
+            'platform_type' => 'Native',
             'price_type' => 'money',
             'platform' => 'wechat',
             'seller_id' => '12',

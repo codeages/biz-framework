@@ -10,6 +10,8 @@ interface OrderService
 
     public function findOrderItemDeductsByItemId($itemId);
 
+    public function getOrderItem($id);
+
     public function getOrder($id);
 
     public function getOrderBySn($sn, $lock = false);
