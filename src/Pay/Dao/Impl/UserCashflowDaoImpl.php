@@ -2,7 +2,7 @@
 
 namespace Codeages\Biz\Framework\Pay\Dao\Impl;
 
-use AppBundle\Common\ArrayToolkit;
+use Codeages\Biz\Framework\Util\ArrayToolkit;
 use Codeages\Biz\Framework\Dao\DaoException;
 use Codeages\Biz\Framework\Pay\Dao\UserCashflowDao;
 use Codeages\Biz\Framework\Dao\GeneralDaoImpl;
