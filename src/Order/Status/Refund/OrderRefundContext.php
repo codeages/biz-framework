@@ -147,7 +147,7 @@ class OrderRefundContext
     {
         $orderLog = array(
             'order_refund_id' => $orderRefund['id'],
-            'status' => $orderRefund['status'],
+            'status' => 'order_refund.'.$orderRefund['status'],
             'order_id' => $orderRefund['order_id'],
             'user_id' => $this->biz['user']['id'],
             'deal_data' => $dealData
