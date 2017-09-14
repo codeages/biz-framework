@@ -224,6 +224,21 @@ class AccountServiceImpl extends BaseService implements AccountService
         return $this->getUserCashflowDao()->sumColumnByConditions($column, $conditions);
     }
 
+    public function searchUserIdsGroupByUserIdOrderBySumColumn($column, $conditions, $sort, $start, $limit)
+    {
+        return $this->getUserCashflowDao()->searchUserIdsGroupByUserIdOrderBySumColumn($column, $conditions, $sort, $start, $limit);
+    }
+
+    public function searchUserIdsGroupByUserIdOrderByBalance($conditions, $sort, $start, $limit)
+    {
+        return $this->getUserCashflowDao()->searchUserIdsGroupByUserIdOrderByBalance($conditions, $sort, $start, $limit);
+    }
+
+    public function countUsersByConditions($conditions)
+    {
+        return $this->getUserCashflowDao()->countUsersByConditions($conditions);
+    }
+
     protected function getPasswordEncoder()
     {
         return new PasswordEncoder('sha256');
