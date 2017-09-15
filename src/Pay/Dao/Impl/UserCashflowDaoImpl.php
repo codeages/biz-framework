@@ -161,7 +161,6 @@ class UserCashflowDaoImpl extends GeneralDaoImpl implements UserCashflowDao
                 'order_sn = :order_sn',
                 'trade_sn = :trade_sn',
                 'platform = :platform',
-                'user_type = :user_type',
                 'amount_type = :amount_type',
                 'created_time > :created_time_GT',
                 'created_time >= :created_time_GTE',
