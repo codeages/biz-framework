@@ -186,23 +186,16 @@ class PayServiceTest extends IntegrationTestCase
         $this->assertNotEmpty($trade['notify_data']);
         $this->assertEquals($notifyData['transaction_id'], $trade['platform_sn']);
         $cashFlows = $this->getUserCashflowDao()->findByTradeSn($trade['trade_sn']);
-        $this->assertEquals(5,count($cashFlows));
+        $this->assertEquals(4,count($cashFlows));
 
         foreach ($cashFlows as $cashFlow) {
             $this->assertNotEmpty($cashFlow['sn']);
             $this->assertTrue(in_array($cashFlow['type'], array('inflow', 'outflow')));
-            if ('buyer' == $cashFlow['user_type']) {
-                $this->assertEquals($this->biz['user']['id'], $cashFlow['user_id']);
-            } else if ('seller' == $cashFlow['user_type']) {
-                $this->assertEquals($trade['seller_id'], $cashFlow['user_id']);
-            }
+
             $this->assertEquals($trade['order_sn'], $cashFlow['order_sn']);
             $this->assertEquals($trade['trade_sn'], $cashFlow['trade_sn']);
             $this->assertEquals($trade['platform'], $cashFlow['platform']);
 
-            if ($cashFlow['type'] == 'outflow') {
-                $this->assertNotEmpty($cashFlow['parent_sn']);
-            }
         }
 
         if ($trade['type'] == 'recharge') {

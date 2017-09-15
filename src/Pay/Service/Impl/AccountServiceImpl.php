@@ -209,6 +209,90 @@ class AccountServiceImpl extends BaseService implements AccountService
         return $this->getUserBalanceDao()->getByUserId($userId);
     }
 
+    public function cashTransfer($fields)
+    {
+        return $this->transfer($fields, false);
+    }
+
+    public function coinTransfer($fields)
+    {
+        return $this->transfer($fields, true);
+    }
+
+    protected function transfer($fields, $isCoin = false)
+    {
+        if (!ArrayToolkit::requireds($fields, array('from_user_id', 'to_user_id', 'amount', 'title'))) {
+            throw $this->createInvalidArgumentException('fields is invalid.');
+        }
+
+        $lock = $this->biz['lock'];
+        $key = "recharge_from_{$fields['from_user_id']}_to_{$fields['to_user_id']}";
+        try {
+            $lock->get($key);
+            $this->beginTransaction();
+
+            $userFlow = array(
+                'sn' => $this->generateSn(),
+                'title' => $fields['title'],
+                'type' => 'outflow',
+                'parent_sn' => empty($fields['parent_sn'])? '' : $fields['parent_sn'],
+                'currency' => $isCoin ? 'coin': $fields['currency'],
+                'amount_type' => $isCoin ? 'coin': 'money',
+                'user_id' => $fields['from_user_id'],
+                'trade_sn' => empty($fields['trade_sn'])? '' : $fields['trade_sn'],
+                'order_sn' => empty($fields['order_sn'])? '' : $fields['order_sn'],
+                'platform' => empty($fields['platform'])? '' : $fields['platform'],
+                'amount' => $fields['amount']
+            );
+
+            if ($isCoin) {
+                $userBalance = $this->waveAmount($userFlow['user_id'], 0 - $fields['amount']);
+                $userFlow['user_balance'] = empty($userBalance['amount']) ? 0 : $userBalance['amount'];
+            } else {
+                $userBalance = $this->waveCashAmount($userFlow['user_id'], 0 - $fields['amount']);
+                $userFlow['user_balance'] = empty($userBalance['cash_amount']) ? 0 : $userBalance['cash_amount'];
+            }
+
+            $cashFlow = $this->getUserCashflowDao()->create($userFlow);
+
+            $userFlow = array(
+                'sn' => $this->generateSn(),
+                'title' => $fields['title'],
+                'type' => 'inflow',
+                'parent_sn' => $cashFlow['sn'],
+                'currency' => $isCoin ? 'coin': $fields['currency'],
+                'amount_type' => $isCoin ? 'coin': 'money',
+                'user_id' => $fields['to_user_id'],
+                'trade_sn' => empty($fields['trade_sn'])? '' : $fields['trade_sn'],
+                'order_sn' => empty($fields['order_sn'])? '' : $fields['order_sn'],
+                'platform' => empty($fields['platform'])? '' : $fields['platform'],
+                'amount' => $fields['amount']
+            );
+
+            if ($isCoin) {
+                $userBalance = $this->waveAmount($userFlow['user_id'], $fields['amount']);
+                $userFlow['user_balance'] = empty($userBalance['amount']) ? 0 : $userBalance['amount'];
+            } else {
+                $userBalance = $this->waveCashAmount($userFlow['user_id'], $fields['amount']);
+                $userFlow['user_balance'] = empty($userBalance['cash_amount']) ? 0 : $userBalance['cash_amount'];
+            }
+
+            $cashFlow = $this->getUserCashflowDao()->create($userFlow);
+            $this->commit();
+            $lock->release($key);
+            return $cashFlow;
+        } catch (\Exception $e) {
+            $this->rollback();
+            $lock->release($key);
+            throw $e;
+        }
+    }
+
+    protected function generateSn($prefix = '')
+    {
+        return $prefix.date('YmdHis', time()).mt_rand(10000, 99999);
+    }
+
     public function searchUserCashflows($conditions, $orderBy, $start, $limit)
     {
         return $this->getUserCashflowDao()->search($conditions, $orderBy, $start, $limit);

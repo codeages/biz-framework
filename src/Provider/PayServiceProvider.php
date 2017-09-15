@@ -33,7 +33,7 @@ class PayServiceProvider implements ServiceProviderInterface
         };
 
         $biz['console.commands'][] = function () use ($biz) {
-            return new \Codeages\Biz\Framework\Pay\Command\PaymentTradeAddPlatformType($biz);
+            return new \Codeages\Biz\Framework\Pay\Command\CashflowDeleteUserTypeCommand($biz);
         };
 
         $this->registerStatus($biz);

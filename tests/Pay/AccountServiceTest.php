@@ -99,6 +99,35 @@ class AccountServiceTest extends IntegrationTestCase
         $this->assertEquals(2, $userBalance['locked_amount']);
     }
 
+    public function testRecharge()
+    {
+        $user = array(
+            'user_id' => 1
+        );
+        $buyer = $this->getAccountService()->createUserBalance($user);
+
+        $user = array(
+            'user_id' => 2
+        );
+
+        $seller = $this->getAccountService()->createUserBalance($user);
+        $recharge = array(
+            'to_user_id' => $buyer['user_id'],
+            'from_user_id' => $seller['user_id'],
+            'amount' => '1000',
+            'amount_type' => 'coin',
+            'title' => '充值1000个虚拟币'
+        );
+
+        $this->getAccountService()->coinTransfer($recharge);
+
+        $buyer = $this->getAccountService()->getUserBalanceByUserId($buyer['user_id']);
+        $seller = $this->getAccountService()->getUserBalanceByUserId($seller['user_id']);
+
+        $this->assertEquals(1000, $buyer['amount']);
+        $this->assertEquals(-1000, $seller['amount']);
+    }
+
     protected function getAccountService()
     {
         return $this->biz->service('Pay:AccountService');

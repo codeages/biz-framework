@@ -208,7 +208,7 @@ class PayServiceImpl extends BaseService implements PayService
                 'notify_data' => $data,
                 'currency' => $data['cash_type'],
             ));
-            $this->createCashFlows($trade, $data);
+            $this->transfer($trade, $data);
             $this->getTargetlogService()->log(TargetlogService::INFO, 'trade.paid', $data['trade_sn'], "交易号{$data['trade_sn']}，账目流水处理成功", $data);
             $this->commit();
             return $trade;
@@ -277,10 +277,30 @@ class PayServiceImpl extends BaseService implements PayService
 
     protected function markRefunded($trade)
     {
-        $flow = $this->createUserFlow('seller', $trade, array(), 'outflow');
+        $fields = array(
+            'title' => $trade['title'],
+            'from_user_id' => $trade['seller_id'],
+            'to_user_id' => $trade['user_id'],
+            'amount' => $trade['cash_amount'],
+            'trade_sn' => $trade['trade_sn'],
+            'order_sn' => $trade['order_sn'],
+            'platform' => $trade['platform'],
+            'parent_sn' => ''
+        );
+        $flow = $this->getAccountService()->cashTransfer($fields);
+
         if (!empty($trade['coin_amount'])) {
-            $flow = $this->createUserFlow('seller', $trade, $flow, 'outflow', true);
-            $this->createUserFlow('buyer', $trade, $flow, 'inflow', true);
+            $fields = array(
+                'title' => $trade['title'],
+                'from_user_id' => $trade['seller_id'],
+                'to_user_id' => $trade['user_id'],
+                'amount' => $trade['coin_amount'],
+                'trade_sn' => $trade['trade_sn'],
+                'order_sn' => $trade['order_sn'],
+                'platform' => $trade['platform'],
+                'parent_sn' => $flow['sn']
+            );
+            $this->getAccountService()->coinTransfer($fields);
         }
 
         return $this->getTradeContext($trade['id'])->refunded();
@@ -359,20 +379,51 @@ class PayServiceImpl extends BaseService implements PayService
         }
     }
 
-    protected function createCashFlows($trade, $notifyData)
+    protected function transfer($trade, $notifyData)
     {
-        $flow = $this->createUserFlow('buyer', $trade, array('amount' => $notifyData['pay_amount']), 'inflow');
-        $flow = $this->createUserFlow('buyer', $trade, $flow, 'outflow');
-
-        $flow = $this->createUserFlow('seller', $trade, $flow, 'inflow');
+        if (!empty($trade['cash_amount'])) {
+            $fields = array(
+                'from_user_id' => $trade['user_id'],
+                'to_user_id' => $trade['seller_id'],
+                'amount' => $trade['cash_amount'],
+                'title' => $trade['title'],
+                'trade_sn' => $trade['trade_sn'],
+                'order_sn' => $trade['order_sn'],
+                'platform' => $trade['platform'],
+                'parent_sn' => '',
+                'currency' => $trade['currency']
+            );
+            $flow = $this->getAccountService()->cashTransfer($fields);
+        }
 
         if ('recharge' == $trade['type']) {
-            $flow = $this->createUserFlow('seller', $trade, $flow, 'outflow', true);
-            $this->createUserFlow('buyer', $trade, $flow, 'inflow', true);
+            if (!empty($trade['cash_amount'])) {
+                $fields = array(
+                    'from_user_id' => $trade['seller_id'],
+                    'to_user_id' => $trade['user_id'],
+                    'amount' => $trade['cash_amount'] * $this->getDefaultCoinRate(),
+                    'title' => $trade['title'],
+                    'trade_sn' => $trade['trade_sn'],
+                    'order_sn' => $trade['order_sn'],
+                    'platform' => $trade['platform'],
+                    'parent_sn' => empty($flow['sn']) ? '' : $flow['sn'],
+                );
+                $this->getAccountService()->coinTransfer($fields);
+            }
+
         } elseif ('purchase' == $trade['type']) {
             if (!empty($trade['coin_amount'])) {
-                $flow = $this->createUserFlow('buyer', $trade, $flow, 'outflow', true);
-                $this->createUserFlow('seller', $trade, $flow, 'inflow', true);
+                $fields = array(
+                    'from_user_id' => $trade['user_id'],
+                    'to_user_id' => $trade['seller_id'],
+                    'amount' => $trade['coin_amount'],
+                    'title' => $trade['title'],
+                    'trade_sn' => $trade['trade_sn'],
+                    'order_sn' => $trade['order_sn'],
+                    'platform' => $trade['platform'],
+                    'parent_sn' => empty($flow['sn']) ? '' : $flow['sn'],
+                );
+                $this->getAccountService()->coinTransfer($fields);
             }
         }
     }
@@ -390,7 +441,6 @@ class PayServiceImpl extends BaseService implements PayService
             'trade_sn' => $trade['trade_sn'],
             'order_sn' => $trade['order_sn'],
             'platform' => $trade['platform'],
-            'user_type' => $userType
         );
 
         if ($this->isRechargeCoin($isCoin, $userType, $flowType)
