@@ -5,7 +5,7 @@ namespace Codeages\Biz\Framework\Pay\Payment;
 
 use Codeages\Biz\Framework\Util\ArrayToolkit;
 
-class AppleGetway extends AbstractGetway
+class IapGetway extends AbstractGetway
 {
     public function converterNotify($data)
     {
@@ -88,7 +88,8 @@ class AppleGetway extends AbstractGetway
 
                 if ($transactionId) {
                     foreach ($data['receipt']['in_app'] as $value) {
-                        if (ArrayToolkit::requireds($value, array('transaction_id', 'quantity', 'product_id')) && $value['transaction_id'] == $transactionId) {
+                        if (ArrayToolkit::requireds($value, array('transaction_id', 'quantity', 'product_id'))
+                            && $value['transaction_id'] == $transactionId) {
                             $inApp = $value;
                             break;
                         }

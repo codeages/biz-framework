@@ -58,7 +58,7 @@ class PayServiceProvider implements ServiceProviderInterface
                 'key' => '',
             ),
             'iap' => array(
-                'class' => '\Codeages\Biz\Framework\Pay\Payment\AppleGetway',
+                'class' => '\Codeages\Biz\Framework\Pay\Payment\IapGetway',
             )
         );
 

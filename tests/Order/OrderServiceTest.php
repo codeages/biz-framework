@@ -186,6 +186,7 @@ class OrderServiceTest extends IntegrationTestCase
         $this->assertNotEmpty($order);
         $this->assertNotEmpty($order['sn']);
         $this->assertEquals('created', $order['status']);
+        $this->assertEquals('wap', $order['device']);
         $this->assertEquals($mockOrder['title'], $order['title']);
         $this->assertEquals($mockOrder['source'], $order['source']);
         $this->assertEquals($mockOrder['callback'], $order['callback']);
@@ -325,7 +326,8 @@ class OrderServiceTest extends IntegrationTestCase
             'created_reason' => '购买',
             'create_extra' => array(
                 'xxx' => 'xxx'
-            )
+            ),
+            'device' => 'wap'
         );
     }
 

@@ -2,7 +2,7 @@
 
 namespace Tests;
 
-use Codeages\Biz\Framework\Pay\Payment\AppleGetway;
+use Codeages\Biz\Framework\Pay\Payment\IapGetway;
 use Codeages\Biz\Framework\Pay\Payment\WechatGetway;
 
 class PayServiceTest extends IntegrationTestCase
@@ -249,7 +249,7 @@ class PayServiceTest extends IntegrationTestCase
             'product_id' => 1,
         );
 
-        $mock = \Mockery::mock(AppleGetway::class);
+        $mock = \Mockery::mock(IapGetway::class);
         $mock->shouldReceive('converterNotify')->andReturn(array($return, 'success'));
         return $mock;
     }
