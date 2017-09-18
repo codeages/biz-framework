@@ -30,9 +30,9 @@ interface AccountService
 
     public function decreaseLockedCoin($userId, $amount);
 
-    public function coinTransfer($fields);
+    public function transferCoin($fields);
 
-    public function cashTransfer($fields);
+    public function transferCash($fields);
 
     public function countUserCashflows($conditions);
 

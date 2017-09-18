@@ -99,7 +99,7 @@ class AccountServiceTest extends IntegrationTestCase
         $this->assertEquals(2, $userBalance['locked_amount']);
     }
 
-    public function testRecharge()
+    public function testTransferCoin()
     {
         $user = array(
             'user_id' => 1
@@ -119,7 +119,7 @@ class AccountServiceTest extends IntegrationTestCase
             'title' => '充值1000个虚拟币'
         );
 
-        $this->getAccountService()->coinTransfer($recharge);
+        $this->getAccountService()->transferCoin($recharge);
 
         $buyer = $this->getAccountService()->getUserBalanceByUserId($buyer['user_id']);
         $seller = $this->getAccountService()->getUserBalanceByUserId($seller['user_id']);

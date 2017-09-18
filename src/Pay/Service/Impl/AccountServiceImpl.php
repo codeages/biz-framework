@@ -209,12 +209,12 @@ class AccountServiceImpl extends BaseService implements AccountService
         return $this->getUserBalanceDao()->getByUserId($userId);
     }
 
-    public function cashTransfer($fields)
+    public function transferCash($fields)
     {
         return $this->transfer($fields, false);
     }
 
-    public function coinTransfer($fields)
+    public function transferCoin($fields)
     {
         return $this->transfer($fields, true);
     }

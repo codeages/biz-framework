@@ -288,7 +288,7 @@ class PayServiceImpl extends BaseService implements PayService
             'platform' => $trade['platform'],
             'parent_sn' => ''
         );
-        $flow = $this->getAccountService()->cashTransfer($fields);
+        $flow = $this->getAccountService()->transferCash($fields);
 
         if (!empty($trade['coin_amount'])) {
             $fields = array(
@@ -301,7 +301,7 @@ class PayServiceImpl extends BaseService implements PayService
                 'platform' => $trade['platform'],
                 'parent_sn' => $flow['sn']
             );
-            $this->getAccountService()->coinTransfer($fields);
+            $this->getAccountService()->transferCoin($fields);
         }
 
         return $this->getTradeContext($trade['id'])->refunded();
@@ -394,7 +394,7 @@ class PayServiceImpl extends BaseService implements PayService
                 'parent_sn' => '',
                 'currency' => $trade['currency']
             );
-            $flow = $this->getAccountService()->cashTransfer($fields);
+            $flow = $this->getAccountService()->transferCash($fields);
         }
 
         if ('recharge' == $trade['type']) {
@@ -409,7 +409,7 @@ class PayServiceImpl extends BaseService implements PayService
                     'platform' => $trade['platform'],
                     'parent_sn' => empty($flow['sn']) ? '' : $flow['sn'],
                 );
-                $this->getAccountService()->coinTransfer($fields);
+                $this->getAccountService()->transferCoin($fields);
             }
 
         } elseif ('purchase' == $trade['type']) {
@@ -424,7 +424,7 @@ class PayServiceImpl extends BaseService implements PayService
                     'platform' => $trade['platform'],
                     'parent_sn' => empty($flow['sn']) ? '' : $flow['sn'],
                 );
-                $this->getAccountService()->coinTransfer($fields);
+                $this->getAccountService()->transferCoin($fields);
             }
         }
     }
