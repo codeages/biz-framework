@@ -41,5 +41,4 @@ interface AccountService
     public function searchUserIdsGroupByUserIdOrderByBalance($conditions, $sort, $start, $limit);
 
     public function countUsersByConditions($conditions);
-
 }

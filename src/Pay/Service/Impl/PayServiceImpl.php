@@ -367,11 +367,6 @@ class PayServiceImpl extends BaseService implements PayService
         return $trade;
     }
 
-    public function findUserCashflowsByTradeSn($sn)
-    {
-        return $this->getUserCashflowDao()->findByTradeSn($sn);
-    }
-
     protected function lockCoin($trade)
     {
         if ($trade['coin_amount']>0) {
@@ -431,24 +426,9 @@ class PayServiceImpl extends BaseService implements PayService
         }
     }
 
-    protected function isRechargeCoin($isCoin, $userType, $flowType)
-    {
-        return $isCoin && $userType == 'buyer' && $flowType == 'inflow';
-    }
-
-    protected function isDischargeCoin($isCoin, $userType, $flowType)
-    {
-        return $isCoin && $userType == 'seller' && $flowType == 'outflow';
-    }
-
     protected function generateSn($prefix = '')
     {
         return $prefix.date('YmdHis', time()).mt_rand(10000, 99999);
-    }
-
-    protected function getUserCashflowDao()
-    {
-        return $this->biz->dao('Pay:UserCashflowDao');
     }
 
     protected function getTargetlogService()
