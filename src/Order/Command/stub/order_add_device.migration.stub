@@ -13,7 +13,7 @@ class BizOrderAddDevice extends Migration
         $db = $biz['db'];
 
         if (!$this->isFieldExist('biz_order', 'device')) {
-            $db->exec("ALTER TABLE `biz_order` ADD COLUMN `device` varchar(32) COMMENT '下单设备';");
+            $db->exec("ALTER TABLE `biz_order` ADD COLUMN `device` varchar(32) COMMENT '下单设备（pc、mobile、app）';");
         }
     }
 

@@ -59,6 +59,11 @@ class PayServiceProvider implements ServiceProviderInterface
             ),
             'iap' => array(
                 'class' => '\Codeages\Biz\Framework\Pay\Payment\IapGetway',
+            ),
+            'lianlianpay' => array(
+                'class' => '\Codeages\Biz\Framework\Pay\Payment\LianlianPayGetway',
+                'secret' => '',
+                'oid_partner' => '',
             )
         );
 
