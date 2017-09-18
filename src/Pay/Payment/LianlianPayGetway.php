@@ -120,12 +120,11 @@ class LianlianPayGetway extends AbstractGetway
     protected function convertParams($params)
     {
         $setting = $this->getSetting();
-
         $converted                 = array();
         $converted['busi_partner'] = '101001';
         $converted['dt_order']     = date('YmdHis', time());
         $converted['money_order']  = $params['amount'];
-        $converted['name_goods']   = mb_substr($this->filterText($params['title']), 0, 12, 'utf-8');
+        $converted['name_goods']   = mb_substr($this->filterText($params['goods_title']), 0, 12, 'utf-8');
         $converted['no_order']     = $params['trade_sn'];
         if (!empty($params['notify_url'])) {
             $converted['notify_url'] = $params['notify_url'];
@@ -135,7 +134,7 @@ class LianlianPayGetway extends AbstractGetway
 
         $converted['oid_partner']  = $setting['oid_partner'];
         $identify = $this->getDefaultIdentify($params);
-        $converted['user_id']      = $identify."_".$params['userId'];
+        $converted['user_id']      = $identify."_".$params['attach']['user_id'];
 
         $converted['timestamp']    = date('YmdHis', time());
         if (!empty($params['return_url'])) {
@@ -143,8 +142,8 @@ class LianlianPayGetway extends AbstractGetway
         }
         $converted['risk_item']  = json_encode(array(
             'frms_ware_category'=>1008,
-            'user_info_mercht_userno'=>$identify."_".$params['userId'],
-            'user_info_dt_register'=>date('YmdHis', $params['user_created_time'])
+            'user_info_mercht_userno'=>$identify."_".$params['attach']['user_id'],
+            'user_info_dt_register'=>date('YmdHis', $params['attach']['user_created_time'])
         ));
 
         $converted['userreq_ip'] = str_replace(".", "_", $params['create_ip']);
