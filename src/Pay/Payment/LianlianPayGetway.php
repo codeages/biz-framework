@@ -127,7 +127,7 @@ class LianlianPayGetway extends AbstractGetway
         $converted                 = array();
         $converted['busi_partner'] = '101001';
         $converted['dt_order']     = date('YmdHis', time());
-        $converted['money_order']  = $params['amount'];
+        $converted['money_order']  = $params['amount']/100;
         $converted['name_goods']   = mb_substr($this->filterText($params['goods_title']), 0, 12, 'utf-8');
         $converted['no_order']     = $params['trade_sn'];
         if (!empty($params['notify_url'])) {
