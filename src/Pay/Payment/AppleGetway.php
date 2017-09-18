@@ -20,13 +20,13 @@ class AppleGetway extends AbstractGetway
         $this->requestReceiptData($data);
     }
 
-    private function requestReceiptData($data)
+    private function requestReceiptData($notifyData)
     {
-        $userId = $data['user_id'];
-        $amount = $data['amount'];
-        $receipt = $data['receipt'];
-        $transactionId = $data['transaction_id'];
-        $isSandbox = $data['is_sand_box'];
+        $userId = $notifyData['user_id'];
+        $amount = $notifyData['amount'];
+        $receipt = $notifyData['receipt'];
+        $transactionId = $notifyData['transaction_id'];
+        $isSandbox = $notifyData['is_sand_box'];
 
         if ($isSandbox) {
             $endpoint = 'https://sandbox.itunes.apple.com/verifyReceipt';
@@ -47,25 +47,39 @@ class AppleGetway extends AbstractGetway
 
         $response = curl_exec($ch);
         $errno = curl_errno($ch);
-        $errmsg = curl_error($ch);
         curl_close($ch);
 
         if ($errno != 0) {
-            return $this->createErrorResponse('error', '充值失败！'.$errno);
+            return array(
+                array(
+                    'msg' => '充值失败！'.$errno
+                ),
+                'failture'
+            );
         }
 
         $data = json_decode($response, true);
         if (empty($data)) {
-            return $this->createErrorResponse('error', '充值验证失败');
+            return array(
+                array(
+                    'msg' => '充值验证失败'
+                ),
+                'failture'
+            );
         }
 
         if ($data['status'] == 21007) {
-            //sandbox receipt
-            return $this->requestReceiptData($userId, $amount, $receipt, $transactionId, true);
+            $notifyData['is_sand_box'] = true;
+            return $this->requestReceiptData($notifyData);
         }
 
         if (!isset($data['status']) || $data['status'] != 0) {
-            return $this->createErrorResponse('error', '充值失败！状态码 :'.$data['status']);
+            return array(
+                array(
+                    'msg' => '充值失败！状态码 :'.$data['status']
+                ),
+                'failture'
+            );
         }
 
         if ($data['status'] == 0) {
@@ -80,59 +94,39 @@ class AppleGetway extends AbstractGetway
                         }
                     }
                 } else {
-                    //兼容没有transactionId的模式
                     $inApp = $data['receipt']['in_app'][0];
                 }
 
                 if (!$inApp) {
-                    return $this->createErrorResponse('error', 'receipt校验失败：找不到对应的transaction_id');
-                }
-
-                $token = 'iap-'.$inApp['transaction_id'];
-                $quantity = $inApp['quantity'];
-                $productId = $inApp['product_id'];
-
-                try {
-                    $calculatedAmount = $this->calculateBoughtAmount($productId, $quantity);
-
-                    // if ($calculatedAmount != $amount) {
-                    //     throw new \RuntimeException("金额校验错误，充值失败");
-                    // }
-
-                    $status = $this->buyCoinByIAP($userId, $calculatedAmount, 'none', $token);
-                } catch (\Exception $e) {
-                    return $this->createErrorResponse('error', $e->getMessage());
+                    return array(
+                        array(
+                            'msg' => 'receipt校验失败：找不到对应的transaction_id'
+                        ),
+                        'failture'
+                    );
                 }
 
                 return array(
-                    'status' => $status,
+                    array(
+                        'status' => 'paid',
+                        'pay_amount' => $amount*100,
+                        'cash_flow' => $inApp['transaction_id'],
+                        'paid_time' => $inApp['purchase_date'],
+                        'quantity' => $inApp['quantity'],
+                        'product_id' => $inApp['product_id'],
+                        'attach' => array(
+                            'user_id' => $userId
+                        )
+                    ),
+                    'success'
                 );
             }
         }
 
         return array(
-            array(
-                'status' => 'paid',
-                'cash_flow' => $data['trade_no'],
-                'paid_time' => $this->getPaidTime($data),
-                'pay_amount' => (int)($data['total_fee']*100),
-                'cash_type' => 'RMB',
-                'trade_sn' => $data['out_trade_no'],
-                'attach' => !empty($data['extra_common_param']) ? json_decode($data['extra_common_param'], true) : array(),
-                'notify_data' => $data,
-            ),
-            'success'
+            array(),
+            'failture'
         );
-    }
-
-    private function calculateBoughtAmount($productId, $quantity)
-    {
-        $registeredProducts = $this->getSettingService()->get('mobile_iap_product', array());
-        if (empty($registeredProducts[$productId])) {
-            throw new \RuntimeException('该商品信息未与苹果服务器同步，充值失败');
-        }
-
-        return $registeredProducts[$productId]['price'] * $quantity;
     }
 
     public function createTrade($data)

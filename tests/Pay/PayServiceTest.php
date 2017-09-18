@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use Codeages\Biz\Framework\Pay\Payment\AppleGetway;
 use Codeages\Biz\Framework\Pay\Payment\WechatGetway;
 
 class PayServiceTest extends IntegrationTestCase
@@ -203,6 +204,54 @@ class PayServiceTest extends IntegrationTestCase
 
         $userBalance = $this->getAccountService()->getUserBalanceByUserId($this->biz['user']['id']);
         $this->assertEquals('80', $userBalance['amount']);
+    }
+
+    public function testRechargeByIap()
+    {
+        $seller = array(
+            'user_id' => 0
+        );
+        $this->getAccountService()->createUserBalance($seller);
+
+        $this->mockIapGetWay();
+        $user = array(
+            'user_id' => $this->biz['user']['id']
+        );
+        $this->getAccountService()->createUserBalance($user);
+
+        $this->biz['payment.iap'] = $this->mockIapGetWay();
+
+        $data = array(
+            'transaction_id' => '1004400740201409030005092168',
+            'user_id' => $user['user_id'],
+            'amount' => 1000,
+            'receipt' => 'xxx',
+            'is_sand_box' => false
+        );
+        $this->getPayService()->rechargeByIap($data);
+
+        $userBalance = $this->getAccountService()->getUserBalanceByUserId($this->biz['user']['id']);
+        $this->assertEquals('1000', $userBalance['amount']);
+    }
+
+    protected function mockIapGetWay()
+    {
+        $return = array(
+            'status' => 'paid',
+            'cash_flow' => '1004400740201409030005092168',
+            'paid_time' => time(),
+            'pay_amount' => 1000,
+            'cash_type' => 'CNY',
+            'attach' => array(
+                'user_id' => 1
+            ),
+            'quantity' => 1,
+            'product_id' => 1,
+        );
+
+        $mock = \Mockery::mock(AppleGetway::class);
+        $mock->shouldReceive('converterNotify')->andReturn(array($return, 'success'));
+        return $mock;
     }
 
     protected function assertPaidTrade($notifyData, $trade)

@@ -149,6 +149,31 @@ class PayServiceImpl extends BaseService implements PayService
         return $result;
     }
 
+    public function rechargeByIap($data)
+    {
+        list($data, $result) = $this->getPayment('iap')->converterNotify($data);
+        $trade = array(
+            'goods_title' => '虚拟币充值',
+            'order_sn' => '',
+            'platform' => 'iap',
+            'platform_type' => '',
+            'amount' => $data['pay_amount'],
+            'user_id' => $data['attach']['user_id'],
+            'type' => 'recharge'
+        );
+        $trade = $this->createPaymentTrade($trade);
+
+        $data = array(
+            'paid_time' => $data['paid_time'],
+            'cash_flow' => $data['cash_flow'],
+            'cash_type' => 'CNY',
+            'trade_sn' => $trade['trade_sn'],
+            'status' => 'paid',
+        );
+        $this->updateTradeToPaid($data);
+        return $result;
+    }
+
     protected function isCloseByPayment()
     {
         return empty($this->biz['payment.options']['closed_notify']) ? false : $this->biz['payment.options']['closed_notify'];
@@ -209,7 +234,7 @@ class PayServiceImpl extends BaseService implements PayService
                 'notify_data' => $data,
                 'currency' => $data['cash_type'],
             ));
-            $this->transfer($trade, $data);
+            $this->transfer($trade);
             $this->getTargetlogService()->log(TargetlogService::INFO, 'trade.paid', $data['trade_sn'], "交易号{$data['trade_sn']}，账目流水处理成功", $data);
             $this->commit();
             return $trade;

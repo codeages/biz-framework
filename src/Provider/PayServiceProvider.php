@@ -57,6 +57,9 @@ class PayServiceProvider implements ServiceProviderInterface
                 'partner' => '',
                 'key' => '',
             ),
+            'iap' => array(
+                'class' => '\Codeages\Biz\Framework\Pay\Payment\AppleGetway',
+            )
         );
 
         $biz['payment.platforms.options'] = null;
