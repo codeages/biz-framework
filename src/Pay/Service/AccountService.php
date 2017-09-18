@@ -18,10 +18,6 @@ interface AccountService
 
     public function createUserBalance($userId);
 
-    public function waveAmount($userId, $amount);
-
-    public function waveCashAmount($userId, $amount);
-
     public function getUserBalanceByUserId($userId);
 
     public function lockCoin($userId, $coinAmount);

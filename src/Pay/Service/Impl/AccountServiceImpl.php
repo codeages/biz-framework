@@ -158,7 +158,7 @@ class AccountServiceImpl extends BaseService implements AccountService
         return $this->getUserBalanceDao()->getByUserId($userId);
     }
 
-    public function waveAmount($userId, $amount)
+    protected function waveAmount($userId, $amount)
     {
         $userBalance = $this->getUserBalanceDao()->getByUserId($userId);
         $this->getUserBalanceDao()->wave(array($userBalance['id']), array(
@@ -168,7 +168,7 @@ class AccountServiceImpl extends BaseService implements AccountService
         return $this->getUserBalanceDao()->getByUserId($userId);
     }
 
-    public function waveCashAmount($userId, $amount)
+    protected function waveCashAmount($userId, $amount)
     {
         $userBalance = $this->getUserBalanceDao()->getByUserId($userId);
         $this->getUserBalanceDao()->wave(array($userBalance['id']), array(
@@ -222,6 +222,10 @@ class AccountServiceImpl extends BaseService implements AccountService
     protected function transfer($fields, $isCoin = false)
     {
         if (!ArrayToolkit::requireds($fields, array('from_user_id', 'to_user_id', 'amount', 'title'))) {
+            throw $this->createInvalidArgumentException('fields is invalid.');
+        }
+
+        if (!$isCoin && !ArrayToolkit::requireds($fields, array('currency'))) {
             throw $this->createInvalidArgumentException('fields is invalid.');
         }
 

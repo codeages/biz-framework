@@ -380,7 +380,7 @@ class PayServiceImpl extends BaseService implements PayService
         }
     }
 
-    protected function transfer($trade, $notifyData)
+    protected function transfer($trade)
     {
         if (!empty($trade['cash_amount'])) {
             $fields = array(
@@ -414,6 +414,8 @@ class PayServiceImpl extends BaseService implements PayService
 
         } elseif ('purchase' == $trade['type']) {
             if (!empty($trade['coin_amount'])) {
+                $this->getAccountService()->decreaseLockedCoin($trade['user_id'], $trade['coin_amount']);
+
                 $fields = array(
                     'from_user_id' => $trade['user_id'],
                     'to_user_id' => $trade['seller_id'],
@@ -427,51 +429,6 @@ class PayServiceImpl extends BaseService implements PayService
                 $this->getAccountService()->transferCoin($fields);
             }
         }
-    }
-
-    protected function createUserFlow($userType, $trade, $parentFlow, $flowType, $isCoin = false)
-    {
-        $userFlow = array(
-            'sn' => $this->generateSn(),
-            'title' => $trade['title'],
-            'type' => $flowType,
-            'parent_sn' => empty($parentFlow['sn']) ? '' : $parentFlow['sn'],
-            'currency' => $isCoin ? 'coin': $trade['currency'],
-            'amount_type' => $isCoin ? 'coin': 'money',
-            'user_id' => $userType == 'buyer' ? $trade['user_id'] : $trade['seller_id'],
-            'trade_sn' => $trade['trade_sn'],
-            'order_sn' => $trade['order_sn'],
-            'platform' => $trade['platform'],
-        );
-
-        if ($this->isRechargeCoin($isCoin, $userType, $flowType)
-            || $this->isDischargeCoin($isCoin, $userType, $flowType)) {
-            $userFlow['amount'] = $trade['cash_amount'] * $this->getDefaultCoinRate();
-        } else if ($isCoin) {
-            $userFlow['amount'] = $trade['coin_amount'];
-        } else {
-            $userFlow['amount'] = $trade['cash_amount'];
-        }
-
-        if ($userFlow['amount'] <= 0) {
-            return array();
-        }
-
-        $amount = $flowType == 'inflow' ? $userFlow['amount'] : 0 - $userFlow['amount'];
-
-        if ($isCoin) {
-            if ($userType == 'buyer' && $flowType == 'outflow') {
-                $userBalance = $this->getAccountService()->decreaseLockedCoin($userFlow['user_id'], $userFlow['amount']);
-            } else {
-                $userBalance = $this->getAccountService()->waveAmount($userFlow['user_id'], $amount);
-            }
-            $userFlow['user_balance'] = empty($userBalance['amount']) ? 0 : $userBalance['amount'];
-        } else {
-            $userBalance = $this->getAccountService()->waveCashAmount($userFlow['user_id'], $amount);
-            $userFlow['user_balance'] = empty($userBalance['cash_amount']) ? 0 : $userBalance['cash_amount'];
-        }
-
-        return $this->getUserCashflowDao()->create($userFlow);
     }
 
     protected function isRechargeCoin($isCoin, $userType, $flowType)

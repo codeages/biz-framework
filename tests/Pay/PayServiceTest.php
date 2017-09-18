@@ -79,12 +79,27 @@ class PayServiceTest extends IntegrationTestCase
     public function testLockedAmount()
     {
         $user = array(
-            'user_id' => $this->biz['user']['id']
+            'user_id' => $this->biz['user']['id'],
+            'cash_amount' => 100,
         );
 
-        $this->getAccountService()->createUserBalance($user);
+        $userBalance = $this->getAccountService()->createUserBalance($user);
 
-        $userBalance = $this->getAccountService()->waveAmount($user['user_id'], 100);
+        $user = array(
+            'user_id' => 2
+        );
+
+        $seller = $this->getAccountService()->createUserBalance($user);
+        $recharge = array(
+            'from_user_id' => $seller['user_id'],
+            'to_user_id' => $userBalance['user_id'],
+            'amount' => '100',
+            'title' => '充值1000个虚拟币',
+        );
+
+        $this->getAccountService()->transferCoin($recharge);
+        $userBalance = $this->getAccountService()->getUserBalanceByUserId($userBalance['user_id']);
+
         $this->assertEquals(100, $userBalance['amount']);
 
         $this->biz['payment.wechat'] = $this->mockCreateTradeResult();
@@ -102,12 +117,26 @@ class PayServiceTest extends IntegrationTestCase
     public function testReleaseAmount()
     {
         $user = array(
-            'user_id' => $this->biz['user']['id']
+            'user_id' => $this->biz['user']['id'],
+            'cash_amount' => 100,
         );
 
-        $this->getAccountService()->createUserBalance($user);
+        $userBalance = $this->getAccountService()->createUserBalance($user);
 
-        $userBalance = $this->getAccountService()->waveAmount($user['user_id'], 100);
+        $user = array(
+            'user_id' => 2
+        );
+
+        $seller = $this->getAccountService()->createUserBalance($user);
+        $recharge = array(
+            'from_user_id' => $seller['user_id'],
+            'to_user_id' => $userBalance['user_id'],
+            'amount' => '100',
+            'title' => '充值1000个虚拟币',
+        );
+
+        $this->getAccountService()->transferCoin($recharge);
+        $userBalance = $this->getAccountService()->getUserBalanceByUserId($userBalance['user_id']);
         $this->assertEquals(100, $userBalance['amount']);
 
         $this->biz['payment.wechat'] = $this->mockCreateTradeResult();
