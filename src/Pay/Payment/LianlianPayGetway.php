@@ -34,7 +34,11 @@ class LianlianPayGetway extends AbstractGetway
             $this->isWap = true;
         }
 
-        return $this->convertParams($data);
+        $data = $this->convertParams($data);
+        return array(
+            'url' => $this->url.'?'.http_build_query($data),
+            'data' => $data
+        );
     }
 
 
