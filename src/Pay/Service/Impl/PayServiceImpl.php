@@ -473,7 +473,8 @@ class PayServiceImpl extends BaseService implements PayService
 
     protected function getDefaultCoinRate()
     {
-        return 1;
+        $options = $this->biz['payment.options'];
+        return $options['coin_rate'];
     }
 
     protected function getCurrencyType()
