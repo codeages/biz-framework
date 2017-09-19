@@ -43,7 +43,6 @@ class LianlianPayGetway extends AbstractGetway
 
     public function converterNotify($data)
     {
-        $data = json_decode($data['res_data'], true);
         $data = ArrayToolkit::parts($data, array(
             'oid_partner',
             'sign_type',
