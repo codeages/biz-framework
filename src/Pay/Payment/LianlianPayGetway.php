@@ -148,7 +148,7 @@ class LianlianPayGetway extends AbstractGetway
         $converted['sign']       = $this->signParams($converted);
 
         if ($this->isWap) {
-            $converted['back_url'] = $params['back_url'];
+            $converted['back_url'] = $params['show_url'];
             return $this->convertMobileParams($converted);
         } else {
             return $converted;

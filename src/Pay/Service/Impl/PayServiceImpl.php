@@ -171,7 +171,7 @@ class PayServiceImpl extends BaseService implements PayService
             'status' => 'paid',
         );
         $this->updateTradeToPaid($data);
-        return $result;
+        return $trade;
     }
 
     protected function isCloseByPayment()
