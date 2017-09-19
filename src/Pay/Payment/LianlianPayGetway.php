@@ -130,8 +130,7 @@ class LianlianPayGetway extends AbstractGetway
         $converted['version']      = '1.0';
 
         $converted['oid_partner']  = $setting['oid_partner'];
-        $identify = $this->getDefaultIdentify($params);
-        $converted['user_id']      = $identify."_".$params['attach']['user_id'];
+        $converted['user_id']      = $params['attach']['identify_user_id'];
 
         $converted['timestamp']    = date('YmdHis', time());
         if (!empty($params['return_url'])) {
@@ -139,7 +138,7 @@ class LianlianPayGetway extends AbstractGetway
         }
         $converted['risk_item']  = json_encode(array(
             'frms_ware_category'=>1008,
-            'user_info_mercht_userno'=>$identify."_".$params['attach']['user_id'],
+            'user_info_mercht_userno'=>$params['attach']['identify_user_id'],
             'user_info_dt_register'=>date('YmdHis', $params['attach']['user_created_time'])
         ));
 
@@ -178,14 +177,6 @@ class LianlianPayGetway extends AbstractGetway
         }
 
         return $title;
-    }
-
-    protected function getDefaultIdentify($params)
-    {
-        if (empty($params['llpay_identify'])) {
-            return substr(md5(uniqid()), 0, 12);
-        }
-        return $params['llpay_identify'];
     }
 
     protected function getSetting()
