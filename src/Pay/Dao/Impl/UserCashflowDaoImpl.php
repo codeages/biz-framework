@@ -151,6 +151,7 @@ class UserCashflowDaoImpl extends GeneralDaoImpl implements UserCashflowDao
             'conditions' => array(
                 'id = :id',
                 'sn = :sn',
+                'user_id != :except_user_id',
                 'user_id = :user_id',
                 'type = :type',
                 'amount > :amount_GT',
