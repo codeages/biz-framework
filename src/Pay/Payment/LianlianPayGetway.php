@@ -43,7 +43,7 @@ class LianlianPayGetway extends AbstractGetway
 
     public function converterNotify($data)
     {
-        $data = ArrayToolkit::parts($data, array(
+        $data = ArrayToolkit::parts($data['res_data'], array(
             'oid_partner',
             'sign_type',
             'sign',
@@ -58,7 +58,8 @@ class LianlianPayGetway extends AbstractGetway
             'bank_code'
         ));
 
-        if (!SignatureToolkit::signVerify($data, array())) {
+        $setting = $this->getSetting();
+        if (!SignatureToolkit::signVerify($data, array('secret'=>$setting['secret']))) {
             return array(
                 array(
                     'status' => 'failture',
