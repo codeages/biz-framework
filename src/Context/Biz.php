@@ -11,6 +11,7 @@ use Pimple\ServiceProviderInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Codeages\Biz\Framework\Dao\CacheStrategy;
+use Codeages\Biz\Framework\Dao\ArrayStorage;
 
 class Biz extends Container
 {
@@ -26,6 +27,11 @@ class Biz extends Container
         $biz['debug'] = false;
         $biz['logger'] = null;
         $biz['migration.directories'] = new \ArrayObject();
+        $biz['console.commands'] = new \ArrayObject();
+
+        $biz['console.commands'][] = function () {
+            return new \Codeages\Biz\Framework\Command\EnvWriteCommand();
+        };
 
         $biz['autoload.aliases'] = new \ArrayObject(array('' => 'Biz'));
 
@@ -64,6 +70,10 @@ class Biz extends Container
             };
         };
 
+        $biz['array_storage'] = function () {
+            return new ArrayStorage();
+        };
+
         $biz['dao.metadata_reader'] = function ($biz) {
             if ($biz['debug']) {
                 $cacheDirectory = null;
@@ -90,11 +100,21 @@ class Biz extends Container
         };
 
         $biz['dao.cache.strategy.table'] = function ($biz) {
-            return new CacheStrategy\TableStrategy($biz['dao.cache.redis_wrapper'], $biz['dao.cache.shared_storage']);
+            return new CacheStrategy\TableStrategy($biz['dao.cache.redis_wrapper'], $biz['dao.cache.array_storage']);
         };
 
         $biz['dao.cache.strategy.row'] = function ($biz) {
             return new CacheStrategy\RowStrategy($biz['dao.cache.redis_wrapper'], $biz['dao.metadata_reader']);
+        };
+
+        $biz['lock.flock.directory'] = null;
+
+        $biz['lock.store'] = function ($biz) {
+            return new \Symfony\Component\Lock\Store\FlockStore($biz['lock.flock.directory']);
+        };
+
+        $biz['lock.factory'] = function ($biz) {
+            return new \Symfony\Component\Lock\Factory($biz['lock.store']);
         };
 
         foreach ($values as $key => $value) {

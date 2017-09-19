@@ -27,9 +27,10 @@ class MigrationBootstrapTest extends TestCase
         $biz->register(new DoctrineServiceProvider());
         $biz->boot();
 
-        $bootstrap = new MigrationBootstrap($biz['db'], $biz['migration.directories']);
+        $bootstrap = new MigrationBootstrap($biz['db'], $biz['migration.directories'], 'new-migrations');
         $container = $bootstrap->boot();
 
         $this->assertInstanceOf('Pimple\Container', $container);
+        $this->assertInstanceOf('Phpmig\Adapter\AdapterInterface', $container['phpmig.adapter']);
     }
 }

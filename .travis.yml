@@ -1,3 +1,6 @@
+dist: precise
+language: php
+
 branches:
   - master
   - develop
@@ -5,8 +8,6 @@ branches:
 services:
   - mysql
   - redis-server
-
-language: php
 
 php:
   - '5.3'
@@ -22,7 +23,9 @@ before_script:
   - mysql -e 'CREATE DATABASE `biz-framework-test` DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci'
   - composer install
 
-script: phpunit
+script: 
+  - vendor/bin/phpunit
+  - CACHE_ENABLED=true vendor/bin/phpunit
 
 cache:
   directories:

@@ -56,6 +56,9 @@ class RowStrategy implements CacheStrategy
 
     public function afterQuery(GeneralDaoInterface $dao, $method, $arguments, $data)
     {
+        if (empty($data)) {
+            return;
+        }
         if (strpos($method, 'get') !== 0) {
             return;
         }
@@ -133,6 +136,14 @@ class RowStrategy implements CacheStrategy
             $primaryKey = $this->getPrimaryCacheKey($dao, $metadata, $id);
             $this->redis->del($primaryKey);
             $this->delRelKeys($primaryKey);
+        }
+    }
+
+    public function flush(GeneralDaoInterface $dao)
+    {
+        $keys = $this->redis->keys("dao:{$dao->table()}:*");
+        foreach ($keys as $key) {
+            $this->redis->del($key);
         }
     }
 
