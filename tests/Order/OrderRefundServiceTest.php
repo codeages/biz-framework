@@ -93,6 +93,7 @@ class OrderRefundServiceTest extends IntegrationTestCase
             'trade_sn' => '',
             'pay_time' => time()
         );
+
         $this->getWorkflowService()->paying($order['id']);
         $this->getWorkflowService()->paid($data);
         $this->getWorkflowService()->finish($order['id'], array());

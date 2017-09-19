@@ -258,7 +258,6 @@ class PayServiceImpl extends BaseService implements PayService
     public function applyRefundByTradeSn($tradeSn)
     {
         $trade = $this->getPaymentTradeDao()->getByTradeSn($tradeSn);
-
         if (in_array($trade['status'], array('refunding', 'refunded'))) {
             return $trade;
         }
@@ -474,7 +473,7 @@ class PayServiceImpl extends BaseService implements PayService
     protected function getDefaultCoinRate()
     {
         $options = $this->biz['payment.options'];
-        return $options['coin_rate'];
+        return empty($options['coin_rate']) ? 1: $options['coin_rate'];
     }
 
     protected function getCurrencyType()
