@@ -41,8 +41,6 @@ class LianlianPayGetway extends AbstractGetway
         );
     }
 
-
-
     public function converterNotify($data)
     {
         $data = ArrayToolkit::parts($data, array(
@@ -60,12 +58,7 @@ class LianlianPayGetway extends AbstractGetway
             'bank_code'
         ));
 
-        $postSign = $data['sign'];
-        unset($data['sign']);
-
-        $sign = $this->signParams($data);
-
-        if ($postSign != $sign) {
+        if (!SignatureToolkit::signVerify($data, array())) {
             return array(
                 array(
                     'status' => 'failture',
@@ -153,12 +146,10 @@ class LianlianPayGetway extends AbstractGetway
         $converted['userreq_ip'] = str_replace(".", "_", $params['create_ip']);
         $converted['bank_code']  = '';
         $converted['pay_type']   = '2';
-        if ($this->isWap) {
-            $converted['back_url'] = $params['back_url'];
-        }
         $converted['sign']       = $this->signParams($converted);
 
         if ($this->isWap) {
+            $converted['back_url'] = $params['back_url'];
             return $this->convertMobileParams($converted);
         } else {
             return $converted;
