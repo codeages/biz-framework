@@ -33,6 +33,7 @@ class AuditingStatus extends AbstractRefundStatus
 
         $orderRefund = $this->getOrderRefundDao()->create(array(
             'order_id' => $order['id'],
+            'title' => $order['title'],
             'order_item_id' => 0,
             'sn' => $this->generateSn(),
             'user_id' => $order['user_id'],
