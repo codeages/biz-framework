@@ -145,7 +145,7 @@ class PayServiceImpl extends BaseService implements PayService
         list($data, $result) = $this->getPayment($payment)->converterNotify($data);
         $this->getTargetlogService()->log(TargetlogService::INFO, 'trade.paid_notify', $data['trade_sn'], "收到第三方支付平台{$payment}的通知，交易号{$data['trade_sn']}，支付状态{$data['status']}", $data);
 
-        $this->updateTradeToPaid($data);
+        $trade = $this->updateTradeToPaid($data);
         return $result;
     }
 

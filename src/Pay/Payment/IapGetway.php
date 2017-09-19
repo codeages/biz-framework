@@ -17,7 +17,7 @@ class IapGetway extends AbstractGetway
             'is_sand_box'
         ));
 
-        $this->requestReceiptData($data);
+        return $this->requestReceiptData($data);
     }
 
     private function requestReceiptData($notifyData)
