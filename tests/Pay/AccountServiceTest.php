@@ -48,55 +48,65 @@ class AccountServiceTest extends IntegrationTestCase
         $this->assertTrue($this->getAccountService()->isSecurityAnswersSetted($this->biz['user']['id']));
     }
 
-    public function testCreateUserBalance()
+    public function testLockedAmount()
     {
-        $user = array(
-            'user_id' => $this->biz['user']['id']
+        $user = array (
+            'user_id' => $this->biz['user']['id'],
         );
 
         $userBalance = $this->getAccountService()->createUserBalance($user);
-        $this->assertNotEmpty($userBalance);
-        $this->assertEquals($user['user_id'], $userBalance['user_id']);
-        $this->assertEquals(0, $userBalance['amount']);
-        $this->assertEquals(0, $userBalance['cash_amount']);
 
-        $userBalance = $this->getAccountService()->waveCashAmount($user['user_id'], 10);
-        $this->assertEquals(10, $userBalance['cash_amount']);
-
-        $userBalance = $this->getAccountService()->waveCashAmount($user['user_id'], -10);
-        $this->assertEquals(0, $userBalance['cash_amount']);
-
-        $userBalance = $this->getAccountService()->waveCashAmount($user['user_id'], -10);
-        $this->assertEquals(-10, $userBalance['cash_amount']);
-
-        $userBalance = $this->getAccountService()->waveAmount($user['user_id'], 10);
-        $this->assertEquals(10, $userBalance['amount']);
-
-        $userBalance = $this->getAccountService()->waveAmount($user['user_id'], -10);
-        $this->assertEquals(0, $userBalance['amount']);
-
-        $userBalance = $this->getAccountService()->waveAmount($user['user_id'], -10);
-        $this->assertEquals(-10, $userBalance['amount']);
-    }
-
-    public function testLockedAmount()
-    {
-        $user = array(
-            'user_id' => $this->biz['user']['id']
+        $seller = array (
+            'user_id' => 2
         );
 
-        $this->getAccountService()->createUserBalance($user);
+        $seller = $this->getAccountService()->createUserBalance($seller);
+        $recharge = array(
+            'from_user_id' => $seller['user_id'],
+            'to_user_id' => $userBalance['user_id'],
+            'amount' => '10',
+            'title' => '充值1000个虚拟币',
+        );
 
-        $userBalance = $this->getAccountService()->waveAmount($user['user_id'], 10);
-        $this->assertEquals(10, $userBalance['amount']);
+        $this->getAccountService()->transferCoin($recharge);
 
         $userBalance = $this->getAccountService()->lockCoin($user['user_id'], 5);
+
         $this->assertEquals(5, $userBalance['amount']);
         $this->assertEquals(5, $userBalance['locked_amount']);
 
         $userBalance = $this->getAccountService()->releaseCoin($user['user_id'], 3);
         $this->assertEquals(8, $userBalance['amount']);
         $this->assertEquals(2, $userBalance['locked_amount']);
+    }
+
+    public function testTransferCoin()
+    {
+        $user = array(
+            'user_id' => 1
+        );
+        $buyer = $this->getAccountService()->createUserBalance($user);
+
+        $user = array(
+            'user_id' => 2
+        );
+
+        $seller = $this->getAccountService()->createUserBalance($user);
+        $recharge = array(
+            'to_user_id' => $buyer['user_id'],
+            'from_user_id' => $seller['user_id'],
+            'amount' => '1000',
+            'amount_type' => 'coin',
+            'title' => '充值1000个虚拟币'
+        );
+
+        $this->getAccountService()->transferCoin($recharge);
+
+        $buyer = $this->getAccountService()->getUserBalanceByUserId($buyer['user_id']);
+        $seller = $this->getAccountService()->getUserBalanceByUserId($seller['user_id']);
+
+        $this->assertEquals(1000, $buyer['amount']);
+        $this->assertEquals(-1000, $seller['amount']);
     }
 
     protected function getAccountService()

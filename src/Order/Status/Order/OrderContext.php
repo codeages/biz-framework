@@ -183,7 +183,7 @@ class OrderContext
     protected function createOrderLog($order, $dealData = array())
     {
         $orderLog = array(
-            'status' => $order['status'],
+            'status' => 'order.'.$order['status'],
             'order_id' => $order['id'],
             'user_id' => $this->biz['user']['id'],
             'deal_data' => $dealData

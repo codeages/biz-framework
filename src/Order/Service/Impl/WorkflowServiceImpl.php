@@ -23,7 +23,8 @@ class WorkflowServiceImpl extends BaseService implements WorkflowService
             'seller_id',
             'price_type',
             'deducts',
-            'create_extra'
+            'create_extra',
+            'device',
         ));
 
         $orderDeducts = empty($order['deducts']) ? array() : $order['deducts'];
@@ -129,12 +130,10 @@ class WorkflowServiceImpl extends BaseService implements WorkflowService
 
     public function applyOrderItemsRefund($orderId, $orderItemIds, $data)
     {
-        $orderRefund = $this->createOrderRefund($orderId, $data);
-        $orderRefund = $this->createOrderRefundItems($orderItemIds, $orderRefund);
-
-        $this->dispatch('order_refund.created', $orderRefund);
-
-        return $orderRefund;
+        $this->validateLogin();
+        $data['orderId'] = $orderId;
+        $data['orderItemIds'] = $orderItemIds;
+        return $this->getOrderRefundContext()->start($data);
     }
 
     public function adoptRefund($id, $data = array())
@@ -163,75 +162,13 @@ class WorkflowServiceImpl extends BaseService implements WorkflowService
         return $this->getOrderRefundContext($id)->cancel();
     }
 
-    protected function createOrderRefundItems($orderItemIds, $orderRefund)
-    {
-        $totalAmount = 0;
-        $orderItemRefunds = array();
-        foreach ($orderItemIds as $orderItemId) {
-            $orderItem = $this->getOrderItemDao()->get($orderItemId);
-            $orderItemRefund = $this->getOrderItemRefundDao()->create(array(
-                'order_refund_id' => $orderRefund['id'],
-                'order_id' => $orderRefund['order_id'],
-                'order_item_id' => $orderItemId,
-                'user_id' => $orderRefund['user_id'],
-                'created_user_id' => $this->biz['user']['id'],
-                'amount' => $orderItem['pay_amount']
-            ));
-
-            $orderItem = $this->getOrderItemDao()->update($orderItem['id'], array(
-                'refund_id' => $orderRefund['id'],
-                'refund_status' => 'auditing'
-            ));
-
-            $totalAmount = $totalAmount + $orderItem['pay_amount'];
-
-            $orderItemRefunds[] = $orderItemRefund;
-        }
-
-        $orderRefund = $this->getOrderRefundDao()->update($orderRefund['id'], array('amount' => $totalAmount));
-        $orderRefund['orderItemRefunds'] = $orderItemRefunds;
-        return $orderRefund;
-    }
-
-    protected function getOrderItemRefundDao()
-    {
-        return $this->biz->dao('Order:OrderItemRefundDao');
-    }
-
-    protected function createOrderRefund($orderId, $data)
-    {
-        $this->validateLogin();
-        $order = $this->getOrderDao()->get($orderId);
-        if (empty($order)) {
-            throw $this->createNotFoundException("order #{$orderId} is not found.");
-        }
-
-        if ($this->biz['user']['id'] != $order['user_id']) {
-            throw $this->createAccessDeniedException("order #{$orderId} can not refund.");
-        }
-
-        $orderRefund = $this->getOrderRefundDao()->create(array(
-            'order_id' => $order['id'],
-            'order_item_id' => 0,
-            'sn' => $this->generateSn(),
-            'user_id' => $order['user_id'],
-            'created_user_id' => $this->biz['user']['id'],
-            'reason' => empty($data['reason']) ? '' : $data['reason'],
-            'amount' => $order['pay_amount'],
-            'status' => 'auditing'
-        ));
-
-        return $orderRefund;
-    }
-
-    protected function generateSn()
-    {
-        return date('YmdHis', time()).mt_rand(10000, 99999);
-    }
-
-    protected function getOrderRefundContext($id)
+    protected function getOrderRefundContext($id = 0)
     {
         $orderRefundContext = $this->biz['order_refund_context'];
+
+        if ($id == 0) {
+            return $orderRefundContext;
+        }
 
         $orderRefund = $this->getOrderRefundDao()->get($id);
         if (empty($orderRefund)) {
@@ -259,11 +196,6 @@ class WorkflowServiceImpl extends BaseService implements WorkflowService
         $orderContext->setOrder($order);
 
         return $orderContext;
-    }
-
-    protected function getOrderService()
-    {
-        return $this->biz->service('Order:OrderService');
     }
 
     protected function getOrderRefundDao()

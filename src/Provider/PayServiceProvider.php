@@ -13,12 +13,13 @@ class PayServiceProvider implements ServiceProviderInterface
         $biz['migration.directories'][] = dirname(dirname(__DIR__)).'/migrations/pay';
         $biz['autoload.aliases']['Pay'] = 'Codeages\Biz\Framework\Pay';
 
-        $biz['payment.options'] = function () {
-            return array(
-                'closed_notify' => false,
-                'refunded_notify' => false
-            );
-        };
+        $biz['payment.options'] =  array(
+            'closed_notify' => false,
+            'trade_closed_sync_platform' => false,
+            'refunded_notify' => false,
+            'trade_refunded_sync_platform' => false,
+            'coin_rate' => 1
+        );
 
         $biz['console.commands'][] = function () use ($biz) {
             return new \Codeages\Biz\Framework\Pay\Command\TableCommand($biz);
@@ -33,7 +34,7 @@ class PayServiceProvider implements ServiceProviderInterface
         };
 
         $biz['console.commands'][] = function () use ($biz) {
-            return new \Codeages\Biz\Framework\Pay\Command\PaymentTradeAddPlatformType($biz);
+            return new \Codeages\Biz\Framework\Pay\Command\CashflowDeleteUserTypeCommand($biz);
         };
 
         $this->registerStatus($biz);
@@ -57,6 +58,14 @@ class PayServiceProvider implements ServiceProviderInterface
                 'partner' => '',
                 'key' => '',
             ),
+            'iap' => array(
+                'class' => '\Codeages\Biz\Framework\Pay\Payment\IapGetway',
+            ),
+            'lianlianpay' => array(
+                'class' => '\Codeages\Biz\Framework\Pay\Payment\LianlianPayGetway',
+                'secret' => '',
+                'oid_partner' => '',
+            )
         );
 
         $biz['payment.platforms.options'] = null;

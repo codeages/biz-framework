@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use Codeages\Biz\Framework\Pay\Payment\IapGetway;
 use Codeages\Biz\Framework\Pay\Payment\WechatGetway;
 
 class PayServiceTest extends IntegrationTestCase
@@ -79,12 +80,27 @@ class PayServiceTest extends IntegrationTestCase
     public function testLockedAmount()
     {
         $user = array(
-            'user_id' => $this->biz['user']['id']
+            'user_id' => $this->biz['user']['id'],
+            'cash_amount' => 100,
         );
 
-        $this->getAccountService()->createUserBalance($user);
+        $userBalance = $this->getAccountService()->createUserBalance($user);
 
-        $userBalance = $this->getAccountService()->waveAmount($user['user_id'], 100);
+        $user = array(
+            'user_id' => 2
+        );
+
+        $seller = $this->getAccountService()->createUserBalance($user);
+        $recharge = array(
+            'from_user_id' => $seller['user_id'],
+            'to_user_id' => $userBalance['user_id'],
+            'amount' => '100',
+            'title' => '充值1000个虚拟币',
+        );
+
+        $this->getAccountService()->transferCoin($recharge);
+        $userBalance = $this->getAccountService()->getUserBalanceByUserId($userBalance['user_id']);
+
         $this->assertEquals(100, $userBalance['amount']);
 
         $this->biz['payment.wechat'] = $this->mockCreateTradeResult();
@@ -102,12 +118,26 @@ class PayServiceTest extends IntegrationTestCase
     public function testReleaseAmount()
     {
         $user = array(
-            'user_id' => $this->biz['user']['id']
+            'user_id' => $this->biz['user']['id'],
+            'cash_amount' => 100,
         );
 
-        $this->getAccountService()->createUserBalance($user);
+        $userBalance = $this->getAccountService()->createUserBalance($user);
 
-        $userBalance = $this->getAccountService()->waveAmount($user['user_id'], 100);
+        $user = array(
+            'user_id' => 2
+        );
+
+        $seller = $this->getAccountService()->createUserBalance($user);
+        $recharge = array(
+            'from_user_id' => $seller['user_id'],
+            'to_user_id' => $userBalance['user_id'],
+            'amount' => '100',
+            'title' => '充值1000个虚拟币',
+        );
+
+        $this->getAccountService()->transferCoin($recharge);
+        $userBalance = $this->getAccountService()->getUserBalanceByUserId($userBalance['user_id']);
         $this->assertEquals(100, $userBalance['amount']);
 
         $this->biz['payment.wechat'] = $this->mockCreateTradeResult();
@@ -176,6 +206,54 @@ class PayServiceTest extends IntegrationTestCase
         $this->assertEquals('80', $userBalance['amount']);
     }
 
+    public function testRechargeByIap()
+    {
+        $seller = array(
+            'user_id' => 0
+        );
+        $this->getAccountService()->createUserBalance($seller);
+
+        $this->mockIapGetWay();
+        $user = array(
+            'user_id' => $this->biz['user']['id']
+        );
+        $this->getAccountService()->createUserBalance($user);
+
+        $this->biz['payment.iap'] = $this->mockIapGetWay();
+
+        $data = array(
+            'transaction_id' => '1004400740201409030005092168',
+            'user_id' => $user['user_id'],
+            'amount' => 1000,
+            'receipt' => 'xxx',
+            'is_sand_box' => false
+        );
+        $this->getPayService()->rechargeByIap($data);
+
+        $userBalance = $this->getAccountService()->getUserBalanceByUserId($this->biz['user']['id']);
+        $this->assertEquals('1000', $userBalance['amount']);
+    }
+
+    protected function mockIapGetWay()
+    {
+        $return = array(
+            'status' => 'paid',
+            'cash_flow' => '1004400740201409030005092168',
+            'paid_time' => time(),
+            'pay_amount' => 1000,
+            'cash_type' => 'CNY',
+            'attach' => array(
+                'user_id' => 1
+            ),
+            'quantity' => 1,
+            'product_id' => 1,
+        );
+
+        $mock = \Mockery::mock(IapGetway::class);
+        $mock->shouldReceive('converterNotify')->andReturn(array($return, 'success'));
+        return $mock;
+    }
+
     protected function assertPaidTrade($notifyData, $trade)
     {
         $xml = simplexml_load_string($notifyData,'SimpleXMLElement', LIBXML_NOCDATA);
@@ -186,23 +264,16 @@ class PayServiceTest extends IntegrationTestCase
         $this->assertNotEmpty($trade['notify_data']);
         $this->assertEquals($notifyData['transaction_id'], $trade['platform_sn']);
         $cashFlows = $this->getUserCashflowDao()->findByTradeSn($trade['trade_sn']);
-        $this->assertEquals(5,count($cashFlows));
+        $this->assertEquals(4,count($cashFlows));
 
         foreach ($cashFlows as $cashFlow) {
             $this->assertNotEmpty($cashFlow['sn']);
             $this->assertTrue(in_array($cashFlow['type'], array('inflow', 'outflow')));
-            if ('buyer' == $cashFlow['user_type']) {
-                $this->assertEquals($this->biz['user']['id'], $cashFlow['user_id']);
-            } else if ('seller' == $cashFlow['user_type']) {
-                $this->assertEquals($trade['seller_id'], $cashFlow['user_id']);
-            }
+
             $this->assertEquals($trade['order_sn'], $cashFlow['order_sn']);
             $this->assertEquals($trade['trade_sn'], $cashFlow['trade_sn']);
             $this->assertEquals($trade['platform'], $cashFlow['platform']);
 
-            if ($cashFlow['type'] == 'outflow') {
-                $this->assertNotEmpty($cashFlow['parent_sn']);
-            }
         }
 
         if ($trade['type'] == 'recharge') {
@@ -256,7 +327,7 @@ class PayServiceTest extends IntegrationTestCase
             'coin_amount' => 20,
             'notify_url' => 'http://try6.edusoho.cn/',
             'create_ip' => '127.0.0.1',
-            'pay_type' => 'Native',
+            'platform_type' => 'Native',
             'price_type' => 'money',
             'platform' => 'wechat',
             'seller_id' => '12',
