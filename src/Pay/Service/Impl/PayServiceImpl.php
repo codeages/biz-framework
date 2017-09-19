@@ -310,7 +310,8 @@ class PayServiceImpl extends BaseService implements PayService
             'trade_sn' => $trade['trade_sn'],
             'order_sn' => $trade['order_sn'],
             'platform' => $trade['platform'],
-            'parent_sn' => ''
+            'parent_sn' => '',
+            'currency' => $trade['currency'],
         );
         $flow = $this->getAccountService()->transferCash($fields);
 

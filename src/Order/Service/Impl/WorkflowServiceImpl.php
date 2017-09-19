@@ -134,7 +134,6 @@ class WorkflowServiceImpl extends BaseService implements WorkflowService
         $data['orderId'] = $orderId;
         $data['orderItemIds'] = $orderItemIds;
         $refund = $this->getOrderRefundContext()->start($data);
-        $this->getOrderContext($refund['order_id'])->refunding($data);
         return $refund;
     }
 
@@ -142,6 +141,7 @@ class WorkflowServiceImpl extends BaseService implements WorkflowService
     {
         $this->validateLogin();
         $refund = $this->getOrderRefundContext($id)->refunding($data);
+        $this->getOrderContext($refund['order_id'])->refunding($data);
 
         $order = $this->getOrderDao()->get($refund['order_id']);
         if (!empty($order['trade_sn'])) {
