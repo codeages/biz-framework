@@ -158,7 +158,7 @@ class PayServiceImpl extends BaseService implements PayService
     {
         list($data, $result) = $this->getPayment('iap')->converterNotify($data);
         $trade = array(
-            'goods_title' => '虚拟币充值',
+            'goods_title' => '充值',
             'order_sn' => '',
             'platform' => 'iap',
             'platform_type' => '',
