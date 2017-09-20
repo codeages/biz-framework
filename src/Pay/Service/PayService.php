@@ -8,7 +8,7 @@ interface PayService
 
     public function createTrade($trade);
 
-    public function closeTradesByOrderSn($orderSn);
+    public function closeTradesByOrderSn($orderSn, $excludeTradeSns = array());
 
     public function findTradesByOrderSns($orderSns);
 

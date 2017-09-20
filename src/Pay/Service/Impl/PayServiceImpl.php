@@ -2,6 +2,7 @@
 
 namespace Codeages\Biz\Framework\Pay\Service\Impl;
 
+use Codeages\Biz\Framework\Pay\Status\PayingStatus;
 use Codeages\Biz\Framework\Service\Exception\AccessDeniedException;
 use Codeages\Biz\Framework\Service\Exception\InvalidArgumentException;
 use Codeages\Biz\Framework\Util\ArrayToolkit;
@@ -119,7 +120,7 @@ class PayServiceImpl extends BaseService implements PayService
         return $this->getPaymentTradeDao()->findByOrderSns($orderSns);
     }
 
-    public function closeTradesByOrderSn($orderSn)
+    public function closeTradesByOrderSn($orderSn, $excludeTradeSns = array())
     {
         $trades = $this->getPaymentTradeDao()->findByOrderSn($orderSn);
         if (empty($trades)) {
@@ -127,6 +128,10 @@ class PayServiceImpl extends BaseService implements PayService
         }
 
         foreach ($trades as $trade) {
+            if (in_array($trade['trade_sn'], $excludeTradeSns)) {
+                continue;
+            }
+
             $trade = $this->getTradeContext($trade['id'])->closing();
 
             if($this->isCloseByPayment()){
@@ -198,7 +203,7 @@ class PayServiceImpl extends BaseService implements PayService
                     return;
                 }
 
-                if ('paying' != $trade['status']) {
+                if (PayingStatus::NAME != $trade['status']) {
                     $this->getTargetlogService()->log(TargetlogService::INFO, 'trade.is_not_paying', $data['trade_sn'], "交易号{$data['trade_sn']}状态不正确，状态为：{$trade['status']}", $data);
                     $lock->release("pay_notify_{$data['trade_sn']}");
                     return;
@@ -235,6 +240,7 @@ class PayServiceImpl extends BaseService implements PayService
                 'currency' => $data['cash_type'],
             ));
             $this->transfer($trade);
+            $this->closeTradesByOrderSn($trade['order_sn'], array($trade['trade_sn']));
             $this->getTargetlogService()->log(TargetlogService::INFO, 'trade.paid', $data['trade_sn'], "交易号{$data['trade_sn']}，账目流水处理成功", $data);
             $this->commit();
             return $trade;
