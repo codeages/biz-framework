@@ -61,7 +61,6 @@ class OrderRefundContext
         }
 
         $this->createOrderLog($orderRefund);
-        $this->dispatchStatusChangeEvent(AuditingStatus::NAME, $orderRefund);
         $this->onOrderRefundStatusChange(AuditingStatus::NAME, $orderRefund);
         return $orderRefund;
     }
@@ -93,49 +92,36 @@ class OrderRefundContext
         }
 
         $this->createOrderLog($orderRefund);
-        $this->dispatchStatusChangeEvent($status, $orderRefund);
         $this->onOrderRefundStatusChange($status, $orderRefund);
         return $orderRefund;
     }
 
     public function onOrderRefundStatusChange($status, $orderRefund)
     {
-        $orderRefundItems = $orderRefund['orderItemRefunds'];
+        $order = $this->getOrderService()->getOrder($orderRefund['order_id']);
+        $orderItemRefunds = $orderRefund['orderItemRefunds'];
         unset($orderRefund['orderItemRefunds']);
-
-        $method = 'onOrderRefund'.ucfirst($status);
-        foreach ($orderRefundItems as $orderRefundItem) {
-            $orderRefundItem['order_refund'] = $orderRefund;
-            $orderRefundItem['order_item'] = $this->getOrderService()->getOrderItem($orderRefundItem['order_item_id']);
-            $orderRefundItem['order'] = $this->getOrderService()->getOrder($orderRefundItem['order_id']);
-
-            $processor = $this->getProductCallback($orderRefundItem['order_item']);
-            if (!empty($processor) && $processor instanceof OrderStatusCallback && method_exists($processor, $method)) {
-                $results[] = $processor->$method($orderRefundItem);
-            }
-        }
-    }
-
-    protected function dispatchStatusChangeEvent($status, $orderRefund)
-    {
-        $orderItemRefunds = $this->getOrderRefundService()->findOrderItemRefundsByOrderRefundId($orderRefund['id']);
 
         $orderItems = $this->getOrderService()->findOrderItemsByOrderId($orderRefund['order_id']);
         $indexedOrderItems = ArrayToolkit::index($orderItems, 'id');
 
+        $method = 'onOrderRefund'.ucfirst($status);
         foreach ($orderItemRefunds as &$orderItemRefund) {
-
             $orderItemRefund['order_refund'] = $orderRefund;
-            $orderItem = $indexedOrderItems[$orderItemRefund['order_item_id']];
-            $orderItemRefund['order_item'] = $orderItem;
+            $orderItemRefund['order_item'] = $indexedOrderItems[$orderItemRefund['order_item_id']];
+            $orderItemRefund['order'] = $order;
+
+            $processor = $this->getProductCallback($orderItemRefund['order_item']);
+            if (!empty($processor) && $processor instanceof OrderStatusCallback && method_exists($processor, $method)) {
+                $results[] = $processor->$method($orderItemRefund);
+            }
 
             $this->getDispatcher()->dispatch("order_refund.item.{$orderItemRefund['order_item']['target_type']}.{$status}", new Event($orderItemRefund));
         }
 
         $orderRefund['items'] = $orderItemRefunds;
+        $orderRefund['order'] = $order;
         $this->getDispatcher()->dispatch("order_refund.{$status}", new Event($orderRefund));
-
-        return $orderRefund;
     }
 
     protected function getProductCallback($orderItem)
