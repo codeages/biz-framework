@@ -32,6 +32,8 @@ interface AccountService
 
     public function transferCash($fields);
 
+    public function withdraw($fields);
+
     public function countUserCashflows($conditions);
 
     public function searchUserCashflows($conditions, $orderBy, $start, $limit);

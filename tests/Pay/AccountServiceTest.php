@@ -109,6 +109,27 @@ class AccountServiceTest extends IntegrationTestCase
         $this->assertEquals(-1000, $seller['amount']);
     }
 
+    public function testWithdraw()
+    {
+        $user = array (
+            'user_id' => $this->biz['user']['id'],
+        );
+
+        $userBalance = $this->getAccountService()->createUserBalance($user);
+
+        $draw = array(
+            'user_id' => $this->biz['user']['id'],
+            'amount' => 100,
+            'title' => '提现100',
+            'currency' => 'CYN',
+            'platform' => 'alipay'
+        );
+        $this->getAccountService()->withdraw($draw);
+        $userBalance = $this->getAccountService()->getUserBalanceByUserId($userBalance['user_id']);
+
+        $this->assertEquals(-100, $userBalance['cash_amount']);
+    }
+
     protected function getAccountService()
     {
         return $this->biz->service('Pay:AccountService');
