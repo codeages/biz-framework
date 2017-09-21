@@ -10,6 +10,8 @@ interface AccountService
 
     public function setSecurityAnswers($userId, $answers);
 
+    public function findSecurityAnswersByUserId($userId);
+
     public function validateSecurityAnswer($userId, $questionKey, $answer);
 
     public function isPayPasswordSetted($userId);
