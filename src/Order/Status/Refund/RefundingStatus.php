@@ -18,12 +18,22 @@ class RefundingStatus extends AbstractRefundStatus
 
     public function process($data = array())
     {
-        $orderRefund = $this->getOrderRefundDao()->update($this->orderRefund['id'], array(
+        $fields = array(
             'deal_time' => time(),
             'deal_user_id' => $this->biz['user']['id'],
             'deal_reason' => empty($data['deal_reason']) ? '' : $data['deal_reason'],
             'status' => self::NAME
-        ));
+        );
+
+        if (!empty($data['refund_cash_amount'])) {
+            $fields['refund_cash_amount'] = $data['refund_cash_amount'];
+        }
+
+        if (!empty($data['refund_coin_amount'])) {
+            $fields['refund_coin_amount'] = $data['refund_coin_amount'];
+        }
+
+        $orderRefund = $this->getOrderRefundDao()->update($this->orderRefund['id'], $fields);
 
         $orderItemRefunds = $this->getOrderItemRefundDao()->findByOrderRefundId($orderRefund['id']);
         $updatedOrderItemRefunds = array();

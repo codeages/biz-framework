@@ -36,6 +36,14 @@ class OrderServiceProvider implements ServiceProviderInterface
         $biz['console.commands'][] = function () use ($biz) {
             return new \Codeages\Biz\Framework\Order\Command\OrderAddDeviceCommand($biz);
         };
+
+        $biz['console.commands'][] = function () use ($biz) {
+            return new \Codeages\Biz\Framework\Order\Command\OrderRefundAddRefundAmountCommand($biz);
+        };
+
+        $biz['console.commands'][] = function () use ($biz) {
+            return new \Codeages\Biz\Framework\Order\Command\OrderAddPaidAmountCommand($biz);
+        };
     }
 
     private function registerOrderRefundStatus($biz)
