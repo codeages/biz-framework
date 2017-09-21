@@ -61,7 +61,7 @@ class OrderRefundContext
         }
 
         $this->createOrderLog($orderRefund);
-        $this->dispatch("order_refund.".AuditingStatus::NAME, $orderRefund);
+        $this->dispatchStatusChangeEvent(AuditingStatus::NAME, $orderRefund);
         $this->onOrderRefundStatusChange(AuditingStatus::NAME, $orderRefund);
         return $orderRefund;
     }
@@ -93,7 +93,7 @@ class OrderRefundContext
         }
 
         $this->createOrderLog($orderRefund);
-        $this->dispatch("order_refund.{$status}", $orderRefund);
+        $this->dispatchStatusChangeEvent($status, $orderRefund);
         $this->onOrderRefundStatusChange($status, $orderRefund);
         return $orderRefund;
     }
@@ -114,6 +114,28 @@ class OrderRefundContext
                 $results[] = $processor->$method($orderRefundItem);
             }
         }
+    }
+
+    protected function dispatchStatusChangeEvent($status, $orderRefund)
+    {
+        $orderItemRefunds = $this->getOrderRefundService()->findOrderItemRefundsByOrderRefundId($orderRefund['id']);
+
+        $orderItems = $this->getOrderService()->findOrderItemsByOrderId($orderRefund['order_id']);
+        $indexedOrderItems = ArrayToolkit::index($orderItems, 'id');
+
+        foreach ($orderItemRefunds as &$orderItemRefund) {
+
+            $orderItemRefund['order_refund'] = $orderRefund;
+            $orderItem = $indexedOrderItems[$orderItemRefund['order_item_id']];
+            $orderItemRefund['order_item'] = $orderItem;
+
+            $this->getDispatcher()->dispatch("order_refund.item.{$orderItemRefund['order_item']['target_type']}.{$status}", new Event($orderItemRefund));
+        }
+
+        $orderRefund['items'] = $orderItemRefunds;
+        $this->getDispatcher()->dispatch("order_refund.{$status}", new Event($orderRefund));
+
+        return $orderRefund;
     }
 
     protected function getProductCallback($orderItem)
@@ -179,5 +201,10 @@ class OrderRefundContext
     protected function getOrderService()
     {
         return $this->biz->service('Order:OrderService');
+    }
+
+    protected function getOrderRefundService()
+    {
+        return $this->biz->service('Order:OrderRefundService');
     }
 }
