@@ -25,6 +25,7 @@ class WorkflowServiceImpl extends BaseService implements WorkflowService
             'deducts',
             'create_extra',
             'device',
+            'refund_deadline'
         ));
 
         $orderDeducts = empty($order['deducts']) ? array() : $order['deducts'];
