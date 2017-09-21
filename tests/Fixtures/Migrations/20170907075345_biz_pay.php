@@ -41,7 +41,8 @@ class BizPay extends Migration
               `locked_amount` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '冻结虚拟币金额',
               `updated_time` int(10) unsigned NOT NULL DEFAULT '0',
               `created_time` int(10) unsigned NOT NULL DEFAULT '0',
-              PRIMARY KEY (`id`)
+              PRIMARY KEY (`id`),
+              UNIQUE(`user_id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
         ");
 
@@ -70,7 +71,8 @@ class BizPay extends Migration
               `refund_success_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '成功退款时间',
               `updated_time` int(10) unsigned NOT NULL DEFAULT '0',
               `created_time` int(10) unsigned NOT NULL DEFAULT '0',
-              PRIMARY KEY (`id`)
+              PRIMARY KEY (`id`),
+              UNIQUE(`trade_sn`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
         ");
 
@@ -82,7 +84,8 @@ class BizPay extends Migration
               `salt` VARCHAR(64) NOT NULL DEFAULT '' COMMENT '',
               `created_time` INT(10) unsigned NOT NULL DEFAULT '0',
               `updated_time` INT(10) unsigned NOT NULL DEFAULT '0',
-              PRIMARY KEY (`id`)
+              PRIMARY KEY (`id`),
+              UNIQUE(`user_id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
         ");
 
