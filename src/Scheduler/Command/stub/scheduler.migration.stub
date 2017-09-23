@@ -2,7 +2,7 @@
 
 use Phpmig\Migration\Migration;
 
-class Scheduler extends Migration
+class BizScheduler extends Migration
 {
     /**
      * Do the migration

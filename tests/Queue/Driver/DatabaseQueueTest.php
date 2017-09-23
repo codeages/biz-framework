@@ -137,7 +137,9 @@ class DatabaseQueueTest extends QueueBaseTestCase
 
         $queue->delete($job);
 
-        $this->assertNotInDatabase($queueOptions['table'], array('queue' => self::TEST_QUEUE));
+        $this->assertEmpty(
+            $this->fetchAllFromDatabase($queueOptions['table'], array('queue' => self::TEST_QUEUE))
+        );
     }
 
     public function testRelease()
