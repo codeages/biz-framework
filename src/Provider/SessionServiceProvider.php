@@ -9,7 +9,11 @@ class SessionServiceProvider implements ServiceProviderInterface
 {
     public function register(Container $container)
     {
-        $container['migration.directories'][] = dirname(dirname(__DIR__)).'/migrations/session';
         $container['autoload.aliases']['Session'] = 'Codeages\Biz\Framework\Session';
+
+        $container['console.commands'][] = function () use ($container) {
+            return new \Codeages\Biz\Framework\Session\Command\TableCommand($container);
+        };
+
     }
 }
