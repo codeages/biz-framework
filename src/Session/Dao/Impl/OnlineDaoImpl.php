@@ -29,6 +29,7 @@ class OnlineDaoImpl extends GeneralDaoImpl implements OnlineDao
             ),
             'conditions' => array(
                 'access_time < :gt_access_time',
+                'user_id > :gt_user_id'
             ),
         );
     }

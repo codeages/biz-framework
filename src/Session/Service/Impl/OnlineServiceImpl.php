@@ -12,22 +12,24 @@ class OnlineServiceImpl extends BaseService implements OnlineService
     public function sample($online)
     {
         if (!empty($online['sess_id'])) {
-            $online = $this->getOnlineBySessId($online['sess_id']);
-            if (empty($online)) {
+            $savedOnine = $this->getOnlineBySessId($online['sess_id']);
+            if (empty($savedOnine)) {
                 $this->createOnline($online);
             } else {
-                $this->updateOnline($online['id'], $online);
+                $this->updateOnline($savedOnine['id'], $online);
             }
         }
     }
 
     public function createOnline($online)
     {
-        if(ArrayToolkit::requireds($online, array('sess_id'))) {
+        if(!ArrayToolkit::requireds($online, array('sess_id'))) {
             throw new InvalidArgumentException('sess_id is required.');
         }
         $user = $this->biz['user'];
-        $online['user_id'] = $user['id'];
+        if (!empty($user['id'])) {
+            $online['user_id'] = $user['id'];
+        }
         $online = ArrayToolkit::parts($online, array('sess_id' , 'user_id', 'access_url', 'ip', 'user_agent', 'source'));
         return $this->getOnlineDao()->create($online);
     }
@@ -35,7 +37,9 @@ class OnlineServiceImpl extends BaseService implements OnlineService
     public function updateOnline($id, $online)
     {
         $user = $this->biz['user'];
-        $online['user_id'] = $user['id'];
+        if (!empty($user['id'])) {
+            $online['user_id'] = $user['id'];
+        }
         $online = ArrayToolkit::parts($online, array('sess_id' , 'user_id', 'access_url', 'ip', 'user_agent', 'source'));
         return $this->getOnlineDao()->update($id, $online);
     }
@@ -54,10 +58,10 @@ class OnlineServiceImpl extends BaseService implements OnlineService
         return $this->getOnlineDao()->count($condition);
     }
 
-    public function countTotal($ltAccessTime)
+    public function countOnline($ltAccessTime)
     {
         $condition = array(
-            'lt_access_time' => $ltAccessTime
+            'lt_access_time' => $ltAccessTime,
         );
         return $this->getOnlineDao()->count($condition);
     }

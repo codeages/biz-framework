@@ -12,7 +12,7 @@ interface OnlineService
 
     public function countLogined($gtSessTime);
 
-    public function countTotal($gtSessTime);
+    public function countOnline($gtSessTime);
 
     public function gc();
 
