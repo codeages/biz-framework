@@ -16,7 +16,7 @@ class OnlineDaoImpl extends GeneralDaoImpl implements OnlineDao
 
     public function deleteByInvalid()
     {
-        $sql = "DELETE FROM {$this->table} WHERE sess_time < (? - sess_lifetime) ";
+        $sql = "DELETE FROM {$this->table} WHERE sess_time < (? - lifetime) ";
         return $this->db()->executeUpdate($sql, array(time()));
     }
 
@@ -28,7 +28,7 @@ class OnlineDaoImpl extends GeneralDaoImpl implements OnlineDao
             'serializes' => array(
             ),
             'conditions' => array(
-                'access_time < :gt_access_time',
+                'access_time > :gt_access_time',
                 'user_id > :gt_user_id'
             ),
         );

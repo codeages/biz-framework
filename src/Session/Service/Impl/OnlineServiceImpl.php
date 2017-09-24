@@ -23,14 +23,14 @@ class OnlineServiceImpl extends BaseService implements OnlineService
 
     public function createOnline($online)
     {
-        if(!ArrayToolkit::requireds($online, array('sess_id'))) {
+        if(!ArrayToolkit::requireds($online, array('sess_id', 'lifetime'))) {
             throw new InvalidArgumentException('sess_id is required.');
         }
         $user = $this->biz['user'];
         if (!empty($user['id'])) {
             $online['user_id'] = $user['id'];
         }
-        $online = ArrayToolkit::parts($online, array('sess_id' , 'user_id', 'access_url', 'ip', 'user_agent', 'source'));
+        $online = ArrayToolkit::parts($online, array('lifetime', 'sess_id' , 'user_id', 'access_url', 'ip', 'user_agent', 'source'));
         return $this->getOnlineDao()->create($online);
     }
 
@@ -40,7 +40,7 @@ class OnlineServiceImpl extends BaseService implements OnlineService
         if (!empty($user['id'])) {
             $online['user_id'] = $user['id'];
         }
-        $online = ArrayToolkit::parts($online, array('sess_id' , 'user_id', 'access_url', 'ip', 'user_agent', 'source'));
+        $online = ArrayToolkit::parts($online, array('lifetime', 'sess_id' , 'user_id', 'access_url', 'ip', 'user_agent', 'source'));
         return $this->getOnlineDao()->update($id, $online);
     }
 
@@ -49,19 +49,19 @@ class OnlineServiceImpl extends BaseService implements OnlineService
         return $this->getOnlineDao()->getBySessId($sessId);
     }
 
-    public function countLogined($ltAccessTime)
+    public function countLogined($gtAccessTime)
     {
         $condition = array(
-            'lt_access_time' => $ltAccessTime,
+            'gt_access_time' => $gtAccessTime,
             'gt_user_id' => 0
         );
         return $this->getOnlineDao()->count($condition);
     }
 
-    public function countOnline($ltAccessTime)
+    public function countOnline($gtAccessTime)
     {
         $condition = array(
-            'lt_access_time' => $ltAccessTime,
+            'gt_access_time' => $gtAccessTime,
         );
         return $this->getOnlineDao()->count($condition);
     }

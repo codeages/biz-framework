@@ -16,6 +16,7 @@ class CreateOnlineTable extends Migration
               `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
               `sess_id` varchar(128) NOT NULL DEFAULT '',
               `user_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '在线用户的id, 0代表游客',
+              `lifetime` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '生命周期',
               `access_time` int(10) unsigned NOT NULL DEFAULT 0 COMMENT '最后访问时间',
               `access_url` VARCHAR(1024) NOT NULL DEFAULT '',
               `ip` varchar(32) NOT NULL DEFAULT '' COMMENT '客户端ip',
