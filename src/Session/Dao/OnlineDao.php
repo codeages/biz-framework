@@ -6,5 +6,7 @@ use Codeages\Biz\Framework\Dao\GeneralDaoInterface;
 
 interface OnlineDao extends GeneralDaoInterface
 {
+    public function getBySessId($sessionId);
 
+    public function deleteByInvalid();
 }

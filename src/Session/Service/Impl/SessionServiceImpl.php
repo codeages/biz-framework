@@ -28,19 +28,9 @@ class SessionServiceImpl extends BaseService implements SessionService
         return $this->getSessionDao()->search($condition, $orderBy, $start, $limit);
     }
 
-    public function countLogined($gtSessTime)
-    {
-        return $this->getSessionDao()->countLogined($gtSessTime);
-    }
-
     public function countSessions($condition)
     {
         return $this->getSessionDao()->count($condition);
-    }
-
-    public function countTotal($gtSessTime)
-    {
-        return $this->getSessionDao()->countTotal($gtSessTime);
     }
 
     public function gc()

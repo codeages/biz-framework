@@ -17,7 +17,8 @@ class SessionDaoImpl extends GeneralDaoImpl implements SessionDao
             'serializes' => array(
             ),
             'conditions' => array(
-                'sess_time < :gt_sess_time',
+                'sess_time < :lt_sess_time',
+                'user_id > :gt_user_id'
             ),
         );
     }

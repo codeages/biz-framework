@@ -14,10 +14,6 @@ interface SessionService
 
     public function gc();
 
-    public function countLogined($gtSessTime);
-
-    public function countTotal($gtSessTime);
-
     public function searchSessions($condition, $orderBy, $start, $limit);
 
     public function countSessions($condition);
