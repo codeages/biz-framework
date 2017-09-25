@@ -16,10 +16,22 @@ class UserBalanceDaoImpl extends GeneralDaoImpl implements UserBalanceDao
         ));
     }
 
+    public function getByUserIds($userIds)
+    {
+        return $this->findInField('user_id', $userIds);
+    }
+
     public function declares()
     {
         return array(
             'timestamps' => array('created_time', 'updated_time'),
+            'orderbys' => array(
+                'id',
+                'created_time',
+            ),
+            'conditions' => array(
+                'user_id IN (:user_ids)',
+            ),
         );
     }
 }
