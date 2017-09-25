@@ -47,29 +47,6 @@ class SessionServiceTest extends IntegrationTestCase
         $this->assertEmpty($deleteSession);
     }
 
-    public function testCountLogin()
-    {
-        $mockedSession = $this->mockSession();
-        $this->getSessionService()->createSession($mockedSession);
-        $count = $this->getSessionService()->countLogined(time()-400);
-
-        $this->assertEquals(1, $count);
-    }
-
-    public function testCountTotal()
-    {
-        $mockedSession = $this->mockSession();
-        $mockedSession['sess_user_id'] = 0;
-        $this->getSessionService()->createSession($mockedSession);
-
-        $count = $this->getSessionService()->countLogined(time()-400);
-        $this->assertEquals(0, $count);
-
-
-        $count = $this->getSessionService()->countTotal(time()-400);
-        $this->assertEquals(1, $count);
-    }
-
     public function testGc()
     {
         $mockedSession = $this->mockSession();
@@ -78,7 +55,7 @@ class SessionServiceTest extends IntegrationTestCase
         sleep(2);
 
         $this->getSessionService()->gc();
-        $count = $this->getSessionService()->countTotal(time()-400);
+        $count = $this->getSessionService()->countSessions(array());
         $this->assertEquals(0, $count);
     }
 
