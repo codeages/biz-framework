@@ -8,5 +8,5 @@ interface UserBalanceDao extends GeneralDaoInterface
 {
     public function getByUserId($userId);
 
-    public function getByUserIds($userIds);
+    public function findByUserIds($userIds);
 }

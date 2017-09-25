@@ -16,7 +16,7 @@ class UserBalanceDaoImpl extends GeneralDaoImpl implements UserBalanceDao
         ));
     }
 
-    public function getByUserIds($userIds)
+    public function findByUserIds($userIds)
     {
         return $this->findInField('user_id', $userIds);
     }
