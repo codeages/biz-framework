@@ -33,6 +33,9 @@ class JobFiredDaoImpl extends GeneralDaoImpl implements JobFiredDao
         return array(
             'timestamps' => array('created_time', 'updated_time'),
             'orderbys' => array('created_time', 'id'),
+            'serializes' => array(
+                'job_detail' => 'json',
+            ),
             'conditions' => array(
                 'job_id = :job_id',
                 'status = :status',

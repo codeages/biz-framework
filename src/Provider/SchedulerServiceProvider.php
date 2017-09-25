@@ -25,5 +25,9 @@ class SchedulerServiceProvider implements ServiceProviderInterface
         $biz['console.commands'][] = function () use ($biz) {
             return new \Codeages\Biz\Framework\Scheduler\Command\RenameTableCommand($biz);
         };
+
+        $biz['console.commands'][] = function () use ($biz) {
+            return new \Codeages\Biz\Framework\Scheduler\Command\AddRetryNumAndJobDetailCommand($biz);
+        };
     }
 }

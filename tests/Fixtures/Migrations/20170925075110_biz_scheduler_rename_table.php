@@ -16,7 +16,6 @@ class BizSchedulerRenameTable extends Migration
         $connection->exec("RENAME TABLE job_fired TO biz_job_fired");
         $connection->exec("RENAME TABLE job_log TO biz_job_log");
 
-        $connection->exec("ALTER TABLE `biz_job_fired` ADD COLUMN `retry_num` INT(10) unsigned NOT NULL DEFAULT 0 COMMENT '重试次数';");
     }
 
     /**
@@ -31,6 +30,5 @@ class BizSchedulerRenameTable extends Migration
         $connection->exec("RENAME TABLE biz_job_fired TO job_fired");
         $connection->exec("RENAME TABLE biz_job_log TO job_log");
 
-        $connection->exec("ALTER TABLE `biz_job_fired` DROP COLUMN `retry_num`;");
     }
 }
