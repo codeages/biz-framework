@@ -2,7 +2,7 @@
 
 namespace Tests;
 
-class SessionServiceTest extends IntegrationTestCase
+class OnlineServiceTest extends IntegrationTestCase
 {
     public function setUp()
     {
