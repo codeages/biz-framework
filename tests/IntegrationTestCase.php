@@ -3,15 +3,18 @@
 namespace Tests;
 
 use Codeages\Biz\Framework\Dao\Connection;
+use Codeages\Biz\Framework\Provider\DoctrineServiceProvider;
 use Codeages\Biz\Framework\Provider\RedisServiceProvider;
 use Codeages\Biz\Framework\Provider\SchedulerServiceProvider;
 use Codeages\Biz\Framework\Provider\TargetlogServiceProvider;
 use Codeages\Biz\Framework\Provider\TokenServiceProvider;
 use Codeages\Biz\Framework\Provider\SettingServiceProvider;
+use Codeages\Biz\Framework\Provider\QueueServiceProvider;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
 use Codeages\Biz\Framework\Context\Biz;
-use Codeages\Biz\Framework\Provider\DoctrineServiceProvider;
+use Monolog\Logger;
+use Monolog\Handler\TestHandler;
 
 class IntegrationTestCase extends TestCase
 {
@@ -59,7 +62,7 @@ class IntegrationTestCase extends TestCase
     {
         $defaultOptions = array(
             'db.options' => array(
-                'dbname' => getenv('DB_NAME') ?: 'biz-target-test',
+                'dbname' => getenv('DB_NAME') ?: 'biz-framework-test',
                 'user' => getenv('DB_USER') ?: 'root',
                 'password' => getenv('DB_PASSWORD') ?: '',
                 'host' => getenv('DB_HOST') ?: '127.0.0.1',
@@ -82,6 +85,7 @@ class IntegrationTestCase extends TestCase
         $biz->register(new TokenServiceProvider());
         $biz->register(new SchedulerServiceProvider());
         $biz->register(new SettingServiceProvider());
+        $biz->register(new QueueServiceProvider());
 
         $cacheEnabled = getenv('CACHE_ENABLED');
 
@@ -99,10 +103,23 @@ class IntegrationTestCase extends TestCase
         }
 
         if (getenv('CACHE_ARRAY_STORAGE_ENABLED')) {
-            $biz['dao.cache.array_storage'] = function() {
+            $biz['dao.cache.array_storage'] = function () {
                 return new Codeages\Biz\Framework\Dao\ArrayStorage();
             };
         }
+
+        $biz['logger.test_handler'] = function () {
+            return new TestHandler();
+        };
+
+        $biz['logger'] = function ($biz) {
+            $logger = new Logger('phpunit');
+            $logger->pushHandler($biz['logger.test_handler']);
+
+            return $logger;
+        };
+
+        $biz['lock.flock.directory'] = sys_get_temp_dir();
 
         $biz->boot();
 
@@ -120,5 +137,43 @@ class IntegrationTestCase extends TestCase
         $seeder = new $seeder($this->db);
 
         return $seeder->run($isRun);
+    }
+
+    protected function grabAllFromDatabase($table, $column, array $criteria = array())
+    {
+    }
+
+    protected function grabFromDatabase($table, $column, array $criteria = array())
+    {
+    }
+
+    protected function fetchFromDatabase($table, array $criteria = array())
+    {
+        $builder = $this->biz['db']->createQueryBuilder();
+        $builder->select('*')->from($table);
+
+        $index = 0;
+        foreach ($criteria as $key => $value) {
+            $builder->andWhere("{$key} = ?");
+            $builder->setParameter($index, $value);
+            ++$index;
+        }
+
+        return $builder->execute()->fetch(\PDO::FETCH_ASSOC);
+    }
+
+    protected function fetchAllFromDatabase($table, array $criteria = array())
+    {
+        $builder = $this->biz['db']->createQueryBuilder();
+        $builder->select('*')->from($table);
+
+        $index = 0;
+        foreach ($criteria as $key => $value) {
+            $builder->andWhere("{$key} = ?");
+            $builder->setParameter($index, $value);
+            ++$index;
+        }
+
+        return $builder->execute()->fetchAll(\PDO::FETCH_ASSOC);
     }
 }
