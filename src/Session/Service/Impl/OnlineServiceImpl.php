@@ -6,6 +6,7 @@ use Codeages\Biz\Framework\Service\BaseService;
 use Codeages\Biz\Framework\Service\Exception\InvalidArgumentException;
 use Codeages\Biz\Framework\Session\Service\OnlineService;
 use Codeages\Biz\Framework\Util\ArrayToolkit;
+use DeviceDetector\DeviceDetector;
 
 class OnlineServiceImpl extends BaseService implements OnlineService
 {
@@ -13,6 +14,15 @@ class OnlineServiceImpl extends BaseService implements OnlineService
     {
         if (!empty($online['sess_id'])) {
             $savedOnine = $this->getOnlineBySessId($online['sess_id']);
+            if (!empty($online['user_agent'])) {
+                $detector = new DeviceDetector($online['user_agent']);
+                $detector->parse();
+                $online['device'] = $detector->getDeviceName();
+                $online['device_brand'] = $detector->getBrandName();
+                $online['os'] = $detector->getOs();
+                $online['client'] = $detector->getClient();
+            }
+
             if (empty($savedOnine)) {
                 $this->createOnline($online);
             } else {
@@ -30,7 +40,19 @@ class OnlineServiceImpl extends BaseService implements OnlineService
         if (!empty($user['id'])) {
             $online['user_id'] = $user['id'];
         }
-        $online = ArrayToolkit::parts($online, array('lifetime', 'sess_id' , 'user_id', 'access_url', 'ip', 'user_agent', 'source'));
+        $online = ArrayToolkit::parts($online, array(
+            'lifetime',
+            'sess_id',
+            'user_id',
+            'access_url',
+            'ip',
+            'user_agent',
+            'source',
+            'device',
+            'os',
+            'client',
+            'device_brand'
+        ));
         return $this->getOnlineDao()->create($online);
     }
 
@@ -40,7 +62,20 @@ class OnlineServiceImpl extends BaseService implements OnlineService
         if (!empty($user['id'])) {
             $online['user_id'] = $user['id'];
         }
-        $online = ArrayToolkit::parts($online, array('lifetime', 'sess_id' , 'user_id', 'access_url', 'ip', 'user_agent', 'source'));
+        $online = ArrayToolkit::parts($online, array(
+            'lifetime',
+            'sess_id',
+            'user_id',
+            'access_url',
+            'ip',
+            'user_agent',
+            'source',
+            'device',
+            'os',
+            'client',
+            'device_brand'
+        ));
+
         return $this->getOnlineDao()->update($id, $online);
     }
 

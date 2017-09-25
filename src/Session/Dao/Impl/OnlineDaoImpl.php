@@ -26,6 +26,8 @@ class OnlineDaoImpl extends GeneralDaoImpl implements OnlineDao
             'timestamps' => array('created_time', 'access_time'),
             'orderbys' => array('created_time', 'id', 'access_time'),
             'serializes' => array(
+                'os' => 'json',
+                'client' => 'json'
             ),
             'conditions' => array(
                 'access_time > :gt_access_time',
