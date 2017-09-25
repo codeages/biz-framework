@@ -14,7 +14,7 @@ class JobDaoImpl extends GeneralDaoImpl implements JobDao
         $sql = "SELECT * FROM 
                 (
                   SELECT * FROM {$this->table} 
-                  WHERE enabled = 1 AND next_fire_time <= ? AND deleted = 0
+                  WHERE enabled = 1 AND next_fire_time <= ?
                 ) as {$this->table} 
                 ORDER BY next_fire_time ASC , priority DESC";
 
@@ -39,8 +39,6 @@ class JobDaoImpl extends GeneralDaoImpl implements JobDao
                 'name like :name',
                 'class like :class',
                 'source like :source',
-                'deleted = :deleted',
-                'deleted_time < :deleted_time_LT'
             ),
         );
     }

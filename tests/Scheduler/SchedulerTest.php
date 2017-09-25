@@ -127,8 +127,7 @@ class SchedulerTest extends IntegrationTestCase
         $this->assertEquals('success', $jobFired['status']);
 
         $savedJob = $this->getJobDao()->get($savedJob['id']);
-        $this->assertEquals(1, $savedJob['deleted']);
-        $this->assertNotEmpty($savedJob['deleted_time']);
+        $this->assertEmpty($savedJob);
     }
 
     public function testBeforeNowRun()
@@ -159,8 +158,7 @@ class SchedulerTest extends IntegrationTestCase
         $this->assertEquals('success', $jobFired['status']);
 
         $savedJob = $this->getJobDao()->get($savedJob['id']);
-        $this->assertEquals(1, $savedJob['deleted']);
-        $this->assertNotEmpty($savedJob['deleted_time']);
+        $this->assertEmpty($savedJob);
     }
 
     public function testDeleteJobByName()
@@ -181,8 +179,7 @@ class SchedulerTest extends IntegrationTestCase
         $this->getSchedulerService()->deleteJobByName('test');
         $savedJob = $this->getJobDao()->get($savedJob['id']);
 
-        $this->assertEquals(1, $savedJob['deleted']);
-        $this->assertNotEmpty($savedJob['deleted_time']);
+        $this->assertEmpty($savedJob);
     }
 
     public function testFailJobResult()
@@ -202,7 +199,9 @@ class SchedulerTest extends IntegrationTestCase
         $job = $this->getSchedulerService()->register($job);
         $this->getSchedulerService()->execute();
         $savedJob = $this->getJobDao()->get($job['id']);
-        $jobFireds = $this->getSchedulerService()->findJobFiredsByJobId($savedJob['id']);
+        $this->assertEmpty($savedJob);
+
+        $jobFireds = $this->getSchedulerService()->findJobFiredsByJobId($job['id']);
         $this->assertEquals('failure', $jobFireds[0]['status']);
     }
 
@@ -223,34 +222,10 @@ class SchedulerTest extends IntegrationTestCase
         $this->getSchedulerService()->execute();
 
         $savedJob = $this->getJobDao()->get($job['id']);
-        $jobFireds = $this->getSchedulerService()->findJobFiredsByJobId($savedJob['id']);
+        $this->assertEmpty($savedJob);
+
+        $jobFireds = $this->getSchedulerService()->findJobFiredsByJobId($job['id']);
         $this->assertEquals('failure', $jobFireds[0]['status']);
-    }
-
-    public function testClearJobs()
-    {
-        $job = array(
-            'name' => 'test',
-            'source' => 'MAIN',
-            'expression' => time()-2,
-//            'nextFireTime' => time()-1,
-            'class' => 'Tests\\Example\\Job\\ExampleAcquiredJob',
-            'args' => array('courseId' => 1),
-            'priority' => 100,
-            'misfire_threshold' => 3000,
-            'misfire_policy' => 'missed',
-        );
-        $job = $this->getSchedulerService()->register($job);
-        sleep(2);
-        $this->getSchedulerService()->execute();
-
-        $options = $this->biz['scheduler.options'];
-        $options['timeout'] = 1;
-        $this->biz['scheduler.options'] = $options;
-
-        $this->getSchedulerService()->clearJobs();
-        $job = $this->getJobDao()->get($job['id']);
-        $this->assertEmpty($job);
     }
 
     public function testTimeoutJobs()
@@ -276,7 +251,9 @@ class SchedulerTest extends IntegrationTestCase
 
         $this->getSchedulerService()->markTimeoutJobs();
         $savedJob = $this->getJobDao()->get($job['id']);
-        $jobFireds = $this->getSchedulerService()->findJobFiredsByJobId($savedJob['id']);
+        $this->assertEmpty($savedJob);
+
+        $jobFireds = $this->getSchedulerService()->findJobFiredsByJobId($job['id']);
         $this->assertEquals('timeout', $jobFireds[0]['status']);
     }
 
