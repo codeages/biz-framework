@@ -9,16 +9,20 @@ use Codeages\Biz\Framework\Util\ArrayToolkit;
 
 class OnlineServiceImpl extends BaseService implements OnlineService
 {
+    const DAY = 86400;
+
     public function saveOnline($online)
     {
-        if(!ArrayToolkit::requireds($online, array('sess_id', 'sess_deadline'))) {
-            throw new InvalidArgumentException('sess_id, sess_deadline is required.');
+        if(!ArrayToolkit::requireds($online, array('sess_id'))) {
+            throw new InvalidArgumentException('sess_id is required.');
         }
         $user = $this->biz['user'];
         if (!empty($user['id'])) {
             $online['user_id'] = $user['id'];
             $online['is_login'] = 1;
         }
+
+        $online['sess_deadline'] = time() + self::DAY;
 
         $online = ArrayToolkit::parts($online, array(
             'sess_deadline',
@@ -59,7 +63,6 @@ class OnlineServiceImpl extends BaseService implements OnlineService
     {
         $condition = array(
             'gt_sess_time' => $gtAccessTime,
-            'is_login' => 0
         );
         return $this->getOnlineDao()->count($condition);
     }
