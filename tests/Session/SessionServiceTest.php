@@ -7,7 +7,7 @@ class SessionServiceTest extends IntegrationTestCase
     public function testCreate()
     {
         $mockedSession = $this->mockSession();
-        $session = $this->getSessionService()->createSession($mockedSession);
+        $session = $this->getSessionService()->saveSession($mockedSession);
 
         $keys = array_keys($mockedSession);
         foreach ($keys as $key) {
@@ -18,12 +18,12 @@ class SessionServiceTest extends IntegrationTestCase
     public function testUpdateSessionBySessId()
     {
         $mockedSession = $this->mockSession();
-        $session = $this->getSessionService()->createSession($mockedSession);
+        $session = $this->getSessionService()->saveSession($mockedSession);
 
         sleep(1);
 
         $session['sess_data'] = 'test';
-        $updatedSession = $this->getSessionService()->updateSessionBySessId($session['sess_id'], $session);
+        $updatedSession = $this->getSessionService()->saveSession($session);
 
         $keys = array_keys($mockedSession);
         foreach ($keys as $key) {
@@ -40,7 +40,7 @@ class SessionServiceTest extends IntegrationTestCase
     public function testDeleteSession()
     {
         $mockedSession = $this->mockSession();
-        $session = $this->getSessionService()->createSession($mockedSession);
+        $session = $this->getSessionService()->saveSession($mockedSession);
         $this->getSessionService()->deleteSessionBySessId($session['sess_id']);
 
         $deleteSession = $this->getSessionService()->getSessionBySessId($session['sess_id']);
@@ -50,7 +50,7 @@ class SessionServiceTest extends IntegrationTestCase
     public function testGc()
     {
         $mockedSession = $this->mockSession();
-        $this->getSessionService()->createSession($mockedSession);
+        $this->getSessionService()->saveSession($mockedSession);
 
         sleep(2);
 

@@ -63,27 +63,13 @@ class BizSessionHandler implements \SessionHandlerInterface
 
     public function write($session_id, $session_data)
     {
-        $user = $this->biz['user'];
-        if (empty($user['id'])) {
-            $userId = 0;
-        } else {
-            $userId = $user['id'];
-        }
-
-        $session = $this->getSessionService()->getSessionBySessId($session_id);
         $currentTime = time();
         $unsavedSession = array(
             'sess_id' => $session_id,
             'sess_data' => $session_data,
-            'sess_time' => time(),
             'sess_deadline' => $currentTime + $this->maxLifeTime,
         );
-        if (empty($session)) {
-            $this->getSessionService()->createSession($unsavedSession);
-        } else {
-            $this->getSessionService()->updateSessionBySessId($session_id, $unsavedSession);
-        }
-
+        $this->getSessionService()->saveSession($unsavedSession);
         return true;
     }
 

@@ -7,9 +7,14 @@ use Codeages\Biz\Framework\Session\Service\SessionService;
 
 class SessionServiceImpl extends BaseService implements SessionService
 {
-    public function createSession($session)
+    public function saveSession($session)
     {
-        return $this->getSessionDao()->create($session);
+        $savedSession = $this->getSessionDao()->getBySessId($session['sess_id']);
+        if (empty($savedSession)) {
+            return $this->getSessionDao()->create($session);
+        } else {
+            return $this->getSessionDao()->update($savedSession['id'], $session);
+        }
     }
 
     public function deleteSessionBySessId($sessId)
@@ -17,10 +22,9 @@ class SessionServiceImpl extends BaseService implements SessionService
         return $this->getSessionDao()->deleteBySessId($sessId);
     }
 
-    public function updateSessionBySessId($sessId, $session)
+    public function getSessionBySessId($sessId)
     {
-        $savedSession = $this->getSessionDao()->getBySessId($sessId);
-        return $this->getSessionDao()->update($savedSession['id'], $session);
+        return $this->getSessionDao()->getBySessId($sessId);
     }
 
     public function gc()
@@ -28,18 +32,8 @@ class SessionServiceImpl extends BaseService implements SessionService
         return $this->getSessionDao()->deleteByInvalid();
     }
 
-    public function getSessionBySessId($sessId)
-    {
-        return $this->getSessionDao()->getBySessId($sessId);
-    }
-
     protected function getSessionDao()
     {
         return $this->biz->dao('Session:SessionDao');
-    }
-
-    protected function getOnlineDao()
-    {
-        return $this->biz->dao('Session:OnlineDao');
     }
 }
