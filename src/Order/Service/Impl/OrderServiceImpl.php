@@ -3,7 +3,6 @@
 namespace Codeages\Biz\Framework\Order\Service\Impl;
 
 use Codeages\Biz\Framework\Order\Service\OrderService;
-use Codeages\Biz\Framework\Order\Status\StatusFactory;
 use Codeages\Biz\Framework\Service\BaseService;
 
 class OrderServiceImpl extends BaseService implements OrderService

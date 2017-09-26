@@ -13,14 +13,23 @@ class PayServiceProvider implements ServiceProviderInterface
         $biz['migration.directories'][] = dirname(dirname(__DIR__)).'/migrations/pay';
         $biz['autoload.aliases']['Pay'] = 'Codeages\Biz\Framework\Pay';
 
-        $biz['payment.options'] =  function () {
-            return array(
+        $biz['payment.options'] = null;
+
+        $biz['payment.final_options'] =  function () {
+
+            $options = array(
                 'closed_notify' => false,
                 'trade_closed_sync_platform' => false,
                 'refunded_notify' => false,
                 'trade_refunded_sync_platform' => false,
                 'coin_rate' => 1
             );
+
+            if (!empty($biz['payment.options'])) {
+                $options = array_merge($options, $biz['payment.options']);
+            }
+
+            return $options;
         };
 
         $biz['console.commands'][] = function () use ($biz) {
