@@ -23,12 +23,12 @@ class OnlineDaoImpl extends GeneralDaoImpl implements OnlineDao
     public function declares()
     {
         return array(
-            'timestamps' => array('created_time', 'access_time'),
-            'orderbys' => array('access_time'),
+            'timestamps' => array('created_time', 'sess_time'),
+            'orderbys' => array('sess_time'),
             'serializes' => array(
             ),
             'conditions' => array(
-                'access_time > :gt_access_time',
+                'sess_time > :gt_sess_time',
                 'is_login = :is_login',
                 'user_id = :user_id'
             ),

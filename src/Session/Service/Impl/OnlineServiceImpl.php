@@ -49,7 +49,7 @@ class OnlineServiceImpl extends BaseService implements OnlineService
     public function countLogined($gtAccessTime)
     {
         $condition = array(
-            'gt_access_time' => $gtAccessTime,
+            'gt_sess_time' => $gtAccessTime,
             'is_login' => 1
         );
         return $this->getOnlineDao()->count($condition);
@@ -58,7 +58,7 @@ class OnlineServiceImpl extends BaseService implements OnlineService
     public function countOnline($gtAccessTime)
     {
         $condition = array(
-            'gt_access_time' => $gtAccessTime,
+            'gt_sess_time' => $gtAccessTime,
             'is_login' => 0
         );
         return $this->getOnlineDao()->count($condition);

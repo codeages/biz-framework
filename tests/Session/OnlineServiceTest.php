@@ -16,7 +16,7 @@ class OnlineServiceTest extends IntegrationTestCase
     public function testCountLogin()
     {
         $mockedSession = $this->mockOnline();
-        $this->getOnlineService()->createOnline($mockedSession);
+        $this->getOnlineService()->saveOnline($mockedSession);
         $count = $this->getOnlineService()->countLogined(time()-400);
 
         $this->assertEquals(1, $count);
@@ -28,10 +28,10 @@ class OnlineServiceTest extends IntegrationTestCase
         $this->biz['user'] = array(
             'id' => 0
         );
-        $this->getOnlineService()->createOnline($mockedSession);
+        $this->getOnlineService()->saveOnline($mockedSession);
 
         $count = $this->getOnlineService()->countLogined(time()-400);
-        $this->assertEquals(1, $count);
+        $this->assertEquals(0, $count);
 
 
         $count = $this->getOnlineService()->countOnline(time()-400);
