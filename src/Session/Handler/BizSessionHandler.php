@@ -2,22 +2,17 @@
 
 namespace Codeages\Biz\Framework\Session\Handler;
 
-use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
-
 class BizSessionHandler implements \SessionHandlerInterface
 {
     protected $biz;
     protected $lockers = array();
-    protected $storage;
     protected $gcCalled = false;
 
     protected $maxLifeTime = 86400;
 
-    public function __construct($container, TokenStorage $storage, $options = array())
+    public function __construct($biz, $options = array())
     {
-        $this->biz = $container->get('biz');
-        $this->storage = $storage;
+        $this->biz = $biz;
         if (!empty($options['max_life_time'])) {
             $this->maxLifeTime = $options['max_life_time'];
         }
@@ -68,12 +63,11 @@ class BizSessionHandler implements \SessionHandlerInterface
 
     public function write($session_id, $session_data)
     {
-        $token = $this->storage->getToken();
-
-        if (empty($token) || ($token instanceof AnonymousToken) || !$token->getUser()) {
+        $user = $this->biz['user'];
+        if (empty($user['id'])) {
             $userId = 0;
         } else {
-            $userId = $token->getUser()->getId();
+            $userId = $user['id'];
         }
 
         $session = $this->getSessionService()->getSessionBySessId($session_id);
