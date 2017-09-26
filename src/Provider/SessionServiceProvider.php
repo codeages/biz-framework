@@ -15,9 +15,5 @@ class SessionServiceProvider implements ServiceProviderInterface
             return new \Codeages\Biz\Framework\Session\Command\TableCommand($container);
         };
 
-        $container['console.commands'][] = function () use ($container) {
-            return new \Codeages\Biz\Framework\Session\Command\AddFieldsCommand($container);
-        };
-
     }
 }
