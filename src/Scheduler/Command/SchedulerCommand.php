@@ -10,7 +10,7 @@ class SchedulerCommand extends AbstractCommand
 {
     protected function configure()
     {
-        $this->setName('util:scheduler');
+        $this->setName('scheduler:run');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
