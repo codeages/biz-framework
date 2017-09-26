@@ -41,7 +41,7 @@ class BizSchedulerUpdateJobDetail extends Migration
         ) VALUES (
               'Scheduler_MarkExecutingTimeoutJob',
               '10 * * * *',
-              'Codeages\\\\Biz\\Framework\\\\Scheduler\\\\Job\\\\MarkExecutingTimeoutJob',
+              'Codeages\\\\Biz\\\\Framework\\\\Scheduler\\\\Job\\\\MarkExecutingTimeoutJob',
               '',
               '100',
               '0',
