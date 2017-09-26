@@ -13,8 +13,4 @@ interface SessionService
     public function deleteSessionBySessId($sessId);
 
     public function gc();
-
-    public function searchSessions($condition, $orderBy, $start, $limit);
-
-    public function countSessions($condition);
 }

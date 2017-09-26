@@ -23,16 +23,6 @@ class SessionServiceImpl extends BaseService implements SessionService
         return $this->getSessionDao()->update($savedSession['id'], $session);
     }
 
-    public function searchSessions($condition, $orderBy, $start, $limit)
-    {
-        return $this->getSessionDao()->search($condition, $orderBy, $start, $limit);
-    }
-
-    public function countSessions($condition)
-    {
-        return $this->getSessionDao()->count($condition);
-    }
-
     public function gc()
     {
         return $this->getSessionDao()->deleteByInvalid();

@@ -17,8 +17,6 @@ class SessionDaoImpl extends GeneralDaoImpl implements SessionDao
             'serializes' => array(
             ),
             'conditions' => array(
-                'sess_time < :lt_sess_time',
-                'user_id > :gt_user_id'
             ),
         );
     }
@@ -38,17 +36,5 @@ class SessionDaoImpl extends GeneralDaoImpl implements SessionDao
     {
         $sql = "DELETE FROM {$this->table} WHERE sess_time < (? - sess_lifetime) ";
         return $this->db()->executeUpdate($sql, array(time()));
-    }
-
-    public function countLogined($gtSessTime)
-    {
-        $sql = "SELECT count(*) FROM {$this->table} WHERE sess_time > ? AND sess_user_id > 0 ";
-        return $this->db()->fetchColumn($sql, array($gtSessTime));
-    }
-
-    public function countTotal($gtSessTime)
-    {
-        $sql = "SELECT count(*) FROM {$this->table} WHERE sess_time > ? ";
-        return $this->db()->fetchColumn($sql, array($gtSessTime));
     }
 }

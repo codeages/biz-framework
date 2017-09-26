@@ -55,8 +55,8 @@ class SessionServiceTest extends IntegrationTestCase
         sleep(2);
 
         $this->getSessionService()->gc();
-        $count = $this->getSessionService()->countSessions(array());
-        $this->assertEquals(0, $count);
+        $deleteSession = $this->getSessionService()->getSessionBySessId($mockedSession['sess_id']);
+        $this->assertEmpty($deleteSession);
     }
 
     protected function mockSession()
