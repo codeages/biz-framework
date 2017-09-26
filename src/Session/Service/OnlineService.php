@@ -4,10 +4,6 @@ namespace Codeages\Biz\Framework\Session\Service;
 
 interface OnlineService
 {
-    public function createOnline($online);
-
-    public function updateOnline($id, $online);
-
     public function getOnlineBySessId($sessId);
 
     public function countLogined($gtSessTime);
@@ -20,5 +16,5 @@ interface OnlineService
 
     public function countOnlines($condition);
 
-    public function sample($online);
+    public function saveOnline($online);
 }

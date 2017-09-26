@@ -63,12 +63,8 @@ class SessionServiceTest extends IntegrationTestCase
     {
         return array(
             'sess_id' => 'sess'.rand(1000000,9000000),
-            'sess_user_id' => 1,
             'sess_data' => 'ababa',
-            'sess_time' => time(),
-            'created_time' => time(),
-            'sess_lifetime' => 1,
-            'source' => 'web',
+            'sess_deadline' => time() + 1,
         );
     }
 

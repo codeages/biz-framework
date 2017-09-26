@@ -13,7 +13,7 @@ class SessionDaoImpl extends GeneralDaoImpl implements SessionDao
     {
         return array(
             'timestamps' => array('created_time', 'sess_time'),
-            'orderbys' => array('created_time', 'id', 'sess_time'),
+            'orderbys' => array(),
             'serializes' => array(
             ),
             'conditions' => array(
@@ -34,7 +34,7 @@ class SessionDaoImpl extends GeneralDaoImpl implements SessionDao
 
     public function deleteByInvalid()
     {
-        $sql = "DELETE FROM {$this->table} WHERE sess_time < (? - sess_lifetime) ";
+        $sql = "DELETE FROM {$this->table} WHERE sess_deadline < ?";
         return $this->db()->executeUpdate($sql, array(time()));
     }
 }

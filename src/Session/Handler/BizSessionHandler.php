@@ -71,13 +71,12 @@ class BizSessionHandler implements \SessionHandlerInterface
         }
 
         $session = $this->getSessionService()->getSessionBySessId($session_id);
+        $currentTime = time();
         $unsavedSession = array(
             'sess_id' => $session_id,
             'sess_data' => $session_data,
             'sess_time' => time(),
-            'sess_lifetime' => $this->maxLifeTime,
-            'sess_user_id' => $userId,
-            'source' => 'web',
+            'sess_deadline' => $currentTime + $this->maxLifeTime,
         );
         if (empty($session)) {
             $this->getSessionService()->createSession($unsavedSession);

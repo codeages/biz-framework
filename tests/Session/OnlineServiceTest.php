@@ -42,12 +42,11 @@ class OnlineServiceTest extends IntegrationTestCase
     {
         return array(
             'sess_id' => 'sess'.rand(1000000,9000000),
+            'sess_deadline' => time() + 1,
             'user_id' => 1,
             'user_agent' => 'xxfafaafasfasf',
-            'access_time' => time(),
-            'created_time' => time(),
-            'lifetime' => 1,
             'source' => 'web',
+            'ip' => '192.178.191.12'
         );
     }
 

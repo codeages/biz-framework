@@ -13,16 +13,11 @@ class BizSessionAndOnline extends Migration
         $connection = $biz['db'];
         $connection->exec("
             CREATE TABLE `biz_session` (
-              `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '编号',
               `sess_id` varbinary(128) NOT NULL,
-              `sess_user_id` int(10) unsigned NOT NULL DEFAULT '0',
               `sess_data` blob NOT NULL,
               `sess_time` int(10) unsigned NOT NULL,
-              `created_time` int(10) unsigned NOT NULL,
-              `sess_lifetime` mediumint(9) NOT NULL,
-              `source` VARCHAR(32) NOT NULL,
-              PRIMARY KEY (`id`),
-              UNIQUE KEY `sess_id` (`sess_id`)
+              `sess_deadline` int(10) unsigned NOT NULL,
+              PRIMARY KEY (`sess_id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
         ");
 
@@ -47,7 +42,7 @@ class BizSessionAndOnline extends Migration
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
         ");
 
-        $connection->exec("ALTER TABLE `biz_session` ADD INDEX sess_time (`sess_time`); ");
+        $connection->exec("ALTER TABLE `biz_session` ADD INDEX sess_deadline (`sess_deadline`); ");
         $connection->exec("ALTER TABLE `biz_online` ADD INDEX access_time (`access_time`); ");
     }
 

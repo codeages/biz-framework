@@ -6,77 +6,39 @@ use Codeages\Biz\Framework\Service\BaseService;
 use Codeages\Biz\Framework\Service\Exception\InvalidArgumentException;
 use Codeages\Biz\Framework\Session\Service\OnlineService;
 use Codeages\Biz\Framework\Util\ArrayToolkit;
-use DeviceDetector\DeviceDetector;
 
 class OnlineServiceImpl extends BaseService implements OnlineService
 {
-    public function sample($online)
+    public function saveOnline($online)
     {
+        if(!ArrayToolkit::requireds($online, array('sess_id', 'sess_deadline'))) {
+            throw new InvalidArgumentException('sess_id, sess_deadline is required.');
+        }
+        $user = $this->biz['user'];
+        if (!empty($user['id'])) {
+            $online['user_id'] = $user['id'];
+            $online['is_login'] = 1;
+        }
+
+        $online = ArrayToolkit::parts($online, array(
+            'sess_deadline',
+            'sess_id',
+            'user_id',
+            'is_login',
+            'ip',
+            'user_agent',
+            'source',
+        ));
+
         if (!empty($online['sess_id'])) {
             $savedOnine = $this->getOnlineBySessId($online['sess_id']);
-            if (!empty($online['user_agent'])) {
-                $detector = new DeviceDetector($online['user_agent']);
-                $detector->parse();
-                $online['device'] = $detector->getDeviceName();
-                $online['device_brand'] = $detector->getBrandName();
-                $online['os'] = $detector->getOs();
-                $online['client'] = $detector->getClient();
-            }
 
             if (empty($savedOnine)) {
-                $this->createOnline($online);
+                $this->getOnlineDao()->create($online);
             } else {
-                $this->updateOnline($savedOnine['id'], $online);
+                $this->getOnlineDao()->update($savedOnine['id'], $online);
             }
         }
-    }
-
-    public function createOnline($online)
-    {
-        if(!ArrayToolkit::requireds($online, array('sess_id', 'lifetime'))) {
-            throw new InvalidArgumentException('sess_id is required.');
-        }
-        $user = $this->biz['user'];
-        if (!empty($user['id'])) {
-            $online['user_id'] = $user['id'];
-        }
-        $online = ArrayToolkit::parts($online, array(
-            'lifetime',
-            'sess_id',
-            'user_id',
-            'access_url',
-            'ip',
-            'user_agent',
-            'source',
-            'device',
-            'os',
-            'client',
-            'device_brand'
-        ));
-        return $this->getOnlineDao()->create($online);
-    }
-
-    public function updateOnline($id, $online)
-    {
-        $user = $this->biz['user'];
-        if (!empty($user['id'])) {
-            $online['user_id'] = $user['id'];
-        }
-        $online = ArrayToolkit::parts($online, array(
-            'lifetime',
-            'sess_id',
-            'user_id',
-            'access_url',
-            'ip',
-            'user_agent',
-            'source',
-            'device',
-            'os',
-            'client',
-            'device_brand'
-        ));
-
-        return $this->getOnlineDao()->update($id, $online);
     }
 
     public function getOnlineBySessId($sessId)
@@ -88,7 +50,7 @@ class OnlineServiceImpl extends BaseService implements OnlineService
     {
         $condition = array(
             'gt_access_time' => $gtAccessTime,
-            'gt_user_id' => 0
+            'is_login' => 1
         );
         return $this->getOnlineDao()->count($condition);
     }
@@ -97,6 +59,7 @@ class OnlineServiceImpl extends BaseService implements OnlineService
     {
         $condition = array(
             'gt_access_time' => $gtAccessTime,
+            'is_login' => 0
         );
         return $this->getOnlineDao()->count($condition);
     }
