@@ -12,7 +12,7 @@ class TableCommand extends AbstractCommand
     protected function configure()
     {
         $this
-            ->setName('scheduler:tables')
+            ->setName('scheduler:table')
             ->setDescription('Create a migration for the scheduler database table')
             ->addArgument('directory', InputArgument::REQUIRED, 'Migration base directory.', null);
     }
