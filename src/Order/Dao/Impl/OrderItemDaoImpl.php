@@ -12,7 +12,7 @@ class OrderItemDaoImpl extends GeneralDaoImpl implements OrderItemDao
     public function findByOrderId($orderId)
     {
         return $this->findByFields(array(
-            'order_id' => $orderId
+            'order_id' => $orderId,
         ));
     }
 
@@ -30,16 +30,30 @@ class OrderItemDaoImpl extends GeneralDaoImpl implements OrderItemDao
         ));
     }
 
+    public function sumPayAmount($conditions)
+    {
+        $builder = $this->createQueryBuilder($conditions)
+            ->select('sum(`pay_amount`)')
+            ->andWhere('target_id = :target_id')
+            ->andWhere('target_type = :target_type')
+            ->andWhere('pay_time >= :start_pay_time')
+            ->andWhere('pay_time <= :end_pay_time')
+            ->andWhere('status IN (:statuses)')
+            ->andWhere('status = :status');
+
+        return (int) $builder->execute()->fetchColumn(0);
+    }
+
     public function declares()
     {
         return array(
             'timestamps' => array('created_time', 'updated_time'),
             'orderbys' => array(
                 'id',
-                'created_time'
+                'created_time',
             ),
             'serializes' => array(
-                'create_extra' => 'json'
+                'create_extra' => 'json',
             ),
             'conditions' => array(
                 'order_id IN (:order_ids)',
@@ -49,7 +63,7 @@ class OrderItemDaoImpl extends GeneralDaoImpl implements OrderItemDao
                 'target_type = :target_type',
                 'created_time >= :start_time',
                 'created_time <= :end_time',
-            )
+            ),
         );
     }
 }

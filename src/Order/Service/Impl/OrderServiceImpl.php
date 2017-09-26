@@ -3,7 +3,6 @@
 namespace Codeages\Biz\Framework\Order\Service\Impl;
 
 use Codeages\Biz\Framework\Order\Service\OrderService;
-use Codeages\Biz\Framework\Order\Status\StatusFactory;
 use Codeages\Biz\Framework\Service\BaseService;
 
 class OrderServiceImpl extends BaseService implements OrderService
@@ -92,7 +91,7 @@ class OrderServiceImpl extends BaseService implements OrderService
     {
         return $this->getOrderLogDao()->findOrderLogsByOrderId($orderId);
     }
-    
+
     public function countOrderLogs($conditions)
     {
         return $this->getOrderLogDao()->count($conditions);
@@ -101,6 +100,18 @@ class OrderServiceImpl extends BaseService implements OrderService
     public function searchOrderLogs($conditions, $orderBy, $start, $limit)
     {
         return $this->getOrderLogDao()->search($conditions, $orderBy, $start, $limit);
+    }
+
+    public function sumOrderPaidAmountByTargetId($targetId)
+    {
+        return $this->getOrderItemDao()->sumPayAmount(array(
+            'target_id' => $targetId,
+            'statuses' => array('paid', 'success', 'fail'), ));
+    }
+
+    public function sumPaidAmount($conditions)
+    {
+        return $this->getOrderItemDao()->sumPayAmount($conditions);
     }
 
     protected function getOrderLogDao()

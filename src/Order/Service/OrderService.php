@@ -21,7 +21,7 @@ interface OrderService
     public function countOrders($conditions);
 
     public function countGroupByDate($conditions, $sort, $dateColumn = 'pay_time');
-    
+
     public function sumGroupByDate($column, $conditions, $sort, $dateColumn = 'pay_time');
 
     public function searchOrderItems($conditions, $orderBy, $start, $limit);
@@ -35,10 +35,14 @@ interface OrderService
     public function findOrderItemDeductsByOrderId($orderId);
 
     public function findOrderLogsByOrderId($orderId);
-    
+
     public function countOrderLogs($conditions);
 
     public function searchOrderLogs($conditions, $orderBy, $start, $limit);
 
     public function getOrderItemByOrderIdAndTargetIdAndTargetType($orderId, $targetId, $targetType);
+
+    public function sumOrderPaidAmountByTargetId($targetId);
+
+    public function sumPaidAmount($conditions);
 }
