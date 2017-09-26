@@ -185,9 +185,13 @@ class GeneralDaoImplTest extends IntegrationTestCase
         $dao = $this->biz->dao($dao);
 
         $dao->create(array('name' => 'pre_test1'));
+        sleep(1);
         $dao->create(array('name' => 'pre_test2'));
+        sleep(1);
         $dao->create(array('name' => 'test3_suf'));
+        sleep(1);
         $dao->create(array('name' => 'test4_suf'));
+        sleep(1);
         $dao->create(array('name' => 'test5'));
 
         $preNames = $dao->search(array('pre_like' => 'pre_'), array('created_time' => 'desc'), 0, 100);
