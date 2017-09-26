@@ -24,7 +24,6 @@ class RedisSessionHandler implements \SessionHandlerInterface
 
     public function __construct($biz, array $options = array())
     {
-        $this->biz = $biz;
         $this->redis = $biz['redis'];
         $this->ttl = isset($options['max_life_time']) ? (int) $options['max_life_time'] : 86400;
         $this->prefix = isset($options['prefix']) ? $options['prefix'] : 'biz_session';
