@@ -23,7 +23,7 @@ class TableCommand extends AbstractCommand
 
         $migrations = array(
             'session_and_online',
-            'online_Add_fields',
+            'online_add_fields',
         );
 
         foreach ($migrations as $migration) {
