@@ -31,7 +31,7 @@ class BizSessionAndOnline extends Migration
               `sess_id` varbinary(128) NOT NULL,
               `active_time` int(10) unsigned NOT NULL DEFAULT 0 COMMENT '最后活跃时间',
               `deadline` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '离线时间',
-              `is_login` tinyint(1) NOT NULL DEFAULT '0',
+              `is_login` tinyint(1) unsigned NOT NULL DEFAULT '0',
               `user_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '在线用户的id, 0代表游客',
               `ip` varchar(32) NOT NULL DEFAULT '' COMMENT '客户端ip',
               `user_agent` varchar(1024) NOT NULL DEFAULT '',
