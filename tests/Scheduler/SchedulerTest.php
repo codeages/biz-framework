@@ -233,7 +233,7 @@ class SchedulerTest extends IntegrationTestCase
         $job = array(
             'name' => 'test',
             'source' => 'MAIN',
-            'expression' => time()-2,
+            'expression' => time() - 2,
 //            'nextFireTime' => time()-1,
             'class' => 'Tests\\Example\\Job\\ExampleAcquiredJob',
             'args' => array('courseId' => 1),
@@ -302,7 +302,7 @@ class SchedulerTest extends IntegrationTestCase
     {
         $this->getJobFiredDao()->update(array('job_id' => $job['id']), array(
             'status' => 'executing',
-            'fired_time' => time() - 2
+            'fired_time' => time() - 2,
         ));
 
         $jobPool = $this->getJobPoolDao()->getByName($job['pool']);

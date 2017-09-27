@@ -3,7 +3,6 @@
 namespace Tests;
 
 use PHPUnit\Framework\TestCase;
-use Codeages\Biz\Framework\Utility\Env;
 
 class FunctionsTest extends TestCase
 {

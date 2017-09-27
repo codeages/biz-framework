@@ -1,6 +1,6 @@
 <?php
 
-namespace Codeages\Biz\Framework\Scheduler\Command;
+namespace Codeages\Biz\Framework\Session\Command;
 
 use Codeages\Biz\Framework\Context\AbstractCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -12,8 +12,8 @@ class TableCommand extends AbstractCommand
     protected function configure()
     {
         $this
-            ->setName('scheduler:table')
-            ->setDescription('Create a migration for the scheduler database table')
+            ->setName('session:table')
+            ->setDescription('Create a migration for the session database table')
             ->addArgument('directory', InputArgument::REQUIRED, 'Migration base directory.', null);
     }
 
@@ -22,11 +22,7 @@ class TableCommand extends AbstractCommand
         $directory = $input->getArgument('directory');
 
         $migrations = array(
-            'scheduler',
-            'scheduler_rename_table',
-            'scheduler_delete_fields',
-            'scheduler_add_retry_num_and_job_detail',
-            'scheduler_update_job_detail',
+            'session_and_online',
         );
 
         foreach ($migrations as $migration) {

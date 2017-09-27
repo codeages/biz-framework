@@ -89,6 +89,7 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         $result = $this->getJobPool()->execute($jobInstance);
 
         $this->jobExecuted($jobFired, $result);
+
         return true;
     }
 
@@ -287,7 +288,7 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
             'job_id' => $job['id'],
             'fired_time' => $job['next_fire_time'],
             'status' => 'acquired',
-            'job_detail' => $job
+            'job_detail' => $job,
         );
         $jobFired = $this->getJobFiredDao()->create($jobFired);
         $jobFired['job_detail'] = $this->updateNextFireTime($job);
@@ -387,8 +388,8 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         $runtimeout = $this->getTimeout();
         $jobFireds = $this->getJobFiredDao()->search(array(
             'status' => 'executing',
-            'fired_time_LT' => time() - $runtimeout
-        ),array(),0, 100);
+            'fired_time_LT' => time() - $runtimeout,
+        ), array(), 0, 100);
         foreach ($jobFireds as $jobFired) {
             $this->markTimout($jobFired);
         }
