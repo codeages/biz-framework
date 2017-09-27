@@ -1,10 +1,8 @@
 <?php
 
-namespace Codeages\Biz\Framework\Session\Storage\Impl;
+namespace Codeages\Biz\Framework\Session\Storage;
 
-use Codeages\Biz\Framework\Session\Storage\SessionStorage;
-
-class RedisSessionStorageImpl implements SessionStorage
+class RedisSessionStorage implements SessionStorage
 {
     private $biz;
 
