@@ -2,9 +2,9 @@
 
 namespace Codeages\Biz\Framework\Order\Status\Order;
 
-class RefundRefusedOrderStatus extends AbstractOrderStatus
+class RefundRefuseOrderStatus extends AbstractOrderStatus
 {
-    const NAME = 'refund_refused';
+    const NAME = 'refund_refuse';
 
     public function getName()
     {
