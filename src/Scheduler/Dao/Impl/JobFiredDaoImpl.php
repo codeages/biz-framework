@@ -7,7 +7,7 @@ use Codeages\Biz\Framework\Scheduler\Dao\JobFiredDao;
 
 class JobFiredDaoImpl extends GeneralDaoImpl implements JobFiredDao
 {
-    protected $table = 'biz_job_fired';
+    protected $table = 'biz_scheduler_job_fired';
 
     public function getByStatus($status)
     {
@@ -33,10 +33,13 @@ class JobFiredDaoImpl extends GeneralDaoImpl implements JobFiredDao
         return array(
             'timestamps' => array('created_time', 'updated_time'),
             'orderbys' => array('created_time', 'id'),
+            'serializes' => array(
+                'job_detail' => 'json',
+            ),
             'conditions' => array(
                 'job_id = :job_id',
                 'status = :status',
-                'fired_time < :fired_time_LT'
+                'fired_time < :fired_time_LT',
             ),
         );
     }
