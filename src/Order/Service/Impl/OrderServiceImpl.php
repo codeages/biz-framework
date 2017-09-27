@@ -91,7 +91,7 @@ class OrderServiceImpl extends BaseService implements OrderService
     {
         return $this->getOrderLogDao()->findOrderLogsByOrderId($orderId);
     }
-    
+
     public function countOrderLogs($conditions)
     {
         return $this->getOrderLogDao()->count($conditions);
@@ -100,6 +100,11 @@ class OrderServiceImpl extends BaseService implements OrderService
     public function searchOrderLogs($conditions, $orderBy, $start, $limit)
     {
         return $this->getOrderLogDao()->search($conditions, $orderBy, $start, $limit);
+    }
+
+    public function sumOrderItemPayAmount($conditions)
+    {
+        return $this->getOrderItemDao()->sumPayAmount($conditions);
     }
 
     protected function getOrderLogDao()
