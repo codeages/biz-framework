@@ -16,7 +16,6 @@ class SessionServiceProvider implements ServiceProviderInterface
         $container['session.options'] = array(
             'max_life_time' => 7200,
             'session_storage' => 'db', // exapmle: db, redis
-            'sess_prefix' => 'biz_session_'
         );
 
         $container['session.storage.db'] = function () use ($container) {
