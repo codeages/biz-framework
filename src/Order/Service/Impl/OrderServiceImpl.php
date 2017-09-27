@@ -102,7 +102,7 @@ class OrderServiceImpl extends BaseService implements OrderService
         return $this->getOrderLogDao()->search($conditions, $orderBy, $start, $limit);
     }
 
-    public function sumPaidAmount($conditions)
+    public function sumOrderItemPayAmount($conditions)
     {
         return $this->getOrderItemDao()->sumPayAmount($conditions);
     }
