@@ -20,7 +20,7 @@ class DbSessionStorageImpl implements SessionStorage
 
     public function getSessionBySessId($sessId)
     {
-        return $this->getSessionDao()->get($sessId);
+        return $this->getSessionDao()->getBySessId($sessId);
     }
 
     public function saveSession($session)

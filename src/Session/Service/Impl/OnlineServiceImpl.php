@@ -36,7 +36,6 @@ class OnlineServiceImpl extends BaseService implements OnlineService
 
         if (!empty($online['sess_id'])) {
             $savedOnine = $this->getOnlineBySessId($online['sess_id']);
-
             if (empty($savedOnine)) {
                 return $this->getOnlineDao()->create($online);
             } else {
