@@ -18,7 +18,9 @@ class SessionServiceImpl extends BaseService implements SessionService
         $session['sess_deadline'] = time() + $this->getMaxLifeTime();
 
         if ($this->isRedisStorage()) {
+            $session['sess_time'] = time();
             $this->getRedis()->setex($this->getSessionPrefix().':'.$session['sess_id'], $this->getMaxLifeTime(), $session['sess_data']);;
+            return $session;
         } else {
             $savedSession = $this->getSessionDao()->getBySessId($session['sess_id']);
             if (empty($savedSession)) {
