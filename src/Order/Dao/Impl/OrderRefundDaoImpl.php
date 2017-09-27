@@ -29,4 +29,9 @@ class OrderRefundDaoImpl extends GeneralDaoImpl implements OrderRefundDao
             )
         );
     }
+
+    public function findByOrderIds($orderIds)
+    {
+        return $this->findInField('order_id', $orderIds);
+    }
 }

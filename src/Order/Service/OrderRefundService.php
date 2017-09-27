@@ -11,4 +11,6 @@ interface OrderRefundService
     public function getOrderRefundById($id);
 
     public function findOrderItemRefundsByOrderRefundId($orderRefundId);
+
+    public function findRefundsByOrderIds($orderIds);
 }
