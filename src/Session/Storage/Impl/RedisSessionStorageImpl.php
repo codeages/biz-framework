@@ -27,6 +27,7 @@ class RedisSessionStorageImpl implements SessionStorage
     {
         $session['sess_time'] = time();
         $this->getRedis()->setex($this->getSessionPrefix().':'.$session['sess_id'], $this->getMaxLifeTime(), $session['sess_data']);;
+        return $session;
     }
 
     public function gc()
@@ -36,7 +37,7 @@ class RedisSessionStorageImpl implements SessionStorage
 
     protected function getSessionPrefix()
     {
-        return $this->biz['session.options']['sess_prefix'];
+        return 'biz_session_';
     }
 
     protected function getMaxLifeTime()

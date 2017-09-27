@@ -11,7 +11,6 @@ class SessionServiceTest extends IntegrationTestCase
         $this->biz['session.options'] = array(
             'max_life_time' => 1,
             'session_storage' => 'db',
-            'sess_prefix' => 'biz_session_'
         );
     }
 
@@ -35,13 +34,12 @@ class SessionServiceTest extends IntegrationTestCase
 
         $session['sess_data'] = 'test';
         $updatedSession = $this->getSessionService()->saveSession($session);
-
         $keys = array_keys($mockedSession);
         foreach ($keys as $key) {
             if (in_array($key, array('sess_data', 'sess_time'))) {
                 continue;
             }
-            $this->assertEquals($mockedSession[$key],$updatedSession[$key]);
+            $this->assertEquals($mockedSession[$key],$session[$key]);
         }
 
         $this->assertNotEquals($mockedSession['sess_data'],$updatedSession['sess_data']);
