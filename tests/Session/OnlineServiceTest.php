@@ -10,13 +10,13 @@ class OnlineServiceTest extends IntegrationTestCase
         $this->biz['user'] = array(
             'id' => 1
         );
-    }
 
+    }
 
     public function testCountLogin()
     {
         $mockedSession = $this->mockOnline();
-        $this->getOnlineService()->saveOnline($mockedSession);
+        $online = $this->getOnlineService()->saveOnline($mockedSession);
         $count = $this->getOnlineService()->countLogined(time()-400);
 
         $this->assertEquals(1, $count);
@@ -41,8 +41,7 @@ class OnlineServiceTest extends IntegrationTestCase
     protected function mockOnline()
     {
         return array(
-            'sess_id' => 'sess'.rand(1000000,9000000),
-            'sess_deadline' => time() + 1,
+            'sess_id' => rand(1000000, 9000000),
             'user_id' => 1,
             'user_agent' => 'xxfafaafasfasf',
             'source' => 'web',

@@ -32,9 +32,9 @@ class SessionDaoImpl extends GeneralDaoImpl implements SessionDao
         return $this->db()->executeUpdate($sql, array($sessId));
     }
 
-    public function deleteByInvalid()
+    public function deleteBySessDeadlineLessThan($sessDeadline)
     {
         $sql = "DELETE FROM {$this->table} WHERE sess_deadline < ?";
-        return $this->db()->executeUpdate($sql, array(time()));
+        return $this->db()->executeUpdate($sql, array($sessDeadline));
     }
 }

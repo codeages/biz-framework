@@ -9,8 +9,6 @@ use Codeages\Biz\Framework\Util\ArrayToolkit;
 
 class OnlineServiceImpl extends BaseService implements OnlineService
 {
-    const DAY = 86400;
-
     public function saveOnline($online)
     {
         if(!ArrayToolkit::requireds($online, array('sess_id'))) {
@@ -22,11 +20,13 @@ class OnlineServiceImpl extends BaseService implements OnlineService
             $online['is_login'] = 1;
         }
 
-        $online['sess_deadline'] = time() + self::DAY;
+        $bizOptions = $this->biz['session.options'];
+        $maxLifeTime = $bizOptions['max_life_time'];
+        $online['deadline'] = time() + $maxLifeTime;
 
         $online = ArrayToolkit::parts($online, array(
-            'sess_deadline',
             'sess_id',
+            'deadline',
             'user_id',
             'is_login',
             'ip',
@@ -38,9 +38,9 @@ class OnlineServiceImpl extends BaseService implements OnlineService
             $savedOnine = $this->getOnlineBySessId($online['sess_id']);
 
             if (empty($savedOnine)) {
-                $this->getOnlineDao()->create($online);
+                return $this->getOnlineDao()->create($online);
             } else {
-                $this->getOnlineDao()->update($savedOnine['id'], $online);
+                return $this->getOnlineDao()->update($savedOnine['id'], $online);
             }
         }
     }
@@ -53,7 +53,7 @@ class OnlineServiceImpl extends BaseService implements OnlineService
     public function countLogined($gtAccessTime)
     {
         $condition = array(
-            'gt_sess_time' => $gtAccessTime,
+            'active_time_GT' => $gtAccessTime,
             'is_login' => 1
         );
         return $this->getOnlineDao()->count($condition);
@@ -62,13 +62,13 @@ class OnlineServiceImpl extends BaseService implements OnlineService
     public function countOnline($gtAccessTime)
     {
         $condition = array(
-            'gt_sess_time' => $gtAccessTime,
+            'active_time_GT' => $gtAccessTime,
         );
         return $this->getOnlineDao()->count($condition);
     }
     public function gc()
     {
-        return $this->getOnlineDao()->deleteByInvalid();
+        return $this->getOnlineDao()->deleteByDeadlineLessThan(time());
     }
 
     public function searchOnlines($condition, $orderBy, $start, $limit)

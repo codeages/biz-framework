@@ -8,14 +8,9 @@ class BizSessionHandler implements \SessionHandlerInterface
     protected $lockers = array();
     protected $gcCalled = false;
 
-    protected $maxLifeTime = 86400;
-
-    public function __construct($biz, $options = array())
+    public function __construct($biz)
     {
         $this->biz = $biz;
-        if (!empty($options['max_life_time'])) {
-            $this->maxLifeTime = $options['max_life_time'];
-        }
     }
 
     public function close()
@@ -45,7 +40,6 @@ class BizSessionHandler implements \SessionHandlerInterface
 
     public function open($save_path, $name)
     {
-        $this->gc($this->maxLifeTime);
         return true;
     }
 
@@ -63,11 +57,9 @@ class BizSessionHandler implements \SessionHandlerInterface
 
     public function write($session_id, $session_data)
     {
-        $currentTime = time();
         $unsavedSession = array(
             'sess_id' => $session_id,
             'sess_data' => $session_data,
-            'sess_deadline' => $currentTime + $this->maxLifeTime,
         );
         $this->getSessionService()->saveSession($unsavedSession);
         return true;

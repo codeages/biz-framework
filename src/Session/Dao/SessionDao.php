@@ -10,5 +10,5 @@ interface SessionDao extends GeneralDaoInterface
 
     public function deleteBySessId($sessId);
 
-    public function deleteByInvalid();
+    public function deleteBySessDeadlineLessThan($sessDeadline);
 }

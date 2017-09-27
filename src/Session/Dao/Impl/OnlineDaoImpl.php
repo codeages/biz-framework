@@ -14,21 +14,21 @@ class OnlineDaoImpl extends GeneralDaoImpl implements OnlineDao
         return $this->getByFields(array('sess_id' => $sessionId));
     }
 
-    public function deleteByInvalid()
+    public function deleteByDeadlineLessThan($deadline)
     {
-        $sql = "DELETE FROM {$this->table} WHERE sess_deadline < ?";
-        return $this->db()->executeUpdate($sql, array(time()));
+        $sql = "DELETE FROM {$this->table} WHERE deadline < ?";
+        return $this->db()->executeUpdate($sql, array($deadline));
     }
 
     public function declares()
     {
         return array(
-            'timestamps' => array('created_time', 'sess_time'),
-            'orderbys' => array('sess_time'),
+            'timestamps' => array('created_time', 'active_time'),
+            'orderbys' => array('active_time'),
             'serializes' => array(
             ),
             'conditions' => array(
-                'sess_time > :gt_sess_time',
+                'active_time > :active_time_GT',
                 'is_login = :is_login',
                 'user_id = :user_id'
             ),

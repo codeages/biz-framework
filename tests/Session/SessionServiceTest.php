@@ -4,6 +4,17 @@ namespace Tests;
 
 class SessionServiceTest extends IntegrationTestCase
 {
+    public function setUp()
+    {
+        parent::setUp();
+
+        $this->biz['session.options'] = array(
+            'max_life_time' => 1,
+            'redis_storage' => false,
+            'sess_prefix' => 'biz_session_'
+        );
+    }
+
     public function testCreate()
     {
         $mockedSession = $this->mockSession();
@@ -64,7 +75,6 @@ class SessionServiceTest extends IntegrationTestCase
         return array(
             'sess_id' => 'sess'.rand(1000000,9000000),
             'sess_data' => 'ababa',
-            'sess_deadline' => time() + 1,
         );
     }
 

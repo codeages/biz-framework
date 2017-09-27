@@ -8,5 +8,5 @@ interface OnlineDao extends GeneralDaoInterface
 {
     public function getBySessId($sessionId);
 
-    public function deleteByInvalid();
+    public function deleteByDeadlineLessThan($deadline);
 }
