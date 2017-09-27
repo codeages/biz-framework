@@ -42,7 +42,5 @@ interface OrderService
 
     public function getOrderItemByOrderIdAndTargetIdAndTargetType($orderId, $targetId, $targetType);
 
-    public function sumOrderPaidAmountByTargetId($targetId);
-
     public function sumPaidAmount($conditions);
 }
