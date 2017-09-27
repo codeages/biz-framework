@@ -98,13 +98,13 @@ class OrderDaoImpl extends GeneralDaoImpl implements OrderDao
             $conditions['ids'] = array(0);
 
             $itemConditionsString = '';
-            if(!empty($customConditions['order_item_title'])) {
+            if (!empty($customConditions['order_item_title'])) {
                 $itemConditionsString .= "AND title LIKE '%{$customConditions['order_item_title']}%'";
             }
 
             if (!empty($customConditions['order_item_target_ids'])) {
                 if (!is_array($customConditions['order_item_target_ids'])) {
-                    throw $this->createDaoException("column order_item_target_ids mast be array");
+                    throw $this->createDaoException('column order_item_target_ids mast be array');
                 }
                 $targetIdMarks = implode(',', $customConditions['order_item_target_ids']);
                 $itemConditionsString .= "AND target_id IN ({$targetIdMarks})";
@@ -122,9 +122,9 @@ class OrderDaoImpl extends GeneralDaoImpl implements OrderDao
                     $ids = ArrayToolkit::column($itemResult, 'order_id');
                     $conditions['ids'] = $ids;
                 }
-
             }
         }
+
         return $conditions;
     }
 
@@ -152,11 +152,11 @@ class OrderDaoImpl extends GeneralDaoImpl implements OrderDao
             'serializes' => array(
                 'pay_data' => 'json',
                 'callback' => 'json',
-                'create_extra' => 'json'
+                'create_extra' => 'json',
             ),
             'orderbys' => array(
                 'id',
-                'created_time'
+                'created_time',
             ),
             'conditions' => array(
                 'id IN (:ids)',
@@ -169,12 +169,13 @@ class OrderDaoImpl extends GeneralDaoImpl implements OrderDao
                 'pay_amount > :pay_amount_GT',
                 'price_amount > :price_amount_GT',
                 'status = :status',
+                'status IN (:statuses)',
                 'display_status = :display_status',
                 'seller_id = :seller_id',
                 'created_time >= :start_time',
                 'created_time <= :end_time',
                 'title LIKE :title_like',
-            )
+            ),
         );
     }
 }
