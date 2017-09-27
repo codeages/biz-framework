@@ -22,7 +22,7 @@ class PayServiceTest extends IntegrationTestCase
             )
         );
 
-        $this->biz['payment.options'] = array(
+        $this->biz['payment.final_options'] = array(
             'closed_notify' => true,
             'refunded_notify' => true
         );

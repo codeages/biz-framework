@@ -219,6 +219,46 @@ class AccountServiceImpl extends BaseService implements AccountService
         return $this->transfer($fields, true);
     }
 
+    public function withdraw($fields)
+    {
+        if (!ArrayToolkit::requireds($fields, array('user_id', 'amount', 'title', 'currency', 'platform'))) {
+            throw $this->createInvalidArgumentException('fields is invalid.');
+        }
+
+        $lock = $this->biz['lock'];
+        $key = "withdraw_{$fields['user_id']}";
+        try {
+            $lock->get($key);
+            $this->beginTransaction();
+
+            $userFlow = array(
+                'sn' => $this->generateSn(),
+                'title' => $fields['title'],
+                'type' => 'outflow',
+                'parent_sn' => '',
+                'currency' => $fields['currency'],
+                'amount_type' => 'money',
+                'user_id' => $fields['user_id'],
+                'trade_sn' => '',
+                'order_sn' => '',
+                'platform' => empty($fields['platform']) ? '' : $fields['platform'],
+                'amount' => $fields['amount']
+            );
+
+            $userBalance = $this->waveCashAmount($userFlow['user_id'], 0 - $fields['amount']);
+            $userFlow['user_balance'] = empty($userBalance['cash_amount']) ? 0 : $userBalance['cash_amount'];
+
+            $cashFlow = $this->getUserCashflowDao()->create($userFlow);
+            $this->commit();
+            $lock->release($key);
+            return $cashFlow;
+        } catch (\Exception $e) {
+            $this->rollback();
+            $lock->release($key);
+            throw $e;
+        }
+    }
+
     protected function transfer($fields, $isCoin = false)
     {
         if (!ArrayToolkit::requireds($fields, array('from_user_id', 'to_user_id', 'amount', 'title'))) {
