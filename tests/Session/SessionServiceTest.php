@@ -10,7 +10,7 @@ class SessionServiceTest extends IntegrationTestCase
 
         $this->biz['session.options'] = array(
             'max_life_time' => 1,
-            'redis_storage' => false,
+            'session_storage' => 'db',
             'sess_prefix' => 'biz_session_'
         );
     }

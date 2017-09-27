@@ -2,6 +2,8 @@
 
 namespace Codeages\Biz\Framework\Provider;
 
+use Codeages\Biz\Framework\Session\Storage\Impl\DbSessionStorageImpl;
+use Codeages\Biz\Framework\Session\Storage\Impl\RedisSessionStorageImpl;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
 
@@ -13,9 +15,17 @@ class SessionServiceProvider implements ServiceProviderInterface
 
         $container['session.options'] = array(
             'max_life_time' => 7200,
-            'redis_storage' => false,
+            'session_storage' => 'db', // exapmle: db, redis
             'sess_prefix' => 'biz_session_'
         );
+
+        $container['session.storage.db'] = function () use ($container) {
+            return new DbSessionStorageImpl($container);
+        };
+
+        $container['session.storage.redis'] = function () use ($container) {
+            return new RedisSessionStorageImpl($container);
+        };
 
         $container['console.commands'][] = function () use ($container) {
             return new \Codeages\Biz\Framework\Session\Command\TableCommand($container);

@@ -16,54 +16,22 @@ class SessionServiceImpl extends BaseService implements SessionService
         }
 
         $session['sess_deadline'] = time() + $this->getMaxLifeTime();
-
-        if ($this->isRedisStorage()) {
-            $session['sess_time'] = time();
-            $this->getRedis()->setex($this->getSessionPrefix().':'.$session['sess_id'], $this->getMaxLifeTime(), $session['sess_data']);;
-            return $session;
-        } else {
-            $savedSession = $this->getSessionDao()->getBySessId($session['sess_id']);
-            if (empty($savedSession)) {
-                return $this->getSessionDao()->create($session);
-            } else {
-                return $this->getSessionDao()->update($savedSession['id'], $session);
-            }
-        }
+        return $this->getSessionStorage()->saveSession($session);
     }
 
     public function deleteSessionBySessId($sessId)
     {
-        if ($this->isRedisStorage()) {
-            return $this->getRedis()->delete($this->getSessionPrefix().':'.$sessId);
-        } else {
-            return $this->getSessionDao()->deleteBySessId($sessId);
-        }
+        return $this->getSessionStorage()->deleteSessionBySessId($sessId);
     }
 
     public function getSessionBySessId($sessId)
     {
-        if ($this->isRedisStorage()) {
-            return $this->getRedis()->get($this->getSessionPrefix().':'.$sessId);
-        } else {
-            return $this->getSessionDao()->getBySessId($sessId);
-        }
+        return $this->getSessionStorage()->getSessionBySessId($sessId);
     }
 
     public function gc()
     {
-        if (!$this->isRedisStorage()) {
-            return $this->getSessionDao()->deleteBySessDeadlineLessThan(time());
-        }
-    }
-
-    protected function getSessionDao()
-    {
-        return $this->biz->dao('Session:SessionDao');
-    }
-
-    protected function getSessionPrefix()
-    {
-        return $this->biz['session.options']['sess_prefix'];
+        return $this->getSessionStorage()->gc(time());
     }
 
     protected function getMaxLifeTime()
@@ -71,13 +39,9 @@ class SessionServiceImpl extends BaseService implements SessionService
         return $this->biz['session.options']['max_life_time'];
     }
 
-    protected function isRedisStorage()
+    protected function getSessionStorage()
     {
-        return $this->biz['session.options']['redis_storage'];
+        return $this->biz['session.storage.'.$this->biz['session.options']['session_storage']];
     }
 
-    protected function getRedis()
-    {
-        return $this->biz['redis'];
-    }
 }
