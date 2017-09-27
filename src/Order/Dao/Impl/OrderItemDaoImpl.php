@@ -36,8 +36,8 @@ class OrderItemDaoImpl extends GeneralDaoImpl implements OrderItemDao
             ->select('sum(`pay_amount`)')
             ->andWhere('target_id = :target_id')
             ->andWhere('target_type = :target_type')
-            ->andWhere('pay_time >= :start_pay_time')
-            ->andWhere('pay_time <= :end_pay_time')
+            ->andWhere('pay_time >= :pay_time_GE')
+            ->andWhere('pay_time <= :pay_time_LE')
             ->andWhere('status IN (:statuses)')
             ->andWhere('status = :status');
 
