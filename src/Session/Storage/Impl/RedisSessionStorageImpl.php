@@ -8,7 +8,7 @@ class RedisSessionStorageImpl implements SessionStorage
 {
     private $biz;
 
-    function __construct($biz)
+    public function __construct($biz)
     {
         $this->biz = $biz;
     }
@@ -26,7 +26,8 @@ class RedisSessionStorageImpl implements SessionStorage
     public function saveSession($session)
     {
         $session['sess_time'] = time();
-        $this->getRedis()->setex($this->getSessionPrefix().':'.$session['sess_id'], $this->getMaxLifeTime(), $session['sess_data']);;
+        $this->getRedis()->setex($this->getSessionPrefix().':'.$session['sess_id'], $this->getMaxLifeTime(), $session['sess_data']);
+
         return $session;
     }
 

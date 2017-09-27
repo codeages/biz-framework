@@ -62,6 +62,7 @@ class BizSessionHandler implements \SessionHandlerInterface
             'sess_data' => $session_data,
         );
         $this->getSessionService()->saveSession($unsavedSession);
+
         return true;
     }
 

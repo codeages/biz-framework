@@ -39,7 +39,7 @@ class JobFiredDaoImpl extends GeneralDaoImpl implements JobFiredDao
             'conditions' => array(
                 'job_id = :job_id',
                 'status = :status',
-                'fired_time < :fired_time_LT'
+                'fired_time < :fired_time_LT',
             ),
         );
     }

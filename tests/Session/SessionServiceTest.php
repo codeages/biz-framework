@@ -21,7 +21,7 @@ class SessionServiceTest extends IntegrationTestCase
 
         $keys = array_keys($mockedSession);
         foreach ($keys as $key) {
-            $this->assertEquals($mockedSession[$key],$session[$key]);
+            $this->assertEquals($mockedSession[$key], $session[$key]);
         }
     }
 
@@ -39,10 +39,10 @@ class SessionServiceTest extends IntegrationTestCase
             if (in_array($key, array('sess_data', 'sess_time'))) {
                 continue;
             }
-            $this->assertEquals($mockedSession[$key],$session[$key]);
+            $this->assertEquals($mockedSession[$key], $session[$key]);
         }
 
-        $this->assertNotEquals($mockedSession['sess_data'],$updatedSession['sess_data']);
+        $this->assertNotEquals($mockedSession['sess_data'], $updatedSession['sess_data']);
         $this->assertNotEmpty($updatedSession['sess_time']);
     }
 
@@ -71,7 +71,7 @@ class SessionServiceTest extends IntegrationTestCase
     protected function mockSession()
     {
         return array(
-            'sess_id' => 'sess'.rand(1000000,9000000),
+            'sess_id' => 'sess'.rand(1000000, 9000000),
             'sess_data' => 'ababa',
         );
     }

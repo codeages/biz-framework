@@ -8,7 +8,7 @@ class DbSessionStorageImpl implements SessionStorage
 {
     private $biz;
 
-    function __construct($biz)
+    public function __construct($biz)
     {
         $this->biz = $biz;
     }

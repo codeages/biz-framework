@@ -11,11 +11,12 @@ class SessionServiceImpl extends BaseService implements SessionService
 {
     public function saveSession($session)
     {
-        if(!ArrayToolkit::requireds($session, array('sess_id', 'sess_data'))) {
+        if (!ArrayToolkit::requireds($session, array('sess_id', 'sess_data'))) {
             throw new InvalidArgumentException('args is invalid.');
         }
 
         $session['sess_deadline'] = time() + $this->getMaxLifeTime();
+
         return $this->getSessionStorage()->saveSession($session);
     }
 
@@ -43,5 +44,4 @@ class SessionServiceImpl extends BaseService implements SessionService
     {
         return $this->biz['session.storage.'.$this->biz['session.options']['session_storage']];
     }
-
 }

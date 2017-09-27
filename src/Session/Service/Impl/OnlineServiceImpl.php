@@ -11,7 +11,7 @@ class OnlineServiceImpl extends BaseService implements OnlineService
 {
     public function saveOnline($online)
     {
-        if(!ArrayToolkit::requireds($online, array('sess_id'))) {
+        if (!ArrayToolkit::requireds($online, array('sess_id'))) {
             throw new InvalidArgumentException('sess_id is required.');
         }
         $user = $this->biz['user'];
@@ -53,8 +53,9 @@ class OnlineServiceImpl extends BaseService implements OnlineService
     {
         $condition = array(
             'active_time_GT' => $gtAccessTime,
-            'is_login' => 1
+            'is_login' => 1,
         );
+
         return $this->getOnlineDao()->count($condition);
     }
 
@@ -63,8 +64,10 @@ class OnlineServiceImpl extends BaseService implements OnlineService
         $condition = array(
             'active_time_GT' => $gtAccessTime,
         );
+
         return $this->getOnlineDao()->count($condition);
     }
+
     public function gc()
     {
         return $this->getOnlineDao()->deleteByDeadlineLessThan(time());

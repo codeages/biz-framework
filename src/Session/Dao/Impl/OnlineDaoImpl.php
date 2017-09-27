@@ -17,6 +17,7 @@ class OnlineDaoImpl extends GeneralDaoImpl implements OnlineDao
     public function deleteByDeadlineLessThan($deadline)
     {
         $sql = "DELETE FROM {$this->table} WHERE deadline < ?";
+
         return $this->db()->executeUpdate($sql, array($deadline));
     }
 
@@ -30,7 +31,7 @@ class OnlineDaoImpl extends GeneralDaoImpl implements OnlineDao
             'conditions' => array(
                 'active_time > :active_time_GT',
                 'is_login = :is_login',
-                'user_id = :user_id'
+                'user_id = :user_id',
             ),
         );
     }
