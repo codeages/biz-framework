@@ -16,9 +16,9 @@ class RefundFailOrderStatus extends AbstractOrderStatus
         return $this->changeStatus(self::NAME);
     }
 
-    protected function chengeStatus($name)
+    protected function changeStatus($name)
     {
-        $this->getOrderDao()->update($this->order['id'], array(
+        $order = $this->getOrderDao()->update($this->order['id'], array(
             'status' => $name,
         ));
 
