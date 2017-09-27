@@ -13,17 +13,17 @@ class RedisSessionStorageImpl implements SessionStorage
         $this->biz = $biz;
     }
 
-    public function deleteSessionBySessId($sessId)
+    public function delete($sessId)
     {
         return $this->getRedis()->delete($this->getSessionPrefix().':'.$sessId);
     }
 
-    public function getSessionBySessId($sessId)
+    public function get($sessId)
     {
         return $this->getRedis()->get($this->getSessionPrefix().':'.$sessId);
     }
 
-    public function saveSession($session)
+    public function save($session)
     {
         $session['sess_time'] = time();
         $this->getRedis()->setex($this->getSessionPrefix().':'.$session['sess_id'], $this->getMaxLifeTime(), $session['sess_data']);

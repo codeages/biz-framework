@@ -2,7 +2,7 @@
 
 namespace Tests;
 
-class SessionServiceTest extends IntegrationTestCase
+class DbSessionStorageTest extends IntegrationTestCase
 {
     public function setUp()
     {

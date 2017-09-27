@@ -13,17 +13,17 @@ class DbSessionStorageImpl implements SessionStorage
         $this->biz = $biz;
     }
 
-    public function deleteSessionBySessId($sessId)
+    public function delete($sessId)
     {
         return $this->getSessionDao()->deleteBySessId($sessId);
     }
 
-    public function getSessionBySessId($sessId)
+    public function get($sessId)
     {
         return $this->getSessionDao()->getBySessId($sessId);
     }
 
-    public function saveSession($session)
+    public function save($session)
     {
         $savedSession = $this->getSessionDao()->getBySessId($session['sess_id']);
         if (empty($savedSession)) {

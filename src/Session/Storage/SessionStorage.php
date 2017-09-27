@@ -4,11 +4,11 @@ namespace Codeages\Biz\Framework\Session\Storage;
 
 interface SessionStorage
 {
-    public function saveSession($session);
+    public function save($session);
 
-    public function deleteSessionBySessId($sessId);
+    public function delete($sessId);
 
-    public function getSessionBySessId($sessId);
+    public function get($sessId);
 
     public function gc();
 }

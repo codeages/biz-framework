@@ -17,17 +17,17 @@ class SessionServiceImpl extends BaseService implements SessionService
 
         $session['sess_deadline'] = time() + $this->getMaxLifeTime();
 
-        return $this->getSessionStorage()->saveSession($session);
+        return $this->getSessionStorage()->save($session);
     }
 
     public function deleteSessionBySessId($sessId)
     {
-        return $this->getSessionStorage()->deleteSessionBySessId($sessId);
+        return $this->getSessionStorage()->delete($sessId);
     }
 
     public function getSessionBySessId($sessId)
     {
-        return $this->getSessionStorage()->getSessionBySessId($sessId);
+        return $this->getSessionStorage()->get($sessId);
     }
 
     public function gc()
