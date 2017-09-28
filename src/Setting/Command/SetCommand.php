@@ -30,13 +30,13 @@ class SetCommand extends AbstractCommand
         $oldData = $this->getSettingService()->get($name);
 
         $output->writeln("Setting name: {$name}");
-        $output->writeln("Old data: ". var_export($oldData, true));
-        $output->writeln("New data: ". var_export($data, true));
+        $output->writeln('Old data: '.var_export($oldData, true));
+        $output->writeln('New data: '.var_export($data, true));
 
         if ($needAsk) {
             $helper = $this->getHelper('question');
             $question = new ConfirmationQuestion('<question>Real change setting data ? (y/n)</question>', false);
-    
+
             if (!$helper->ask($input, $output, $question)) {
                 return;
             }
@@ -44,7 +44,7 @@ class SetCommand extends AbstractCommand
 
         $this->getSettingService()->set($name, $data);
 
-        $output->writeln("New data setted.");
+        $output->writeln('New data setted.');
     }
 
     protected function getSettingService()
