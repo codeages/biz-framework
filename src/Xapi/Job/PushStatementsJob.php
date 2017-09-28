@@ -4,25 +4,37 @@ namespace Codeages\Biz\Framework\Xapi\Job;
 
 use Codeages\Biz\Framework\Scheduler\AbstractJob;
 use Codeages\Biz\Framework\Util\ArrayToolkit;
+use Guzzle\Http\Client;
 
 class PushStatementsJob extends AbstractJob
 {
+
     public function execute()
     {
         $condition = array(
             'status' => 'created'
         );
-        $statments = $this->getXapiService()->searchStatements($condition, array('created_time' => 'ASC'), 0, 100);
-        $statementIds = ArrayToolkit::column($statments, 'id');
+        $statements = $this->getXapiService()->searchStatements($condition, array('created_time' => 'ASC'), 0, 100);
+        $statementIds = ArrayToolkit::column($statements, 'id');
 
         $this->getXapiService()->updateStatementsPushingByStatementIds($statementIds);
-//        $this->getClient()->push($statments);
-        $this->getXapiService()->updateStatementsPushedByStatementIds($statementIds);
+        $result = $this->pushStatements($statements);
+        if ($result) {
+            $this->getXapiService()->updateStatementsPushedByStatementIds($statementIds);
+        }
     }
 
-    protected function getClient()
+    protected function pushStatements($statements)
     {
-        // TODO
+        $client = new Client();
+        $request = $client->post($this->biz['xapi.options']['getway'], array(), $statements);
+
+        $response = $request->send();
+        if ($response->getStatusCode() == 200) {
+            return true;
+        }
+
+        return false;
     }
 
     protected function getXapiService()

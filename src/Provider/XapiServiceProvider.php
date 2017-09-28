@@ -12,7 +12,8 @@ class XapiServiceProvider implements ServiceProviderInterface
         $biz['autoload.aliases']['Xapi'] = 'Codeages\\Biz\\Framework\\Xapi';
 
         $biz['xapi.options'] = array(
-            'version' => '1.0.0'
+            'version' => '1.0.0',
+            'getway' => ''
         );
 
         $biz['console.commands'][] = function () use ($biz) {
