@@ -32,6 +32,7 @@ $biz->register(new \Codeages\Biz\Framework\Provider\MonologServiceProvider(), [
     'monolog.logfile' => $biz['log_dir'].'/biz.log',
 ]);
 $biz->register(new \Codeages\Biz\Framework\Provider\SessionServiceProvider());
+$biz->register(new \Codeages\Biz\Framework\Provider\XapiServiceProvider());
 
 $biz['queue.connection.default'] = function ($biz) {
     return new \Codeages\Biz\Framework\Queue\Driver\DatabaseQueue('default', $biz);

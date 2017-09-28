@@ -11,6 +11,7 @@ use Codeages\Biz\Framework\Provider\TargetlogServiceProvider;
 use Codeages\Biz\Framework\Provider\TokenServiceProvider;
 use Codeages\Biz\Framework\Provider\SettingServiceProvider;
 use Codeages\Biz\Framework\Provider\QueueServiceProvider;
+use Codeages\Biz\Framework\Provider\XapiServiceProvider;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
 use Codeages\Biz\Framework\Context\Biz;
@@ -88,6 +89,7 @@ class IntegrationTestCase extends TestCase
         $biz->register(new SettingServiceProvider());
         $biz->register(new QueueServiceProvider());
         $biz->register(new SessionServiceProvider());
+        $biz->register(new XapiServiceProvider());
 
         $cacheEnabled = getenv('CACHE_ENABLED');
 
