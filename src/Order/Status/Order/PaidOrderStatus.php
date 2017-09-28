@@ -49,7 +49,6 @@ class PaidOrderStatus extends AbstractOrderStatus
             'paid_coin_amount',
         ));
         $data['status'] = PaidOrderStatus::NAME;
-        $data['display_status'] = 'paid';
         return $this->getOrderDao()->update($order['id'], $data);
     }
 
