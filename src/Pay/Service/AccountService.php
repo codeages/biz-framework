@@ -32,7 +32,7 @@ interface AccountService
 
     public function transferCash($fields);
 
-    public function withdraw($fields);
+    public function withdrawCash($fields);
 
     public function countUserCashflows($conditions);
 

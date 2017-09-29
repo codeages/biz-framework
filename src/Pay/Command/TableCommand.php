@@ -27,6 +27,7 @@ class TableCommand extends AbstractCommand
             'payment_trade_add_platform_type',
             'cashflow_delete_user_type',
             'cashflow_add_title',
+            'cashflow_add_buyer_id'
         );
 
         foreach ($migrations as $migration) {

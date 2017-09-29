@@ -219,14 +219,24 @@ class AccountServiceImpl extends BaseService implements AccountService
         return $this->transfer($fields, true);
     }
 
-    public function withdraw($fields)
+    public function rechargeCash($fields)
+    {
+        return $this->waveCashAmountWithUserCashflow($fields, 'inflow');
+    }
+
+    public function withdrawCash($fields)
+    {
+        return $this->waveCashAmountWithUserCashflow($fields, 'outflow');
+    }
+
+    protected function waveCashAmountWithUserCashflow($fields, $flowType)
     {
         if (!ArrayToolkit::requireds($fields, array('user_id', 'amount', 'title', 'currency', 'platform'))) {
             throw $this->createInvalidArgumentException('fields is invalid.');
         }
 
         $lock = $this->biz['lock'];
-        $key = "withdraw_{$fields['user_id']}";
+        $key = "transfer_{$fields['user_id']}";
         try {
             $lock->get($key);
             $this->beginTransaction();
@@ -234,18 +244,20 @@ class AccountServiceImpl extends BaseService implements AccountService
             $userFlow = array(
                 'sn' => $this->generateSn(),
                 'title' => $fields['title'],
-                'type' => 'outflow',
-                'parent_sn' => '',
+                'type' => $flowType,
+                'parent_sn' => empty($fields['parent_sn']) ? '' : $fields['parent_sn'],
                 'currency' => $fields['currency'],
                 'amount_type' => 'money',
                 'user_id' => $fields['user_id'],
-                'trade_sn' => '',
-                'order_sn' => '',
+                'trade_sn' => empty($fields['trade_sn']) ? '' : $fields['trade_sn'],
+                'order_sn' => empty($fields['order_sn']) ? '' : $fields['order_sn'],
                 'platform' => empty($fields['platform']) ? '' : $fields['platform'],
-                'amount' => $fields['amount']
+                'amount' => $fields['amount'],
+                'buyer_id' => $fields['user_id'],
             );
 
-            $userBalance = $this->waveCashAmount($userFlow['user_id'], 0 - $fields['amount']);
+            $amount = $flowType == 'inflow' ? $fields['amount'] : 0 - $fields['amount'];
+            $userBalance = $this->waveCashAmount($userFlow['user_id'], $amount);
             $userFlow['user_balance'] = empty($userBalance['cash_amount']) ? 0 : $userBalance['cash_amount'];
 
             $cashFlow = $this->getUserCashflowDao()->create($userFlow);
@@ -269,15 +281,18 @@ class AccountServiceImpl extends BaseService implements AccountService
             throw $this->createInvalidArgumentException('fields is invalid.');
         }
 
-        $lock = $this->biz['lock'];
-        $key = "recharge_from_{$fields['from_user_id']}_to_{$fields['to_user_id']}";
         try {
-            $lock->get($key);
+            $lock = $this->biz['lock'];
+            $lockFromUserKey = "transfer_{$fields['from_user_id']}";
+            $lockToUserKey = "transfer_{$fields['to_user_id']}";
+
             $this->beginTransaction();
 
+            $lock->get($lockFromUserKey);
             $userFlow = array(
                 'sn' => $this->generateSn(),
                 'title' => $fields['title'],
+                'buyer_id' => $fields['buyer_id'],
                 'type' => 'outflow',
                 'parent_sn' => empty($fields['parent_sn'])? '' : $fields['parent_sn'],
                 'currency' => $isCoin ? 'coin': $fields['currency'],
@@ -298,10 +313,13 @@ class AccountServiceImpl extends BaseService implements AccountService
             }
 
             $cashFlow = $this->getUserCashflowDao()->create($userFlow);
+            $lock->release($lockFromUserKey);
 
+            $lock->get($lockToUserKey);
             $userFlow = array(
                 'sn' => $this->generateSn(),
                 'title' => $fields['title'],
+                'buyer_id' => $fields['buyer_id'],
                 'type' => 'inflow',
                 'parent_sn' => $cashFlow['sn'],
                 'currency' => $isCoin ? 'coin': $fields['currency'],
@@ -322,12 +340,12 @@ class AccountServiceImpl extends BaseService implements AccountService
             }
 
             $cashFlow = $this->getUserCashflowDao()->create($userFlow);
+            $lock->release($lockToUserKey);
+
             $this->commit();
-            $lock->release($key);
             return $cashFlow;
         } catch (\Exception $e) {
             $this->rollback();
-            $lock->release($key);
             throw $e;
         }
     }

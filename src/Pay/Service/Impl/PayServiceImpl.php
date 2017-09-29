@@ -318,6 +318,7 @@ class PayServiceImpl extends BaseService implements PayService
             'platform' => $trade['platform'],
             'parent_sn' => '',
             'currency' => $trade['currency'],
+            'buyer_id' => $trade['user_id'],
         );
         $flow = $this->getAccountService()->transferCash($fields);
 
@@ -330,7 +331,8 @@ class PayServiceImpl extends BaseService implements PayService
                 'trade_sn' => $trade['trade_sn'],
                 'order_sn' => $trade['order_sn'],
                 'platform' => $trade['platform'],
-                'parent_sn' => $flow['sn']
+                'parent_sn' => $flow['sn'],
+                'buyer_id' => $trade['user_id'],
             );
             $this->getAccountService()->transferCoin($fields);
         }
@@ -408,16 +410,29 @@ class PayServiceImpl extends BaseService implements PayService
 
     protected function transfer($trade)
     {
+
         if (!empty($trade['cash_amount'])) {
             $fields = array(
+                'user_id' => $trade['user_id'],
+                'amount' => $trade['cash_amount'],
+                'title' => $trade['title'],
+                'currency' => $trade['currency'],
+                'platform' => $trade['platform'],
+                'trade_sn' => $trade['trade_sn'],
+                'order_sn' => $trade['order_sn'],
+            );
+            $flow = $this->getAccountService()->rechargeCash($fields);
+
+            $fields = array(
                 'from_user_id' => $trade['user_id'],
+                'buyer_id' => $trade['user_id'],
                 'to_user_id' => $trade['seller_id'],
                 'amount' => $trade['cash_amount'],
                 'title' => $trade['title'],
                 'trade_sn' => $trade['trade_sn'],
                 'order_sn' => $trade['order_sn'],
                 'platform' => $trade['platform'],
-                'parent_sn' => '',
+                'parent_sn' => $flow['sn'],
                 'currency' => $trade['currency']
             );
             $flow = $this->getAccountService()->transferCash($fields);
@@ -428,6 +443,7 @@ class PayServiceImpl extends BaseService implements PayService
                 $fields = array(
                     'from_user_id' => $trade['seller_id'],
                     'to_user_id' => $trade['user_id'],
+                    'buyer_id' => $trade['user_id'],
                     'amount' => $trade['cash_amount'] * $this->getDefaultCoinRate(),
                     'title' => $trade['title'],
                     'trade_sn' => $trade['trade_sn'],
@@ -445,6 +461,7 @@ class PayServiceImpl extends BaseService implements PayService
                 $fields = array(
                     'from_user_id' => $trade['user_id'],
                     'to_user_id' => $trade['seller_id'],
+                    'buyer_id' => $trade['user_id'],
                     'amount' => $trade['coin_amount'],
                     'title' => $trade['title'],
                     'trade_sn' => $trade['trade_sn'],
