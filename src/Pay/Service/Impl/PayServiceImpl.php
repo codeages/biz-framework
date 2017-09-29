@@ -54,19 +54,8 @@ class PayServiceImpl extends BaseService implements PayService
 
             $trade = $this->createPaymentTrade($data);
 
-            if ($trade['cash_amount'] != 0) {
+            if ($trade['cash_amount'] > 0) {
                 $trade = $this->createPaymentPlatformTrade($data, $trade);
-            } else {
-                $mockNotify = array(
-                    'status' => 'paid',
-                    'paid_time' => time(),
-                    'cash_flow' => '',
-                    'cash_type' => '',
-                    'trade_sn' => $trade['trade_sn'],
-                    'pay_amount' => '0',
-                );
-
-                $trade = $this->updateTradeToPaid($mockNotify);
             }
 
             $this->commit();
@@ -147,6 +136,20 @@ class PayServiceImpl extends BaseService implements PayService
 
     public function notifyPaid($payment, $data)
     {
+        if ($payment == 'coin') {
+            $mockNotify = array(
+                'status' => 'paid',
+                'paid_time' => time(),
+                'cash_flow' => '',
+                'cash_type' => '',
+                'trade_sn' => $data['trade_sn'],
+                'pay_amount' => '0',
+            );
+
+            $trade = $this->updateTradeToPaid($mockNotify);
+            return $trade;
+        }
+
         list($data, $result) = $this->getPayment($payment)->converterNotify($data);
         $this->getTargetlogService()->log(TargetlogService::INFO, 'trade.paid_notify', $data['trade_sn'], "收到第三方支付平台{$payment}的通知，交易号{$data['trade_sn']}，支付状态{$data['status']}", $data);
 

@@ -171,6 +171,7 @@ class PayServiceTest extends IntegrationTestCase
         $data = $this->mockTrade();
         $data['amount'] = 20;
         $trade = $this->getPayService()->createTrade($data);
+        $this->getPayService()->notifyPaid('coin', $trade);
 
         $trade = $this->getPaymentTradeDao()->get($trade['id']);
         $this->assertEquals('paid', $trade['status']);
