@@ -13,7 +13,7 @@ class XapiServiceTest extends IntegrationTestCase
 
         $this->biz['xapi.options'] = array(
             'version' => '1.0.0',
-            'getway' => ''
+            'getway' => 'http://192.168.4.214:8762/xapi/statement'
         );
 
         $this->biz['user'] = array(
@@ -59,13 +59,51 @@ class XapiServiceTest extends IntegrationTestCase
         $this->asserts($statement, $savedStatement);
     }
 
-    public function testPushStatementJob()
+    public function pushStatementJob()
     {
         $statement = array(
             'data' => array(
-                'verb' => 'xx',
-                'actor' => 'xx',
-                'object' => 'xx'
+                'actor' => array(
+                    "objectType" => "Agent",
+                        "account" => array(
+                        "id" => "38923",
+                        "name" => "张三",
+                        "email" => "zhangsan@howzhi.com",
+                        "homePage" => "http://www.ganlantu.com"
+                    )
+                ),
+                'verb' => array(
+                    "id" => "https://w3id.org/xapi/acrossx/verbs/watched",
+                    "display" => array(
+                        "zh-CN" => "观看",
+                        "en-US" => "watched"
+                    )
+                ),
+                'object' => array(
+                    "id" => "99cfb51730c44434b60a9bb23c65bd0a",
+                    "type" => "https://w3id.org/xapi/acrossx/activities/video",
+                    "defination" => array(
+                        "name" => array(
+                            "zh-CN" => "摄影基础"
+                        )
+                    )
+                ),
+                'result' => array(
+                    "duration" => "PT4M30S",
+                    "extensions" => array(
+                        "http://id.tincanapi.com/extension/starting-point" => "PT2M",
+                        "http://id.tincanapi.com/extension/ending-point" => "PT6M30S"
+                    )
+                ),
+                'context' => array(
+                    "extensions" => array(
+                        "http://xapi.edusoho.com/extensions/school" => array(
+                            "id" => "110",
+                            "name" => "Photo",
+                            "url" => "http://www.edusoho.com"
+                        )
+                    )
+                )
             ),
         );
         $savedStatement = $this->getXapiService()->createStatement($statement);

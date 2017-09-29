@@ -26,8 +26,18 @@ class PushStatementsJob extends AbstractJob
 
     protected function pushStatements($statements)
     {
+        $pushdStatements = array();
+        foreach ($statements as $statement) {
+            $pushStatement = ArrayToolkit::parts($statement['data'], array('actor', 'verb', 'object', 'result', 'context'));
+            $pushStatement['timestamp'] = time();
+            $pushStatement['id'] = $statement['uuid'];
+            $pushdStatements[] = $pushStatement;
+        }
+
         $client = new Client();
-        $request = $client->post($this->biz['xapi.options']['getway'], array(), $statements);
+        $request = $client->post($this->biz['xapi.options']['getway'], array(
+            'Content-type' => 'application/json; charset=utf-8',
+        ), json_encode($pushdStatements));
 
         $response = $request->send();
         if ($response->getStatusCode() == 200) {
