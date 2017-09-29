@@ -13,6 +13,7 @@ class XapiServiceTest extends IntegrationTestCase
 
         $this->biz['xapi.options'] = array(
             'version' => '1.0.0',
+            'getway' => ''
         );
 
         $this->biz['user'] = array(
@@ -31,6 +32,7 @@ class XapiServiceTest extends IntegrationTestCase
         );
         $savedStatement = $this->getXapiService()->createStatement($statement);
 
+        $this->assertNotEmpty($savedStatement['uuid']);
         $this->asserts($statement, $savedStatement);
     }
 

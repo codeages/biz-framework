@@ -27,9 +27,18 @@ class XapiServiceImpl extends BaseService implements XapiService
 
         $statement['version'] = $this->biz['xapi.options']['version'];
         $statement['user_id'] = $this->biz['user']['id'];
-        $statement['uuid'] = '';
+        $statement['uuid'] = $this->generateUUID();
 
         return $this->getStatementDao()->create($statement);
+    }
+
+    protected function generateUUID()
+    {
+        mt_srand ( ( double ) microtime () * 10000 );
+        $charid = strtoupper ( md5 ( uniqid ( rand (), true ) ) );
+        $hyphen = chr ( 45 );
+        $uuid = '' . substr ( $charid, 0, 8 ) . $hyphen . substr ( $charid, 8, 4 ) . $hyphen . substr ( $charid, 12, 4 ) . $hyphen . substr ( $charid, 16, 4 ) . $hyphen . substr ( $charid, 20, 12 );
+        return $uuid;
     }
 
     public function updateStatementsPushedByStatementIds($statementIds)
