@@ -64,6 +64,7 @@ class AccountServiceTest extends IntegrationTestCase
         $recharge = array(
             'from_user_id' => $seller['user_id'],
             'to_user_id' => $userBalance['user_id'],
+            'buyer_id' => $userBalance['user_id'],
             'amount' => '10',
             'title' => '充值1000个虚拟币',
         );
@@ -95,6 +96,7 @@ class AccountServiceTest extends IntegrationTestCase
         $recharge = array(
             'to_user_id' => $buyer['user_id'],
             'from_user_id' => $seller['user_id'],
+            'buyer_id' => $buyer['user_id'],
             'amount' => '1000',
             'amount_type' => 'coin',
             'title' => '充值1000个虚拟币'
@@ -119,12 +121,13 @@ class AccountServiceTest extends IntegrationTestCase
 
         $draw = array(
             'user_id' => $this->biz['user']['id'],
+            'buyer_id' => $this->biz['user']['id'],
             'amount' => 100,
             'title' => '提现100',
             'currency' => 'CYN',
             'platform' => 'alipay'
         );
-        $this->getAccountService()->withdraw($draw);
+        $this->getAccountService()->withdrawCash($draw);
         $userBalance = $this->getAccountService()->getUserBalanceByUserId($userBalance['user_id']);
 
         $this->assertEquals(-100, $userBalance['cash_amount']);

@@ -18,10 +18,8 @@ class PayServiceProvider implements ServiceProviderInterface
         $biz['payment.final_options'] =  function () {
 
             $options = array(
-                'closed_notify' => false,
-                'trade_closed_sync_platform' => false,
-                'refunded_notify' => false,
-                'trade_refunded_sync_platform' => false,
+                'closed_by_notify' => false,
+                'refunded_by_notify' => false,
                 'coin_rate' => 1
             );
 
@@ -34,18 +32,6 @@ class PayServiceProvider implements ServiceProviderInterface
 
         $biz['console.commands'][] = function () use ($biz) {
             return new \Codeages\Biz\Framework\Pay\Command\TableCommand($biz);
-        };
-
-        $biz['console.commands'][] = function () use ($biz) {
-            return new \Codeages\Biz\Framework\Pay\Command\CashflowAddTitleCommand($biz);
-        };
-
-        $biz['console.commands'][] = function () use ($biz) {
-            return new \Codeages\Biz\Framework\Pay\Command\PaymentTradeAddCreatedParams($biz);
-        };
-
-        $biz['console.commands'][] = function () use ($biz) {
-            return new \Codeages\Biz\Framework\Pay\Command\CashflowDeleteUserTypeCommand($biz);
         };
 
         $this->registerStatus($biz);

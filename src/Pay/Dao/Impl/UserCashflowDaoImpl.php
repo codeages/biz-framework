@@ -153,6 +153,7 @@ class UserCashflowDaoImpl extends GeneralDaoImpl implements UserCashflowDao
                 'sn = :sn',
                 'user_id != :except_user_id',
                 'user_id = :user_id',
+                'buyer_id = :buyer_id',
                 'type = :type',
                 'amount > :amount_GT',
                 'amount >= :amount_GTE',
