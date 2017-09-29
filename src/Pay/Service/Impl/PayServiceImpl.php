@@ -184,7 +184,7 @@ class PayServiceImpl extends BaseService implements PayService
 
     protected function isCloseByPayment()
     {
-        return empty($this->biz['payment.final_options']['closed_notify']) ? false : $this->biz['payment.final_options']['closed_notify'];
+        return empty($this->biz['payment.final_options']['closed_by_notify']) ? false : $this->biz['payment.final_options']['closed_by_notify'];
     }
 
     protected function closeByPayment($trade)
@@ -288,7 +288,7 @@ class PayServiceImpl extends BaseService implements PayService
 
     protected function isRefundByPayment()
     {
-        return empty($this->biz['payment.final_options']['refunded_notify']) ? false : $this->biz['payment.final_options']['refunded_notify'];
+        return empty($this->biz['payment.final_options']['refunded_by_notify']) ? false : $this->biz['payment.final_options']['refunded_by_notify'];
     }
 
     protected function refundByPayment($trade)
