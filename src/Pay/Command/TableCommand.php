@@ -21,11 +21,25 @@ class TableCommand extends AbstractCommand
     {
         $directory = $input->getArgument('directory');
 
-        $this->ensureMigrationDoseNotExist($directory, 'biz_pay');
+        $migrations = array(
+            'pay',
+            'payment_trade_add_created_params',
+            'payment_trade_add_platform_type',
+            'cashflow_delete_user_type',
+            'cashflow_add_title',
+        );
 
-        $filepath = $this->generateMigrationPath($directory, 'biz_pay');
-        file_put_contents($filepath, file_get_contents(__DIR__.'/stub/pay.migration.stub'));
+        foreach ($migrations as $migration) {
+            $this->copyNextMigration($directory, $migration);
+        }
 
         $output->writeln('<info>Migration created successfully!</info>');
+    }
+
+    protected function copyNextMigration($directory, $next)
+    {
+        if (!$this->existMigration($directory, $next)) {
+            $this->generateMigration($directory, 'biz_'.$next, __DIR__."/stub/{$next}.migration.stub");
+        }
     }
 }

@@ -21,33 +21,6 @@ class OrderServiceProvider implements ServiceProviderInterface
             return new \Codeages\Biz\Framework\Order\Command\TableCommand($biz);
         };
 
-        $biz['console.commands'][] = function () use ($biz) {
-            return new \Codeages\Biz\Framework\Order\Command\OrderAddDisplayStatusCommand($biz);
-        };
-
-        $biz['console.commands'][] = function () use ($biz) {
-            return new \Codeages\Biz\Framework\Order\Command\OrderRefundAddTitleCommand($biz);
-        };
-
-        $biz['console.commands'][] = function () use ($biz) {
-            return new \Codeages\Biz\Framework\Order\Command\OrderItemAndDeductAddSnapshotCommand($biz);
-        };
-
-        $biz['console.commands'][] = function () use ($biz) {
-            return new \Codeages\Biz\Framework\Order\Command\OrderAddDeviceCommand($biz);
-        };
-
-        $biz['console.commands'][] = function () use ($biz) {
-            return new \Codeages\Biz\Framework\Order\Command\OrderRefundAddRefundAmountCommand($biz);
-        };
-
-        $biz['console.commands'][] = function () use ($biz) {
-            return new \Codeages\Biz\Framework\Order\Command\OrderAddPaidAmountCommand($biz);
-        };
-
-        $biz['console.commands'][] = function () use ($biz) {
-            return new \Codeages\Biz\Framework\Order\Command\OrderAddRefundDeadlineCommand($biz);
-        };
     }
 
     private function registerOrderRefundStatus($biz)

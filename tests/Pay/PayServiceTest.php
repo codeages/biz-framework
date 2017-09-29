@@ -311,6 +311,7 @@ class PayServiceTest extends IntegrationTestCase
 
     public function tearDown()
     {
+        parent::tearDown();
         \Mockery::close();
     }
 
