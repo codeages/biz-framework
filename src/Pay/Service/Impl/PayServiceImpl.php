@@ -12,7 +12,7 @@ use Codeages\Biz\Framework\Targetlog\Service\TargetlogService;
 
 class PayServiceImpl extends BaseService implements PayService
 {
-    public function createTrade($data)
+    public function createTrade($data, $createPlatformTrade = true)
     {
         $data = ArrayToolkit::parts($data, array(
             'goods_title',
@@ -36,15 +36,15 @@ class PayServiceImpl extends BaseService implements PayService
         ));
 
         if ('recharge' == $data['type']) {
-            return $this->createRechargeTrade($data);
+            return $this->createRechargeTrade($data, $createPlatformTrade);
         } else if ('purchase' == $data['type']) {
-            return $this->createPurchaseTrade($data);
+            return $this->createPurchaseTrade($data, $createPlatformTrade);
         } else {
             throw new InvalidArgumentException("can't create the type of {$data['type']} trade");
         }
     }
 
-    protected function createPurchaseTrade($data)
+    protected function createPurchaseTrade($data, $createPlatformTrade)
     {
         $lock = $this->biz['lock'];
 
@@ -54,7 +54,7 @@ class PayServiceImpl extends BaseService implements PayService
 
             $trade = $this->createPaymentTrade($data);
 
-            if ($trade['cash_amount'] > 0) {
+            if ($trade['cash_amount'] > 0 && $createPlatformTrade) {
                 $trade = $this->createPaymentPlatformTrade($data, $trade);
             }
 
@@ -70,7 +70,7 @@ class PayServiceImpl extends BaseService implements PayService
         return $trade;
     }
 
-    protected function createRechargeTrade($data)
+    protected function createRechargeTrade($data, $createPlatformTrade)
     {
         $lock = $this->biz['lock'];
 
@@ -81,7 +81,9 @@ class PayServiceImpl extends BaseService implements PayService
             $this->beginTransaction();
             $trade = $this->createPaymentTrade($data);
 
-            $trade = $this->createPaymentPlatformTrade($data, $trade);
+            if ($createPlatformTrade) {
+                $trade = $this->createPaymentPlatformTrade($data, $trade);
+            }
 
             $this->commit();
             $lock->release($lockName);
