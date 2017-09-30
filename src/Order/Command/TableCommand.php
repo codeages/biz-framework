@@ -24,7 +24,6 @@ class TableCommand extends AbstractCommand
         $migrations = array(
             'order',
             'order_add_device',
-            'order_add_display_status',
             'order_add_paid_amount',
             'order_add_refund_deadline',
             'order_item_and_deduct_add_snapshot',
