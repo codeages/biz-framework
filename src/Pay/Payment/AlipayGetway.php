@@ -66,7 +66,7 @@ class AlipayGetway extends AbstractGetway
         $order['out_trade_no'] = $data['trade_sn'];
         $order['total_fee'] = $data['amount']/100;
         $order['app_pay'] = isset($data['app_pay']) ? $data['app_pay'] : '';
-        $order['show_url'] = $data['show_url'];
+        $order['show_url'] = $data['return_url'];
 
 
         $order['passback_params'] = urlencode(json_encode($data['attach']));
