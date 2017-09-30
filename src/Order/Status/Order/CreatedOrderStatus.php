@@ -34,7 +34,6 @@ class CreatedOrderStatus extends AbstractOrderStatus
         $order['price_type'] = empty($order['price_type']) ? 'money' : $order['price_type'];
         $order['pay_amount'] = $this->countOrderPayAmount($order['price_amount'], $orderDeducts, $items);
         $order['created_user_id'] = $user['id'];
-        $order['display_status'] = 'no_paid';
         $order = $this->getOrderDao()->create($order);
         return $order;
     }
