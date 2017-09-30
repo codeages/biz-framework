@@ -103,7 +103,11 @@ class PayServiceImpl extends BaseService implements PayService
     public function queryTradeFromPlatform($tradeSn)
     {
         $trade = $this->getPaymentTradeDao()->getByTradeSn($tradeSn);
-        return $this->getPayment($trade['platform'])->queryTrade($trade);
+        $result = $this->getPayment($trade['platform'])->queryTrade($tradeSn);
+        if (!empty($result)) {
+            return $this->updateTradeToPaid($result);
+        }
+        return $trade;
     }
 
     public function findTradesByOrderSns($orderSns)

@@ -17,7 +17,7 @@ abstract class AbstractGetway
 
     abstract public function applyRefund($data);
 
-    abstract public function queryTrade($trade);
+    abstract public function queryTrade($tradeSn);
 
     /**
      * @param $data 第三方支付平台的通知信息
