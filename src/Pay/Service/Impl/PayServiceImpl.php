@@ -249,7 +249,9 @@ class PayServiceImpl extends BaseService implements PayService
                 'currency' => $data['cash_type'],
             ));
             $this->transfer($trade);
-            $this->closeTradesByOrderSn($trade['order_sn'], array($trade['trade_sn']));
+            if($trade['type'] == 'purchase'){
+                $this->closeTradesByOrderSn($trade['order_sn'], array($trade['trade_sn']));
+            }
             $this->getTargetlogService()->log(TargetlogService::INFO, 'trade.paid', $data['trade_sn'], "交易号{$data['trade_sn']}，账目流水处理成功", $data);
             $this->commit();
             return $trade;
