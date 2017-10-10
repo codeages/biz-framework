@@ -26,8 +26,6 @@ interface AccountService
 
     public function releaseCoin($userId, $coinAmount);
 
-    public function decreaseLockedCoin($userId, $amount);
-
     public function transferCoin($fields);
 
     public function transferCash($fields);

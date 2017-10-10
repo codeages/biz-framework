@@ -105,7 +105,10 @@ class PayServiceImpl extends BaseService implements PayService
         $trade = $this->getPaymentTradeDao()->getByTradeSn($tradeSn);
         $result = $this->getPayment($trade['platform'])->queryTrade($tradeSn);
         if (!empty($result)) {
-            return $this->updateTradeToPaid($result);
+            $paidTrade = $this->updateTradeToPaid($result);
+            if ($paidTrade) {
+                return $paidTrade;
+            }
         }
         return $trade;
     }
@@ -467,7 +470,7 @@ class PayServiceImpl extends BaseService implements PayService
 
         } elseif ('purchase' == $trade['type']) {
             if (!empty($trade['coin_amount'])) {
-                $this->getAccountService()->decreaseLockedCoin($trade['user_id'], $trade['coin_amount']);
+                $this->getAccountService()->releaseCoin($trade['user_id'], $trade['coin_amount']);
 
                 $fields = array(
                     'from_user_id' => $trade['user_id'],
