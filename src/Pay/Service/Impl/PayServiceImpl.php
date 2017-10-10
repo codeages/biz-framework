@@ -2,6 +2,7 @@
 
 namespace Codeages\Biz\Framework\Pay\Service\Impl;
 
+use Codeages\Biz\Framework\Pay\Status\PaidStatus;
 use Codeages\Biz\Framework\Pay\Status\PayingStatus;
 use Codeages\Biz\Framework\Service\Exception\AccessDeniedException;
 use Codeages\Biz\Framework\Service\Exception\InvalidArgumentException;
@@ -104,12 +105,16 @@ class PayServiceImpl extends BaseService implements PayService
     {
         $trade = $this->getPaymentTradeDao()->getByTradeSn($tradeSn);
         $result = $this->getPayment($trade['platform'])->queryTrade($tradeSn);
-        if (!empty($result)) {
+
+        if ($trade['status'] != PaidStatus::NAME && !empty($result)) {
             $paidTrade = $this->updateTradeToPaid($result);
             if ($paidTrade) {
+                $paidTrade['platform_trade'] = $result;
                 return $paidTrade;
             }
         }
+
+        $trade['platform_trade'] = $result;
         return $trade;
     }
 
