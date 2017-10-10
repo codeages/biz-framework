@@ -27,7 +27,10 @@ class OrderItemDeductDaoImpl extends GeneralDaoImpl implements OrderItemDeductDa
     public function declares()
     {
         return array(
-            'timestamps' => array('created_time', 'updated_time')
+            'timestamps' => array('created_time', 'updated_time'),
+            'serializes' => array(
+                'snapshot' => 'json',
+            ),
         );
     }
 }

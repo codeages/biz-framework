@@ -54,6 +54,7 @@ class OrderItemDaoImpl extends GeneralDaoImpl implements OrderItemDao
             ),
             'serializes' => array(
                 'create_extra' => 'json',
+                'snapshot' => 'json',
             ),
             'conditions' => array(
                 'order_id IN (:order_ids)',
