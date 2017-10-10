@@ -2,7 +2,7 @@
 
 use Phpmig\Migration\Migration;
 
-class OrderAddRefundDeadline extends Migration
+class BizOrderRefundAddTitle extends Migration
 {
     /**
      * Do the migration
@@ -12,8 +12,8 @@ class OrderAddRefundDeadline extends Migration
         $biz = $this->getContainer();
         $db = $biz['db'];
 
-        if (!$this->isFieldExist('biz_order', 'refund_deadline')) {
-            $db->exec("ALTER TABLE `biz_order` ADD COLUMN `refund_deadline` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '申请退款截止日期';");
+        if (!$this->isFieldExist('biz_order_refund', 'title')) {
+            $db->exec("ALTER TABLE `biz_order_refund` ADD COLUMN `title` VARCHAR(1024) NOT NULL DEFAULT '' COMMENT '订单标题' AFTER `id`");
         }
     }
 
@@ -25,7 +25,7 @@ class OrderAddRefundDeadline extends Migration
         $biz = $this->getContainer();
         $db = $biz['db'];
 
-        $db->exec("ALTER TABLE `biz_order` DROP COLUMN `refund_deadline`;");
+        $db->exec("ALTER TABLE `biz_order_refund` DROP COLUMN `title`;");
     }
 
     protected function isFieldExist($table, $filedName)

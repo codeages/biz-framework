@@ -2,7 +2,7 @@
 
 use Phpmig\Migration\Migration;
 
-class BizUserCashflowDeleteUserType extends Migration
+class BizCashflowDeleteUserType extends Migration
 {
     /**
      * Do the migration

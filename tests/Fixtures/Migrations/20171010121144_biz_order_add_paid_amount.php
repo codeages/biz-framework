@@ -2,7 +2,7 @@
 
 use Phpmig\Migration\Migration;
 
-class OrderAddPaidAmount extends Migration
+class BizOrderAddPaidAmount extends Migration
 {
     /**
      * Do the migration
@@ -13,11 +13,11 @@ class OrderAddPaidAmount extends Migration
         $db = $biz['db'];
 
         if (!$this->isFieldExist('biz_order', 'paid_cash_amount')) {
-            $db->exec("ALTER TABLE `biz_order` ADD COLUMN `paid_cash_amount` int(10) NOT NULL DEFAULT '0' COMMENT '付款的现金金额'");
+            $db->exec("ALTER TABLE `biz_order` ADD COLUMN `paid_cash_amount` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '付款的现金金额'");
         }
 
         if (!$this->isFieldExist('biz_order', 'paid_coin_amount')) {
-            $db->exec("ALTER TABLE `biz_order` ADD COLUMN `paid_coin_amount` int(10) NOT NULL DEFAULT '0' COMMENT '付款的虚拟币金额'");
+            $db->exec("ALTER TABLE `biz_order` ADD COLUMN `paid_coin_amount` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '付款的虚拟币金额'");
         }
     }
 

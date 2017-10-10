@@ -2,7 +2,7 @@
 
 use Phpmig\Migration\Migration;
 
-class BizUserCashflowDeleteUserType extends Migration
+class BizOrderAddRefundDeadline extends Migration
 {
     /**
      * Do the migration
@@ -10,12 +10,11 @@ class BizUserCashflowDeleteUserType extends Migration
     public function up()
     {
         $biz = $this->getContainer();
-        $connection = $biz['db'];
+        $db = $biz['db'];
 
-        if ($this->isFieldExist('biz_user_cashflow', 'user_type')) {
-            $connection->exec("ALTER TABLE `biz_user_cashflow` DROP COLUMN `user_type`");
+        if (!$this->isFieldExist('biz_order', 'refund_deadline')) {
+            $db->exec("ALTER TABLE `biz_order` ADD COLUMN `refund_deadline` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '申请退款截止日期';");
         }
-
     }
 
     /**
@@ -24,7 +23,9 @@ class BizUserCashflowDeleteUserType extends Migration
     public function down()
     {
         $biz = $this->getContainer();
-        $connection = $biz['db'];
+        $db = $biz['db'];
+
+        $db->exec("ALTER TABLE `biz_order` DROP COLUMN `refund_deadline`;");
     }
 
     protected function isFieldExist($table, $filedName)

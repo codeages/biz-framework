@@ -2,7 +2,7 @@
 
 use Phpmig\Migration\Migration;
 
-class BizOrderAddDevice extends Migration
+class BizCashflowDeleteUserType extends Migration
 {
     /**
      * Do the migration
@@ -10,11 +10,12 @@ class BizOrderAddDevice extends Migration
     public function up()
     {
         $biz = $this->getContainer();
-        $db = $biz['db'];
+        $connection = $biz['db'];
 
-        if (!$this->isFieldExist('biz_order', 'device')) {
-            $db->exec("ALTER TABLE `biz_order` ADD COLUMN `device` varchar(32) COMMENT '下单设备';");
+        if ($this->isFieldExist('biz_user_cashflow', 'user_type')) {
+            $connection->exec("ALTER TABLE `biz_user_cashflow` DROP COLUMN `user_type`");
         }
+
     }
 
     /**
@@ -23,9 +24,7 @@ class BizOrderAddDevice extends Migration
     public function down()
     {
         $biz = $this->getContainer();
-        $db = $biz['db'];
-
-        $db->exec("ALTER TABLE `biz_order` DROP COLUMN `device`;");
+        $connection = $biz['db'];
     }
 
     protected function isFieldExist($table, $filedName)

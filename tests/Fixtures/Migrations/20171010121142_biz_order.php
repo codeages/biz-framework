@@ -12,7 +12,7 @@ class BizOrder extends Migration
         $biz = $this->getContainer();
         $connection = $biz['db'];
         $connection->exec("
-            CREATE TABLE `biz_order` (
+            CREATE TABLE IF NOT EXISTS `biz_order` (
               `id` INT(10) unsigned NOT NULL AUTO_INCREMENT,
               `title` VARCHAR(1024) NOT NULL DEFAULT '' COMMENT '订单标题',
               `sn` VARCHAR(64) NOT NULL COMMENT '订单号',
@@ -40,7 +40,7 @@ class BizOrder extends Migration
               UNIQUE(`sn`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-            CREATE TABLE `biz_order_item` (
+            CREATE TABLE IF NOT EXISTS `biz_order_item` (
               `id` INT(10) unsigned NOT NULL AUTO_INCREMENT,
               `order_id` INT(10) unsigned NOT NULL COMMENT '订单id',
               `sn` VARCHAR(64) NOT NULL COMMENT '编号',
@@ -67,7 +67,7 @@ class BizOrder extends Migration
               UNIQUE(`sn`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-            CREATE TABLE `biz_order_item_deduct` (
+            CREATE TABLE IF NOT EXISTS `biz_order_item_deduct` (
               `id` INT(10) unsigned NOT NULL AUTO_INCREMENT,
               `order_id` INT(10) unsigned NOT NULL COMMENT '订单id',
               `detail` TEXT COMMENT '描述',
@@ -83,7 +83,7 @@ class BizOrder extends Migration
               PRIMARY KEY (`id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-            CREATE TABLE `biz_order_refund` (
+            CREATE TABLE IF NOT EXISTS `biz_order_refund` (
               `id` INT(10) unsigned NOT NULL AUTO_INCREMENT,
               `order_id` INT(10) unsigned NOT NULL COMMENT '订单id',
               `order_item_id` INT(10) unsigned NOT NULL COMMENT '退款商品的id',
@@ -105,7 +105,7 @@ class BizOrder extends Migration
         ");
 
         $connection->exec("
-          CREATE TABLE `biz_order_item_refund` (
+          CREATE TABLE IF NOT EXISTS `biz_order_item_refund` (
             `id` INT(10) unsigned NOT NULL AUTO_INCREMENT,
             `order_refund_id` INT(10) unsigned NOT NULL COMMENT '退款订单id',
             `order_id` INT(10) unsigned NOT NULL COMMENT '订单id',
@@ -122,15 +122,15 @@ class BizOrder extends Migration
         ");
 
         $connection->exec("
-            CREATE TABLE `biz_order_log` (
+            CREATE TABLE IF NOT EXISTS `biz_order_log` (
               `id` INT(10) unsigned NOT NULL AUTO_INCREMENT,
               `order_id` INT(10) unsigned NOT NULL DEFAULT 0 COMMENT '订单id',
               `status` VARCHAR(32) NOT NULL COMMENT '订单状态',
               `user_id` INT(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建用户',
               `deal_data` TEXT COMMENT '处理数据',
+              `order_refund_id` INT(10) unsigned NOT NULL DEFAULT 0 COMMENT '退款id',
               `created_time` INT(10) unsigned NOT NULL DEFAULT '0',
               `updated_time` INT(10) unsigned NOT NULL DEFAULT '0',
-              `order_refund_id` INT(10) unsigned NOT NULL DEFAULT 0 COMMENT '退款id',
               PRIMARY KEY (`id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
         ");

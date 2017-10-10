@@ -2,7 +2,7 @@
 
 use Phpmig\Migration\Migration;
 
-class BizUserCashflowAddTitle extends Migration
+class BizOrderAddDevice extends Migration
 {
     /**
      * Do the migration
@@ -10,12 +10,11 @@ class BizUserCashflowAddTitle extends Migration
     public function up()
     {
         $biz = $this->getContainer();
-        $connection = $biz['db'];
+        $db = $biz['db'];
 
-        if (!$this->isFieldExist('biz_user_cashflow', 'title')) {
-            $connection->exec("ALTER TABLE `biz_user_cashflow` ADD COLUMN `title` VARCHAR(1024) NOT NULL DEFAULT '' COMMENT '流水名称'");
+        if (!$this->isFieldExist('biz_order', 'device')) {
+            $db->exec("ALTER TABLE `biz_order` ADD COLUMN `device` varchar(32) COMMENT '下单设备（pc、mobile、app）';");
         }
-
     }
 
     /**
@@ -24,9 +23,9 @@ class BizUserCashflowAddTitle extends Migration
     public function down()
     {
         $biz = $this->getContainer();
-        $connection = $biz['db'];
+        $db = $biz['db'];
 
-        $connection->exec('ALTER TABLE `biz_user_cashflow` DROP COLUMN `title`;');
+        $db->exec("ALTER TABLE `biz_order` DROP COLUMN `device`;");
     }
 
     protected function isFieldExist($table, $filedName)

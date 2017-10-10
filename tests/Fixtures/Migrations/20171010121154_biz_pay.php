@@ -12,7 +12,7 @@ class BizPay extends Migration
         $biz = $this->getContainer();
         $connection = $biz['db'];
         $connection->exec("
-            CREATE TABLE `biz_user_cashflow` (
+            CREATE TABLE IF NOT EXISTS `biz_user_cashflow` (
               `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
               `sn` VARCHAR(64) NOT NULL COMMENT '账目流水号',
               `parent_sn` VARCHAR(64) COMMENT '本次交易的上一个账单的流水号',
@@ -25,7 +25,7 @@ class BizPay extends Migration
               `trade_sn` varchar(64) NOT NULL COMMENT '交易号',
               `platform` VARCHAR(32) NOT NULL DEFAULT 'none' COMMENT '支付平台：none, alipay, wxpay...',
               `user_type` VARCHAR(32) NOT NULL COMMENT '用户类型：seller, buyer',
-              `amount_type` VARCHAR(32) NOT NULL COMMENT 'ammount的类型：coin, money',
+              `amount_type` VARCHAR(32) NOT NULL COMMENT 'ammount的类型：coin, money, locked_amount',
               `created_time` int(10) unsigned NOT NULL,
               PRIMARY KEY (`id`),
               UNIQUE(`sn`)
@@ -33,7 +33,7 @@ class BizPay extends Migration
         ");
 
         $connection->exec("
-            CREATE TABLE `biz_user_balance` (
+            CREATE TABLE IF NOT EXISTS `biz_user_balance` (
               `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
               `user_id` int(10) unsigned NOT NULL COMMENT '用户',
               `amount` int(10) NOT NULL DEFAULT '0' COMMENT '账户余额',
@@ -47,7 +47,7 @@ class BizPay extends Migration
         ");
 
         $connection->exec("
-            CREATE TABLE `biz_payment_trade` (
+            CREATE TABLE IF NOT EXISTS `biz_payment_trade` (
               `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
               `title` varchar(1024) NOT NULL COMMENT '标题',
               `trade_sn` varchar(64) NOT NULL COMMENT '交易号',
@@ -77,7 +77,7 @@ class BizPay extends Migration
         ");
 
         $connection->exec("
-            CREATE TABLE `biz_pay_account` (
+            CREATE TABLE IF NOT EXISTS `biz_pay_account` (
               `id` INT(10) unsigned NOT NULL AUTO_INCREMENT,
               `user_id` INT(10) unsigned NOT NULL COMMENT '所属用户',
               `password` VARCHAR(64) NOT NULL DEFAULT '' COMMENT '密码',
@@ -90,7 +90,7 @@ class BizPay extends Migration
         ");
 
         $connection->exec("
-            CREATE TABLE `biz_security_answer` (
+            CREATE TABLE IF NOT EXISTS `biz_security_answer` (
               `id` INT(10) unsigned NOT NULL AUTO_INCREMENT,
               `user_id` INT(10) unsigned NOT NULL COMMENT '所属用户',
               `question_key` VARCHAR(64) NOT NULL DEFAULT '' COMMENT '安全问题的key',

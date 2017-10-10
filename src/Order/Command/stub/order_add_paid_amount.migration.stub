@@ -2,7 +2,7 @@
 
 use Phpmig\Migration\Migration;
 
-class OrderAddPaidAmount extends Migration
+class BizOrderAddPaidAmount extends Migration
 {
     /**
      * Do the migration

@@ -2,7 +2,7 @@
 
 use Phpmig\Migration\Migration;
 
-class BizUserCashflowAddTitle extends Migration
+class BizCashflowAddTitle extends Migration
 {
     /**
      * Do the migration

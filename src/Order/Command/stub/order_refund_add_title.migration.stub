@@ -2,7 +2,7 @@
 
 use Phpmig\Migration\Migration;
 
-class OrderRefundAddTitle extends Migration
+class BizOrderRefundAddTitle extends Migration
 {
     /**
      * Do the migration
