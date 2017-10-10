@@ -192,7 +192,8 @@ class AccountServiceImpl extends BaseService implements AccountService
     {
         $userBalance = $this->getUserBalanceDao()->getByUserId($userId);
         $this->getUserBalanceDao()->wave(array($userBalance['id']), array(
-            'locked_amount' => 0 - $amount
+            'locked_amount' => 0 - $amount,
+            'amount' => $amount
         ));
 
         return $this->getUserBalanceDao()->getByUserId($userId);
