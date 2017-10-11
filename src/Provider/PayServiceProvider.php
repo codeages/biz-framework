@@ -20,7 +20,8 @@ class PayServiceProvider implements ServiceProviderInterface
             $options = array(
                 'closed_by_notify' => false,
                 'refunded_by_notify' => false,
-                'coin_rate' => 1
+                'coin_rate' => 1,
+                'goods_title' => '',
             );
 
             if (!empty($biz['payment.options'])) {
