@@ -519,6 +519,12 @@ class PayServiceImpl extends BaseService implements PayService
         return empty($options['coin_rate']) ? 1: $options['coin_rate'];
     }
 
+    protected function getGoodsTitle()
+    {
+        $options = $this->biz['payment.final_options'];
+        return empty($options['goods_title']) ? '': $options['goods_title'];
+    }
+
     protected function getCurrencyType()
     {
         return 'money';
@@ -537,6 +543,10 @@ class PayServiceImpl extends BaseService implements PayService
         $data['amount'] = $trade['cash_amount'];
         $data['platform_type'] = $trade['platform_type'];
         $data['platform'] = $trade['platform'];
+
+        if ($title = $this->getGoodsTitle()) {
+            $data['goods_title'] = $title;
+        }
 
         $result = $this->getPayment($data['platform'])->createTrade($data);
 
