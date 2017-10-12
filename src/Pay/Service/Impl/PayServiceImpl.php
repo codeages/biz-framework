@@ -4,6 +4,7 @@ namespace Codeages\Biz\Framework\Pay\Service\Impl;
 
 use Codeages\Biz\Framework\Pay\Status\PaidStatus;
 use Codeages\Biz\Framework\Pay\Status\PayingStatus;
+use Codeages\Biz\Framework\Pay\Status\RefundedStatus;
 use Codeages\Biz\Framework\Service\Exception\AccessDeniedException;
 use Codeages\Biz\Framework\Service\Exception\InvalidArgumentException;
 use Codeages\Biz\Framework\Util\ArrayToolkit;
@@ -299,7 +300,7 @@ class PayServiceImpl extends BaseService implements PayService
             return $this->refundByPayment($trade);
         }
 
-        return $this->markRefunded($trade);
+        return $this->getTradeContext($trade['id'])->refunded();
     }
 
     protected function isRefundByPayment()
@@ -325,40 +326,6 @@ class PayServiceImpl extends BaseService implements PayService
         return $trade;
     }
 
-    protected function markRefunded($trade)
-    {
-        $fields = array(
-            'title' => $trade['title'],
-            'from_user_id' => $trade['seller_id'],
-            'to_user_id' => $trade['user_id'],
-            'amount' => $trade['cash_amount'],
-            'trade_sn' => $trade['trade_sn'],
-            'order_sn' => $trade['order_sn'],
-            'platform' => $trade['platform'],
-            'parent_sn' => '',
-            'currency' => $trade['currency'],
-            'buyer_id' => $trade['user_id'],
-        );
-        $flow = $this->getAccountService()->transferCash($fields);
-
-        if (!empty($trade['coin_amount'])) {
-            $fields = array(
-                'title' => $trade['title'],
-                'from_user_id' => $trade['seller_id'],
-                'to_user_id' => $trade['user_id'],
-                'amount' => $trade['coin_amount'],
-                'trade_sn' => $trade['trade_sn'],
-                'order_sn' => $trade['order_sn'],
-                'platform' => $trade['platform'],
-                'parent_sn' => $flow['sn'],
-                'buyer_id' => $trade['user_id'],
-            );
-            $this->getAccountService()->transferCoin($fields);
-        }
-
-        return $this->getTradeContext($trade['id'])->refunded();
-    }
-
     public function notifyRefunded($payment, $data)
     {
         $paymentGetWay = $this->getPayment($payment);
@@ -366,8 +333,11 @@ class PayServiceImpl extends BaseService implements PayService
         $tradeSn = $response[0]['trade_sn'];
 
         $trade = $this->getPaymentTradeDao()->getByTradeSn($tradeSn);
+        if ($trade['status'] == RefundedStatus::NAME) {
+            return $trade;
+        }
 
-        return $this->markRefunded($trade);
+        return $this->getTradeContext($trade['id'])->refunded($data);
     }
 
     protected function validateLogin()
