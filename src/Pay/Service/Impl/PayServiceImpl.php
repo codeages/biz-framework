@@ -288,11 +288,7 @@ class PayServiceImpl extends BaseService implements PayService
         }
 
         if ($trade['status'] != 'paid') {
-            throw new AccessDeniedException('can not refund, becourse the trade is not paid');
-        }
-
-        if ((time() - $trade['pay_time']) > 86400) {
-            throw new AccessDeniedException('can not refund, becourse the paid trade is expired.');
+            throw new AccessDeniedException('can not refund, because the trade is not paid');
         }
 
         if($this->isRefundByPayment()){
