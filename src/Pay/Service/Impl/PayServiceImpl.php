@@ -363,7 +363,7 @@ class PayServiceImpl extends BaseService implements PayService
     {
         $paymentGetWay = $this->getPayment($payment);
         $response = $paymentGetWay->converterRefundNotify($data);
-        $tradeSn = $response[0]['notify_data']['trade_sn'];
+        $tradeSn = $response[0]['trade_sn'];
 
         $trade = $this->getPaymentTradeDao()->getByTradeSn($tradeSn);
 
