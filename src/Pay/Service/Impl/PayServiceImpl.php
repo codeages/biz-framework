@@ -337,7 +337,8 @@ class PayServiceImpl extends BaseService implements PayService
             return $trade;
         }
 
-        return $this->getTradeContext($trade['id'])->refunded($data);
+        $this->getTradeContext($trade['id'])->refunded($data);
+        return $response[1];
     }
 
     protected function validateLogin()
