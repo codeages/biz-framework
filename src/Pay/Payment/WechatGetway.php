@@ -153,7 +153,7 @@ class WechatGetway extends AbstractGetway
                 array(
                     'status' => 'refunded',
                     'cash_flow' => $reqInfo['transaction_id'],
-                    'refund_time' => $this->timeConverter($data['success_time']),
+                    'refund_time' => $this->timeConverter($reqInfo['success_time']),
                     'pay_amount' => $reqInfo['refund_fee'],
                     'trade_sn' => $reqInfo['out_trade_no'],
                     'refund_sn' => $reqInfo['out_refund_no'],
