@@ -13,4 +13,6 @@ interface OrderItemDao extends GeneralDaoInterface
     public function getOrderItemByOrderIdAndTargetIdAndTargetType($orderId, $targetId, $targetType);
 
     public function sumPayAmount($conditions);
+
+    public function findByConditions($conditions);
 }

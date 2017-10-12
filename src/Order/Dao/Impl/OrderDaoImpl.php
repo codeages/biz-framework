@@ -38,8 +38,6 @@ class OrderDaoImpl extends GeneralDaoImpl implements OrderDao
 
     public function count($conditions)
     {
-        $conditions = $this->handleConditions($conditions);
-
         $builder = $this->createQueryBuilder($conditions)
             ->select('COUNT(*)');
 
@@ -48,7 +46,6 @@ class OrderDaoImpl extends GeneralDaoImpl implements OrderDao
 
     public function search($conditions, $orderBys, $start, $limit)
     {
-        $conditions = $this->handleConditions($conditions);
         $builder = $this->createQueryBuilder($conditions)
             ->select('*')
             ->setFirstResult($start)
@@ -65,7 +62,6 @@ class OrderDaoImpl extends GeneralDaoImpl implements OrderDao
 
     public function sumGroupByDate($column, $conditions, $sort, $dateColumn = 'pay_time')
     {
-        $conditions = $this->handleConditions($conditions);
         $builder = $this->createQueryBuilder($conditions)
             ->select("sum({$column}) as count ,from_unixtime({$dateColumn},'%Y-%m-%d') date")
             ->groupBy("date {$sort}");
@@ -75,57 +71,11 @@ class OrderDaoImpl extends GeneralDaoImpl implements OrderDao
 
     public function countGroupByDate($conditions, $sort, $dateColumn = 'pay_time')
     {
-        $conditions = $this->handleConditions($conditions);
         $builder = $this->createQueryBuilder($conditions)
             ->select("count(id) as count ,from_unixtime({$dateColumn},'%Y-%m-%d') date")
             ->groupBy("date {$sort}");
 
         return $builder->execute()->fetchAll(0) ?: array();
-    }
-
-    private function handleConditions($conditions)
-    {
-        $customKeys = array('order_item_title', 'order_item_target_ids', 'order_item_target_type', 'trade_payment');
-        foreach ($conditions as $key => $value) {
-            if (in_array($key, $customKeys)) {
-                $customConditions[$key] = $value;
-                unset($conditions[$key]);
-            }
-        }
-
-        if (!empty($customConditions)) {
-            //设置0的目的是为了当搜索出数量为0的时候，搜索出来的数据为0
-            $conditions['ids'] = array(0);
-
-            $itemConditionsString = '';
-            if (!empty($customConditions['order_item_title'])) {
-                $itemConditionsString .= "AND title LIKE '%{$customConditions['order_item_title']}%'";
-            }
-
-            if (!empty($customConditions['order_item_target_ids'])) {
-                if (!is_array($customConditions['order_item_target_ids'])) {
-                    throw $this->createDaoException('column order_item_target_ids mast be array');
-                }
-                $targetIdMarks = implode(',', $customConditions['order_item_target_ids']);
-                $itemConditionsString .= "AND target_id IN ({$targetIdMarks})";
-            }
-
-            if (!empty($customConditions['order_item_target_type'])) {
-                $itemConditionsString .= "AND target_type = '{$customConditions['order_item_target_type']}'";
-            }
-
-            if (!empty($itemConditionsString)) {
-                $itemConditionsString = ltrim($itemConditionsString, 'AND');
-                $itemSql = "SELECT order_id FROM `biz_order_item` WHERE {$itemConditionsString}";
-                $itemResult = $this->db()->fetchAll($itemSql);
-                if (!empty($itemResult)) {
-                    $ids = ArrayToolkit::column($itemResult, 'order_id');
-                    $conditions['ids'] = $ids;
-                }
-            }
-        }
-
-        return $conditions;
     }
 
     private function checkOrderBy($order, $sort, $allowOrderBys)

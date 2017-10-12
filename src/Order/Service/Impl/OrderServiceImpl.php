@@ -4,6 +4,7 @@ namespace Codeages\Biz\Framework\Order\Service\Impl;
 
 use Codeages\Biz\Framework\Order\Service\OrderService;
 use Codeages\Biz\Framework\Service\BaseService;
+use Codeages\Biz\Framework\Util\ArrayToolkit;
 
 class OrderServiceImpl extends BaseService implements OrderService
 {
@@ -49,21 +50,25 @@ class OrderServiceImpl extends BaseService implements OrderService
 
     public function searchOrders($conditions, $orderBy, $start, $limit)
     {
+        $conditions = $this->filterConditions($conditions);
         return $this->getOrderDao()->search($conditions, $orderBy, $start, $limit);
     }
 
     public function countOrders($conditions)
     {
+        $conditions = $this->filterConditions($conditions);
         return $this->getOrderDao()->count($conditions);
     }
 
     public function countGroupByDate($conditions, $sort, $dateColumn = 'pay_time')
     {
+        $conditions = $this->filterConditions($conditions);
         return $this->getOrderDao()->countGroupByDate($conditions, $sort, $dateColumn);
     }
 
     public function sumGroupByDate($column, $conditions, $sort, $dateColumn = 'pay_time')
     {
+        $conditions = $this->filterConditions($conditions);
         return $this->getOrderDao()->sumGroupByDate($column, $conditions, $sort, $dateColumn);
     }
 
@@ -105,6 +110,38 @@ class OrderServiceImpl extends BaseService implements OrderService
     public function sumOrderItemPayAmount($conditions)
     {
         return $this->getOrderItemDao()->sumPayAmount($conditions);
+    }
+
+    protected function filterConditions($conditions)
+    {
+        foreach ($conditions as $key => $value) {
+            if ($key == 'order_item_title') {
+                $customConditions['title_LIKE'] = $value;
+                unset($conditions[$key]);
+            }
+
+            if ($key == 'order_item_target_ids') {
+                $customConditions['target_ids'] = $value;
+                unset($conditions[$key]);
+            }
+
+            if ($key == 'order_item_target_type') {
+                $customConditions['target_type'] = $value;
+                unset($conditions[$key]);
+            }
+        }
+
+        if (!empty($customConditions)) {
+            $conditions['ids'] = array(0);
+
+            $itemResult = $this->getOrderItemDao()->findByConditions($customConditions);
+            if (!empty($itemResult)) {
+                $ids = ArrayToolkit::column($itemResult, 'order_id');
+                $conditions['ids'] = $ids;
+            }
+        }
+
+        return $conditions;
     }
 
     protected function getOrderLogDao()

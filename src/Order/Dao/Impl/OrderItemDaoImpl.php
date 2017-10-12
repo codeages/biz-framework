@@ -44,6 +44,13 @@ class OrderItemDaoImpl extends GeneralDaoImpl implements OrderItemDao
         return (int) $builder->execute()->fetchColumn(0);
     }
 
+    public function findByConditions($conditions)
+    {
+        $builder = $this->createQueryBuilder($conditions)
+            ->select('*');
+        return $builder->execute()->fetchAll();
+    }
+
     public function declares()
     {
         return array(
@@ -62,6 +69,7 @@ class OrderItemDaoImpl extends GeneralDaoImpl implements OrderItemDao
                 'status IN (:statuses)',
                 'target_id IN (:target_ids)',
                 'target_id = :target_id',
+                'title like :title_LIKE',
                 'target_type = :target_type',
                 'created_time >= :start_time',
                 'created_time <= :end_time',
