@@ -2,6 +2,7 @@
 
 namespace Codeages\Biz\Framework\Pay\Payment;
 
+use Codeages\Biz\Framework\Service\Exception\AccessDeniedException;
 use Codeages\Biz\Framework\Util\ArrayToolkit;
 use Codeages\Biz\Framework\Service\Exception\InvalidArgumentException;
 use Omnipay\Omnipay;
@@ -164,18 +165,18 @@ class AlipayGetway extends AbstractGetway
         );
     }
 
-    public function queryTrade($trade)
-    {
-
-    }
-
     public function applyRefund($data)
     {
-        // TODO: Implement applyRefund() method.
+        throw new AccessDeniedException('can not apply refund with alipay.');
+    }
+
+    public function queryTrade($trade)
+    {
+        throw new AccessDeniedException('can not query refund with alipay.');
     }
 
     public function converterRefundNotify($data)
     {
-        // TODO: Implement converterRefundNotify() method.
+        throw new AccessDeniedException('can not convert refund notify with alipay.');
     }
 }

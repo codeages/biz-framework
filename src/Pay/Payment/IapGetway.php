@@ -3,6 +3,7 @@
 namespace Codeages\Biz\Framework\Pay\Payment;
 
 
+use Codeages\Biz\Framework\Service\Exception\AccessDeniedException;
 use Codeages\Biz\Framework\Util\ArrayToolkit;
 
 class IapGetway extends AbstractGetway
@@ -132,21 +133,21 @@ class IapGetway extends AbstractGetway
 
     public function createTrade($data)
     {
-        // TODO: Implement createTrade() method.
+        throw new AccessDeniedException('can not create trade with iap.');
     }
 
     public function applyRefund($data)
     {
-        // TODO: Implement applyRefund() method.
+        throw new AccessDeniedException('can not apply refund with iap.');
     }
 
     public function queryTrade($trade)
     {
-        // TODO: Implement queryTrade() method.
+        throw new AccessDeniedException('can not query refund with iap.');
     }
 
     public function converterRefundNotify($data)
     {
-        // TODO: Implement converterRefundNotify() method.
+        throw new AccessDeniedException('can not convert refund notify with iap.');
     }
 }

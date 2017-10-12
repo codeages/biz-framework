@@ -3,6 +3,7 @@
 namespace Codeages\Biz\Framework\Pay\Payment;
 
 
+use Codeages\Biz\Framework\Service\Exception\AccessDeniedException;
 use Codeages\Biz\Framework\Service\Exception\InvalidArgumentException;
 use Codeages\Biz\Framework\Util\ArrayToolkit;
 
@@ -90,19 +91,19 @@ class LianlianPayGetway extends AbstractGetway
         );
     }
 
-    public function converterRefundNotify($data)
+    public function applyRefund($data)
     {
-        // TODO: Implement converterRefundNotify() method.
+        throw new AccessDeniedException('can not apply refund with lianlianpay.');
     }
 
     public function queryTrade($trade)
     {
-        // TODO: Implement queryTrade() method.
+        throw new AccessDeniedException('can not query refund with lianlianpay.');
     }
 
-    public function applyRefund($data)
+    public function converterRefundNotify($data)
     {
-        // TODO: Implement applyRefund() method.
+        throw new AccessDeniedException('can not convert refund notify with lianlianpay.');
     }
 
     protected function signParams($params)

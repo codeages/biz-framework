@@ -32,7 +32,7 @@
         "codeages/symfony-lock-lite": "^1.0",
         "symfony/polyfill-php55": "^1.4",
         "wenqinruan/omnipay-alipay": "^2.3",
-        "wenqinruan/omnipay-wechatpay": "^1.0"
+        "canuonifeng/omnipay-wechatpay": "^1.1"
     },
     "require-dev": {
         "mockery/mockery": "^0.9.9",
