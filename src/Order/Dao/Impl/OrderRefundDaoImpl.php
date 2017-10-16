@@ -21,6 +21,7 @@ class OrderRefundDaoImpl extends GeneralDaoImpl implements OrderRefundDao
             ),
             'conditions' => array(
                 'status = :status',
+                'sn = :sn',
                 'title LIKE :titleLike',
                 'user_id = :user_id',
                 'deal_user_id = :deal_user_id',
