@@ -41,6 +41,13 @@ class PaymentTradeDaoImpl extends GeneralDaoImpl implements PaymentTradeDao
         return $this->findInField('trade_sn', $sns);      
     }
 
+    public function getByPlatformSn($platformSn)
+    {
+        return $this->getByFields(array(
+            'platform_sn' => $platformSn,
+        )); 
+    }
+
     public function declares()
     {
         return array(

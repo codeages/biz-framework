@@ -31,4 +31,6 @@ interface PayService
     public function getCreateTradeResultByTradeSnFromPlatform($tradeSn);
 
     public function rechargeByIap($data);
+
+    public function getTradeByPlatformSn($platformSn);
 }

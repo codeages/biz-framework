@@ -541,6 +541,11 @@ class PayServiceImpl extends BaseService implements PayService
         return $result;
     }
 
+    public function getTradeByPlatformSn($platformSn)
+    {
+        return  $this->getPaymentTradeDao()->getByPlatformSn($platformSn);
+    }
+
     protected function getTradeContext($id)
     {
         $tradeContext = $this->biz['payment_trade_context'];
