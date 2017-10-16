@@ -36,7 +36,10 @@ class OrderSubscriber extends EventSubscriber implements EventSubscriberInterfac
         $data = array(
             'trade_sn' => $trade['trade_sn'],
             'pay_time' => $args['paid_time'],
-            'order_sn' => $trade['order_sn']
+            'payment' => $trade['platform'],
+            'order_sn' => $trade['order_sn'],
+            'paid_cash_amount' => $trade['cash_amount'],
+            'paid_coin_amount' => $trade['coin_amount'],
         );
         $this->getWorkflowService()->paid($data);
     }

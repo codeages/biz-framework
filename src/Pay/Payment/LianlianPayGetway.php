@@ -3,12 +3,17 @@
 namespace Codeages\Biz\Framework\Pay\Payment;
 
 
+use Codeages\Biz\Framework\Service\Exception\AccessDeniedException;
 use Codeages\Biz\Framework\Service\Exception\InvalidArgumentException;
 use Codeages\Biz\Framework\Util\ArrayToolkit;
 
 class LianlianPayGetway extends AbstractGetway
 {
-    protected $url = 'https://yintong.com.cn/payment/bankgateway.htm';
+//    protected $url = 'https://yintong.com.cn/payment/bankgateway.htm';
+//    protected $wapUrl = 'https://yintong.com.cn/llpayh5/payment.htm';
+
+    protected $url = 'https://cashier.lianlianpay.com/payment/bankgateway.htm';
+    protected $wapUrl = 'https://wap.lianlianpay.com/payment.htm';
 
     protected $isWap = false;
 
@@ -30,7 +35,7 @@ class LianlianPayGetway extends AbstractGetway
         $platformType = empty($data['platform_type']) ? 'Web' : $data['platform_type'];
 
         if ($platformType == 'Wap') {
-            $this->url = 'https://yintong.com.cn/llpayh5/payment.htm';
+            $this->url = $this->wapUrl;
             $this->isWap = true;
         }
 
@@ -79,23 +84,26 @@ class LianlianPayGetway extends AbstractGetway
                 'attach' => array(),
                 'notify_data' => $data,
             ),
-            'success'
+            json_encode(array(
+                'ret_code' => '0000',
+                'ret_msg' => '交易成功'
+            ))
         );
-    }
-
-    public function converterRefundNotify($data)
-    {
-        // TODO: Implement converterRefundNotify() method.
-    }
-
-    public function queryTrade($trade)
-    {
-        // TODO: Implement queryTrade() method.
     }
 
     public function applyRefund($data)
     {
-        // TODO: Implement applyRefund() method.
+        throw new AccessDeniedException('can not apply refund with lianlianpay.');
+    }
+
+    public function queryTrade($trade)
+    {
+        throw new AccessDeniedException('can not query refund with lianlianpay.');
+    }
+
+    public function converterRefundNotify($data)
+    {
+        throw new AccessDeniedException('can not convert refund notify with lianlianpay.');
     }
 
     protected function signParams($params)

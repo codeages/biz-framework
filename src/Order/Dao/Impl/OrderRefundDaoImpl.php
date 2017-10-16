@@ -21,6 +21,7 @@ class OrderRefundDaoImpl extends GeneralDaoImpl implements OrderRefundDao
             ),
             'conditions' => array(
                 'status = :status',
+                'sn = :sn',
                 'title LIKE :titleLike',
                 'user_id = :user_id',
                 'deal_user_id = :deal_user_id',
@@ -28,5 +29,10 @@ class OrderRefundDaoImpl extends GeneralDaoImpl implements OrderRefundDao
                 'order_id IN (:order_ids)',
             )
         );
+    }
+
+    public function findByOrderIds($orderIds)
+    {
+        return $this->findInField('order_id', $orderIds);
     }
 }

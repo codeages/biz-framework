@@ -40,7 +40,9 @@ class AuditingStatus extends AbstractRefundStatus
             'created_user_id' => $this->biz['user']['id'],
             'reason' => empty($data['reason']) ? '' : $data['reason'],
             'amount' => $order['pay_amount'],
-            'status' => 'auditing'
+            'status' => self::NAME,
+            'refund_cash_amount' => $order['paid_cash_amount'],
+            'refund_coin_amount' => $order['paid_coin_amount'],
         ));
 
         return $orderRefund;

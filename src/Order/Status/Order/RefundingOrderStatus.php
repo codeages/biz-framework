@@ -18,7 +18,28 @@ class RefundingOrderStatus extends AbstractOrderStatus
             return $order;
         }
 
-        $this->getPayService()->applyRefundByTradeSn($order['trade_sn']);
+        return $order;
+    }
+
+    protected function changeStatus($name)
+    {
+        $order = $this->getOrderDao()->update($this->order['id'], array(
+            'status' => $name,
+        ));
+
+        $items = $this->getOrderItemDao()->findByOrderId($this->order['id']);
+        foreach ($items as $item) {
+            $this->getOrderItemDao()->update($item['id'], array(
+                'status' => $name,
+            ));
+        }
+
+        $deducts = $this->getOrderItemDeductDao()->findByOrderId($this->order['id']);
+        foreach ($deducts as $key => $deduct) {
+            $deducts[$key] = $this->getOrderItemDeductDao()->update($deduct['id'], array(
+                'status' => $name
+            ));
+        }
         return $order;
     }
 
@@ -30,10 +51,5 @@ class RefundingOrderStatus extends AbstractOrderStatus
     public function success($data = array())
     {
         return $this->getOrderStatus(SuccessOrderStatus::NAME)->process($data);
-    }
-
-    protected function getPayService()
-    {
-        return $this->biz->service('Pay:PayService');
     }
 }

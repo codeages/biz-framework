@@ -22,9 +22,10 @@ class PayServiceTest extends IntegrationTestCase
             )
         );
 
-        $this->biz['payment.options'] = array(
-            'closed_notify' => true,
-            'refunded_notify' => true
+        $this->biz['payment.final_options'] = array(
+            'closed_by_notify' => true,
+            'refunded_by_notify' => true,
+            'coin_rate' => 1
         );
     }
 
@@ -94,6 +95,7 @@ class PayServiceTest extends IntegrationTestCase
         $recharge = array(
             'from_user_id' => $seller['user_id'],
             'to_user_id' => $userBalance['user_id'],
+            'buyer_id' => $userBalance['user_id'],
             'amount' => '100',
             'title' => '充值1000个虚拟币',
         );
@@ -132,6 +134,7 @@ class PayServiceTest extends IntegrationTestCase
         $recharge = array(
             'from_user_id' => $seller['user_id'],
             'to_user_id' => $userBalance['user_id'],
+            'buyer_id' => $userBalance['user_id'],
             'amount' => '100',
             'title' => '充值1000个虚拟币',
         );
@@ -169,6 +172,7 @@ class PayServiceTest extends IntegrationTestCase
         $data = $this->mockTrade();
         $data['amount'] = 20;
         $trade = $this->getPayService()->createTrade($data);
+        $this->getPayService()->notifyPaid('coin', $trade);
 
         $trade = $this->getPaymentTradeDao()->get($trade['id']);
         $this->assertEquals('paid', $trade['status']);
@@ -264,7 +268,7 @@ class PayServiceTest extends IntegrationTestCase
         $this->assertNotEmpty($trade['notify_data']);
         $this->assertEquals($notifyData['transaction_id'], $trade['platform_sn']);
         $cashFlows = $this->getUserCashflowDao()->findByTradeSn($trade['trade_sn']);
-        $this->assertEquals(4,count($cashFlows));
+        $this->assertEquals(5,count($cashFlows));
 
         foreach ($cashFlows as $cashFlow) {
             $this->assertNotEmpty($cashFlow['sn']);
@@ -311,6 +315,7 @@ class PayServiceTest extends IntegrationTestCase
 
     public function tearDown()
     {
+        parent::tearDown();
         \Mockery::close();
     }
 

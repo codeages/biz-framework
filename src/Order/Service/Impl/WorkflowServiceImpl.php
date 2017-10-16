@@ -25,6 +25,7 @@ class WorkflowServiceImpl extends BaseService implements WorkflowService
             'deducts',
             'create_extra',
             'device',
+            'refund_deadline'
         ));
 
         $orderDeducts = empty($order['deducts']) ? array() : $order['deducts'];
@@ -133,7 +134,8 @@ class WorkflowServiceImpl extends BaseService implements WorkflowService
         $this->validateLogin();
         $data['orderId'] = $orderId;
         $data['orderItemIds'] = $orderItemIds;
-        return $this->getOrderRefundContext()->start($data);
+        $refund = $this->getOrderRefundContext()->start($data);
+        return $refund;
     }
 
     public function adoptRefund($id, $data = array())
@@ -141,12 +143,19 @@ class WorkflowServiceImpl extends BaseService implements WorkflowService
         $this->validateLogin();
         $refund = $this->getOrderRefundContext($id)->refunding($data);
         $this->getOrderContext($refund['order_id'])->refunding($data);
+
+        $order = $this->getOrderDao()->get($refund['order_id']);
+        if (!empty($order['trade_sn'])) {
+            $this->getPayService()->applyRefundByTradeSn($order['trade_sn']);
+        }
+
         return $refund;
     }
 
     public function refuseRefund($id, $data = array())
     {
         $this->validateLogin();
+
         return $this->getOrderRefundContext($id)->refused($data);
     }
 
@@ -196,6 +205,11 @@ class WorkflowServiceImpl extends BaseService implements WorkflowService
         $orderContext->setOrder($order);
 
         return $orderContext;
+    }
+
+    protected function getPayService()
+    {
+        return $this->biz->service('Pay:PayService');
     }
 
     protected function getOrderRefundDao()

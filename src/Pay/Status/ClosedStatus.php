@@ -8,7 +8,7 @@ class ClosedStatus extends AbstractStatus
 
     public function getName()
     {
-        self::NAME;
+        return self::NAME;
     }
 
     public function process($data = array())

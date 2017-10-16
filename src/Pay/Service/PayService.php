@@ -6,9 +6,9 @@ interface PayService
 {
     public function findEnabledPayments();
 
-    public function createTrade($trade);
+    public function createTrade($data, $createPlatformTrade = true);
 
-    public function closeTradesByOrderSn($orderSn);
+    public function closeTradesByOrderSn($orderSn, $excludeTradeSns = array());
 
     public function findTradesByOrderSns($orderSns);
 

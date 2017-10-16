@@ -20,6 +20,8 @@ class PaidOrderStatus extends AbstractOrderStatus
             'trade_sn',
             'pay_time',
             'payment',
+            'paid_cash_amount',
+            'paid_coin_amount',
         ));
 
         $order = $this->getOrderDao()->getBySn($data['order_sn'], array('lock' => true));
@@ -43,9 +45,10 @@ class PaidOrderStatus extends AbstractOrderStatus
             'trade_sn',
             'pay_time',
             'payment',
+            'paid_cash_amount',
+            'paid_coin_amount',
         ));
         $data['status'] = PaidOrderStatus::NAME;
-        $data['display_status'] = 'paid';
         return $this->getOrderDao()->update($order['id'], $data);
     }
 

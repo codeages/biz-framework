@@ -13,28 +13,26 @@ class PayServiceProvider implements ServiceProviderInterface
         $biz['migration.directories'][] = dirname(dirname(__DIR__)).'/migrations/pay';
         $biz['autoload.aliases']['Pay'] = 'Codeages\Biz\Framework\Pay';
 
-        $biz['payment.options'] =  array(
-            'closed_notify' => false,
-            'trade_closed_sync_platform' => false,
-            'refunded_notify' => false,
-            'trade_refunded_sync_platform' => false,
-            'coin_rate' => 1
-        );
+        $biz['payment.options'] = null;
+
+        $biz['payment.final_options'] =  function () use ($biz) {
+
+            $options = array(
+                'closed_by_notify' => false,
+                'refunded_by_notify' => false,
+                'coin_rate' => 1,
+                'goods_title' => '',
+            );
+
+            if (!empty($biz['payment.options'])) {
+                $options = array_merge($options, $biz['payment.options']);
+            }
+
+            return $options;
+        };
 
         $biz['console.commands'][] = function () use ($biz) {
             return new \Codeages\Biz\Framework\Pay\Command\TableCommand($biz);
-        };
-
-        $biz['console.commands'][] = function () use ($biz) {
-            return new \Codeages\Biz\Framework\Pay\Command\CashflowAddTitleCommand($biz);
-        };
-
-        $biz['console.commands'][] = function () use ($biz) {
-            return new \Codeages\Biz\Framework\Pay\Command\PaymentTradeAddCreatedParams($biz);
-        };
-
-        $biz['console.commands'][] = function () use ($biz) {
-            return new \Codeages\Biz\Framework\Pay\Command\CashflowDeleteUserTypeCommand($biz);
         };
 
         $this->registerStatus($biz);

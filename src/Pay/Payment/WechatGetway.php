@@ -19,16 +19,7 @@ class WechatGetway extends AbstractGetway
 
         if ($response->isPaid()) {
             return array(
-                array(
-                    'status' => 'paid',
-                    'cash_flow' => $data['transaction_id'],
-                    'paid_time' => $this->timeConverter($data['time_end']),
-                    'pay_amount' => $data['cash_fee'],
-                    'cash_type' => $data['fee_type'],
-                    'trade_sn' => $data['out_trade_no'],
-                    'attach' => json_decode($data['attach'], true),
-                    'notify_data' => $data,
-                ),
+                $this->coverterTradeResponse($data),
                 $this->getNotifyResponse()
             );
         }
@@ -42,12 +33,28 @@ class WechatGetway extends AbstractGetway
         );
     }
 
-    public function queryTrade($trade)
+    public function queryTrade($tradeSn)
     {
-        $response = $this->createGetWay("WechatPay")->query(array('out_trade_no' => $trade['trade_sn']))->send();
-        if ($response->isSuccessful()) {
-            return $response->getData();
+        $response = $this->createGetWay("WechatPay")->query(array('out_trade_no' => $tradeSn))->send();
+        $data = $response->getData();
+        if ($response->isSuccessful() && $data['trade_state'] == 'SUCCESS') {
+            $result = $this->coverterTradeResponse($data);
+            return $result;
         }
+    }
+
+    protected function coverterTradeResponse($data)
+    {
+        return array(
+            'status' => 'paid',
+            'cash_flow' => $data['transaction_id'],
+            'paid_time' => $this->timeConverter($data['time_end']),
+            'pay_amount' => $data['cash_fee'],
+            'cash_type' => $data['fee_type'],
+            'trade_sn' => $data['out_trade_no'],
+            'attach' => json_decode($data['attach'], true),
+            'notify_data' => $data,
+        );
     }
 
     protected function timeConverter($time)
@@ -140,17 +147,16 @@ class WechatGetway extends AbstractGetway
         ));
         $response = $request->send();
         $data = $request->getData();
-
+        $reqInfo = $data['req_info'];
         if ($response->isRefunded()) {
             return array(
                 array(
-                    'status' => 'paid',
-                    'cash_flow' => $data['transaction_id'],
-                    'paid_time' => $this->timeConverter($data['time_end']),
-                    'pay_amount' => $data['cash_fee'],
-                    'cash_type' => $data['fee_type'],
-                    'trade_sn' => $data['out_trade_no'],
-                    'attach' => json_decode($data['attach'], true),
+                    'status' => 'refunded',
+                    'cash_flow' => $reqInfo['transaction_id'],
+                    'refund_time' => $this->timeConverter($reqInfo['success_time']),
+                    'pay_amount' => $reqInfo['refund_fee'],
+                    'trade_sn' => $reqInfo['out_trade_no'],
+                    'refund_sn' => $reqInfo['out_refund_no'],
                     'notify_data' => $data,
                 ),
                 $this->getNotifyResponse()

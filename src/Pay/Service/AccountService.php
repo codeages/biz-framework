@@ -10,6 +10,8 @@ interface AccountService
 
     public function setSecurityAnswers($userId, $answers);
 
+    public function findSecurityAnswersByUserId($userId);
+
     public function validateSecurityAnswer($userId, $questionKey, $answer);
 
     public function isPayPasswordSetted($userId);
@@ -24,11 +26,11 @@ interface AccountService
 
     public function releaseCoin($userId, $coinAmount);
 
-    public function decreaseLockedCoin($userId, $amount);
-
     public function transferCoin($fields);
 
     public function transferCash($fields);
+
+    public function withdrawCash($fields);
 
     public function countUserCashflows($conditions);
 

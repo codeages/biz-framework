@@ -192,6 +192,7 @@ class OrderServiceTest extends IntegrationTestCase
         $this->assertEquals($mockOrder['callback'], $order['callback']);
         $this->assertEquals($mockOrder['created_reason'], $order['created_reason']);
         $this->assertEquals($mockOrder['create_extra'], $order['create_extra']);
+        $this->assertEquals($mockOrder['refund_deadline'], $order['refund_deadline']);
         $this->assertEquals($this->sumOrderPriceAmount($mockedOrderItems), $order['price_amount']);
         $this->assertEquals($this->sumOrderPayAmount($mockedOrderItems), $order['pay_amount']);
         $this->assertEquals($this->biz['user']['id'], $order['user_id']);
@@ -327,7 +328,8 @@ class OrderServiceTest extends IntegrationTestCase
             'create_extra' => array(
                 'xxx' => 'xxx'
             ),
-            'device' => 'wap'
+            'device' => 'wap',
+            'refund_deadline' => time()
         );
     }
 

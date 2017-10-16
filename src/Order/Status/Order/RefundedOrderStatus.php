@@ -20,7 +20,6 @@ class RefundedOrderStatus extends AbstractOrderStatus
     {
         $order = $this->getOrderDao()->update($this->order['id'], array(
             'status' => $name,
-            'display_status' => self::NAME
         ));
 
         $items = $this->getOrderItemDao()->findByOrderId($this->order['id']);
