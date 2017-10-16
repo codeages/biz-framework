@@ -36,6 +36,11 @@ class PaymentTradeDaoImpl extends GeneralDaoImpl implements PaymentTradeDao
         ));
     }
 
+    public function findByTradeSns($sns)
+    {
+        return $this->findInField('trade_sn', $sns);      
+    }
+
     public function declares()
     {
         return array(
