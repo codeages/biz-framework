@@ -118,6 +118,7 @@ class OrderDaoImpl extends GeneralDaoImpl implements OrderDao
                 'pay_time > :pay_time_GT',
                 'pay_amount > :pay_amount_GT',
                 'price_amount > :price_amount_GT',
+                'source = :source', 
                 'status = :status',
                 'status IN (:statuses)',
                 'seller_id = :seller_id',
