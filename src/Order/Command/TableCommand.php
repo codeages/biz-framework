@@ -29,6 +29,7 @@ class TableCommand extends AbstractCommand
             'order_item_and_deduct_add_snapshot',
             'order_refund_add_refund_amount',
             'order_refund_add_title',
+            'order_add_expired_refund_days',
         );
 
         foreach ($migrations as $migration) {

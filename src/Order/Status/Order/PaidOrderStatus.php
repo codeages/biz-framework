@@ -49,6 +49,7 @@ class PaidOrderStatus extends AbstractOrderStatus
             'paid_coin_amount',
         ));
         $data['status'] = PaidOrderStatus::NAME;
+        $data['refund_deadline'] = $data['pay_time'] + $order['expired_refund_days']*86400;
         return $this->getOrderDao()->update($order['id'], $data);
     }
 
