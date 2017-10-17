@@ -65,7 +65,9 @@ class AuditingStatus extends AbstractRefundStatus
                 'order_item_id' => $orderItemId,
                 'user_id' => $orderRefund['user_id'],
                 'created_user_id' => $this->biz['user']['id'],
-                'amount' => $orderItem['pay_amount']
+                'amount' => $orderItem['pay_amount'],
+                'target_type' => $orderItem['target_type'],
+                'target_id' => $orderItem['target_id']
             ));
 
             $orderItem = $this->getOrderItemDao()->update($orderItem['id'], array(
