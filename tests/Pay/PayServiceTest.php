@@ -98,6 +98,7 @@ class PayServiceTest extends IntegrationTestCase
             'buyer_id' => $userBalance['user_id'],
             'amount' => '100',
             'title' => '充值1000个虚拟币',
+            'action' => 'recharge'
         );
 
         $this->getAccountService()->transferCoin($recharge);
@@ -137,6 +138,7 @@ class PayServiceTest extends IntegrationTestCase
             'buyer_id' => $userBalance['user_id'],
             'amount' => '100',
             'title' => '充值1000个虚拟币',
+            'action' => 'recharge'
         );
 
         $this->getAccountService()->transferCoin($recharge);

@@ -67,6 +67,7 @@ class AccountServiceTest extends IntegrationTestCase
             'buyer_id' => $userBalance['user_id'],
             'amount' => '10',
             'title' => '充值1000个虚拟币',
+            'action' => 'recharge'
         );
 
         $this->getAccountService()->transferCoin($recharge);
@@ -99,7 +100,8 @@ class AccountServiceTest extends IntegrationTestCase
             'buyer_id' => $buyer['user_id'],
             'amount' => '1000',
             'amount_type' => 'coin',
-            'title' => '充值1000个虚拟币'
+            'title' => '充值1000个虚拟币',
+            'action' => 'recharge'
         );
 
         $this->getAccountService()->transferCoin($recharge);
@@ -125,7 +127,7 @@ class AccountServiceTest extends IntegrationTestCase
             'amount' => 100,
             'title' => '提现100',
             'currency' => 'CYN',
-            'platform' => 'alipay'
+            'platform' => 'alipay',
         );
         $this->getAccountService()->withdrawCash($draw);
         $userBalance = $this->getAccountService()->getUserBalanceByUserId($userBalance['user_id']);

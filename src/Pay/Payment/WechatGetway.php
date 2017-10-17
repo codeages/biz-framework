@@ -19,7 +19,7 @@ class WechatGetway extends AbstractGetway
 
         if ($response->isPaid()) {
             return array(
-                $this->coverterTradeResponse($data),
+                $this->converterTradeResponse($data),
                 $this->getNotifyResponse()
             );
         }
@@ -38,12 +38,12 @@ class WechatGetway extends AbstractGetway
         $response = $this->createGetWay("WechatPay")->query(array('out_trade_no' => $tradeSn))->send();
         $data = $response->getData();
         if ($response->isSuccessful() && $data['trade_state'] == 'SUCCESS') {
-            $result = $this->coverterTradeResponse($data);
+            $result = $this->converterTradeResponse($data);
             return $result;
         }
     }
 
-    protected function coverterTradeResponse($data)
+    protected function converterTradeResponse($data)
     {
         return array(
             'status' => 'paid',

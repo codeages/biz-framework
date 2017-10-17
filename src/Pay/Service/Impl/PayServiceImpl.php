@@ -427,7 +427,8 @@ class PayServiceImpl extends BaseService implements PayService
                 'order_sn' => $trade['order_sn'],
                 'platform' => $trade['platform'],
                 'parent_sn' => $flow['sn'],
-                'currency' => $trade['currency']
+                'currency' => $trade['currency'],
+                'action' => $trade['type']
             );
             $flow = $this->getAccountService()->transferCash($fields);
         }
@@ -444,6 +445,7 @@ class PayServiceImpl extends BaseService implements PayService
                     'order_sn' => $trade['order_sn'],
                     'platform' => $trade['platform'],
                     'parent_sn' => empty($flow['sn']) ? '' : $flow['sn'],
+                    'action' => 'recharge'
                 );
                 $this->getAccountService()->transferCoin($fields);
             }
@@ -462,6 +464,7 @@ class PayServiceImpl extends BaseService implements PayService
                     'order_sn' => $trade['order_sn'],
                     'platform' => $trade['platform'],
                     'parent_sn' => empty($flow['sn']) ? '' : $flow['sn'],
+                    'action' => 'purchase'
                 );
                 $this->getAccountService()->transferCoin($fields);
             }

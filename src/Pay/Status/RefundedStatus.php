@@ -29,6 +29,7 @@ class RefundedStatus extends AbstractStatus
             'parent_sn' => '',
             'currency' => $trade['currency'],
             'buyer_id' => $trade['user_id'],
+            'action' => 'refund'
         );
         $flow = $this->getAccountService()->transferCash($fields);
 
@@ -43,6 +44,7 @@ class RefundedStatus extends AbstractStatus
                 'platform' => $trade['platform'],
                 'parent_sn' => $flow['sn'],
                 'buyer_id' => $trade['user_id'],
+                'action' => 'refund'
             );
             $this->getAccountService()->transferCoin($fields);
         }

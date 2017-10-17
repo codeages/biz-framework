@@ -212,11 +212,13 @@ class AccountServiceImpl extends BaseService implements AccountService
 
     public function rechargeCash($fields)
     {
+        $fields['action'] = 'recharge';
         return $this->waveCashAmountWithUserCashflow($fields, 'inflow');
     }
 
     public function withdrawCash($fields)
     {
+        $fields['action'] = 'withdraw';
         return $this->waveCashAmountWithUserCashflow($fields, 'outflow');
     }
 
@@ -245,6 +247,7 @@ class AccountServiceImpl extends BaseService implements AccountService
                 'platform' => empty($fields['platform']) ? '' : $fields['platform'],
                 'amount' => $fields['amount'],
                 'buyer_id' => $fields['user_id'],
+                'action' => $fields['action']
             );
 
             $amount = $flowType == 'inflow' ? $fields['amount'] : 0 - $fields['amount'];
@@ -292,7 +295,8 @@ class AccountServiceImpl extends BaseService implements AccountService
                 'trade_sn' => empty($fields['trade_sn'])? '' : $fields['trade_sn'],
                 'order_sn' => empty($fields['order_sn'])? '' : $fields['order_sn'],
                 'platform' => empty($fields['platform'])? '' : $fields['platform'],
-                'amount' => $fields['amount']
+                'amount' => $fields['amount'],
+                'action' => $fields['action']
             );
 
             if ($isCoin) {
@@ -319,7 +323,8 @@ class AccountServiceImpl extends BaseService implements AccountService
                 'trade_sn' => empty($fields['trade_sn'])? '' : $fields['trade_sn'],
                 'order_sn' => empty($fields['order_sn'])? '' : $fields['order_sn'],
                 'platform' => empty($fields['platform'])? '' : $fields['platform'],
-                'amount' => $fields['amount']
+                'amount' => $fields['amount'],
+                'action' => $fields['action']
             );
 
             if ($isCoin) {
