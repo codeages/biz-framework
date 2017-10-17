@@ -192,7 +192,7 @@ class OrderServiceTest extends IntegrationTestCase
         $this->assertEquals($mockOrder['callback'], $order['callback']);
         $this->assertEquals($mockOrder['created_reason'], $order['created_reason']);
         $this->assertEquals($mockOrder['create_extra'], $order['create_extra']);
-        $this->assertEquals($mockOrder['refund_deadline'], $order['refund_deadline']);
+        $this->assertEquals($mockOrder['expired_refund_days'], $order['expired_refund_days']);
         $this->assertEquals($this->sumOrderPriceAmount($mockedOrderItems), $order['price_amount']);
         $this->assertEquals($this->sumOrderPayAmount($mockedOrderItems), $order['pay_amount']);
         $this->assertEquals($this->biz['user']['id'], $order['user_id']);
@@ -245,6 +245,7 @@ class OrderServiceTest extends IntegrationTestCase
         $this->assertNotEmpty($order['trade_sn']);
         $this->assertEquals($notifyData['trade_sn'], $order['trade_sn']);
         $this->assertEquals($notifyData['pay_time'], $order['pay_time']);
+        $this->assertEquals($order['pay_time'] + $order['expired_refund_days']*86400, $order['refund_deadline']);
 
         $orderItems = $this->getOrderService()->findOrderItemsByOrderId($order['id']);
         foreach ($orderItems as $orderItem) {
@@ -329,7 +330,7 @@ class OrderServiceTest extends IntegrationTestCase
                 'xxx' => 'xxx'
             ),
             'device' => 'wap',
-            'refund_deadline' => time()
+            'expired_refund_days' => 5
         );
     }
 
