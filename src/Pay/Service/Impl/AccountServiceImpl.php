@@ -206,6 +206,7 @@ class AccountServiceImpl extends BaseService implements AccountService
 
     public function transferCoin($fields)
     {
+        $fields['platform'] = 'none';
         return $this->transfer($fields, true);
     }
 

@@ -276,7 +276,11 @@ class PayServiceTest extends IntegrationTestCase
 
             $this->assertEquals($trade['order_sn'], $cashFlow['order_sn']);
             $this->assertEquals($trade['trade_sn'], $cashFlow['trade_sn']);
-            $this->assertEquals($trade['platform'], $cashFlow['platform']);
+            if ($cashFlow['currency'] == 'coin') {
+                $this->assertEquals('none', $cashFlow['platform']);
+            } else {
+                $this->assertEquals($trade['platform'], $cashFlow['platform']);
+            }
 
         }
 

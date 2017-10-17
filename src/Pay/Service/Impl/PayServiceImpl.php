@@ -250,13 +250,16 @@ class PayServiceImpl extends BaseService implements PayService
     {
         try {
             $this->beginTransaction();
-            $trade = $this->getPaymentTradeDao()->update($trade['id'], array(
+
+            $updatedFields = array(
                 'status' => $data['status'],
                 'pay_time' => $data['paid_time'],
                 'platform_sn' => $data['cash_flow'],
                 'notify_data' => $data,
                 'currency' => $data['cash_type'],
-            ));
+            );
+
+            $trade = $this->getPaymentTradeDao()->update($trade['id'], $updatedFields);
             $this->transfer($trade);
             if($trade['type'] == 'purchase'){
                 $this->closeTradesByOrderSn($trade['order_sn'], array($trade['trade_sn']));
