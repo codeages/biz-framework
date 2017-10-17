@@ -103,6 +103,8 @@ class OrderDaoImpl extends GeneralDaoImpl implements OrderDao
                 'pay_data' => 'json',
                 'callback' => 'json',
                 'create_extra' => 'json',
+                'success_data' => 'json',
+                'fail_data' => 'json',
             ),
             'orderbys' => array(
                 'id',

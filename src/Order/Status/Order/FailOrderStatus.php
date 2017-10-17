@@ -13,7 +13,25 @@ class FailOrderStatus extends AbstractOrderStatus
 
     public function process($data = array())
     {
-        return $this->changeStatus(self::NAME);
+        $order = $this->getOrderDao()->update($this->order['id'], array(
+            'status' => self::NAME,
+            'fail_data' => $data
+        ));
+
+        $items = $this->getOrderItemDao()->findByOrderId($this->order['id']);
+        foreach ($items as $item) {
+            $this->getOrderItemDao()->update($item['id'], array(
+                'status' => self::NAME,
+            ));
+        }
+
+        $deducts = $this->getOrderItemDeductDao()->findByOrderId($this->order['id']);
+        foreach ($deducts as $key => $deduct) {
+            $deducts[$key] = $this->getOrderItemDeductDao()->update($deduct['id'], array(
+                'status' => self::NAME
+            ));
+        }
+        return $order;
     }
 
     public function success($data = array())
