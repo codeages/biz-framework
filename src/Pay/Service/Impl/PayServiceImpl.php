@@ -180,6 +180,11 @@ class PayServiceImpl extends BaseService implements PayService
     public function rechargeByIap($data)
     {
         list($data, $result) = $this->getPayment('iap')->converterNotify($data);
+
+        if ($result == 'failure') {
+            throw new \Exception($data['msg']);
+        }
+
         $trade = array(
             'goods_title' => '充值',
             'order_sn' => '',
@@ -192,7 +197,7 @@ class PayServiceImpl extends BaseService implements PayService
         $trade = $this->createPaymentTrade($trade);
 
         $data = array(
-            'paid_time' => $data['paid_time'],
+            'paid_time' => strtotime($data['paid_time']),
             'cash_flow' => $data['cash_flow'],
             'cash_type' => 'CNY',
             'trade_sn' => $trade['trade_sn'],
