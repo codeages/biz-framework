@@ -28,6 +28,10 @@ class UserBalanceDaoImpl extends GeneralDaoImpl implements UserBalanceDao
             'orderbys' => array(
                 'id',
                 'created_time',
+                'amount',
+                'cash_amount',
+                'recharge_amount',
+                'purchase_amount',
             ),
             'conditions' => array(
                 'user_id IN (:user_ids)',
