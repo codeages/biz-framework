@@ -30,6 +30,7 @@ class TableCommand extends AbstractCommand
             'cashflow_add_buyer_id',
             'user_cashflow_add_action',
             'user_balance_add_recharge_and_purchase_amount',
+            'payment_retype_amount',
         );
 
         foreach ($migrations as $migration) {

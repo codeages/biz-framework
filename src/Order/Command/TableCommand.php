@@ -31,7 +31,8 @@ class TableCommand extends AbstractCommand
             'order_refund_add_title',
             'order_add_expired_refund_days',
             'order_add_success_fail_data',
-            'order_refund_item_add_target'
+            'order_refund_item_add_target',
+            'order_retype_amount',
         );
 
         foreach ($migrations as $migration) {
