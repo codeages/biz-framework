@@ -2,7 +2,7 @@
 
 use Phpmig\Migration\Migration;
 
-class UserBalanceAddRechargeAndPurchaseAmount extends Migration
+class BizUserBalanceAddRechargeAndPurchaseAmount extends Migration
 {
     /**
      * Do the migration
