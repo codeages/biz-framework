@@ -205,7 +205,7 @@ class PayServiceImpl extends BaseService implements PayService
         $trade = $this->createPaymentTrade($trade);
 
         $data = array(
-            'paid_time' => $data['paid_time'],
+            'paid_time' => strtotime($data['paid_time']),
             'cash_flow' => $data['cash_flow'],
             'cash_type' => 'CNY',
             'trade_sn' => $trade['trade_sn'],

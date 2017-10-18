@@ -42,12 +42,13 @@ class IapGetway extends AbstractGetway
         $ch = curl_init($endpoint);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
 
         $response = curl_exec($ch);
         $errno = curl_errno($ch);
+
         curl_close($ch);
 
         if ($errno != 0) {
@@ -55,7 +56,7 @@ class IapGetway extends AbstractGetway
                 array(
                     'msg' => '充值失败！'.$errno
                 ),
-                'failture'
+                'failure'
             );
         }
 
@@ -65,7 +66,7 @@ class IapGetway extends AbstractGetway
                 array(
                     'msg' => '充值验证失败'
                 ),
-                'failture'
+                'failure'
             );
         }
 
@@ -79,7 +80,7 @@ class IapGetway extends AbstractGetway
                 array(
                     'msg' => '充值失败！状态码 :'.$data['status']
                 ),
-                'failture'
+                'failure'
             );
         }
 
@@ -104,7 +105,7 @@ class IapGetway extends AbstractGetway
                         array(
                             'msg' => 'receipt校验失败：找不到对应的transaction_id'
                         ),
-                        'failture'
+                        'failure'
                     );
                 }
 
@@ -127,7 +128,7 @@ class IapGetway extends AbstractGetway
 
         return array(
             array(),
-            'failture'
+            'failure'
         );
     }
 
