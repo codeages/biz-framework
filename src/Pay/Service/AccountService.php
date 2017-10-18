@@ -22,6 +22,10 @@ interface AccountService
 
     public function getUserBalanceByUserId($userId);
 
+    public function countBalances($conditions);
+
+    public function searchBalances($conditions, $orderBy, $start, $limit);
+
     public function lockCoin($userId, $coinAmount);
 
     public function releaseCoin($userId, $coinAmount);
@@ -37,10 +41,6 @@ interface AccountService
     public function searchUserCashflows($conditions, $orderBy, $start, $limit);
 
     public function sumColumnByConditions($column, $conditions);
-
-    public function searchUserIdsGroupByUserIdOrderBySumColumn($column, $conditions, $sort, $start, $limit);
-
-    public function searchUserIdsGroupByUserIdOrderByBalance($conditions, $sort, $start, $limit);
 
     public function countUsersByConditions($conditions);
 }

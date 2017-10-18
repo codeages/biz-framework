@@ -34,7 +34,8 @@ class PayServiceImpl extends BaseService implements PayService
             'seller_id',
             'user_id',
             'type',
-            'rate'
+            'rate',
+            'app_pay'
         ));
 
         if ('recharge' == $data['type']) {
@@ -183,6 +184,13 @@ class PayServiceImpl extends BaseService implements PayService
 
         if ($result == 'failure') {
             throw new \Exception($data['msg']);
+        }
+
+        $platformSn = $data['cash_flow'];
+        $trade = $this->getTradeByPlatformSn($platformSn);
+
+        if (!empty($trade) && $trade['platform'] == 'iap') {
+            return $trade;
         }
 
         $trade = array(
