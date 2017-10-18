@@ -16,6 +16,13 @@ class OrderItemRefundDaoImpl extends GeneralDaoImpl implements OrderItemRefundDa
         ));
     }
 
+    public function findByConditions($conditions)
+    {
+        $builder = $this->createQueryBuilder($conditions)
+            ->select('*');
+        return $builder->execute()->fetchAll();
+    }
+
     public function declares()
     {
         return array(
@@ -27,6 +34,9 @@ class OrderItemRefundDaoImpl extends GeneralDaoImpl implements OrderItemRefundDa
             'serializes' => array(
             ),
             'conditions' => array(
+                'title LIKE :title_LIKE',
+                'target_id = :target_id',
+                'target_type = :target_type'
             )
         );
     }
