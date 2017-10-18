@@ -181,6 +181,14 @@ class PayServiceImpl extends BaseService implements PayService
     public function rechargeByIap($data)
     {
         list($data, $result) = $this->getPayment('iap')->converterNotify($data);
+
+        $platformSn = $data['cash_flow'];
+        $trade = $this->getTradeByPlatformSn($platformSn);
+
+        if (!empty($trade) && $trade['platform'] == 'iap') {
+            return $trade;
+        }
+
         $trade = array(
             'goods_title' => '充值',
             'order_sn' => '',
