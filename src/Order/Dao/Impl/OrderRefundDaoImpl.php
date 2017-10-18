@@ -27,6 +27,7 @@ class OrderRefundDaoImpl extends GeneralDaoImpl implements OrderRefundDao
                 'deal_user_id = :deal_user_id',
                 'order_id = :order_id',
                 'order_id IN (:order_ids)',
+                'id IN (:ids)',
             )
         );
     }
