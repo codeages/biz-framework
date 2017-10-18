@@ -34,7 +34,8 @@ class PayServiceImpl extends BaseService implements PayService
             'seller_id',
             'user_id',
             'type',
-            'rate'
+            'rate',
+            'app_pay'
         ));
 
         if ('recharge' == $data['type']) {
