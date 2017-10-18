@@ -158,6 +158,16 @@ class AccountServiceImpl extends BaseService implements AccountService
         return $this->getUserBalanceDao()->getByUserId($userId);
     }
 
+    public function searchBalances($conditions, $orderBy, $start, $limit)
+    {
+        return $this->getUserBalanceDao()->search($conditions, $orderBy, $start, $limit);
+    }
+
+    public function countBalances($conditions)
+    {
+        return $this->getUserBalanceDao()->count($conditions);
+    }
+
     protected function waveAmount($userId, $amount)
     {
         $userBalance = $this->getUserBalanceDao()->getByUserId($userId);
@@ -366,15 +376,15 @@ class AccountServiceImpl extends BaseService implements AccountService
         return $this->getUserCashflowDao()->sumColumnByConditions($column, $conditions);
     }
 
-    public function searchUserIdsGroupByUserIdOrderBySumColumn($column, $conditions, $sort, $start, $limit)
-    {
-        return $this->getUserCashflowDao()->searchUserIdsGroupByUserIdOrderBySumColumn($column, $conditions, $sort, $start, $limit);
-    }
+//    public function searchUserIdsGroupByUserIdOrderBySumColumn($column, $conditions, $sort, $start, $limit)
+//    {
+//        return $this->getUserCashflowDao()->searchUserIdsGroupByUserIdOrderBySumColumn($column, $conditions, $sort, $start, $limit);
+//    }
 
-    public function searchUserIdsGroupByUserIdOrderByBalance($conditions, $sort, $start, $limit)
-    {
-        return $this->getUserCashflowDao()->searchUserIdsGroupByUserIdOrderByBalance($conditions, $sort, $start, $limit);
-    }
+//    public function searchUserIdsGroupByUserIdOrderByBalance($conditions, $sort, $start, $limit)
+//    {
+//        return $this->getUserCashflowDao()->searchUserIdsGroupByUserIdOrderByBalance($conditions, $sort, $start, $limit);
+//    }
 
     public function countUsersByConditions($conditions)
     {
