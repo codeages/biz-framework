@@ -182,6 +182,10 @@ class PayServiceImpl extends BaseService implements PayService
     {
         list($data, $result) = $this->getPayment('iap')->converterNotify($data);
 
+        if ($result == 'failure') {
+            throw new \Exception($data['msg']);
+        }
+
         $platformSn = $data['cash_flow'];
         $trade = $this->getTradeByPlatformSn($platformSn);
 
