@@ -143,7 +143,7 @@ class IapGetway extends AbstractGetway
 
     public function queryTrade($trade)
     {
-        throw new AccessDeniedException('can not query refund with iap.');
+        return $trade;
     }
 
     public function converterRefundNotify($data)
