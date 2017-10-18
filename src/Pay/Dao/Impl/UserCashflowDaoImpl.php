@@ -69,6 +69,7 @@ class UserCashflowDaoImpl extends GeneralDaoImpl implements UserCashflowDao
                 'user_id = :user_id',
                 'buyer_id = :buyer_id',
                 'type = :type',
+                'title LIKE :title_like',
                 'amount > :amount_GT',
                 'amount >= :amount_GTE',
                 'amount < :amount_LT',
