@@ -16,7 +16,7 @@ class BizUserBalanceAddRechargeAndPurchaseAmount extends Migration
             $connection->exec("ALTER TABLE `biz_user_balance` ADD COLUMN `recharge_amount` int(10) NOT NULL DEFAULT '0' COMMENT '充值总额'");
         }
 
-        if (!$this->isFieldExist('biz_user_balance', 'recharge_amount')) {
+        if (!$this->isFieldExist('biz_user_balance', 'purchase_amount')) {
             $connection->exec("ALTER TABLE `biz_user_balance` ADD COLUMN `purchase_amount` int(10) NOT NULL DEFAULT '0' COMMENT '消费总额'");
         }
     }
