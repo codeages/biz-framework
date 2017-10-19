@@ -223,25 +223,31 @@ class PayServiceImpl extends BaseService implements PayService
 
     protected function closeByPayment($trade)
     {
-        // todo 调用支付平台的取消支付接口
+        // TODO 调用支付平台的取消支付接口
     }
 
     protected function updateTradeToPaidAndTransferAmount($data)
     {
-        $trade = $this->getPaymentTradeDao()->getByTradeSn($data['trade_sn']);
-
         if ($data['status'] == 'paid') {
+            $lock = $this->biz['lock'];
+            $lockKey = "payment_trade_paid_{$data['trade_sn']}";
+            $lock->get($lockKey);
+
+            $trade = $this->getPaymentTradeDao()->getByTradeSn($data['trade_sn']);
+
+            if (empty($trade)) {
+                $this->getTargetlogService()->log(TargetlogService::INFO, 'trade.not_found', $data['trade_sn'], "交易号{$data['trade_sn']}不存在", $data);
+                $lock->release($lockKey);
+                return $trade;
+            }
+
+            if (PayingStatus::NAME != $trade['status']) {
+                $this->getTargetlogService()->log(TargetlogService::INFO, 'trade.is_not_paying', $data['trade_sn'], "交易号{$data['trade_sn']}状态不正确，状态为：{$trade['status']}", $data);
+                $lock->release($lockKey);
+                return $trade;
+            }
+
             try {
-                if (empty($trade)) {
-                    $this->getTargetlogService()->log(TargetlogService::INFO, 'trade.not_found', $data['trade_sn'], "交易号{$data['trade_sn']}不存在", $data);
-                    return;
-                }
-
-                if (PayingStatus::NAME != $trade['status']) {
-                    $this->getTargetlogService()->log(TargetlogService::INFO, 'trade.is_not_paying', $data['trade_sn'], "交易号{$data['trade_sn']}状态不正确，状态为：{$trade['status']}", $data);
-                    return;
-                }
-
                 $this->beginTransaction();
 
                 $trade = $this->updateTradeToPaid($trade['id'], $data);
@@ -250,18 +256,19 @@ class PayServiceImpl extends BaseService implements PayService
                     $this->closeTradesByOrderSn($trade['order_sn'], array($trade['trade_sn']));
                 }
                 $this->getTargetlogService()->log(TargetlogService::INFO, 'trade.paid', $data['trade_sn'], "交易号{$data['trade_sn']}，账目流水处理成功", $data);
+
                 $this->commit();
-                $this->dispatch('payment_trade.paid', $trade, $data);
-                return $trade;
             } catch (\Exception $e) {
                 $this->getTargetlogService()->log(TargetlogService::INFO, 'pay.error', $data['trade_sn'], "交易号{$data['trade_sn']}处理失败, {$e->getMessage()}", $data);
                 $this->rollback();
-                throw $e;
             }
 
+            $lock->release($lockKey);
+            $this->dispatch('payment_trade.paid', $trade, $data);
+            return $trade;
         }
 
-        return $trade;
+        return $this->getPaymentTradeDao()->getByTradeSn($data['trade_sn']);
     }
 
     public function searchTrades($conditions, $orderBy, $start, $limit)
@@ -340,12 +347,18 @@ class PayServiceImpl extends BaseService implements PayService
         list($result, $response) = $paymentGetWay->converterRefundNotify($data);
         $tradeSn = $result['trade_sn'];
 
+        $lockKey = "payment_trade_refunded_{$tradeSn}";
+        $lock = $this->biz['lock'];
+        $lock->get($lockKey);
+
         $trade = $this->getPaymentTradeDao()->getByTradeSn($tradeSn);
         if ($trade['status'] == RefundedStatus::NAME) {
             return $trade;
         }
 
         $this->getTradeContext($trade['id'])->refunded($data);
+        $lock->release($lockKey);
+
         return $response;
     }
 

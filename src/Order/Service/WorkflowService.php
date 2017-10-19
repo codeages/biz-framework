@@ -30,5 +30,5 @@ interface WorkflowService
 
     public function cancelRefund($refundId);
 
-    public function closeOrders();
+    public function closeExpiredOrders();
 }

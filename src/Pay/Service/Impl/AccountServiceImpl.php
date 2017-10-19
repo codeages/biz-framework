@@ -44,7 +44,6 @@ class AccountServiceImpl extends BaseService implements AccountService
             throw new ServiceException($e->getMessage());
         }
 
-
         return $account;
     }
 

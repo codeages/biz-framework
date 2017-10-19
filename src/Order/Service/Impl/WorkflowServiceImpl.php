@@ -56,7 +56,7 @@ class WorkflowServiceImpl extends BaseService implements WorkflowService
         return $this->getOrderContext($orderId)->fail($data);
     }
 
-    public function closeOrders()
+    public function closeExpiredOrders()
     {
         $orders = $this->getOrderDao()->search(array(
             'created_time_LT' => time()-2*60*60
