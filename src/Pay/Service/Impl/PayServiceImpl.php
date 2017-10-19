@@ -223,7 +223,7 @@ class PayServiceImpl extends BaseService implements PayService
 
     protected function closeByPayment($trade)
     {
-        // TODO 调用支付平台的取消支付接口
+        return $this->getPayment($trade['platform'])->closeTrade($trade);
     }
 
     protected function updateTradeToPaidAndTransferAmount($data)
@@ -315,7 +315,9 @@ class PayServiceImpl extends BaseService implements PayService
             return $this->refundPlatformTrade($trade);
         }
 
-        return $this->getTradeContext($trade['id'])->refunded();
+        $trade = $this->updateTradeToRefunded($tradeSn, array());
+
+        return $trade;
     }
 
     protected function isRefundByPayment()
@@ -347,6 +349,13 @@ class PayServiceImpl extends BaseService implements PayService
         list($result, $response) = $paymentGetWay->converterRefundNotify($data);
         $tradeSn = $result['trade_sn'];
 
+        $this->updateTradeToRefunded($tradeSn, $data);
+
+        return $response;
+    }
+
+    protected function updateTradeToRefunded($tradeSn, $data)
+    {
         $lockKey = "payment_trade_refunded_{$tradeSn}";
         $lock = $this->biz['lock'];
         $lock->get($lockKey);
@@ -356,10 +365,10 @@ class PayServiceImpl extends BaseService implements PayService
             return $trade;
         }
 
-        $this->getTradeContext($trade['id'])->refunded($data);
+        $trade = $this->getTradeContext($trade['id'])->refunded($data);
         $lock->release($lockKey);
 
-        return $response;
+        return $trade;
     }
 
     protected function validateLogin()

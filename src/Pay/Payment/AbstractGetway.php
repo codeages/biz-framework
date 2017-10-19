@@ -3,6 +3,8 @@
 namespace Codeages\Biz\Framework\Pay\Payment;
 
 
+use Codeages\Biz\Framework\Service\Exception\AccessDeniedException;
+
 abstract class AbstractGetway
 {
     protected $biz;
@@ -12,6 +14,10 @@ abstract class AbstractGetway
         $this->biz = $biz;
     }
 
+    public function closeTrade($trade)
+    {
+        throw new AccessDeniedException('can not close trade.');
+    }
 
     abstract public function createTrade($data);
 
