@@ -336,8 +336,8 @@ class PayServiceImpl extends BaseService implements PayService
     public function notifyRefunded($payment, $data)
     {
         $paymentGetWay = $this->getPayment($payment);
-        $response = $paymentGetWay->converterRefundNotify($data);
-        $tradeSn = $response[0]['trade_sn'];
+        list($result, $response) = $paymentGetWay->converterRefundNotify($data);
+        $tradeSn = $result['trade_sn'];
 
         $trade = $this->getPaymentTradeDao()->getByTradeSn($tradeSn);
         if ($trade['status'] == RefundedStatus::NAME) {
@@ -345,7 +345,7 @@ class PayServiceImpl extends BaseService implements PayService
         }
 
         $this->getTradeContext($trade['id'])->refunded($data);
-        return $response[1];
+        return $response;
     }
 
     protected function validateLogin()
@@ -401,16 +401,8 @@ class PayServiceImpl extends BaseService implements PayService
     {
 
         if (!empty($trade['cash_amount'])) {
-            $fields = array(
-                'user_id' => $trade['user_id'],
-                'amount' => $trade['cash_amount'],
-                'title' => $trade['title'],
-                'currency' => $trade['currency'],
-                'platform' => $trade['platform'],
-                'trade_sn' => $trade['trade_sn'],
-                'order_sn' => $trade['order_sn'],
-            );
-            $flow = $this->getAccountService()->rechargeCash($fields);
+
+            $flow = $this->getAccountService()->rechargeCash($trade);
 
             $fields = array(
                 'from_user_id' => $trade['user_id'],

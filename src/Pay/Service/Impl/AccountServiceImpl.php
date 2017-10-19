@@ -2,7 +2,6 @@
 
 namespace Codeages\Biz\Framework\Pay\Service\Impl;
 
-use Codeages\Biz\Framework\Pay\Dao\UserCashflowDao;
 use Codeages\Biz\Framework\Util\ArrayToolkit;
 use Codeages\Biz\Framework\Util\RandomToolkit;
 use Codeages\Biz\Framework\Pay\Service\AccountService;
@@ -20,9 +19,6 @@ class AccountServiceImpl extends BaseService implements AccountService
         if ($userId != $this->biz['user']['id']) {
             throw $this->createAccessDeniedException('current user is invalid.');
         }
-
-        $lock = $this->biz['lock'];
-        $lock->get("set_pay_password_{$userId}");
 
         $account = $this->getPayAccountDao()->getByUserId($userId);
 
@@ -45,11 +41,9 @@ class AccountServiceImpl extends BaseService implements AccountService
             $this->commit();
         } catch (\Exception $e) {
             $this->rollback();
-            $lock->release("set_pay_password_{$userId}");
             throw new ServiceException($e->getMessage());
         }
 
-        $lock->release("set_pay_password_{$userId}");
 
         return $account;
     }
@@ -83,9 +77,6 @@ class AccountServiceImpl extends BaseService implements AccountService
             throw $this->createAccessDeniedException('current user is invalid.');
         }
 
-        $lock = $this->biz['lock'];
-        $lock->get("set_security_answers_{$userId}");
-
         try {
             $this->beginTransaction();
 
@@ -104,11 +95,8 @@ class AccountServiceImpl extends BaseService implements AccountService
             $this->commit();
         } catch (\Exception $e) {
             $this->rollback();
-            $lock->release("set_security_answers_{$userId}");
             throw new ServiceException($e);
         }
-
-        $lock->release("set_security_answers_{$userId}");
     }
 
     public function findSecurityAnswersByUserId($userId)
@@ -168,33 +156,6 @@ class AccountServiceImpl extends BaseService implements AccountService
         return $this->getUserBalanceDao()->count($conditions);
     }
 
-    protected function waveAmount($userId, $amount)
-    {
-        $userBalance = $this->getUserBalanceDao()->getByUserId($userId);
-        $fields = array(
-            'amount' => $amount
-        );
-
-        if ($amount>0) {
-            $fields['recharge_amount'] = $userBalance['recharge_amount'] + $amount;
-        } else {
-            $fields['purchase_amount'] = $userBalance['purchase_amount'] + abs($amount);
-        }
-
-        $this->getUserBalanceDao()->wave(array($userBalance['id']), $fields);
-
-        return $this->getUserBalanceDao()->getByUserId($userId);
-    }
-
-    protected function waveCashAmount($userId, $amount)
-    {
-        $userBalance = $this->getUserBalanceDao()->getByUserId($userId);
-        $this->getUserBalanceDao()->wave(array($userBalance['id']), array(
-            'cash_amount' => $amount
-        ));
-        return $this->getUserBalanceDao()->getByUserId($userId);
-    }
-
     public function lockCoin($userId, $coinAmount)
     {
         $lock = $this->biz['lock'];
@@ -229,28 +190,95 @@ class AccountServiceImpl extends BaseService implements AccountService
 
     public function transferCash($fields)
     {
-        return $this->transfer($fields, false);
+        $userFlow = array(
+            'title' => $fields['title'],
+            'buyer_id' => $fields['buyer_id'],
+            'type' => 'outflow',
+            'parent_sn' => empty($fields['parent_sn'])? '' : $fields['parent_sn'],
+            'user_id' => $fields['from_user_id'],
+            'trade_sn' => empty($fields['trade_sn'])? '' : $fields['trade_sn'],
+            'order_sn' => empty($fields['order_sn'])? '' : $fields['order_sn'],
+            'amount' => $fields['amount'],
+            'action' => $fields['action'],
+            'platform' => $fields['platform'],
+            'currency' => $fields['currency'],
+            'flow_type' => 'outflow'
+        );
+        $cashFlow = $this->waveCashAmount($userFlow);
+
+        $userFlow = array(
+            'title' => $fields['title'],
+            'buyer_id' => $fields['buyer_id'],
+            'type' => 'inflow',
+            'parent_sn' => $cashFlow['sn'],
+            'user_id' => $fields['to_user_id'],
+            'trade_sn' => empty($fields['trade_sn'])? '' : $fields['trade_sn'],
+            'order_sn' => empty($fields['order_sn'])? '' : $fields['order_sn'],
+            'amount' => $fields['amount'],
+            'action' => $fields['action'],
+            'platform' => $fields['platform'],
+            'currency' => $fields['currency'],
+            'flow_type' => 'inflow'
+        );
+        return $this->waveCashAmount($userFlow);
     }
 
     public function transferCoin($fields)
     {
-        $fields['platform'] = 'none';
-        return $this->transfer($fields, true);
+        $userFlow = array(
+            'title' => $fields['title'],
+            'buyer_id' => $fields['buyer_id'],
+            'type' => 'outflow',
+            'parent_sn' => empty($fields['parent_sn'])? '' : $fields['parent_sn'],
+            'user_id' => $fields['from_user_id'],
+            'trade_sn' => empty($fields['trade_sn'])? '' : $fields['trade_sn'],
+            'order_sn' => empty($fields['order_sn'])? '' : $fields['order_sn'],
+            'amount' => $fields['amount'],
+            'action' => $fields['action'],
+            'flow_type' => 'outflow'
+        );
+        $cashFlow = $this->waveCoinAmount($userFlow);
+
+        $userFlow = array(
+            'title' => $fields['title'],
+            'buyer_id' => $fields['buyer_id'],
+            'type' => 'inflow',
+            'parent_sn' => $cashFlow['sn'],
+            'user_id' => $fields['to_user_id'],
+            'trade_sn' => empty($fields['trade_sn'])? '' : $fields['trade_sn'],
+            'order_sn' => empty($fields['order_sn'])? '' : $fields['order_sn'],
+            'amount' => $fields['amount'],
+            'action' => $fields['action'],
+            'flow_type' => 'inflow'
+        );
+        return $this->waveCoinAmount($userFlow);
     }
 
-    public function rechargeCash($fields)
+    public function rechargeCash($trade)
     {
-        $fields['action'] = 'recharge';
-        return $this->waveCashAmountWithUserCashflow($fields, 'inflow');
+        $fields = array(
+            'user_id' => $trade['user_id'],
+            'buyer_id' => $trade['user_id'],
+            'amount' => $trade['cash_amount'],
+            'title' => $trade['title'],
+            'currency' => $trade['currency'],
+            'platform' => $trade['platform'],
+            'trade_sn' => $trade['trade_sn'],
+            'order_sn' => $trade['order_sn'],
+            'action' => 'recharge',
+            'flow_type' => 'inflow'
+        );
+        return $this->waveCashAmount($fields);
     }
 
     public function withdrawCash($fields)
     {
         $fields['action'] = 'withdraw';
-        return $this->waveCashAmountWithUserCashflow($fields, 'outflow');
+        $fields['flow_type'] = 'outflow';
+        return $this->waveCashAmount($fields);
     }
 
-    protected function waveCashAmountWithUserCashflow($fields, $flowType)
+    protected function waveCashAmount($fields)
     {
         if (!ArrayToolkit::requireds($fields, array('user_id', 'amount', 'title', 'currency', 'platform'))) {
             throw $this->createInvalidArgumentException('fields is invalid.');
@@ -262,10 +290,17 @@ class AccountServiceImpl extends BaseService implements AccountService
             $lock->get($key);
             $this->beginTransaction();
 
+            $amount = $fields['flow_type'] == 'inflow' ? $fields['amount'] : 0 - $fields['amount'];
+            $userBalance = $this->getUserBalanceDao()->getByUserId($fields['user_id']);
+            $this->getUserBalanceDao()->wave(array($userBalance['id']), array(
+                'cash_amount' => $amount
+            ));
+            $userBalance = $this->getUserBalanceDao()->getByUserId($fields['user_id']);
+
             $userFlow = array(
                 'sn' => $this->generateSn(),
                 'title' => $fields['title'],
-                'type' => $flowType,
+                'type' => $fields['flow_type'],
                 'parent_sn' => empty($fields['parent_sn']) ? '' : $fields['parent_sn'],
                 'currency' => $fields['currency'],
                 'amount_type' => 'money',
@@ -274,15 +309,12 @@ class AccountServiceImpl extends BaseService implements AccountService
                 'order_sn' => empty($fields['order_sn']) ? '' : $fields['order_sn'],
                 'platform' => empty($fields['platform']) ? '' : $fields['platform'],
                 'amount' => $fields['amount'],
-                'buyer_id' => $fields['user_id'],
-                'action' => $fields['action']
+                'buyer_id' => $fields['buyer_id'],
+                'action' => $fields['action'],
+                'user_balance' => empty($userBalance['cash_amount']) ? 0 : $userBalance['cash_amount']
             );
-
-            $amount = $flowType == 'inflow' ? $fields['amount'] : 0 - $fields['amount'];
-            $userBalance = $this->waveCashAmount($userFlow['user_id'], $amount);
-            $userFlow['user_balance'] = empty($userBalance['cash_amount']) ? 0 : $userBalance['cash_amount'];
-
             $cashFlow = $this->getUserCashflowDao()->create($userFlow);
+
             $this->commit();
             $lock->release($key);
             return $cashFlow;
@@ -293,82 +325,49 @@ class AccountServiceImpl extends BaseService implements AccountService
         }
     }
 
-    protected function transfer($fields, $isCoin = false)
+    protected function waveCoinAmount($fields)
     {
-        if (!ArrayToolkit::requireds($fields, array('from_user_id', 'to_user_id', 'amount', 'title'))) {
+        if (!ArrayToolkit::requireds($fields, array('user_id', 'amount', 'title'))) {
             throw $this->createInvalidArgumentException('fields is invalid.');
         }
 
-        if (!$isCoin && !ArrayToolkit::requireds($fields, array('currency'))) {
-            throw $this->createInvalidArgumentException('fields is invalid.');
-        }
-
+        $lock = $this->biz['lock'];
+        $key = "user_balance_{$fields['user_id']}";
         try {
+            $lock->get($key);
             $this->beginTransaction();
-            $lock = $this->biz['lock'];
 
-            $lockFromUserKey = "user_balance_{$fields['from_user_id']}";
-            $lock->get($lockFromUserKey);
+            $amount = $fields['flow_type'] == 'inflow' ? $fields['amount'] : 0 - $fields['amount'];
+            $userBalance = $this->getUserBalanceDao()->getByUserId($fields['user_id']);
+            $this->getUserBalanceDao()->wave(array($userBalance['id']), array(
+                'amount' => $amount
+            ));
+            $userBalance = $this->getUserBalanceDao()->getByUserId($fields['user_id']);
+
             $userFlow = array(
                 'sn' => $this->generateSn(),
                 'title' => $fields['title'],
-                'buyer_id' => $fields['buyer_id'],
-                'type' => 'outflow',
-                'parent_sn' => empty($fields['parent_sn'])? '' : $fields['parent_sn'],
-                'currency' => $isCoin ? 'coin': $fields['currency'],
-                'amount_type' => $isCoin ? 'coin': 'money',
-                'user_id' => $fields['from_user_id'],
-                'trade_sn' => empty($fields['trade_sn'])? '' : $fields['trade_sn'],
-                'order_sn' => empty($fields['order_sn'])? '' : $fields['order_sn'],
-                'platform' => empty($fields['platform'])? '' : $fields['platform'],
+                'type' => $fields['flow_type'],
+                'parent_sn' => empty($fields['parent_sn']) ? '' : $fields['parent_sn'],
+                'currency' => 'coin',
+                'amount_type' => 'coin',
+                'user_id' => $fields['user_id'],
+                'trade_sn' => empty($fields['trade_sn']) ? '' : $fields['trade_sn'],
+                'order_sn' => empty($fields['order_sn']) ? '' : $fields['order_sn'],
+                'platform' => 'none',
                 'amount' => $fields['amount'],
-                'action' => $fields['action']
-            );
-
-            if ($isCoin) {
-                $userBalance = $this->waveAmount($userFlow['user_id'], 0 - $fields['amount']);
-                $userFlow['user_balance'] = empty($userBalance['amount']) ? 0 : $userBalance['amount'];
-            } else {
-                $userBalance = $this->waveCashAmount($userFlow['user_id'], 0 - $fields['amount']);
-                $userFlow['user_balance'] = empty($userBalance['cash_amount']) ? 0 : $userBalance['cash_amount'];
-            }
-
-            $cashFlow = $this->getUserCashflowDao()->create($userFlow);
-            $lock->release($lockFromUserKey);
-
-            $lockToUserKey = "user_balance_{$fields['to_user_id']}";
-            $lock->get($lockToUserKey);
-            $userFlow = array(
-                'sn' => $this->generateSn(),
-                'title' => $fields['title'],
                 'buyer_id' => $fields['buyer_id'],
-                'type' => 'inflow',
-                'parent_sn' => $cashFlow['sn'],
-                'currency' => $isCoin ? 'coin': $fields['currency'],
-                'amount_type' => $isCoin ? 'coin': 'money',
-                'user_id' => $fields['to_user_id'],
-                'trade_sn' => empty($fields['trade_sn'])? '' : $fields['trade_sn'],
-                'order_sn' => empty($fields['order_sn'])? '' : $fields['order_sn'],
-                'platform' => empty($fields['platform'])? '' : $fields['platform'],
-                'amount' => $fields['amount'],
-                'action' => $fields['action']
+                'action' => $fields['action'],
+                'user_balance' => empty($userBalance['amount']) ? 0 : $userBalance['amount']
             );
-
-            if ($isCoin) {
-                $userBalance = $this->waveAmount($userFlow['user_id'], $fields['amount']);
-                $userFlow['user_balance'] = empty($userBalance['amount']) ? 0 : $userBalance['amount'];
-            } else {
-                $userBalance = $this->waveCashAmount($userFlow['user_id'], $fields['amount']);
-                $userFlow['user_balance'] = empty($userBalance['cash_amount']) ? 0 : $userBalance['cash_amount'];
-            }
-
             $cashFlow = $this->getUserCashflowDao()->create($userFlow);
-            $lock->release($lockToUserKey);
 
             $this->commit();
+            $lock->release($key);
             return $cashFlow;
         } catch (\Exception $e) {
             $this->rollback();
+            $lock->release($key);
             throw $e;
         }
     }
@@ -418,9 +417,6 @@ class AccountServiceImpl extends BaseService implements AccountService
         return $this->biz->dao('Pay:SecurityAnswerDao');
     }
 
-    /**
-     * @return UserCashflowDao
-     */
     protected function getUserCashflowDao()
     {
         return $this->biz->dao('Pay:UserCashflowDao');
