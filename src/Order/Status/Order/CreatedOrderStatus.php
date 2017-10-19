@@ -2,6 +2,7 @@
 
 namespace Codeages\Biz\Framework\Order\Status\Order;
 
+use Codeages\Biz\Framework\Service\Exception\InvalidArgumentException;
 use Codeages\Biz\Framework\Util\ArrayToolkit;
 
 class CreatedOrderStatus extends AbstractOrderStatus
@@ -15,11 +16,64 @@ class CreatedOrderStatus extends AbstractOrderStatus
 
     public function process($data = array())
     {
+        $orderItems = $this->validateFields($data['order'], $data['orderItems']);
+        $order = ArrayToolkit::parts($data['order'], array(
+            'title',
+            'callback',
+            'source',
+            'user_id',
+            'created_reason',
+            'seller_id',
+            'price_type',
+            'deducts',
+            'create_extra',
+            'device',
+            'expired_refund_days'
+        ));
+
+        $orderDeducts = empty($order['deducts']) ? array() : $order['deducts'];
+        unset($order['deducts']);
+
+        $data = array(
+            'order' => $order,
+            'orderDeducts' => $orderDeducts,
+            'orderItems' => $orderItems
+        );
+
         $order = $this->saveOrder($data);
         $order = $this->createOrderDeducts($order, $data['orderDeducts']);
         $order = $this->createOrderItems($order, $data['orderItems']);
 
+        if (0 == $order['pay_amount']) {
+            $data = array(
+                'order_sn' => $order['sn'],
+                'pay_time' => time(),
+                'payment' => 'none'
+            );
+
+            return $this->paid($data);
+        }
+
         return $order;
+    }
+
+    protected function validateFields($order, $orderItems)
+    {
+        if (!ArrayToolkit::requireds($order, array('user_id'))) {
+            throw new InvalidArgumentException('user_id is required in order.');
+        }
+
+        foreach ($orderItems as $item) {
+            if (!ArrayToolkit::requireds($item, array(
+                'title',
+                'price_amount',
+                'target_id',
+                'target_type'))) {
+                throw new InvalidArgumentException('args is invalid.');
+            }
+        }
+
+        return $orderItems;
     }
 
     protected function saveOrder($data)

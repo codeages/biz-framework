@@ -174,7 +174,7 @@ class PayServiceImpl extends BaseService implements PayService
         list($data, $result) = $this->getPayment($payment)->converterNotify($data);
         $this->getTargetlogService()->log(TargetlogService::INFO, 'trade.paid_notify', $data['trade_sn'], "收到第三方支付平台{$payment}的通知，交易号{$data['trade_sn']}，支付状态{$data['status']}", $data);
 
-        $trade = $this->updateTradeToPaid($data);
+        $this->updateTradeToPaid($data);
         return $result;
     }
 
@@ -187,6 +187,10 @@ class PayServiceImpl extends BaseService implements PayService
         }
 
         $platformSn = $data['cash_flow'];
+        $lockKey = "recharge_by_iap_{$platformSn}";
+        $lock = $this->biz['lock'];
+        $lock->get($lockKey);
+
         $trade = $this->getTradeByPlatformSn($platformSn);
 
         if (!empty($trade) && $trade['platform'] == 'iap') {
@@ -212,7 +216,11 @@ class PayServiceImpl extends BaseService implements PayService
             'status' => 'paid',
         );
         $this->updateTradeToPaid($data);
-        return $this->getPaymentTradeDao()->get($trade['id']);
+        $trade = $this->getPaymentTradeDao()->get($trade['id']);
+
+        $lock->release($lockKey);
+
+        return $trade;
     }
 
     protected function isCloseByPayment()

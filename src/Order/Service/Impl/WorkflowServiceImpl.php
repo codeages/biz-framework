@@ -13,41 +13,11 @@ class WorkflowServiceImpl extends BaseService implements WorkflowService
     public function start($fields, $orderItems)
     {
         $this->validateLogin();
-        $orderItems = $this->validateFields($fields, $orderItems);
-        $order = ArrayToolkit::parts($fields, array(
-            'title',
-            'callback',
-            'source',
-            'user_id',
-            'created_reason',
-            'seller_id',
-            'price_type',
-            'deducts',
-            'create_extra',
-            'device',
-            'expired_refund_days'
-        ));
-
-        $orderDeducts = empty($order['deducts']) ? array() : $order['deducts'];
-        unset($order['deducts']);
-
         $data = array(
-            'order' => $order,
-            'orderDeducts' => $orderDeducts,
+            'order' => $fields,
             'orderItems' => $orderItems
         );
-        $order = $this->getOrderContext()->created($data);
-
-        if (0 == $order['pay_amount']) {
-            $data = array(
-                'order_sn' => $order['sn'],
-                'pay_time' => time(),
-                'payment' => 'none'
-            );
-            $order = $this->paid($data);
-        }
-
-        return $order;
+        return $this->getOrderContext()->created($data);
     }
 
     protected function validateLogin()
@@ -55,25 +25,6 @@ class WorkflowServiceImpl extends BaseService implements WorkflowService
         if (empty($this->biz['user']['id'])) {
             throw new AccessDeniedException('user is not login.');
         }
-    }
-
-    protected function validateFields($order, $orderItems)
-    {
-        if (!ArrayToolkit::requireds($order, array('user_id'))) {
-            throw new InvalidArgumentException('user_id is required in order.');
-        }
-
-        foreach ($orderItems as $item) {
-            if (!ArrayToolkit::requireds($item, array(
-                'title',
-                'price_amount',
-                'target_id',
-                'target_type'))) {
-                throw new InvalidArgumentException('args is invalid.');
-            }
-        }
-
-        return $orderItems;
     }
 
     public function paying($id, $data = array())
