@@ -29,10 +29,12 @@ interface AccountService
     public function lockCoin($userId, $coinAmount);
 
     public function releaseCoin($userId, $coinAmount);
-
+    
     public function transferCoin($fields);
 
     public function transferCash($fields);
+
+    public function rechargeCash($trade);
 
     public function withdrawCash($fields);
 

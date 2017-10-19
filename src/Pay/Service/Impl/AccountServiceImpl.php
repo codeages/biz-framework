@@ -337,11 +337,12 @@ class AccountServiceImpl extends BaseService implements AccountService
             $lock->get($key);
             $this->beginTransaction();
 
-            $amount = $fields['flow_type'] == 'inflow' ? $fields['amount'] : 0 - $fields['amount'];
             $userBalance = $this->getUserBalanceDao()->getByUserId($fields['user_id']);
-            $this->getUserBalanceDao()->wave(array($userBalance['id']), array(
-                'amount' => $amount
-            ));
+            $userBalanceFields = array(
+                'amount' => $fields['flow_type'] == 'inflow' ? $fields['amount'] : 0 - $fields['amount']
+            );
+            $userBalanceFields = $this->filterUserBalanceFields($fields['action'], $fields['flow_type'], $userBalanceFields, $userBalance);
+            $this->getUserBalanceDao()->wave(array($userBalance['id']), $userBalanceFields);
             $userBalance = $this->getUserBalanceDao()->getByUserId($fields['user_id']);
 
             $userFlow = array(
@@ -370,6 +371,35 @@ class AccountServiceImpl extends BaseService implements AccountService
             $lock->release($key);
             throw $e;
         }
+    }
+
+    protected function filterUserBalanceFields($action, $flowType, $fields, $userBalance)
+    {
+        if ($action == 'recharge') {
+            if ($flowType == 'outflow') {
+                $fields['purchase_amount'] = $userBalance['purchase_amount'] + abs($fields['amount']);
+            } elseif ($flowType == 'inflow') {
+                $fields['recharge_amount'] = $userBalance['recharge_amount'] + abs($fields['amount']);
+            }
+        }
+
+        if ($action == 'purchase') {
+            if ($flowType == 'outflow') {
+                $fields['purchase_amount'] = $userBalance['purchase_amount'] + abs($fields['amount']);
+            } elseif ($flowType == 'inflow') {
+                $fields['recharge_amount'] = $userBalance['recharge_amount'] + abs($fields['amount']);
+            }
+        }
+
+        if ($action == 'refund') {
+            if ($flowType == 'outflow') {
+                $fields['recharge_amount'] = $userBalance['recharge_amount'] - abs($fields['amount']);
+            } elseif ($flowType == 'inflow') {
+                $fields['purchase_amount'] = $userBalance['purchase_amount'] - abs($fields['amount']);
+            }
+        }
+
+        return $fields;
     }
 
     protected function generateSn($prefix = '')
