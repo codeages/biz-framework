@@ -245,7 +245,7 @@ class PayServiceTest extends IntegrationTestCase
         $return = array(
             'status' => 'paid',
             'cash_flow' => '1004400740201409030005092168',
-            'paid_time' => time(),
+            'paid_time' => '2017-10-18 06:55:36 Etc/GMT',
             'pay_amount' => 1000,
             'cash_type' => 'CNY',
             'attach' => array(

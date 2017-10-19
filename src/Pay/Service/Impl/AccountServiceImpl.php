@@ -197,23 +197,33 @@ class AccountServiceImpl extends BaseService implements AccountService
 
     public function lockCoin($userId, $coinAmount)
     {
+        $lock = $this->biz['lock'];
+        $key = "user_balance_{$userId}";
+        $lock->get($key);
+
         $userBalance = $this->getUserBalanceDao()->getByUserId($userId);
         $this->getUserBalanceDao()->wave(array($userBalance['id']), array(
             'amount' => (0 - $coinAmount),
             'locked_amount' => $coinAmount
         ));
 
+        $lock->release($key);
         return $this->getUserBalanceDao()->getByUserId($userId);
     }
 
     public function releaseCoin($userId, $coinAmount)
     {
+        $lock = $this->biz['lock'];
+        $key = "user_balance_{$userId}";
+        $lock->get($key);
+
         $userBalance = $this->getUserBalanceDao()->getByUserId($userId);
         $this->getUserBalanceDao()->wave(array($userBalance['id']), array(
             'amount' => $coinAmount,
             'locked_amount' => 0 - $coinAmount
         ));
 
+        $lock->release($key);
         return $this->getUserBalanceDao()->getByUserId($userId);
     }
 
@@ -247,7 +257,7 @@ class AccountServiceImpl extends BaseService implements AccountService
         }
 
         $lock = $this->biz['lock'];
-        $key = "transfer_{$fields['user_id']}";
+        $key = "user_balance_{$fields['user_id']}";
         try {
             $lock->get($key);
             $this->beginTransaction();
@@ -297,7 +307,7 @@ class AccountServiceImpl extends BaseService implements AccountService
             $this->beginTransaction();
             $lock = $this->biz['lock'];
 
-            $lockFromUserKey = "transfer_{$fields['from_user_id']}";
+            $lockFromUserKey = "user_balance_{$fields['from_user_id']}";
             $lock->get($lockFromUserKey);
             $userFlow = array(
                 'sn' => $this->generateSn(),
@@ -326,7 +336,7 @@ class AccountServiceImpl extends BaseService implements AccountService
             $cashFlow = $this->getUserCashflowDao()->create($userFlow);
             $lock->release($lockFromUserKey);
 
-            $lockToUserKey = "transfer_{$fields['to_user_id']}";
+            $lockToUserKey = "user_balance_{$fields['to_user_id']}";
             $lock->get($lockToUserKey);
             $userFlow = array(
                 'sn' => $this->generateSn(),
