@@ -10,7 +10,7 @@ interface WorkflowService
 
     public function paying($orderId, $data = array());
 
-    public function paid($data);
+    public function paid($notifyData);
 
     public function finish($orderId, $data = array());
 

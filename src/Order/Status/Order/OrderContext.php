@@ -202,7 +202,8 @@ class OrderContext
         $indexedOrderItems = ArrayToolkit::index($orderItems, 'id');
         foreach ($orderItems as $orderItem) {
             $orderItem['order'] = $order;
-            $this->getDispatcher()->dispatch("order.item.{$orderItem['target_type']}.{$status}", new Event($orderItem));
+            $event = new Event($orderItem);
+            $this->getDispatcher()->dispatch("order.item.{$orderItem['target_type']}.{$status}", $event);
         }
 
         $deducts = $this->getOrderService()->findOrderItemDeductsByOrderId($order['id']);
