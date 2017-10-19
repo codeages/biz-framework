@@ -171,9 +171,17 @@ class AccountServiceImpl extends BaseService implements AccountService
     protected function waveAmount($userId, $amount)
     {
         $userBalance = $this->getUserBalanceDao()->getByUserId($userId);
-        $this->getUserBalanceDao()->wave(array($userBalance['id']), array(
+        $fields = array(
             'amount' => $amount
-        ));
+        );
+
+        if ($amount>0) {
+            $fields['recharge_amount'] = $userBalance['recharge_amount'] + $amount;
+        } else {
+            $fields['purchase_amount'] = $userBalance['purchase_amount'] + abs($amount);
+        }
+
+        $this->getUserBalanceDao()->wave(array($userBalance['id']), $fields);
 
         return $this->getUserBalanceDao()->getByUserId($userId);
     }
@@ -286,12 +294,10 @@ class AccountServiceImpl extends BaseService implements AccountService
         }
 
         try {
-            $lock = $this->biz['lock'];
-            $lockFromUserKey = "transfer_{$fields['from_user_id']}";
-            $lockToUserKey = "transfer_{$fields['to_user_id']}";
-
             $this->beginTransaction();
+            $lock = $this->biz['lock'];
 
+            $lockFromUserKey = "transfer_{$fields['from_user_id']}";
             $lock->get($lockFromUserKey);
             $userFlow = array(
                 'sn' => $this->generateSn(),
@@ -320,6 +326,7 @@ class AccountServiceImpl extends BaseService implements AccountService
             $cashFlow = $this->getUserCashflowDao()->create($userFlow);
             $lock->release($lockFromUserKey);
 
+            $lockToUserKey = "transfer_{$fields['to_user_id']}";
             $lock->get($lockToUserKey);
             $userFlow = array(
                 'sn' => $this->generateSn(),

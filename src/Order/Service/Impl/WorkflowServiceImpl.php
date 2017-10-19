@@ -10,11 +10,11 @@ use Codeages\Biz\Framework\Util\ArrayToolkit;
 
 class WorkflowServiceImpl extends BaseService implements WorkflowService
 {
-    public function start($fields, $orderItems)
+    public function start($order, $orderItems)
     {
         $this->validateLogin();
         $data = array(
-            'order' => $fields,
+            'order' => $order,
             'orderItems' => $orderItems
         );
         return $this->getOrderContext()->created($data);

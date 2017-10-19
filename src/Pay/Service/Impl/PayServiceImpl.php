@@ -322,7 +322,7 @@ class PayServiceImpl extends BaseService implements PayService
         }
 
         if($this->isRefundByPayment()){
-            return $this->refundByPayment($trade);
+            return $this->refundPlatformTrade($trade);
         }
 
         return $this->getTradeContext($trade['id'])->refunded();
@@ -333,7 +333,7 @@ class PayServiceImpl extends BaseService implements PayService
         return empty($this->biz['payment.final_options']['refunded_by_notify']) ? false : $this->biz['payment.final_options']['refunded_by_notify'];
     }
 
-    protected function refundByPayment($trade)
+    protected function refundPlatformTrade($trade)
     {
         $paymentGetWay = $this->getPayment($trade['platform']);
         $response = $paymentGetWay->applyRefund($trade);
