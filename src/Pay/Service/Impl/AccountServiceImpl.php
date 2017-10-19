@@ -376,28 +376,27 @@ class AccountServiceImpl extends BaseService implements AccountService
     {
         if ($action == 'recharge') {
             if ($flowType == 'outflow') {
-                $fields['purchase_amount'] = $userBalance['purchase_amount'] + abs($fields['amount']);
+                $fields['purchase_amount'] = abs($fields['amount']);
             } elseif ($flowType == 'inflow') {
-                $fields['recharge_amount'] = $userBalance['recharge_amount'] + abs($fields['amount']);
+                $fields['recharge_amount'] = abs($fields['amount']);
             }
         }
 
         if ($action == 'purchase') {
             if ($flowType == 'outflow') {
-                $fields['purchase_amount'] = $userBalance['purchase_amount'] + abs($fields['amount']);
+                $fields['purchase_amount'] = abs($fields['amount']);
             } elseif ($flowType == 'inflow') {
-                $fields['recharge_amount'] = $userBalance['recharge_amount'] + abs($fields['amount']);
+                $fields['recharge_amount'] = abs($fields['amount']);
             }
         }
-
         if ($action == 'refund') {
+
             if ($flowType == 'outflow') {
-                $fields['recharge_amount'] = $userBalance['recharge_amount'] - abs($fields['amount']);
+                $fields['recharge_amount'] = 0 - abs($fields['amount']);
             } elseif ($flowType == 'inflow') {
-                $fields['purchase_amount'] = $userBalance['purchase_amount'] - abs($fields['amount']);
+                $fields['purchase_amount'] = 0 - abs($fields['amount']);
             }
         }
-
         return $fields;
     }
 
