@@ -33,6 +33,7 @@ class TableCommand extends AbstractCommand
             'order_add_success_fail_data',
             'order_refund_item_add_target',
             'order_retype_amount',
+            'order_log_add_ip',
         );
 
         foreach ($migrations as $migration) {

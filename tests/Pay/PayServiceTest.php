@@ -430,6 +430,7 @@ class PayServiceTest extends IntegrationTestCase
 
         $mock = \Mockery::mock(WechatGetway::class);
         $mock->shouldReceive('createTrade')->andReturn($return);
+        $mock->shouldReceive('closeTrade')->andReturn();
         return $mock;
     }
 
