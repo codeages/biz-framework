@@ -186,7 +186,8 @@ class OrderContext
             'status' => 'order.'.$order['status'],
             'order_id' => $order['id'],
             'user_id' => $this->biz['user']['id'],
-            'deal_data' => $dealData
+            'deal_data' => $dealData,
+            'ip' => empty($this->biz['user']['currentIp']) ? '' : $this->biz['user']['currentIp'],
         );
         return $this->getOrderLogDao()->create($orderLog);
     }

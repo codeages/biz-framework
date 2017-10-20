@@ -158,7 +158,8 @@ class OrderRefundContext
             'status' => 'order_refund.'.$orderRefund['status'],
             'order_id' => $orderRefund['order_id'],
             'user_id' => $this->biz['user']['id'],
-            'deal_data' => $dealData
+            'deal_data' => $dealData,
+            'ip' => empty($this->biz['user']['currentIp']) ? '' : $this->biz['user']['currentIp'],
         );
         return $this->getOrderLogDao()->create($orderLog);
     }
