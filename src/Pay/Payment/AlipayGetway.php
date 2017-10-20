@@ -170,9 +170,9 @@ class AlipayGetway extends AbstractGetway
         throw new AccessDeniedException('can not apply refund with alipay.');
     }
 
-    public function queryTrade($trade)
+    public function queryTrade($tradeSn)
     {
-        return $trade;
+        return null;
     }
 
     public function converterRefundNotify($data)

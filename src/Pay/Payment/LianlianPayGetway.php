@@ -96,9 +96,9 @@ class LianlianPayGetway extends AbstractGetway
         throw new AccessDeniedException('can not apply refund with lianlianpay.');
     }
 
-    public function queryTrade($trade)
+    public function queryTrade($tradeSn)
     {
-        return $trade;
+        return null;
     }
 
     public function converterRefundNotify($data)

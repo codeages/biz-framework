@@ -41,6 +41,11 @@ class OrderSubscriber extends EventSubscriber implements EventSubscriberInterfac
             'paid_cash_amount' => $trade['cash_amount'],
             'paid_coin_amount' => $trade['coin_amount'],
         );
+
+        if ($trade['cash_amount'] == 0 && $trade['coin_amount'] > 0) {
+            $data['payment'] = 'coin';
+        }
+
         $this->getWorkflowService()->paid($data);
     }
 
