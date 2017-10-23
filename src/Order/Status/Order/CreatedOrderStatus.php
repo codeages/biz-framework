@@ -44,16 +44,6 @@ class CreatedOrderStatus extends AbstractOrderStatus
         $order = $this->createOrderDeducts($order, $data['orderDeducts']);
         $order = $this->createOrderItems($order, $data['orderItems']);
 
-        if (0 == $order['pay_amount']) {
-            $data = array(
-                'order_sn' => $order['sn'],
-                'pay_time' => time(),
-                'payment' => 'none'
-            );
-
-            return $this->paid($data);
-        }
-
         return $order;
     }
 

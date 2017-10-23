@@ -17,7 +17,18 @@ class WorkflowServiceImpl extends BaseService implements WorkflowService
             'order' => $order,
             'orderItems' => $orderItems
         );
-        return $this->getOrderContext()->created($data);
+        $order = $this->getOrderContext()->created($data);
+
+        if (0 == $order['pay_amount']) {
+            $data = array(
+                'order_sn' => $order['sn'],
+                'pay_time' => time(),
+                'payment' => 'none'
+            );
+
+            return $this->paid($data);
+        }
+        return $order;
     }
 
     protected function validateLogin()
