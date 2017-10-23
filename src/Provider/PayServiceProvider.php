@@ -2,7 +2,7 @@
 
 namespace Codeages\Biz\Framework\Provider;
 
-use Codeages\Biz\Framework\Pay\Status\PaymentTradeContext;
+use Codeages\Biz\Framework\Pay\Status\PayTradeContext;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
 
@@ -92,7 +92,7 @@ class PayServiceProvider implements ServiceProviderInterface
     private function registerStatus($biz)
     {
         $biz['payment_trade_context'] = function ($biz) {
-            return new PaymentTradeContext($biz);
+            return new PayTradeContext($biz);
         };
 
         $statusArray = array(

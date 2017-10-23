@@ -7,7 +7,7 @@ use Codeages\Biz\Framework\Dao\GeneralDaoImpl;
 
 class SecurityAnswerDaoImpl extends GeneralDaoImpl implements SecurityAnswerDao
 {
-    protected $table = 'biz_security_answer';
+    protected $table = 'biz_pay_security_answer';
 
     public function findByUserId($userId)
     {

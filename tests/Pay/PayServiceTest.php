@@ -36,7 +36,7 @@ class PayServiceTest extends IntegrationTestCase
         $data = $this->mockTrade();
         $this->getPayService()->createTrade($data);
 
-        $trade = $this->getPaymentTradeDao()->getByOrderSnAndPlatform('123456', 'wechat');
+        $trade = $this->getPayTradeDao()->getByOrderSnAndPlatform('123456', 'wechat');
         $this->assertCreatedTrade($data, $trade);
     }
 
@@ -74,7 +74,7 @@ class PayServiceTest extends IntegrationTestCase
 
         $this->getPayService()->notifyPaid('wechat', $this->mockNotifyData($trade));
 
-        $trade = $this->getPaymentTradeDao()->get($trade['id']);
+        $trade = $this->getPayTradeDao()->get($trade['id']);
         $this->assertPaidTrade($notifyData, $trade);
     }
 
@@ -176,7 +176,7 @@ class PayServiceTest extends IntegrationTestCase
         $trade = $this->getPayService()->createTrade($data);
         $this->getPayService()->notifyPaid('coin', $trade);
 
-        $trade = $this->getPaymentTradeDao()->get($trade['id']);
+        $trade = $this->getPayTradeDao()->get($trade['id']);
         $this->assertEquals('paid', $trade['status']);
     }
 
@@ -205,7 +205,7 @@ class PayServiceTest extends IntegrationTestCase
 
         $this->getPayService()->notifyPaid('wechat', $this->mockNotifyData($trade));
 
-        $trade = $this->getPaymentTradeDao()->get($trade['id']);
+        $trade = $this->getPayTradeDao()->get($trade['id']);
         $this->assertPaidTrade($notifyData, $trade);
 
         $userBalance = $this->getAccountService()->getUserBalanceByUserId($this->biz['user']['id']);
@@ -269,7 +269,7 @@ class PayServiceTest extends IntegrationTestCase
         $this->assertEquals($notifyData['fee_type'], $trade['currency']);
         $this->assertNotEmpty($trade['notify_data']);
         $this->assertEquals($notifyData['transaction_id'], $trade['platform_sn']);
-        $cashFlows = $this->getUserCashflowDao()->findByTradeSn($trade['trade_sn']);
+        $cashFlows = $this->getCashflowDao()->findByTradeSn($trade['trade_sn']);
         $this->assertEquals(5,count($cashFlows));
 
         foreach ($cashFlows as $cashFlow) {
@@ -444,14 +444,14 @@ class PayServiceTest extends IntegrationTestCase
         return $this->biz->dao('Pay:SiteCashflowDao');
     }
 
-    protected function getPaymentTradeDao()
+    protected function getPayTradeDao()
     {
-        return $this->biz->dao('Pay:PaymentTradeDao');
+        return $this->biz->dao('Pay:PayTradeDao');
     }
 
-    protected function getUserCashflowDao()
+    protected function getCashflowDao()
     {
-        return $this->biz->dao('Pay:UserCashflowDao');
+        return $this->biz->dao('Pay:CashflowDao');
     }
 
     protected function getPayService()

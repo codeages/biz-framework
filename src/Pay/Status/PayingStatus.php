@@ -13,7 +13,7 @@ class PayingStatus extends AbstractStatus
 
     public function process($data = array())
     {
-        return $this->getPaymentTradeDao()->update($this->paymentTrade['id'], array(
+        return $this->getPayTradeDao()->update($this->PayTrade['id'], array(
             'status' => PayingStatus::NAME,
         ));
     }

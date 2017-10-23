@@ -6,12 +6,12 @@ use Codeages\Biz\Framework\Service\Exception\AccessDeniedException;
 
 abstract class AbstractStatus
 {
-    protected $paymentTrade;
+    protected $PayTrade;
     protected $biz;
 
-    public function setPaymentTrade($paymentTrade)
+    public function setPayTrade($PayTrade)
     {
-        $this->paymentTrade = $paymentTrade;
+        $this->PayTrade = $PayTrade;
     }
 
     function __construct($biz)
@@ -29,12 +29,12 @@ abstract class AbstractStatus
     public function getPayStatus($name)
     {
         $status = $this->biz['payment_trade_status.'.$name];
-        $status->setPaymentTrade($this->paymentTrade);
+        $status->setPayTrade($this->PayTrade);
         return $status;
     }
 
-    protected function getPaymentTradeDao()
+    protected function getPayTradeDao()
     {
-        return $this->biz->dao('Pay:PaymentTradeDao');
+        return $this->biz->dao('Pay:PayTradeDao');
     }
 }

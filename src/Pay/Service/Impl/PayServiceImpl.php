@@ -52,7 +52,7 @@ class PayServiceImpl extends BaseService implements PayService
         try {
             $this->beginTransaction();
 
-            $trade = $this->createPaymentTrade($data);
+            $trade = $this->createPayTrade($data);
 
             if ($trade['coin_amount']>0) {
                 $user = $this->biz['user'];
@@ -77,7 +77,7 @@ class PayServiceImpl extends BaseService implements PayService
     {
         try {
             $this->beginTransaction();
-            $trade = $this->createPaymentTrade($data);
+            $trade = $this->createPayTrade($data);
 
             if ($createPlatformTrade) {
                 $trade = $this->createPaymentPlatformTrade($data, $trade);
@@ -93,17 +93,17 @@ class PayServiceImpl extends BaseService implements PayService
 
     public function getTradeByTradeSn($tradeSn)
     {
-        return $this->getPaymentTradeDao()->getByTradeSn($tradeSn);
+        return $this->getPayTradeDao()->getByTradeSn($tradeSn);
     }
 
     public function findTradesByTradeSn($tradeSns)
     {
-        return $this->getPaymentTradeDao()->findByTradeSns($tradeSns);
+        return $this->getPayTradeDao()->findByTradeSns($tradeSns);
     }
 
     public function queryTradeFromPlatform($tradeSn)
     {
-        $trade = $this->getPaymentTradeDao()->getByTradeSn($tradeSn);
+        $trade = $this->getPayTradeDao()->getByTradeSn($tradeSn);
         $result = $this->getPayment($trade['platform'])->queryTrade($tradeSn);
 
         if ($trade['status'] != PaidStatus::NAME && !empty($result)) {
@@ -120,12 +120,12 @@ class PayServiceImpl extends BaseService implements PayService
 
     public function findTradesByOrderSns($orderSns)
     {
-        return $this->getPaymentTradeDao()->findByOrderSns($orderSns);
+        return $this->getPayTradeDao()->findByOrderSns($orderSns);
     }
 
     public function closeTradesByOrderSn($orderSn, $excludeTradeSns = array())
     {
-        $trades = $this->getPaymentTradeDao()->findByOrderSn($orderSn);
+        $trades = $this->getPayTradeDao()->findByOrderSn($orderSn);
         if (empty($trades)) {
             return;
         }
@@ -199,7 +199,7 @@ class PayServiceImpl extends BaseService implements PayService
             'user_id' => $data['attach']['user_id'],
             'type' => 'recharge'
         );
-        $trade = $this->createPaymentTrade($trade);
+        $trade = $this->createPayTrade($trade);
 
         $data = array(
             'paid_time' => strtotime($data['paid_time']),
@@ -209,7 +209,7 @@ class PayServiceImpl extends BaseService implements PayService
             'status' => 'paid',
         );
         $this->updateTradeToPaidAndTransferAmount($data);
-        $trade = $this->getPaymentTradeDao()->get($trade['id']);
+        $trade = $this->getPayTradeDao()->get($trade['id']);
 
         $lock->release($lockKey);
 
@@ -233,7 +233,7 @@ class PayServiceImpl extends BaseService implements PayService
             $lockKey = "payment_trade_paid_{$data['trade_sn']}";
             $lock->get($lockKey);
 
-            $trade = $this->getPaymentTradeDao()->getByTradeSn($data['trade_sn']);
+            $trade = $this->getPayTradeDao()->getByTradeSn($data['trade_sn']);
 
             if (empty($trade)) {
                 $this->getTargetlogService()->log(TargetlogService::INFO, 'trade.not_found', $data['trade_sn'], "交易号{$data['trade_sn']}不存在", $data);
@@ -268,12 +268,12 @@ class PayServiceImpl extends BaseService implements PayService
             return $trade;
         }
 
-        return $this->getPaymentTradeDao()->getByTradeSn($data['trade_sn']);
+        return $this->getPayTradeDao()->getByTradeSn($data['trade_sn']);
     }
 
     public function searchTrades($conditions, $orderBy, $start, $limit)
     {
-        return $this->getPaymentTradeDao()->search($conditions, $orderBy, $start, $limit);
+        return $this->getPayTradeDao()->search($conditions, $orderBy, $start, $limit);
     }
 
     protected function updateTradeToPaid($tradeId, $data)
@@ -286,7 +286,7 @@ class PayServiceImpl extends BaseService implements PayService
             'currency' => $data['cash_type'],
         );
 
-        return $this->getPaymentTradeDao()->update($tradeId, $updatedFields);
+        return $this->getPayTradeDao()->update($tradeId, $updatedFields);
     }
 
     public function findEnabledPayments()
@@ -296,13 +296,13 @@ class PayServiceImpl extends BaseService implements PayService
 
     public function notifyClosed($data)
     {
-        $trade = $this->getPaymentTradeDao()->getByTradeSn($data['sn']);
+        $trade = $this->getPayTradeDao()->getByTradeSn($data['sn']);
         return $this->getTradeContext($trade['id'])->closed();
     }
 
     public function applyRefundByTradeSn($tradeSn)
     {
-        $trade = $this->getPaymentTradeDao()->getByTradeSn($tradeSn);
+        $trade = $this->getPayTradeDao()->getByTradeSn($tradeSn);
         if (in_array($trade['status'], array('refunding', 'refunded'))) {
             return $trade;
         }
@@ -334,7 +334,7 @@ class PayServiceImpl extends BaseService implements PayService
             return $trade;
         }
 
-        $trade = $this->getPaymentTradeDao()->update($trade['id'], array(
+        $trade = $this->getPayTradeDao()->update($trade['id'], array(
             'status' => 'refunding',
             'apply_refund_time' => time()
         ));
@@ -360,7 +360,7 @@ class PayServiceImpl extends BaseService implements PayService
         $lock = $this->biz['lock'];
         $lock->get($lockKey);
 
-        $trade = $this->getPaymentTradeDao()->getByTradeSn($tradeSn);
+        $trade = $this->getPayTradeDao()->getByTradeSn($tradeSn);
         if ($trade['status'] == RefundedStatus::NAME) {
             return $trade;
         }
@@ -378,7 +378,7 @@ class PayServiceImpl extends BaseService implements PayService
         }
     }
 
-    protected function createPaymentTrade($data)
+    protected function createPayTrade($data)
     {
         $rate = $this->getDefaultCoinRate();
 
@@ -417,7 +417,7 @@ class PayServiceImpl extends BaseService implements PayService
             $trade['platform_type'] = '';
         }
 
-        return $this->getPaymentTradeDao()->create($trade);
+        return $this->getPayTradeDao()->create($trade);
     }
 
     protected function transfer($trade)
@@ -491,9 +491,9 @@ class PayServiceImpl extends BaseService implements PayService
         return $this->biz->service('Targetlog:TargetlogService');
     }
 
-    protected function getPaymentTradeDao()
+    protected function getPayTradeDao()
     {
-        return $this->biz->dao('Pay:PaymentTradeDao');
+        return $this->biz->dao('Pay:PayTradeDao');
     }
 
     protected function getAccountService()
@@ -538,7 +538,7 @@ class PayServiceImpl extends BaseService implements PayService
 
         $result = $this->getPayment($data['platform'])->createTrade($data);
 
-        return $this->getPaymentTradeDao()->update($trade['id'], array(
+        return $this->getPayTradeDao()->update($trade['id'], array(
             'platform_created_result' => $result,
             'platform_created_params' => $data
         ));
@@ -546,11 +546,11 @@ class PayServiceImpl extends BaseService implements PayService
 
     public function getCreateTradeResultByTradeSnFromPlatform($tradeSn)
     {
-        $trade = $this->getPaymentTradeDao()->getByTradeSn($tradeSn);
+        $trade = $this->getPayTradeDao()->getByTradeSn($tradeSn);
 
         $result = $this->getPayment($trade['platform'])->createTrade($trade['platform_created_params']);
 
-        $this->getPaymentTradeDao()->update($trade['id'], array(
+        $this->getPayTradeDao()->update($trade['id'], array(
             'platform_created_result' => $result
         ));
 
@@ -559,19 +559,19 @@ class PayServiceImpl extends BaseService implements PayService
 
     public function getTradeByPlatformSn($platformSn)
     {
-        return  $this->getPaymentTradeDao()->getByPlatformSn($platformSn);
+        return  $this->getPayTradeDao()->getByPlatformSn($platformSn);
     }
 
     protected function getTradeContext($id)
     {
         $tradeContext = $this->biz['payment_trade_context'];
 
-        $trade = $this->getPaymentTradeDao()->get($id);
+        $trade = $this->getPayTradeDao()->get($id);
         if (empty($trade)) {
             throw $this->createNotFoundException("trade #{$trade['id']} is not found");
         }
 
-        $tradeContext->setPaymentTrade($trade);
+        $tradeContext->setPayTrade($trade);
 
         return $tradeContext;
     }

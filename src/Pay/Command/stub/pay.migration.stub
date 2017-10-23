@@ -12,7 +12,7 @@ class BizPay extends Migration
         $biz = $this->getContainer();
         $connection = $biz['db'];
         $connection->exec("
-            CREATE TABLE IF NOT EXISTS `biz_user_cashflow` (
+            CREATE TABLE IF NOT EXISTS `biz_pay_cashflow` (
               `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
               `sn` VARCHAR(64) NOT NULL COMMENT '账目流水号',
               `parent_sn` VARCHAR(64) COMMENT '本次交易的上一个账单的流水号',
@@ -33,7 +33,7 @@ class BizPay extends Migration
         ");
 
         $connection->exec("
-            CREATE TABLE IF NOT EXISTS `biz_user_balance` (
+            CREATE TABLE IF NOT EXISTS `biz_pay_user_balance` (
               `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
               `user_id` int(10) unsigned NOT NULL COMMENT '用户',
               `amount` int(10) NOT NULL DEFAULT '0' COMMENT '账户余额',
@@ -47,7 +47,7 @@ class BizPay extends Migration
         ");
 
         $connection->exec("
-            CREATE TABLE IF NOT EXISTS `biz_payment_trade` (
+            CREATE TABLE IF NOT EXISTS `biz_pay_trade` (
               `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
               `title` varchar(1024) NOT NULL COMMENT '标题',
               `trade_sn` varchar(64) NOT NULL COMMENT '交易号',
@@ -90,7 +90,7 @@ class BizPay extends Migration
         ");
 
         $connection->exec("
-            CREATE TABLE IF NOT EXISTS `biz_security_answer` (
+            CREATE TABLE IF NOT EXISTS `biz_pay_security_answer` (
               `id` INT(10) unsigned NOT NULL AUTO_INCREMENT,
               `user_id` INT(10) unsigned NOT NULL COMMENT '所属用户',
               `question_key` VARCHAR(64) NOT NULL DEFAULT '' COMMENT '安全问题的key',
@@ -123,11 +123,11 @@ class BizPay extends Migration
         $biz = $this->getContainer();
         $connection = $biz['db'];
         $connection->exec("
-            DROP TABLE `biz_user_cashflow`;
-            DROP TABLE `biz_user_balance`;
-            DROP TABLE `biz_payment_trade`;
+            DROP TABLE `biz_pay_cashflow`;
+            DROP TABLE `biz_pay_user_balance`;
+            DROP TABLE `biz_pay_trade`;
             DROP TABLE `biz_pay_account`;
-            DROP TABLE `biz_security_answer`;
+            DROP TABLE `biz_pay_security_answer`;
         ");
     }
 }

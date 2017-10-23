@@ -2,14 +2,13 @@
 
 namespace Codeages\Biz\Framework\Pay\Dao\Impl;
 
-use Codeages\Biz\Framework\Util\ArrayToolkit;
 use Codeages\Biz\Framework\Dao\DaoException;
-use Codeages\Biz\Framework\Pay\Dao\UserCashflowDao;
+use Codeages\Biz\Framework\Pay\Dao\CashflowDao;
 use Codeages\Biz\Framework\Dao\GeneralDaoImpl;
 
-class UserCashflowDaoImpl extends GeneralDaoImpl implements UserCashflowDao
+class CashflowDaoImpl extends GeneralDaoImpl implements CashflowDao
 {
-    protected $table = 'biz_user_cashflow';
+    protected $table = 'biz_pay_cashflow';
 
     public function findByTradeSn($sn)
     {

@@ -2,12 +2,12 @@
 
 namespace Codeages\Biz\Framework\Pay\Dao\Impl;
 
-use Codeages\Biz\Framework\Pay\Dao\PaymentTradeDao;
+use Codeages\Biz\Framework\Pay\Dao\PayTradeDao;
 use Codeages\Biz\Framework\Dao\GeneralDaoImpl;
 
-class PaymentTradeDaoImpl extends GeneralDaoImpl implements PaymentTradeDao
+class PayTradeDaoImpl extends GeneralDaoImpl implements PayTradeDao
 {
-    protected $table = 'biz_payment_trade';
+    protected $table = 'biz_pay_trade';
 
     public function getByOrderSnAndPlatform($orderSn, $platform)
     {

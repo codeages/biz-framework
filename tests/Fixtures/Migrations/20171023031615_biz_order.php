@@ -18,7 +18,7 @@ class BizOrder extends Migration
               `sn` VARCHAR(64) NOT NULL COMMENT '订单号',
               `source` VARCHAR(16) NOT NULL DEFAULT 'self' COMMENT '订单来源：网校本身、营销平台、第三方系统',
               `created_reason` TEXT COMMENT '订单创建原因, 例如：导入，购买等',
-              `price_amount` INT(10) unsigned NOT NULL COMMENT '订单总金额',
+              `price_amount` int(10) unsigned NOT NULL COMMENT '订单总金额',
               `price_type` varchar(32) not null  COMMENT '标价类型，现金支付or虚拟币；money, coin',
               `pay_amount` INT(10) unsigned NOT NULL COMMENT '应付金额',
               `user_id` INT(10) unsigned NOT NULL COMMENT '购买者',

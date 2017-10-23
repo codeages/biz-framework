@@ -38,9 +38,9 @@ interface AccountService
 
     public function withdrawCash($fields);
 
-    public function countUserCashflows($conditions);
+    public function countCashflows($conditions);
 
-    public function searchUserCashflows($conditions, $orderBy, $start, $limit);
+    public function searchCashflows($conditions, $orderBy, $start, $limit);
 
     public function sumColumnByConditions($column, $conditions);
 

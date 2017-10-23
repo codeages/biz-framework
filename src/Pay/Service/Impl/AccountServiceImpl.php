@@ -312,7 +312,7 @@ class AccountServiceImpl extends BaseService implements AccountService
                 'action' => $fields['action'],
                 'user_balance' => empty($userBalance['cash_amount']) ? 0 : $userBalance['cash_amount']
             );
-            $cashFlow = $this->getUserCashflowDao()->create($userFlow);
+            $cashFlow = $this->getCashflowDao()->create($userFlow);
 
             $this->commit();
             $lock->release($key);
@@ -360,7 +360,7 @@ class AccountServiceImpl extends BaseService implements AccountService
                 'action' => $fields['action'],
                 'user_balance' => empty($userBalance['amount']) ? 0 : $userBalance['amount']
             );
-            $cashFlow = $this->getUserCashflowDao()->create($userFlow);
+            $cashFlow = $this->getCashflowDao()->create($userFlow);
 
             $this->commit();
             $lock->release($key);
@@ -405,24 +405,24 @@ class AccountServiceImpl extends BaseService implements AccountService
         return $prefix.date('YmdHis', time()).mt_rand(10000, 99999);
     }
 
-    public function searchUserCashflows($conditions, $orderBy, $start, $limit)
+    public function searchCashflows($conditions, $orderBy, $start, $limit)
     {
-        return $this->getUserCashflowDao()->search($conditions, $orderBy, $start, $limit);
+        return $this->getCashflowDao()->search($conditions, $orderBy, $start, $limit);
     }
 
-    public function countUserCashflows($conditions)
+    public function countCashflows($conditions)
     {
-        return $this->getUserCashflowDao()->count($conditions);
+        return $this->getCashflowDao()->count($conditions);
     }
 
     public function sumColumnByConditions($column, $conditions)
     {
-        return $this->getUserCashflowDao()->sumColumnByConditions($column, $conditions);
+        return $this->getCashflowDao()->sumColumnByConditions($column, $conditions);
     }
 
     public function countUsersByConditions($conditions)
     {
-        return $this->getUserCashflowDao()->countUsersByConditions($conditions);
+        return $this->getCashflowDao()->countUsersByConditions($conditions);
     }
 
     protected function getPasswordEncoder()
@@ -445,8 +445,8 @@ class AccountServiceImpl extends BaseService implements AccountService
         return $this->biz->dao('Pay:SecurityAnswerDao');
     }
 
-    protected function getUserCashflowDao()
+    protected function getCashflowDao()
     {
-        return $this->biz->dao('Pay:UserCashflowDao');
+        return $this->biz->dao('Pay:CashflowDao');
     }
 }

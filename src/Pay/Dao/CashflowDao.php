@@ -4,7 +4,7 @@ namespace Codeages\Biz\Framework\Pay\Dao;
 
 use Codeages\Biz\Framework\Dao\GeneralDaoInterface;
 
-interface UserCashflowDao extends GeneralDaoInterface
+interface CashflowDao extends GeneralDaoInterface
 {
     public function findByTradeSn($sn);
 

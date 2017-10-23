@@ -23,14 +23,14 @@ class TableCommand extends AbstractCommand
 
         $migrations = array(
             'pay',
-            'payment_trade_add_created_params',
-            'payment_trade_add_platform_type',
+            'pay_trade_add_created_params',
+            'pay_trade_add_platform_type',
             'cashflow_delete_user_type',
             'cashflow_add_title',
             'cashflow_add_buyer_id',
-            'user_cashflow_add_action',
+            'cashflow_add_action',
             'user_balance_add_recharge_and_purchase_amount',
-            'payment_retype_amount',
+            'pay_trade_retype_amount',
         );
 
         foreach ($migrations as $migration) {

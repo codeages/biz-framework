@@ -8,10 +8,10 @@ use Codeages\Biz\Framework\Service\Exception\InvalidArgumentException;
 use Codeages\Biz\Framework\Service\Exception\NotFoundException;
 use Codeages\Biz\Framework\Service\Exception\ServiceException;
 
-class PaymentTradeContext
+class PayTradeContext
 {
     protected $biz;
-    protected $paymentTrade;
+    protected $PayTrade;
     protected $status;
 
     function __construct($biz)
@@ -19,17 +19,17 @@ class PaymentTradeContext
         $this->biz = $biz;
     }
 
-    public function setPaymentTrade($paymentTrade)
+    public function setPayTrade($PayTrade)
     {
-        $this->paymentTrade = $paymentTrade;
-        $this->status = $this->biz["payment_trade_status.{$paymentTrade['status']}"];
+        $this->PayTrade = $PayTrade;
+        $this->status = $this->biz["payment_trade_status.{$PayTrade['status']}"];
 
-        $this->status->setPaymentTrade($paymentTrade);
+        $this->status->setPayTrade($PayTrade);
     }
 
-    public function getPaymentTrade()
+    public function getPayTrade()
     {
-        return $this->paymentTrade;
+        return $this->PayTrade;
     }
 
     public function getStatus()
@@ -42,7 +42,7 @@ class PaymentTradeContext
         $status = $this->getNextStatusName($method);
 
         if (!method_exists($this->status, $method)) {
-            throw new AccessDeniedException("can't change {$this->paymentTrade['status']} to {$status}.");
+            throw new AccessDeniedException("can't change {$this->PayTrade['status']} to {$status}.");
         }
 
         try {
