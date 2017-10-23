@@ -17,7 +17,7 @@ class BizOrder extends Migration
               `title` VARCHAR(1024) NOT NULL DEFAULT '' COMMENT '订单标题',
               `sn` VARCHAR(64) NOT NULL COMMENT '订单号',
               `price_amount` BIGINT(16) unsigned NOT NULL COMMENT '订单总价',
-              `price_type` varchar(32) not null  COMMENT '订单总价的类型，现金支付or虚拟币；money, coin',
+              `price_type` VARCHAR(32) NOT NULL  COMMENT '订单总价的类型，现金支付or虚拟币；money, coin',
               `pay_amount` BIGINT(16) unsigned NOT NULL COMMENT '应付金额',
               `user_id` INT(10) unsigned NOT NULL COMMENT '购买者',
               `seller_id` INT(10) unsigned DEFAULT '0' COMMENT '卖家id',
@@ -143,7 +143,7 @@ class BizOrder extends Migration
               `user_id` INT(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建用户',
               `deal_data` TEXT COMMENT '处理数据',
               `order_refund_id` INT(10) unsigned NOT NULL DEFAULT 0 COMMENT '退款id',
-              `ip` VARCHAR(32) not null default '' COMMENT 'ip',
+              `ip` VARCHAR(32) NOT NULL default '' COMMENT 'ip',
               `created_time` INT(10) unsigned NOT NULL DEFAULT '0',
               `updated_time` INT(10) unsigned NOT NULL DEFAULT '0',
               PRIMARY KEY (`id`)
