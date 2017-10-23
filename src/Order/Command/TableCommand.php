@@ -23,17 +23,6 @@ class TableCommand extends AbstractCommand
 
         $migrations = array(
             'order',
-            'order_add_device',
-            'order_add_paid_amount',
-            'order_add_refund_deadline',
-            'order_item_and_deduct_add_snapshot',
-            'order_refund_add_refund_amount',
-            'order_refund_add_title',
-            'order_add_expired_refund_days',
-            'order_add_success_fail_data',
-            'order_refund_item_add_target',
-            'order_retype_amount',
-            'order_log_add_ip',
         );
 
         foreach ($migrations as $migration) {

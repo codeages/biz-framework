@@ -119,7 +119,17 @@ class AccountServiceTest extends IntegrationTestCase
             'user_id' => $this->biz['user']['id'],
         );
 
+
         $userBalance = $this->getAccountService()->createUserBalance($user);
+        $this->getAccountService()->rechargeCash(array(
+            'user_id' => $this->biz['user']['id'],
+            'cash_amount' => 100,
+            'title' => 'test',
+            'currency' => 'money',
+            'platform' => 'cash',
+            'trade_sn' => '112',
+            'order_sn' => 123,
+        ));
 
         $draw = array(
             'user_id' => $this->biz['user']['id'],
@@ -132,7 +142,7 @@ class AccountServiceTest extends IntegrationTestCase
         $this->getAccountService()->withdrawCash($draw);
         $userBalance = $this->getAccountService()->getUserBalanceByUserId($userBalance['user_id']);
 
-        $this->assertEquals(-100, $userBalance['cash_amount']);
+        $this->assertEquals(0, $userBalance['cash_amount']);
     }
 
     protected function getAccountService()
