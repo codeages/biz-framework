@@ -12,7 +12,7 @@ class BizSessionAndOnline extends Migration
         $biz = $this->getContainer();
         $connection = $biz['db'];
         $connection->exec("
-            CREATE TABLE `biz_session` (
+            CREATE TABLE IF NOT EXISTS `biz_session` (
               `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
               `sess_id` varbinary(128) NOT NULL,
               `sess_data` blob NOT NULL,
@@ -26,7 +26,7 @@ class BizSessionAndOnline extends Migration
         ");
 
         $connection->exec("
-            CREATE TABLE `biz_online` (
+            CREATE TABLE IF NOT EXISTS `biz_online` (
               `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
               `sess_id` varbinary(128) NOT NULL,
               `active_time` int(10) unsigned NOT NULL DEFAULT 0 COMMENT '最后活跃时间',

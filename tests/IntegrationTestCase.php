@@ -2,7 +2,10 @@
 
 namespace Tests;
 
+use Codeages\Biz\Framework\Dao\ArrayStorage;
 use Codeages\Biz\Framework\Dao\Connection;
+use Codeages\Biz\Framework\Provider\OrderServiceProvider;
+use Codeages\Biz\Framework\Provider\PayServiceProvider;
 use Codeages\Biz\Framework\Provider\DoctrineServiceProvider;
 use Codeages\Biz\Framework\Provider\RedisServiceProvider;
 use Codeages\Biz\Framework\Provider\SchedulerServiceProvider;
@@ -14,6 +17,7 @@ use Codeages\Biz\Framework\Provider\QueueServiceProvider;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
 use Codeages\Biz\Framework\Context\Biz;
+use Codeages\Biz\Framework\Order\Subscriber\OrderSubscriber;
 use Monolog\Logger;
 use Monolog\Handler\TestHandler;
 
@@ -43,6 +47,7 @@ class IntegrationTestCase extends TestCase
     {
         $this->biz = $this->createBiz();
         $this->db = $this->biz['db'];
+
         $this->redis = $this->biz['redis'];
 
         $this->db->beginTransaction();
@@ -85,6 +90,8 @@ class IntegrationTestCase extends TestCase
         $biz->register(new TargetlogServiceProvider());
         $biz->register(new TokenServiceProvider());
         $biz->register(new SchedulerServiceProvider());
+        $biz->register(new OrderServiceProvider());
+        $biz->register(new PayServiceProvider());
         $biz->register(new SettingServiceProvider());
         $biz->register(new QueueServiceProvider());
         $biz->register(new SessionServiceProvider());
@@ -105,8 +112,8 @@ class IntegrationTestCase extends TestCase
         }
 
         if (getenv('CACHE_ARRAY_STORAGE_ENABLED')) {
-            $biz['dao.cache.array_storage'] = function () {
-                return new Codeages\Biz\Framework\Dao\ArrayStorage();
+            $biz['dao.cache.array_storage'] = function() {
+                return new ArrayStorage();
             };
         }
 
@@ -124,6 +131,8 @@ class IntegrationTestCase extends TestCase
         $biz['lock.flock.directory'] = sys_get_temp_dir();
 
         $biz->boot();
+
+        $biz['dispatcher']->addSubscriber(new OrderSubscriber($biz));
 
         return $biz;
     }
