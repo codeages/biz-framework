@@ -5,7 +5,6 @@ namespace Codeages\Biz\Framework\Order\Dao\Impl;
 use Codeages\Biz\Framework\Dao\DaoException;
 use Codeages\Biz\Framework\Order\Dao\OrderDao;
 use Codeages\Biz\Framework\Dao\GeneralDaoImpl;
-use Codeages\Biz\Framework\Util\ArrayToolkit;
 
 class OrderDaoImpl extends GeneralDaoImpl implements OrderDao
 {
@@ -62,6 +61,18 @@ class OrderDaoImpl extends GeneralDaoImpl implements OrderDao
 
     public function sumGroupByDate($column, $conditions, $sort, $dateColumn = 'pay_time')
     {
+        if (!$this->isSumColumnAllow($column)) {
+            throw $this->createDaoException('column is not allowed');
+        }
+
+        if (!$this->isDateColumnAllow($dateColumn)) {
+            throw $this->createDaoException('dateColumn is not allowed');
+        }
+
+        if (!in_array(strtoupper($sort), array('ASC', 'DESC'), true)) {
+            throw $this->createDaoException("SQL order by direction is only allowed `ASC`, `DESC`, but you give `{$sort}`.");
+        }
+
         $builder = $this->createQueryBuilder($conditions)
             ->select("sum({$column}) as count ,from_unixtime({$dateColumn},'%Y-%m-%d') date")
             ->groupBy("date {$sort}");
@@ -71,11 +82,49 @@ class OrderDaoImpl extends GeneralDaoImpl implements OrderDao
 
     public function countGroupByDate($conditions, $sort, $dateColumn = 'pay_time')
     {
+        if (!$this->isDateColumnAllow($dateColumn)) {
+            throw $this->createDaoException('dateColumn is not allowed');
+        }
+
+        if (!in_array(strtoupper($sort), array('ASC', 'DESC'), true)) {
+            throw $this->createDaoException("SQL order by direction is only allowed `ASC`, `DESC`, but you give `{$sort}`.");
+        }
+
         $builder = $this->createQueryBuilder($conditions)
             ->select("count(id) as count ,from_unixtime({$dateColumn},'%Y-%m-%d') date")
             ->groupBy("date {$sort}");
 
         return $builder->execute()->fetchAll(0) ?: array();
+    }
+
+    private function isDateColumnAllow($column)
+    {
+        $whiteList = $this->dateColumnWhiteList();
+
+        if (in_array($column, $whiteList)) {
+            return true;
+        }
+        return false;
+    }
+
+    private function isSumColumnAllow($column)
+    {
+        $whiteList = $this->sumColumnWhiteList();
+
+        if (in_array($column, $whiteList)) {
+            return true;
+        }
+        return false;
+    }
+
+    private function sumColumnWhiteList()
+    {
+        return array('amount', 'pay_amount', 'price_amount');
+    }
+
+    private function dateColumnWhiteList()
+    {
+        return array('pay_time');
     }
 
     private function checkOrderBy($order, $sort, $allowOrderBys)
