@@ -28,7 +28,6 @@
         "mtdowling/cron-expression": "~1.2",
         "webpatser/laravel-uuid": "~2.0",
         "monolog/monolog": "^1.20",
-        "psr/log": "^1.0.0",
         "codeages/symfony-lock-lite": "^1.0",
         "symfony/polyfill-php55": "^1.4"
     },
