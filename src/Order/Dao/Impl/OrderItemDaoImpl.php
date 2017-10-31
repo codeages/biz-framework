@@ -70,6 +70,7 @@ class OrderItemDaoImpl extends GeneralDaoImpl implements OrderItemDao
                 'target_id IN (:target_ids)',
                 'target_id = :target_id',
                 'title like :title_LIKE',
+                'user_id = :user_id',
                 'target_type = :target_type',
                 'created_time >= :start_time',
                 'created_time <= :end_time',
