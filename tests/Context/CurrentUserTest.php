@@ -15,8 +15,6 @@ class CurrentUserTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     *
-     * @return void
      */
     public function testNewInstance_MissArguments_ThrowException()
     {
@@ -44,8 +42,6 @@ class CurrentUserTest extends TestCase
 
     /**
      * @expectedException \LogicException
-     *
-     * @return void
      */
     public function testSet_ResetOldKey_ThrowException()
     {

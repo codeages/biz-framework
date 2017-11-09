@@ -1,4 +1,5 @@
 <?php
+
 namespace Codeages\Biz\Framework\Context;
 
 /**
@@ -10,7 +11,6 @@ class CurrentUser implements \ArrayAccess
      * Data
      *
      * @var array
-     * @access private
      */
     private $user = [];
 
@@ -20,13 +20,14 @@ class CurrentUser implements \ArrayAccess
         $this->user = $user;
     }
 
-    public function offsetSet($key, $value) {
+    public function offsetSet($key, $value)
+    {
         if (empty($key)) {
-            throw new \InvalidArgumentException("Key is empty, set current user attribute failed.");
+            throw new \InvalidArgumentException('Key is empty, set current user attribute failed.');
         }
 
         if (array_key_exists($key, $this->user)) {
-            throw new \LogicException("Key is already exist, set current user attribute failed.");
+            throw new \LogicException('Key is already exist, set current user attribute failed.');
         }
 
         $this->user[$key] = $value;
@@ -34,7 +35,7 @@ class CurrentUser implements \ArrayAccess
 
     public function offsetUnset($key)
     {
-        throw new \LogicException("can not unset current user attribute.");
+        throw new \LogicException('can not unset current user attribute.');
     }
 
     public function offsetExists($key)

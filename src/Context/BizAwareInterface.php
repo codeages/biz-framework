@@ -1,7 +1,6 @@
 <?php
-namespace Codeages\PhalconBiz;
 
-use Codeages\Biz\Framework\Context\Biz;
+namespace Codeages\Biz\Framework\Context;
 
 interface BizAwareInterface
 {

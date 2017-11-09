@@ -1,4 +1,5 @@
 <?php
+
 namespace Codeages\Biz\Framework\Testing;
 
 use Doctrine\DBAL\Connection;
