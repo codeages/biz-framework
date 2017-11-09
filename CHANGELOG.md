@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+* 删除`Codeages\Biz\Framework\Context\CurrentUserInterface`接口，新增 `Codeages\Biz\Framework\Context\CurrentUser`类。
+
+
+
 ## [0.8.4] - 2017-09-14
 
 * 增加 `setting:set` 命令。
