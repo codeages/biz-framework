@@ -4,7 +4,10 @@
 
 * 删除`Codeages\Biz\Framework\Context\CurrentUserInterface`接口，新增 `Codeages\Biz\Framework\Context\CurrentUser`类。
 * 新增`Codeages\Biz\Framework\Context\BizAwareInterface`接口。
-
+* 新增`BizCodeceptionModule`。
+* 删除单元测试相关基类及其辅助类。
+* 新增自动生成`env.php`的脚手架。
+* 重命名：`Codeages\Biz\Framework\UnitTests\DatabaseSeeder` -> `Codeages\Biz\Framework\Testing\DatabaseSeeder`。
 
 ## [0.8.4] - 2017-09-14
 
