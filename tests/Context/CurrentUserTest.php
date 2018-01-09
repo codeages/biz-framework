@@ -18,7 +18,7 @@ class CurrentUserTest extends TestCase
      */
     public function testNewInstance_MissArguments_ThrowException()
     {
-        $user = new CurrentUser(['id' => 1]);
+        $user = new CurrentUser(array('id' => 1));
     }
 
     public function testGet()
