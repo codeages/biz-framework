@@ -12,7 +12,7 @@ class CurrentUser implements \ArrayAccess
      *
      * @var array
      */
-    private $user = [];
+    private $user = array();
 
     public function __construct(array $user)
     {
