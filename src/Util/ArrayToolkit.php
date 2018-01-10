@@ -2,6 +2,9 @@
 
 namespace Codeages\Biz\Framework\Util;
 
+/**
+ * @deprecated 2.0
+ */
 class ArrayToolkit
 {
     public static function get(array $array, $key, $default)

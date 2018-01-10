@@ -2,6 +2,9 @@
 
 namespace Codeages\Biz\Framework\Util;
 
+/**
+ * @deprecated 2.0
+ */
 class Lock
 {
     private $biz;
