@@ -94,7 +94,7 @@ class JobPool
         $ids = array($id);
         $diff = array('num' => $diff);
         $jobPool = $this->getJobPoolDao()->get($id);
-        if (!(0 == $jobPool['num'] && $diff < 0)) {
+        if (!(0 == $jobPool['num'] && $diff['num'] < 0)) {
             $this->getJobPoolDao()->wave($ids, $diff);
         }
     }
