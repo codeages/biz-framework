@@ -93,9 +93,9 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         return true;
     }
 
-    public function findJobFiredsByJobId($jobId)
+    public function findExecutingJobFiredByJobId($jobId)
     {
-        return $this->getJobFiredDao()->findByJobId($jobId);
+        return $this->getJobFiredDao()->findByJobIdAndStatus($jobId, static::EXECUTING);
     }
 
     public function deleteJob($id)
@@ -126,7 +126,7 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
 
     protected function checkExecuting($jobFired)
     {
-        $jobFireds = $this->findJobFiredsByJobId($jobFired['job_id']);
+        $jobFireds = $this->findExecutingJobFiredByJobId($jobFired['job_id']);
         foreach ($jobFireds as $item) {
             if ($item['id'] == $jobFired['id']) {
                 continue;
