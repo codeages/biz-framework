@@ -71,6 +71,11 @@ class StrTest extends TestCase
         $this->assertEquals('laravelPhpFramework', Str::camel('Laravel  -_-  php   -_-   framework   '));
     }
 
+    /**
+     * @requires PHP 5.5
+     *
+     * @return void
+     */
     public function testSubstr()
     {
         $this->assertEquals('Ё', Str::substr('БГДЖИЛЁ', -1));
@@ -86,6 +91,11 @@ class StrTest extends TestCase
         $this->assertEmpty(Str::substr('Б', 2));
     }
 
+    /**
+     * @requires PHP 5.5
+     *
+     * @return void
+     */
     public function testUcfirst()
     {
         $this->assertEquals('Laravel', Str::ucfirst('laravel'));
