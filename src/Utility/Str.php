@@ -102,7 +102,7 @@ class Str
         while (($len = strlen($string)) < $length) {
             $size = $length - $len;
             $bytes = random_bytes($size);
-            $string .= substr(str_replace(['/', '+', '='], '', base64_encode($bytes)), 0, $size);
+            $string .= substr(str_replace(array('/', '+', '='), '', base64_encode($bytes)), 0, $size);
         }
         return $string;
     }
@@ -151,31 +151,7 @@ class Str
         if (isset(static::$studlyCache[$key])) {
             return static::$studlyCache[$key];
         }
-        $value = ucwords(str_replace(['-', '_'], ' ', $value));
+        $value = ucwords(str_replace(array('-', '_'), ' ', $value));
         return static::$studlyCache[$key] = str_replace(' ', '', $value);
-    }
-
-    /**
-     * Returns the portion of string specified by the start and length parameters.
-     *
-     * @param  string  $string
-     * @param  int  $start
-     * @param  int|null  $length
-     * @return string
-     */
-    public static function substr($string, $start, $length = null)
-    {
-        return mb_substr($string, $start, $length, 'UTF-8');
-    }
-
-    /**
-     * Make a string's first character uppercase.
-     *
-     * @param  string  $string
-     * @return string
-     */
-    public static function ucfirst($string)
-    {
-        return static::upper(static::substr($string, 0, 1)).static::substr($string, 1);
     }
 }
