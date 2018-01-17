@@ -151,7 +151,7 @@ class Str
         if (isset(static::$studlyCache[$key])) {
             return static::$studlyCache[$key];
         }
-        $value = ucwords(str_replace(['-', '_'], ' ', $value));
+        $value = ucwords(str_replace(array('-', '_'), ' ', $value));
         return static::$studlyCache[$key] = str_replace(' ', '', $value);
     }
 
