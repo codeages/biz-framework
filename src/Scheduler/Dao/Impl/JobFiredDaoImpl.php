@@ -18,6 +18,13 @@ class JobFiredDaoImpl extends GeneralDaoImpl implements JobFiredDao
         return $this->db()->fetchAssoc($sql, array(strtotime('+1 minutes'), $status));
     }
 
+    public function findByJobId($jobId)
+    {
+        return $this->findByFields(array(
+            'job_id' => $jobId,
+        ));
+    }
+
     public function findByJobIdAndStatus($jobId, $status)
     {
         return $this->findByFields(array(

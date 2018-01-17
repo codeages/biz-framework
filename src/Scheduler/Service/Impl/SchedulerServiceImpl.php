@@ -93,6 +93,11 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         return true;
     }
 
+    public function findJobFiredsByJobId($jobId)
+    {
+        return $this->getJobFiredDao()->findByJobId($jobId);
+    }
+
     public function findExecutingJobFiredByJobId($jobId)
     {
         return $this->getJobFiredDao()->findByJobIdAndStatus($jobId, static::EXECUTING);
