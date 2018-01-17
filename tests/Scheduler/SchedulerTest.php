@@ -120,7 +120,7 @@ class SchedulerTest extends IntegrationTestCase
 
         $this->asserts($job, $savedJob);
 
-        $jobFireds = $this->getSchedulerService()->findExecutingJobFiredsByJobId($savedJob['id']);
+        $jobFireds = $this->getSchedulerService()->findExecutingJobFiredByJobId($savedJob['id']);
         $this->assertNotEmpty($jobFireds[0]);
 
         $jobFired = $jobFireds[0];
@@ -151,7 +151,7 @@ class SchedulerTest extends IntegrationTestCase
 
         $this->asserts($job, $savedJob);
 
-        $jobFireds = $this->getSchedulerService()->findExecutingJobFiredsByJobId($savedJob['id']);
+        $jobFireds = $this->getSchedulerService()->findExecutingJobFiredByJobId($savedJob['id']);
         $this->assertNotEmpty($jobFireds[0]);
 
         $jobFired = $jobFireds[0];
@@ -201,7 +201,7 @@ class SchedulerTest extends IntegrationTestCase
         $savedJob = $this->getJobDao()->get($job['id']);
         $this->assertEmpty($savedJob);
 
-        $jobFireds = $this->getSchedulerService()->findExecutingJobFiredsByJobId($job['id']);
+        $jobFireds = $this->getSchedulerService()->findExecutingJobFiredByJobId($job['id']);
         $this->assertEquals('failure', $jobFireds[0]['status']);
     }
 
@@ -224,7 +224,7 @@ class SchedulerTest extends IntegrationTestCase
         $savedJob = $this->getJobDao()->get($job['id']);
         $this->assertEmpty($savedJob);
 
-        $jobFireds = $this->getSchedulerService()->findExecutingJobFiredsByJobId($job['id']);
+        $jobFireds = $this->getSchedulerService()->findExecutingJobFiredByJobId($job['id']);
         $this->assertEquals('failure', $jobFireds[0]['status']);
     }
 
@@ -253,7 +253,7 @@ class SchedulerTest extends IntegrationTestCase
         $savedJob = $this->getJobDao()->get($job['id']);
         $this->assertEmpty($savedJob);
 
-        $jobFireds = $this->getSchedulerService()->findExecutingJobFiredsByJobId($job['id']);
+        $jobFireds = $this->getSchedulerService()->findExecutingJobFiredByJobId($job['id']);
         $this->assertEquals('timeout', $jobFireds[0]['status']);
     }
 
