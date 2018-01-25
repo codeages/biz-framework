@@ -6,5 +6,4 @@ use Codeages\Biz\Framework\Dao\GeneralDaoInterface;
 
 interface JobProcessDao extends GeneralDaoInterface
 {
-    public function findByProcessId($fields);
 }

@@ -9,11 +9,6 @@ class JobProcessDaoImpl extends GeneralDaoImpl implements JobProcessDao
 {
     protected $table = 'biz_scheduler_job_process';
 
-    public function findByProcessId($fields)
-    {
-        return $this->findByFields($fields);
-    }
-
     public function declares()
     {
         return array(

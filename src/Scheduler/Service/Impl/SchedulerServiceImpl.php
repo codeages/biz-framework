@@ -73,7 +73,7 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
 
     public function execute()
     {
-        $initProcess = $this->getJobProcessDao()->create(array(
+        $initProcess = $this->createJobProcess(array(
             'pid' => getmypid(),
         ));
 
@@ -86,7 +86,7 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         $process['cost_time'] = $process['end_time'] - $process['start_time'];
         $process['peak_memory'] = !function_exists('memory_get_peak_usage') ? 0 : memory_get_peak_usage();
 
-        $this->getJobProcessDao()->update($initProcess['id'], $process);
+        $this->updateJobProcess($initProcess['id'], $process);
     }
 
     protected function runAcquiredJobs($processId)
@@ -441,6 +441,11 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
     public function createJobProcess($process)
     {
         return $this->getJobProcessDao()->create($process);
+    }
+
+    public function updateJobProcess($id, $process)
+    {
+        return $this->getJobProcessDao()->update($id, $process);
     }
 
     protected function getMillisecond()
