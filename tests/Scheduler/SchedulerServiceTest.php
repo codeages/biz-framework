@@ -19,7 +19,8 @@ class SchedulerServiceTest extends IntegrationTestCase
         );
 
         $result = $this->getSchedulerService()->createJobProcess($process);
-        var_dump($result);
+        $this->assertEquals(10000, $result['start_time']);
+        $this->assertEquals($uuid, $result['process_id']);
     }
 
     /**

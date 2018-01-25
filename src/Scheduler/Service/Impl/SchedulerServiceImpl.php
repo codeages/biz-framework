@@ -91,13 +91,11 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         $jobInstance = $this->createJobInstance($jobFired);
         $result = $this->getJobPool()->execute($jobInstance);
         $process['end_time'] = $this->getMillisecond();
-        $process['cost_time'] = $process['end_time'] - $process['start_time'] = $this->getMillisecond();
+        $process['cost_time'] = $process['end_time'] - $process['start_time'];
         $process['peak_memory'] = !function_exists('memory_get_peak_usage') ? 0 : memory_get_peak_usage();
 
         $process = $this->createJobProcess($process);
         $this->jobExecuted($jobFired, $result, $process);
-
-
 
         return true;
     }
@@ -424,7 +422,8 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
     protected function getMillisecond()
     {
         list($t1, $t2) = explode(' ', microtime());
-        return (float)sprintf('%.0f',(floatval($t1)+floatval($t2))*1000);
+
+        return (float) sprintf('%.0f', (floatval($t1) + floatval($t2)) * 1000);
     }
 
     protected function markTimeout($jobFired)

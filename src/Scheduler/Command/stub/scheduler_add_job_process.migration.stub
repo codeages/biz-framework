@@ -1,7 +1,5 @@
 <?php
 
-namespace Phpmig\Migration\Migration;
-
 use Phpmig\Migration\Migration;
 
 class BizSchedulerAddJobProcess extends Migration
