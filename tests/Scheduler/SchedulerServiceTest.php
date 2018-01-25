@@ -3,15 +3,13 @@
 namespace Tests;
 
 use Codeages\Biz\Framework\Scheduler\Service\SchedulerService;
-use Webpatser\Uuid\Uuid;
 
 class SchedulerServiceTest extends IntegrationTestCase
 {
     public function testCreateJobProcess()
     {
-        $uuid = str_replace('-', '', Uuid::generate(4));
         $process = array(
-            'process_id' => $uuid,
+            'pid' => 1234,
             'start_time' => 10000,
             'end_time' => 12000,
             'cost_time' => 2000,
@@ -20,7 +18,7 @@ class SchedulerServiceTest extends IntegrationTestCase
 
         $result = $this->getSchedulerService()->createJobProcess($process);
         $this->assertEquals(10000, $result['start_time']);
-        $this->assertEquals($uuid, $result['process_id']);
+        $this->assertEquals(1234, $result['pid']);
     }
 
     /**
