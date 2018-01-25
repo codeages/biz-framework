@@ -39,7 +39,7 @@ class BizSchedulerAddJobProcess extends Migration
         $biz = $this->getContainer();
         $connection = $biz['db'];
         $connection->exec('DROP TABLE `biz_scheduler_job_process`;');
-        $connection->exec('ALTER TABLE `biz_scheduler_job_process` 
+        $connection->exec('ALTER TABLE `biz_scheduler_job_fired` 
           DROP COLUMN `process_id`, 
           DROP COLUMN `cost_time`, 
           DROP COLUMN `end_time`,
