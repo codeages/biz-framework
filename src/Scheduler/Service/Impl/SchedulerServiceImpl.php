@@ -175,52 +175,33 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
 
     protected function jobExecuted($jobFired, $result, $process)
     {
+        $process = ArrayToolkit::parts($process, array('process_id', 'peak_memory', 'start_time', 'end_time', 'cost_time'));
         if ('success' == $result) {
-            $this->getJobFiredDao()->update($jobFired['id'], array(
+            $this->getJobFiredDao()->update($jobFired['id'], array_merge(array(
                 'status' => 'success',
-                'process_id' => $process['process_id'],
-                'peak_memory' => $process['peak_memory'],
-                'start_time' => $process['start_time'],
-                'end_time' => $process['end_time'],
-                'cost_time' => $process['cost_time'],
-            ));
+            ), $process));
             $this->createJobLog($jobFired, 'success');
         } elseif ('retry' == $result) {
             if ($jobFired['retry_num'] < $this->getMaxRetryNum()) {
-                $this->getJobFiredDao()->update($jobFired['id'], array(
+                $this->getJobFiredDao()->update($jobFired['id'], array_merge(array(
                     'retry_num' => $jobFired['retry_num'] + 1,
                     'fired_time' => time(),
                     'status' => 'acquired',
-                    'process_id' => $process['process_id'],
-                    'peak_memory' => $process['peak_memory'],
-                    'start_time' => $process['start_time'],
-                    'end_time' => $process['end_time'],
-                    'cost_time' => $process['cost_time'],
-                ));
+                ), $process));
                 $this->createJobLog($jobFired, 'acquired');
             } else {
                 $result = 'failure';
-                $this->getJobFiredDao()->update($jobFired['id'], array(
+                $this->getJobFiredDao()->update($jobFired['id'], array_merge(array(
                     'fired_time' => time(),
                     'status' => $result,
-                    'process_id' => $process['process_id'],
-                    'peak_memory' => $process['peak_memory'],
-                    'start_time' => $process['start_time'],
-                    'end_time' => $process['end_time'],
-                    'cost_time' => $process['cost_time'],
-                ));
+                ), $process));
                 $this->createJobLog($jobFired, $result);
             }
         } else {
-            $this->getJobFiredDao()->update($jobFired['id'], array(
+            $this->getJobFiredDao()->update($jobFired['id'], array_merge(array(
                 'fired_time' => time(),
                 'status' => $result,
-                'process_id' => $process['process_id'],
-                'peak_memory' => $process['peak_memory'],
-                'start_time' => $process['start_time'],
-                'end_time' => $process['end_time'],
-                'cost_time' => $process['cost_time'],
-            ));
+            ), $process));
             $this->createJobLog($jobFired, $result);
         }
 
