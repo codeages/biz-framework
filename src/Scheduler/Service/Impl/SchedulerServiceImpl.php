@@ -119,6 +119,13 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         }
     }
 
+    public function error($job, $message, $trace)
+    {
+        $job['message'] = $message;
+        $job['trace'] = $trace;
+        $this->createJobLog(array('job_detail' => $job), 'error');
+    }
+
     protected function check($jobFired)
     {
         $result = $this->checkExecuting($jobFired);
@@ -313,6 +320,8 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
             'args',
             'priority',
             'status',
+            'message',
+            'trace',
         ));
 
         if (!empty($jobFired['id'])) {

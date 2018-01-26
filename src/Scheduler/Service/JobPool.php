@@ -30,7 +30,15 @@ class JobPool
         try {
             $result = $job->execute();
         } catch (\Exception $e) {
-            $this->getTargetlogService()->log(TargetlogService::ERROR, 'job', $this->id, $e->getMessage());
+            $data = array(
+                'id' => $job->__get('id'),
+                'name' => $job->__get('name'),
+                'source' => $job->__get('source'),
+                'class' => $job->__get('class'),
+                'args' => $job->__get('args'),
+                'priority' => $job->__get('priority'),
+            );
+            $this->getSchedulerService()->error($data, $e->getMessage(), $e->getTraceAsString());
         }
 
         $this->release($job);
@@ -104,9 +112,9 @@ class JobPool
         return $this->biz->dao('Scheduler:JobPoolDao');
     }
 
-    protected function getTargetlogService()
+    protected function getSchedulerService()
     {
-        return $this->biz->service('Targetlog:TargetlogService');
+        return $this->biz->service('Scheduler:SchedulerService');
     }
 
     public function __get($name)

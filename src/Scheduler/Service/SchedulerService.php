@@ -25,4 +25,6 @@ interface SchedulerService
     public function countJobs($condition);
 
     public function markTimeoutJobs();
+
+    public function error($jobFired, $message, $trace);
 }
