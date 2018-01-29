@@ -271,8 +271,8 @@ class SchedulerTest extends IntegrationTestCase
             'misfire_policy' => 'missed',
         );
         $this->getSchedulerService()->error($job, 'error', 'error');
-        $result = $this->getJobLogDao()->get(1);
-        $this->assertEquals('error', $result['message']);
+        $result = $this->getJobLogDao()->search(array('job_fired_id' => 0), array('created_time' => 'DESC'), 0, PHP_INT_MAX);
+        $this->assertEquals('error', $result[0]['message']);
     }
 
     protected function wavePoolNum($id, $diff)
