@@ -31,12 +31,12 @@ class JobPool
             $result = $job->execute();
         } catch (\Exception $e) {
             $data = array(
-                'id' => $job->__get('id'),
-                'name' => $job->__get('name'),
-                'source' => $job->__get('source'),
-                'class' => $job->__get('class'),
-                'args' => $job->__get('args'),
-                'priority' => $job->__get('priority'),
+                'id' => $job['id'],
+                'name' => $job['name'],
+                'source' => $job['source'],
+                'class' => $job['class'],
+                'args' => $job['args'],
+                'priority' => $job['priority'],
             );
             $this->getSchedulerService()->error($data, $e->getMessage(), $e->getTraceAsString());
         }

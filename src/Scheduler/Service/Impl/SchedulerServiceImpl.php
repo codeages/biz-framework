@@ -119,7 +119,7 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         }
     }
 
-    public function error($job, $message, $trace)
+    public function createErrorLog($job, $message, $trace)
     {
         $job['message'] = $message;
         $job['trace'] = $trace;

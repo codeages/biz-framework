@@ -257,7 +257,7 @@ class SchedulerTest extends IntegrationTestCase
         $this->assertEquals('timeout', $jobFireds[0]['status']);
     }
 
-    public function testError()
+    public function testCreateErrorLog()
     {
         $job = array(
             'id' => 22,
@@ -270,7 +270,7 @@ class SchedulerTest extends IntegrationTestCase
             'misfire_threshold' => 3000,
             'misfire_policy' => 'missed',
         );
-        $this->getSchedulerService()->error($job, 'error', 'error');
+        $this->getSchedulerService()->createErrorLog($job, 'error', 'error');
         $result = $this->getJobLogDao()->search(array('job_fired_id' => 0), array('created_time' => 'DESC'), 0, PHP_INT_MAX);
         $this->assertEquals('error', $result[0]['message']);
     }
