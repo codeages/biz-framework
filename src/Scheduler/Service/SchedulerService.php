@@ -26,5 +26,13 @@ interface SchedulerService
 
     public function markTimeoutJobs();
 
+<<<<<<< HEAD
     public function createErrorLog($job, $message, $trace);
+=======
+    public function error($jobFired, $message, $trace);
+
+    public function createJobProcess($process);
+
+    public function updateJobProcess($id, $process);
+>>>>>>> d04b1f39ab48cab3c540008697af93e88904cf4c
 }
