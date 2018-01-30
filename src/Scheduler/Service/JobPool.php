@@ -38,7 +38,7 @@ class JobPool
                 'args' => $job['args'],
                 'priority' => $job['priority'],
             );
-            $this->getSchedulerService()->error($data, $e->getMessage(), $e->getTraceAsString());
+            $this->getSchedulerService()->createErrorLog($data, $e->getMessage(), $e->getTraceAsString());
         }
 
         $this->release($job);
