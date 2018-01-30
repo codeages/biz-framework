@@ -98,7 +98,11 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         $process['process_id'] = $processId;
         $process['start_time'] = $this->getMillisecond();
         $jobInstance = $this->createJobInstance($jobFired);
-        $result = $this->getJobPool()->execute($jobInstance);
+        try {
+            $result = $this->getJobPool()->execute($jobInstance);
+        } catch (\Exception $e) {
+            $this->createErrorLog($jobFired, $e->getMessage(), $e->getTraceAsString());
+        }
         $process['end_time'] = $this->getMillisecond();
         $process['cost_time'] = $process['end_time'] - $process['start_time'];
         $process['peak_memory'] = !function_exists('memory_get_peak_usage') ? 0 : memory_get_peak_usage();
@@ -134,11 +138,11 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         }
     }
 
-    public function createErrorLog($job, $message, $trace)
+    public function createErrorLog($jobFired, $message, $trace)
     {
-        $job['message'] = $message;
-        $job['trace'] = $trace;
-        $this->createJobLog(array('job_detail' => $job), 'error');
+        $jobFired['job_detail']['message'] = $message;
+        $jobFired['job_detail']['trace'] = $trace;
+        $this->createJobLog($jobFired, 'error');
     }
 
     protected function check($jobFired)
