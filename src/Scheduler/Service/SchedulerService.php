@@ -25,4 +25,8 @@ interface SchedulerService
     public function countJobs($condition);
 
     public function markTimeoutJobs();
+
+    public function createJobProcess($process);
+
+    public function updateJobProcess($id, $process);
 }
