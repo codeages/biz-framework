@@ -10,10 +10,6 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
 
     protected $table = null;
 
-    protected $timestamps = array();
-
-    protected $serializes = array();
-
     public function __construct(Biz $biz)
     {
         $this->biz = $biz;
@@ -21,12 +17,6 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
 
     public function create($fields)
     {
-        $timestampField = $this->getTimestampField('created');
-
-        if ($timestampField) {
-            $fields[$timestampField] = time();
-        }
-
         $affected = $this->db()->insert($this->table(), $fields);
         if ($affected <= 0) {
             throw $this->createDaoException('Insert error.');
@@ -107,11 +97,6 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
 
     protected function updateById($id, $fields)
     {
-        $timestampField = $this->getTimestampField('updated');
-        if ($timestampField) {
-            $fields[$timestampField] = time();
-        }
-
         $this->db()->update($this->table, $fields, array('id' => $id));
 
         return $this->get($id);
@@ -127,12 +112,6 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
     {
         $builder = $this->createQueryBuilder($conditions)
             ->update($this->table, $this->table);
-
-        $timestampField = $this->getTimestampField('updated');
-
-        if ($timestampField) {
-            $fields[$timestampField] = time();
-        }
 
         foreach ($fields as $key => $value) {
             $builder
@@ -282,23 +261,6 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
     {
         $start = (int) $start;
         $limit = (int) $limit;
-    }
-
-    private function getTimestampField($mode = null)
-    {
-        if (empty($this->timestamps)) {
-            return null;
-        }
-
-        if ('created' == $mode) {
-            return isset($this->timestamps[0]) ? $this->timestamps[0] : null;
-        }
-
-        if ('updated' == $mode) {
-            return isset($this->timestamps[1]) ? $this->timestamps[1] : null;
-        }
-
-        throw $this->createDaoException('mode error.');
     }
 
     private function createDaoException($message = '', $code = 0)
