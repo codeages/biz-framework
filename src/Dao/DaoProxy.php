@@ -386,19 +386,24 @@ class DaoProxy
         }
 
         $declares = $this->dao->declares();
-        if (isset($declares['cache']) && false === $declares['cache']) {
-            return null;
-        }
 
-        if (!empty($declares['cache'])) {
-            return $this->container['dao.cache.strategy.'.$declares['cache']];
-        }
-
-        if (isset($this->container['dao.cache.strategy.default'])) {
+        // 未指定 cache 策略，则使用默认策略
+        if (!isset($declares['cache'])) {
             return $this->container['dao.cache.strategy.default'];
         }
 
-        return null;
+        // 针对某个 Dao 关闭 Cache
+        if (false === $declares['cache']) {
+            return null;
+        }
+
+        // 针对某个 Dao 指定 Cache 策略
+        $strategyServiceId = 'dao.cache.strategy.'.strtolower($declares['cache']);
+        if (!isset($this->container[$strategyServiceId])) {
+            throw new DaoException("Dao %s cache strategy is not defined, please define first in biz container use %s service id.", get_class($this->dao), $strategyServiceId);
+        }
+
+        return $this->container[$strategyServiceId];
     }
 
     private function getStrategyFromAnnotation($dao)
@@ -408,7 +413,12 @@ class DaoProxy
             return null;
         }
 
-        return $this->container['dao.cache.strategy.'.strtolower($metadata['strategy'])];
+        $strategyServiceId = 'dao.cache.strategy.'.strtolower($metadata['strategy']);
+        if (!isset($this->container[$strategyServiceId])) {
+            throw new DaoException("Dao %s cache strategy is not defined, please define first in biz container use %s service id.", get_class($this->dao), $strategyServiceId);
+        }
+
+        return $this->container[$strategyServiceId];
     }
 
     private function getCacheKey(GeneralDaoInterface $dao, $method, $arguments)
