@@ -61,6 +61,13 @@ class DaoProxy
         return null;
     }
 
+    /**
+     * 代理 get 开头的方法调用
+     *
+     * @param string $method 被调用的 Dao 方法名
+     * @param array $arguments 调用参数
+     * @return array|null
+     */
     protected function get($method, $arguments)
     {
         $lastArgument = end($arguments);
@@ -84,6 +91,7 @@ class DaoProxy
         $strategy = $this->buildCacheStrategy();
         if ($strategy) {
             $cache = $strategy->beforeQuery($this->dao, $method, $arguments);
+            // 命中 cache, 直接返回 cache 数据
             if (false !== $cache) {
                 return $cache;
             }
@@ -91,6 +99,8 @@ class DaoProxy
 
         $row = $this->callRealDao($method, $arguments);
         $this->unserialize($row);
+
+        // 将结果缓存至 ArrayStorage
         $this->arrayStorage && ($this->arrayStorage[$this->getCacheKey($this->dao, $method, $arguments)] = $row);
 
         if ($strategy) {
@@ -379,7 +389,7 @@ class DaoProxy
         }
 
         if (!empty($this->container['dao.cache.annotation'])) {
-            $strategy = $this->getStrategyFromAnnotation($this->dao);
+            $strategy = $this->getCacheStrategyFromAnnotation($this->dao);
             if ($strategy) {
                 return $strategy;
             }
@@ -406,7 +416,7 @@ class DaoProxy
         return $this->container[$strategyServiceId];
     }
 
-    private function getStrategyFromAnnotation($dao)
+    private function getCacheStrategyFromAnnotation($dao)
     {
         $metadata = $this->metadataReader->read($dao);
         if (empty($metadata)) {
