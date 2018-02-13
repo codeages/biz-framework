@@ -1,6 +1,6 @@
 <?php
 
-namespace Codeages\Biz\Framework\Queue;
+namespace Codeages\Biz\Framework\Queue\Driver;
 
 use Codeages\Beanstalk\Client;
 
