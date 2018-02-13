@@ -3,6 +3,9 @@
 namespace Codeages\Biz\Framework\Dao;
 
 use Codeages\Biz\Framework\Context\Biz;
+use Webpatser\Uuid\Uuid;
+use Ramsey\Uuid\UuidFactory;
+use Ramsey\Uuid\Codec\OrderedTimeCodec;
 
 abstract class GeneralDaoImpl implements GeneralDaoInterface
 {
@@ -17,6 +20,11 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
 
     public function create($fields)
     {
+        $generator = $this->getIdGenerator();
+        if ($generator) {
+            $fields['id'] = $generator->generate();
+        }
+
         $affected = $this->db()->insert($this->table(), $fields);
         if ($affected <= 0) {
             throw $this->createDaoException('Insert error.');
@@ -44,11 +52,15 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
 
     public function delete($id)
     {
-        return $this->db()->delete($this->table(), array('id' => $id));
+        return $this->db()->delete($this->table(), array('id' => $this->encodeId($id)));
     }
 
     public function wave(array $ids, array $diffs)
     {
+        foreach ($ids as $index => $id) {
+            $ids[$index] = $this->encodeId($id);
+        }
+
         $sets = array_map(
             function ($name) {
                 return "{$name} = {$name} + ?";
@@ -68,7 +80,7 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
         $lock = isset($options['lock']) && true === $options['lock'];
         $sql = "SELECT * FROM {$this->table()} WHERE id = ?".($lock ? ' FOR UPDATE' : '');
 
-        return $this->db()->fetchAssoc($sql, array($id)) ?: null;
+        return $this->db()->fetchAssoc($sql, array($this->encodeId($id))) ?: null;
     }
 
     public function search($conditions, $orderBys, $start, $limit)
@@ -97,7 +109,9 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
 
     protected function updateById($id, $fields)
     {
-        $this->db()->update($this->table, $fields, array('id' => $id));
+        // Notice：如果 $fields 中含有键 id，请自行 encode，通常情况下 id 不应该被更新。
+
+        $this->db()->update($this->table, $fields, array('id' => $this->encodeId($id)));
 
         return $this->get($id);
     }
@@ -184,6 +198,8 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
 
     protected function getByFields($fields)
     {
+        $this->encodeIdInFields($fields);
+
         $placeholders = array_map(
             function ($name) {
                 return "{$name} = ?";
@@ -202,6 +218,12 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
             return array();
         }
 
+        if ($field == 'id') {
+            foreach($values as $i => $val) {
+                $values[$i] = $this->encodeId($val);
+            }
+        }
+
         $marks = str_repeat('?,', count($values) - 1).'?';
         $sql = "SELECT * FROM {$this->table} WHERE {$field} IN ({$marks});";
 
@@ -210,6 +232,8 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
 
     protected function findByFields($fields)
     {
+        $this->encodeIdInFields($fields);
+
         $placeholders = array_map(
             function ($name) {
                 return "{$name} = ?";
@@ -239,6 +263,8 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
             }
         );
 
+        $this->encodeIdInFields($conditions);
+
         $builder = $this->getQueryBuilder($conditions);
         $builder->from($this->table(), $this->table());
 
@@ -261,6 +287,38 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
     {
         $start = (int) $start;
         $limit = (int) $limit;
+    }
+
+    protected function getIdGenerator()
+    {
+        $declares = $this->declares();
+        if (empty($declares['id_generator'])) {
+            return null;
+        }
+        return $this->biz['dao.id_generator.'.$declares['id_generator']];
+    }
+
+    protected function encodeId($id)
+    {
+        $generator = $this->getIdGenerator();
+        if ($generator) {
+            $id = $generator->encode($id);
+        }
+        return $id;
+    }
+
+    protected function encodeIdInFields(array &$fields)
+    {
+        if (empty($fields['id'])) {
+            return ;
+        }
+
+        $generator = $this->getIdGenerator();
+        if (empty($generator)) {
+            return ;
+        }
+
+        $fields['id'] = $generator->encode($fields['id']);
     }
 
     private function createDaoException($message = '', $code = 0)
