@@ -3,6 +3,7 @@
 namespace Codeages\Biz\Framework\Queue\Driver;
 
 use Codeages\Beanstalk\Client;
+use Codeages\Biz\Framework\Queue\Job;
 
 class BeanstalkQueue implements Queue
 {
