@@ -5,7 +5,7 @@ namespace Tests\Example\Dao\Impl;
 use Codeages\Biz\Framework\Dao\GeneralDaoImpl;
 use Tests\Example\Dao\UuidExampleDao;
 
-class UuidUuidExampleDaoImpl extends GeneralDaoImpl implements UuidExampleDao
+class UuidExampleDaoImpl extends GeneralDaoImpl implements UuidExampleDao
 {
     protected $table = 'example_uuid';
 

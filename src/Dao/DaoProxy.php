@@ -72,7 +72,7 @@ class DaoProxy
     {
         $lastArgument = end($arguments);
         reset($arguments);
-
+        
         // lock模式下，因为需要借助mysql的锁，不走cache
         if (is_array($lastArgument) && isset($lastArgument['lock']) && true === $lastArgument['lock']) {
             $row = $this->callRealDao($method, $arguments);
@@ -160,6 +160,11 @@ class DaoProxy
     protected function create($method, $arguments)
     {
         $declares = $this->dao->declares();
+
+        $generator = $this->getIdGenerator();
+        if ($generator) {
+            $id = $arguments[0]['id'] = $generator->generate();
+        }
 
         $time = time();
 
@@ -363,6 +368,15 @@ class DaoProxy
 
             $row[$key] = $this->serializer->serialize($method, $row[$key]);
         }
+    }
+
+    protected function getIdGenerator()
+    {
+        $declares = $this->declares();
+        if (empty($declares['id_generator'])) {
+            return null;
+        }
+        return $this->container['dao.id_generator.'.$declares['id_generator']];
     }
 
     private function flushTableCache()
