@@ -3,9 +3,6 @@
 namespace Codeages\Biz\Framework\Dao;
 
 use Codeages\Biz\Framework\Context\Biz;
-use Webpatser\Uuid\Uuid;
-use Ramsey\Uuid\UuidFactory;
-use Ramsey\Uuid\Codec\OrderedTimeCodec;
 
 abstract class GeneralDaoImpl implements GeneralDaoInterface
 {
@@ -266,20 +263,6 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
     {
         $start = (int) $start;
         $limit = (int) $limit;
-    }
-
-    protected function encodeIdInFields(array &$fields)
-    {
-        if (empty($fields['id'])) {
-            return ;
-        }
-
-        $generator = $this->getIdGenerator();
-        if (empty($generator)) {
-            return ;
-        }
-
-        $fields['id'] = $generator->encode($fields['id']);
     }
 
     private function createDaoException($message = '', $code = 0)

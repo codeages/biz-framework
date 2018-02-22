@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## [0.9.9] - 2018-02-22
+
+* Dao支持UUID，需PHP 5.5+。
+
 ## [0.9.8] - 2018-01-10
 
 * 删除`Codeages\Biz\Framework\Context\CurrentUserInterface`接口，新增 `Codeages\Biz\Framework\Context\CurrentUser`类。

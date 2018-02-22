@@ -6,6 +6,9 @@ use Codeages\Biz\Framework\Util\ArrayToolkit;
 use Tests\Example\Dao\AdvancedExampleDao;
 use Codeages\Biz\Framework\Dao\IdGenerator\OrderedTimeUUIDGenerator;
 
+/**
+ * @requires PHP 5.5
+ */
 class UuidExampleDaoImplTest extends IntegrationTestCase
 {
     public function testCreate()

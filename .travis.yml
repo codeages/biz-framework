@@ -25,6 +25,9 @@ before_script:
   - echo "extension = redis.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - mysql -e 'CREATE DATABASE `biz-framework-test` DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci'
   - composer install
+  - if [ $(phpenv version-name) = "5.5" ]; then composer require ramsey/uuid; fi
+  - if [ $(phpenv version-name) = "7.0" ]; then composer require ramsey/uuid; fi
+  - if [ $(phpenv version-name) = "7.1" ]; then composer require ramsey/uuid; fi
 
 script: 
   - vendor/bin/phpunit
