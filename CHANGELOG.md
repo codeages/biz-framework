@@ -4,7 +4,7 @@
 
 ## [0.9.9] - 2018-02-22
 
-* Dao支持UUID，需PHP 5.5+。
+* Dao支持UUID，需PHP 5.5+。@see https://github.com/ramsey/uuid/wiki/Ramsey%5CUuid-Codecs
 
 ## [0.9.8] - 2018-01-10
 
