@@ -5,6 +5,9 @@ namespace Tests;
 use PHPUnit\Framework\TestCase;
 use Codeages\Biz\Framework\Dao\IdGenerator\OrderedTimeUUIDGenerator;
 
+/**
+ * @requires PHP 5.5
+ */
 class OrderedTimeUUIDGeneratorTest extends TestCase
 {
     public function testGenerate()
