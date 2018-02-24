@@ -205,7 +205,13 @@ class DaoProxy
         $time = time();
         $rows = $arguments[$lastKey];
 
+        $generator = $this->getIdGenerator();
+
         foreach ($rows as &$row) {
+            if ($generator) {
+                $row['id'] = $generator->generate();
+            }
+
             if (isset($declares['timestamps'][0])) {
                 $row[$declares['timestamps'][0]] = $time;
             }

@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## [0.9.12] - 2018-02-24
+
+* Dao 的 `batchCreate` 方法支持 UUID。
+
 ## [0.9.11] - 2018-02-22
 
 * Dao支持UUID，需PHP 5.5+。@see https://github.com/ramsey/uuid/wiki/Ramsey%5CUuid-Codecs
