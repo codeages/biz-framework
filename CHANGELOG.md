@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## [0.9.13] - 2018-03-02
+
+* 修复 Dao 的 `update` 方法，当主键`id`为UUID时，无法更新的问题。
+
 ## [0.9.12] - 2018-02-24
 
 * Dao 的 `batchCreate` 方法支持 UUID。

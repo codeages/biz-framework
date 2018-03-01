@@ -33,7 +33,7 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
             return 0;
         }
 
-        if (is_numeric($identifier)) {
+        if (is_numeric($identifier) || is_string($identifier)) {
             return $this->updateById($identifier, $fields);
         }
 
