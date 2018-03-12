@@ -92,17 +92,19 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
 
     private function addSelect(DynamicQueryBuilder $builder, $columns)
     {
-        if ($columns) {
-            foreach ($columns as $column) {
-                if (preg_match('/^\w+$/', $column)) {
-                    $builder->addSelect($column);
-                } else {
-                    throw $this->createDaoException('Illegal column name: '. $column);
-                }
-            }
-        } else {
-            $builder->select('*');
+        if (!$columns) {
+            return $builder->select('*');
         }
+
+        foreach ($columns as $column) {
+            if (preg_match('/^\w+$/', $column)) {
+                $builder->addSelect($column);
+            } else {
+                throw $this->createDaoException('Illegal column name: '. $column);
+            }
+        }
+
+        return $builder;
     }
 
     public function count($conditions)
