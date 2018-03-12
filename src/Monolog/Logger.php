@@ -4,9 +4,6 @@ namespace Codeages\Biz\Framework\Monolog;
 
 use Monolog\Logger as BaseLogger;
 
-/**
- * TODO 暂时重写6个等级，后续开发完成补全
- */
 class Logger extends BaseLogger
 {
     public function log($level, $message, array $context = array(), $type = '')
