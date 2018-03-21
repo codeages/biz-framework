@@ -4,6 +4,7 @@ namespace Tests;
 
 use Codeages\Biz\Framework\Dao\ArrayStorage;
 use Codeages\Biz\Framework\Dao\Connection;
+use Codeages\Biz\Framework\Dao\IdGenerator\OrderedTimeUUIDGenerator;
 use Codeages\Biz\Framework\Provider\DoctrineServiceProvider;
 use Codeages\Biz\Framework\Provider\RedisServiceProvider;
 use Codeages\Biz\Framework\Provider\SchedulerServiceProvider;
@@ -12,9 +13,9 @@ use Codeages\Biz\Framework\Provider\TargetlogServiceProvider;
 use Codeages\Biz\Framework\Provider\TokenServiceProvider;
 use Codeages\Biz\Framework\Provider\SettingServiceProvider;
 use Codeages\Biz\Framework\Provider\QueueServiceProvider;
+use Codeages\Biz\Framework\Context\Biz;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
-use Codeages\Biz\Framework\Context\Biz;
 use Monolog\Logger;
 use Monolog\Handler\TestHandler;
 use Mockery;
@@ -176,6 +177,10 @@ class IntegrationTestCase extends TestCase
                 return new ArrayStorage();
             };
         }
+
+        $biz['dao.id_generator.uuid'] = function () {
+            return new OrderedTimeUUIDGenerator();
+        };
 
         $biz['logger.test_handler'] = function () {
             return new TestHandler();
