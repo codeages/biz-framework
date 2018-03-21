@@ -9,6 +9,7 @@ use Codeages\Biz\Framework\Service\Exception\InvalidArgumentException;
 use Codeages\Biz\Framework\Service\Exception\ServiceException;
 use Codeages\Biz\Framework\Util\ArrayToolkit;
 use Codeages\Biz\Framework\Util\Lock;
+use Codeages\Biz\Framework\Util\TimeMachine;
 use Cron\CronExpression;
 
 class SchedulerServiceImpl extends BaseService implements SchedulerService
@@ -91,6 +92,13 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         $this->jobExecuted($jobFired, $result);
 
         return true;
+    }
+
+    public function deleteJobFired($keepDays)
+    {
+        $startTime = strtotime("-{$keepDays} day", TimeMachine::time());
+
+        return $this->getJobFiredDao()->deleteWhenCreatedTimeBefore($startTime);
     }
 
     public function findJobFiredsByJobId($jobId)
