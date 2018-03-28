@@ -390,6 +390,11 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         return $this->getJobDao()->search($condition, $orderBy, $start, $limit);
     }
 
+    public function searchJobFireds($condition, $orderBy, $start, $limit)
+    {
+        return $this->getJobFiredDao()->search($condition, $orderBy, $start, $limit);
+    }
+
     public function countJobs($condition)
     {
         return $this->getJobDao()->count($condition);
