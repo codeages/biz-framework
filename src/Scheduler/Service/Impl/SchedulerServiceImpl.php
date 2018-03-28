@@ -325,6 +325,7 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
             'fired_time' => $job['next_fire_time'],
             'status' => 'acquired',
             'job_detail' => $job,
+            'job_name' => $job['name'],
         );
         $jobFired = $this->getJobFiredDao()->create($jobFired);
         $jobFired['job_detail'] = $this->updateNextFireTime($job);
