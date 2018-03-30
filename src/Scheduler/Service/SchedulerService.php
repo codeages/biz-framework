@@ -22,6 +22,8 @@ interface SchedulerService
 
     public function searchJobs($condition, $orderBy, $start, $limit);
 
+    public function searchJobFireds($condition, $orderBy, $start, $limit);
+
     public function countJobs($condition);
 
     public function markTimeoutJobs();

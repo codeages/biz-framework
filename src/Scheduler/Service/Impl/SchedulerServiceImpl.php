@@ -325,6 +325,7 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
             'fired_time' => $job['next_fire_time'],
             'status' => 'acquired',
             'job_detail' => $job,
+            'job_name' => $job['name'],
         );
         $jobFired = $this->getJobFiredDao()->create($jobFired);
         $jobFired['job_detail'] = $this->updateNextFireTime($job);
@@ -388,6 +389,11 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
     public function searchJobs($condition, $orderBy, $start, $limit)
     {
         return $this->getJobDao()->search($condition, $orderBy, $start, $limit);
+    }
+
+    public function searchJobFireds($condition, $orderBy, $start, $limit)
+    {
+        return $this->getJobFiredDao()->search($condition, $orderBy, $start, $limit);
     }
 
     public function countJobs($condition)
