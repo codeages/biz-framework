@@ -4,6 +4,8 @@ namespace Codeages\Biz\Framework\Scheduler\Service;
 
 interface SchedulerService
 {
+    const JOB_MEMORY_LIMIT = 209715200; //200MB
+
     public function register($job);
 
     public function execute();
@@ -11,6 +13,8 @@ interface SchedulerService
     public function deleteJobByName($name);
 
     public function deleteJob($id);
+
+    public function deleteJobFired($keepDays);
 
     public function findJobFiredsByJobId($jobId);
 
