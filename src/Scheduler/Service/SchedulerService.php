@@ -14,7 +14,7 @@ interface SchedulerService
 
     public function deleteJob($id);
 
-    public function deleteJobFired($keepDays);
+    public function deleteUnaccquiredJobFired($keepDays);
 
     public function findJobFiredsByJobId($jobId);
 
@@ -25,6 +25,8 @@ interface SchedulerService
     public function countJobLogs($condition);
 
     public function searchJobs($condition, $orderBy, $start, $limit);
+
+    public function searchJobFireds($condition, $orderBy, $start, $limit);
 
     public function countJobs($condition);
 
