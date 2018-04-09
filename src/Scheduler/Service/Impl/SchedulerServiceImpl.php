@@ -121,7 +121,7 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
     {
         $startTime = strtotime("-{$keepDays} day", TimeMachine::time());
 
-        return $this->getJobFiredDao()->deleteWhenCreatedTimeBefore($startTime);
+        return $this->getJobFiredDao()->deleteUnacquiredBeforeCreatedTime($startTime);
     }
 
     public function findJobFiredsByJobId($jobId)

@@ -67,7 +67,7 @@ class SchedulerTest extends IntegrationTestCase
             'Scheduler:JobFiredDao',
             array(
                 array(
-                    'functionName' => 'deleteWhenCreatedTimeBefore',
+                    'functionName' => 'deleteUnacquiredBeforeCreatedTime',
                     'withParams' => array(1521512171), //1521598571-60*60*24, 1天前
                     'returnValue' => 1,
                 ),
@@ -75,7 +75,7 @@ class SchedulerTest extends IntegrationTestCase
         );
 
         $result = $this->getSchedulerService()->deleteJobFired(1);
-        $jobFiredDao->shouldHaveReceived('deleteWhenCreatedTimeBefore')->times(1);
+        $jobFiredDao->shouldHaveReceived('deleteUnacquiredBeforeCreatedTime')->times(1);
         $this->assertEquals(1, $result);
     }
 

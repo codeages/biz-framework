@@ -33,11 +33,11 @@ class JobFiredDaoImpl extends GeneralDaoImpl implements JobFiredDao
         ));
     }
 
-    public function deleteWhenCreatedTimeBefore($time)
+    public function deleteUnacquiredBeforeCreatedTime($time)
     {
-        $sql = "delete FROM {$this->table} where created_time < ?";
+        $sql = "delete FROM {$this->table} where created_time < ? and status != ?";
 
-        return $this->db()->executeUpdate($sql, array($time));
+        return $this->db()->executeUpdate($sql, array($time, 'acquired'));
     }
 
     public function declares()
