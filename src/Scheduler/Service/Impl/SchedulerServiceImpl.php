@@ -117,7 +117,7 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         return true;
     }
 
-    public function deleteJobFired($keepDays)
+    public function deleteUnaccquiredJobFired($keepDays)
     {
         $startTime = strtotime("-{$keepDays} day", TimeMachine::time());
 

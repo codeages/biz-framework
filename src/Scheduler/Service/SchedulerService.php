@@ -12,7 +12,7 @@ interface SchedulerService
 
     public function deleteJob($id);
 
-    public function deleteJobFired($keepDays);
+    public function deleteUnaccquiredJobFired($keepDays);
 
     public function findJobFiredsByJobId($jobId);
 

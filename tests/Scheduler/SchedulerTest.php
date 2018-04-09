@@ -60,10 +60,10 @@ class SchedulerTest extends IntegrationTestCase
         $this->getSchedulerService()->register($job);
     }
 
-    public function testDeleteJobFired()
+    public function testDeleteUnaccquiredJobFired()
     {
         TimeMachine::setMockedTime(1521598571);
-        $jobFiredDao = $this->mockBiz(
+        $jobFiredDao = $this->mockObjectIntoBiz(
             'Scheduler:JobFiredDao',
             array(
                 array(
@@ -74,7 +74,7 @@ class SchedulerTest extends IntegrationTestCase
             )
         );
 
-        $result = $this->getSchedulerService()->deleteJobFired(1);
+        $result = $this->getSchedulerService()->deleteUnaccquiredJobFired(1);
         $jobFiredDao->shouldHaveReceived('deleteUnacquiredBeforeCreatedTime')->times(1);
         $this->assertEquals(1, $result);
     }
