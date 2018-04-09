@@ -52,6 +52,7 @@ class JobFiredDaoImpl extends GeneralDaoImpl implements JobFiredDao
                 'job_id = :job_id',
                 'status = :status',
                 'fired_time < :fired_time_LT',
+                'job_name = :job_name',
             ),
         );
     }
