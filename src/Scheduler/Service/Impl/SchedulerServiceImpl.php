@@ -10,6 +10,7 @@ use Codeages\Biz\Framework\Service\Exception\InvalidArgumentException;
 use Codeages\Biz\Framework\Service\Exception\ServiceException;
 use Codeages\Biz\Framework\Util\ArrayToolkit;
 use Codeages\Biz\Framework\Util\Lock;
+use Codeages\Biz\Framework\Util\TimeMachine;
 use Cron\CronExpression;
 
 class SchedulerServiceImpl extends BaseService implements SchedulerService
@@ -81,10 +82,11 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         $this->updateWaitingJobsToAcquired();
         do {
             $result = $this->runAcquiredJobs($initProcess['id']);
-        } while ($result);
+            $peak_memory = !function_exists('memory_get_peak_usage') ? 0 : memory_get_peak_usage();
+        } while ($result && $peak_memory < SchedulerService::JOB_MEMORY_LIMIT);
         $process['end_time'] = $this->getMillisecond();
         $process['cost_time'] = $process['end_time'] - $process['start_time'];
-        $process['peak_memory'] = !function_exists('memory_get_peak_usage') ? 0 : memory_get_peak_usage();
+        $process['peak_memory'] = $peak_memory;
 
         $this->updateJobProcess($initProcess['id'], $process);
     }
@@ -114,6 +116,13 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         $this->jobExecuted($jobFired, $result, $process);
 
         return true;
+    }
+
+    public function deleteUnacquiredJobFired($keepDays)
+    {
+        $startTime = strtotime("-{$keepDays} day", TimeMachine::time());
+
+        return $this->getJobFiredDao()->deleteUnacquiredBeforeCreatedTime($startTime);
     }
 
     public function findJobFiredsByJobId($jobId)
@@ -325,6 +334,7 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
             'fired_time' => $job['next_fire_time'],
             'status' => 'acquired',
             'job_detail' => $job,
+            'job_name' => $job['name'],
         );
         $jobFired = $this->getJobFiredDao()->create($jobFired);
         $jobFired['job_detail'] = $this->updateNextFireTime($job);
