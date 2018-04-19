@@ -115,6 +115,8 @@ class MetadataReader
         $content = "<?php \n return ".var_export($metadata, true).';';
 
         file_put_contents($filePath, $content);
+        $fs = new Filesystem();
+        $fs->chmod($filePath, 0777);
     }
 
     protected function getCacheFilePath($cacheDirectory, $dao)
