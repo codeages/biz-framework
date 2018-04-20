@@ -7,14 +7,11 @@ use Symfony\Component\Filesystem\Filesystem;
 
 class MetadataReader
 {
+    private $cacheDirectory;
+
     public function __construct($cacheDirectory = null)
     {
         $this->cacheDirectory = $cacheDirectory;
-        if ($cacheDirectory) {
-            $fs = new Filesystem();
-            $fs->mkdir($cacheDirectory);
-            $fs->chmod($cacheDirectory, 0777);
-        }
     }
 
     public function read($dao)
@@ -112,6 +109,7 @@ class MetadataReader
 
         $metadata['cached_time'] = time();
 
+        $this->makeCacheDirectory($this->cacheDirectory);
         $filePath = $this->getCacheFilePath($this->cacheDirectory, $dao);
         $content = "<?php \n return ".var_export($metadata, true).';';
 
@@ -126,5 +124,16 @@ class MetadataReader
         $filepath = $this->cacheDirectory.DIRECTORY_SEPARATOR.$filename;
 
         return $filepath;
+    }
+
+    protected function makeCacheDirectory($cacheDirectory)
+    {
+        $fs = new Filesystem();
+        if ($fs->exists($cacheDirectory)) {
+            return ;
+        }
+
+        $fs->mkdir($cacheDirectory);
+        $fs->chmod($cacheDirectory, 0777);
     }
 }
