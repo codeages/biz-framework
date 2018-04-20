@@ -13,6 +13,7 @@ class MetadataReader
         if ($cacheDirectory) {
             $fs = new Filesystem();
             $fs->mkdir($cacheDirectory);
+            $fs->chmod($cacheDirectory, 0777);
         }
     }
 
@@ -116,7 +117,7 @@ class MetadataReader
 
         file_put_contents($filePath, $content);
         $fs = new Filesystem();
-        $fs->chmod($filePath, 0777);
+        $fs->chmod($filePath, 0666);
     }
 
     protected function getCacheFilePath($cacheDirectory, $dao)
