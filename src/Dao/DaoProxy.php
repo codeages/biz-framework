@@ -353,6 +353,11 @@ class DaoProxy
 
             $row[$key] = $this->serializer->unserialize($method, $row[$key]);
         }
+
+        $idGenerator = $this->getIdGenerator();
+        if (isset($row['id']) && $idGenerator) {
+            $row['id'] = $idGenerator->decode($row['id']);
+        }
     }
 
     protected function unserializes(array &$rows)
