@@ -85,7 +85,7 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
             $peakMemory = !function_exists('memory_get_peak_usage') ? 0 : memory_get_peak_usage();
             $currentTime = $this->getMillisecond();
             $processUsedTime = (int) (($currentTime - $process['start_time']) / 1000);
-        } while ($result && $peakMemory < SchedulerService::JOB_MEMORY_LIMIT && $processUsedTime > $this->getMaxProcessExecTime());
+        } while ($result && $peakMemory < SchedulerService::JOB_MEMORY_LIMIT && $processUsedTime < $this->getMaxProcessExecTime());
         $process['end_time'] = $this->getMillisecond();
         $process['cost_time'] = $process['end_time'] - $process['start_time'];
         $process['peak_memory'] = $peakMemory;
