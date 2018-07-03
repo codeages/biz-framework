@@ -10,6 +10,7 @@ use Codeages\Biz\Framework\Service\Exception\InvalidArgumentException;
 use Codeages\Biz\Framework\Service\Exception\ServiceException;
 use Codeages\Biz\Framework\Util\ArrayToolkit;
 use Codeages\Biz\Framework\Util\Lock;
+use Codeages\Biz\Framework\Util\TimeMachine;
 use Cron\CronExpression;
 
 class SchedulerServiceImpl extends BaseService implements SchedulerService
@@ -81,10 +82,13 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         $this->updateWaitingJobsToAcquired();
         do {
             $result = $this->runAcquiredJobs($initProcess['id']);
-        } while ($result);
+            $peakMemory = !function_exists('memory_get_peak_usage') ? 0 : memory_get_peak_usage();
+            $currentTime = $this->getMillisecond();
+            $processUsedTime = (int) (($currentTime - $process['start_time']) / 1000);
+        } while ($result && $peakMemory < SchedulerService::JOB_MEMORY_LIMIT && $processUsedTime < $this->getMaxProcessExecTime());
         $process['end_time'] = $this->getMillisecond();
         $process['cost_time'] = $process['end_time'] - $process['start_time'];
-        $process['peak_memory'] = !function_exists('memory_get_peak_usage') ? 0 : memory_get_peak_usage();
+        $process['peak_memory'] = $peakMemory;
 
         $this->updateJobProcess($initProcess['id'], $process);
     }
@@ -116,6 +120,13 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         return true;
     }
 
+    public function deleteUnacquiredJobFired($keepDays)
+    {
+        $startTime = strtotime("-{$keepDays} day", TimeMachine::time());
+
+        return $this->getJobFiredDao()->deleteUnacquiredBeforeCreatedTime($startTime);
+    }
+
     public function findJobFiredsByJobId($jobId)
     {
         return $this->getJobFiredDao()->findByJobId($jobId);
@@ -140,6 +151,11 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         if (!empty($job)) {
             $this->deleteJob($job['id']);
         }
+    }
+
+    public function getJobByName($name)
+    {
+        return $this->getJobDao()->getByName($name);
     }
 
     public function createErrorLog($jobFired, $message, $trace)
@@ -325,6 +341,7 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
             'fired_time' => $job['next_fire_time'],
             'status' => 'acquired',
             'job_detail' => $job,
+            'job_name' => $job['name'],
         );
         $jobFired = $this->getJobFiredDao()->create($jobFired);
         $jobFired['job_detail'] = $this->updateNextFireTime($job);
@@ -446,6 +463,13 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         return $this->getJobProcessDao()->update($id, $process);
     }
 
+    public function updateJob($id, $fields)
+    {
+        $fields = ArrayToolkit::parts($fields, array('args', 'priority', 'pre_fire_time', 'next_fire_time', ' misfire_threshold', 'misfire_policy', 'enabled'));
+
+        return $this->getJobDao()->update($id, $fields);
+    }
+
     protected function getMillisecond()
     {
         list($t1, $t2) = explode(' ', microtime());
@@ -506,5 +530,10 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
     protected function getMaxRetryNum()
     {
         return $this->biz['scheduler.options']['max_retry_num'];
+    }
+
+    protected function getMaxProcessExecTime()
+    {
+        return $this->biz['scheduler.options']['max_process_exec_time'];
     }
 }

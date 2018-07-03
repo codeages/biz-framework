@@ -2,6 +2,34 @@
 
 ## [Unreleased]
 
+## [0.9.25] - 2018-06-14
+
+* `bin/bin` 控制台，优化载入 `autoload` 的方式。
+
+## [0.9.22] - 2018-05-02
+
+* UUID 模式下， Dao 输出 经过 decode 之后的 `id`。
+
+## [0.9.21] - 2018-04-21
+
+* 修复 Dao Metadata 缓存目录创建的问题。
+
+## [0.9.19] - 2018-04-26
+
+* 修复 Dao Metadata 缓存文件的权限问题。
+
+## [0.9.13] - 2018-03-02
+
+* 修复 Dao 的 `update` 方法，当主键`id`为UUID时，无法更新的问题。
+
+## [0.9.12] - 2018-02-24
+
+* Dao 的 `batchCreate` 方法支持 UUID。
+
+## [0.9.11] - 2018-02-22
+
+* Dao支持UUID，需PHP 5.5+。@see https://github.com/ramsey/uuid/wiki/Ramsey%5CUuid-Codecs
+
 ## [0.9.8] - 2018-01-10
 
 * 删除`Codeages\Biz\Framework\Context\CurrentUserInterface`接口，新增 `Codeages\Biz\Framework\Context\CurrentUser`类。
