@@ -42,7 +42,7 @@ class AnnotationInterceptor extends AbstractInterceptor
         if (!empty($this->interceptorData[$funcName])) {
             $log = $this->interceptorData[$funcName];
             $currentUser = $this->biz['user'];
-            $level = $log['level'];
+            $levelId = $log['levelId'];
             $targetType = $log['targetType'];
             $targetId = $log['targetId'];
             $context['@funcName'] = $funcName;
@@ -51,7 +51,7 @@ class AnnotationInterceptor extends AbstractInterceptor
             $context['@user_id'] = empty($currentUser['id']) ? 0 : $currentUser['id'];
             $context['@ip'] = empty($currentUser['currentIp']) ? '' : $currentUser['currentIp'];
             $message = $log['message'];
-            $this->getTargetlogService()->log($level, $targetType, $targetId, $message, $context);
+            $this->getTargetlogService()->log($levelId, $targetType, $targetId, $message, $context);
         }
     }
 

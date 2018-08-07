@@ -46,9 +46,9 @@ class Log
         }
     }
 
-    private function getLevelId($level)
+    public function getLevelId()
     {
-        switch ($level) {
+        switch ($this->level) {
             case self::DEBUG:
                 return 1;
                 break;
@@ -85,7 +85,7 @@ class Log
 
     public function getLevel()
     {
-        return $this->getLevelId($this->level);
+        return $this->level;
     }
 
     public function getAction()

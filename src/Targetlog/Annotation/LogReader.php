@@ -38,6 +38,7 @@ class LogReader
                 }
                 $log = array();
                 $log['level'] = $annotation->getLevel();
+                $log['levelId'] = $annotation->getLevelId();
                 $log['targetType'] = $annotation->getTargetType();
                 $log['targetId'] = $annotation->getTargetId();
                 $log['action'] = $annotation->getAction();
