@@ -24,12 +24,14 @@ class ServiceProxy
     {
         $beforeResult = array();
         foreach ($this->interceptorDatas as $interceptorName => $interceptorData) {
-            if (!empty($interceptorData[$funcName])) {
-                try {
-                    $beforeResult = $this->interceptors[$interceptorName]->beforeExec($funcName, $arguments);
-                } catch (\Exception $exception) {
-                    throw $exception;
-                }
+            if (empty($interceptorData[$funcName])) {
+                continue;
+            }
+
+            try {
+                $beforeResult = $this->interceptors[$interceptorName]->beforeExec($funcName, $arguments);
+            } catch (\Exception $exception) {
+                throw $exception;
             }
         }
 
