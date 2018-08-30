@@ -22,11 +22,20 @@ class LogReader
         if ($cache) {
             return $cache;
         }
-        $annotationReader = new AnnotationReader();
-        $annotationReader::addGlobalIgnoredName('before');
         $reflectClass = new \ReflectionClass($service);
         $interfaces = $reflectClass->getInterfaces();
 
+        $interceptorData = $this->handleInterface($interfaces);
+
+        $this->saveCache($service, $interceptorData);
+
+        return $interceptorData;
+    }
+
+    protected function handleInterface($interfaces)
+    {
+        $annotationReader = new AnnotationReader();
+        $annotationReader::addGlobalIgnoredName('before');
         foreach ($interfaces as $interfaceName => $interfaceObj) {
             $reflectInterface = new \ReflectionClass($interfaceName);
             $methods = $reflectInterface->getMethods();
@@ -47,9 +56,7 @@ class LogReader
             }
         }
 
-        $this->saveCache($service, $interceptorData);
-
-        return $interceptorData;
+        return empty($interceptorData) ? array() : $interceptorData;
     }
 
     protected function readCache($service)
