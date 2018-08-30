@@ -48,16 +48,21 @@ class Log
 
     public function getLevelId()
     {
-        switch ($this->level) {
-            case self::DEBUG:$levelId = 1; break;
-            case self::INFO:$levelId = 2; break;
-            case self::NOTICE:$levelId = 3; break;
-            case self::WARNING:$levelId = 4; break;
-            case self::ERROR:$levelId = 5; break;
-            case self::CRITICAL:$levelId = 6; break;
-            case self::ALERT:$levelId = 7; break;
-            case self::EMERGENCY:$levelId = 8; break;
-            default:$levelId = 1;
+        $levelArray = array(
+            self::DEBUG => 1,
+            self::INFO => 2,
+            self::NOTICE => 3,
+            self::WARNING => 4,
+            self::ERROR => 5,
+            self::CRITICAL => 6,
+            self::ALERT => 7,
+            self::EMERGENCY => 8,
+        );
+
+        if (array_key_exists($this->level, $levelArray)) {
+            $levelId = $levelArray[$this->level];
+        } else {
+            $levelId = 1;
         }
 
         return $levelId;
