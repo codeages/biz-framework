@@ -49,33 +49,18 @@ class Log
     public function getLevelId()
     {
         switch ($this->level) {
-            case self::DEBUG:
-                return 1;
-                break;
-            case self::INFO:
-                return 2;
-                break;
-            case self::NOTICE:
-                return 3;
-                break;
-            case self::WARNING:
-                return 4;
-                break;
-            case self::ERROR:
-                return 5;
-                break;
-            case self::CRITICAL:
-                return 6;
-                break;
-            case self::ALERT:
-                return 7;
-                break;
-            case self::EMERGENCY:
-                return 8;
-                break;
-            default:
-                return 1;
+            case self::DEBUG:$levelId = 1; break;
+            case self::INFO:$levelId = 2; break;
+            case self::NOTICE:$levelId = 3; break;
+            case self::WARNING:$levelId = 4; break;
+            case self::ERROR:$levelId = 5; break;
+            case self::CRITICAL:$levelId = 6; break;
+            case self::ALERT:$levelId = 7; break;
+            case self::EMERGENCY:$levelId = 8; break;
+            default:$levelId = 1;
         }
+
+        return $levelId;
     }
 
     public function getMessage()
