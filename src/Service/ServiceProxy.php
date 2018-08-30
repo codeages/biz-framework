@@ -29,7 +29,8 @@ class ServiceProxy
             }
 
             try {
-                $beforeResult = $this->interceptors[$interceptorName]->beforeExec($funcName, $arguments);
+                $interceptor = $this->interceptors[$interceptorName];
+                $beforeResult = $interceptor->beforeExec($funcName, $arguments);
             } catch (\Exception $exception) {
                 throw $exception;
             }
@@ -39,7 +40,8 @@ class ServiceProxy
 
         foreach ($this->interceptorDatas as $interceptorName => $interceptorData) {
             if (!empty($interceptorData[$funcName])) {
-                $this->interceptors[$interceptorName]->afterExec($funcName, $arguments, $result, $beforeResult);
+                $interceptor = $this->interceptors[$interceptorName];
+                $interceptor->afterExec($funcName, $arguments, $result, $beforeResult);
             }
         }
 
