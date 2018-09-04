@@ -16,9 +16,10 @@ $options = array(
         'host' => getenv('REDIS_HOST'),
     ),
     'debug' => true,
-    'log_dir' => __DIR__ . '/var/logs',
-    'run_dir' => __DIR__ . '/var/run',
-    'lock.flock.directory' => __DIR__ . '/var/run',
+    'log_dir' => __DIR__.'/var/logs',
+    'run_dir' => __DIR__.'/var/run',
+    'lock.flock.directory' => __DIR__.'/var/run',
+    'service_proxy_enabled' => true,
 );
 
 $biz = new Biz($options);
