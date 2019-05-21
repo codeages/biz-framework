@@ -81,7 +81,7 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         $process['start_time'] = $this->getMillisecond();
         $this->updateWaitingJobsToAcquired();
         do {
-            $result = $this->runAcquiredJobs($initProcess['id']);
+            $result = $this->runAcquiredJobs($initProcess);
             $peakMemory = !function_exists('memory_get_peak_usage') ? 0 : memory_get_peak_usage();
             $currentTime = $this->getMillisecond();
             $processUsedTime = (int) (($currentTime - $process['start_time']) / 1000);
@@ -93,14 +93,15 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         $this->updateJobProcess($initProcess['id'], $process);
     }
 
-    protected function runAcquiredJobs($processId)
+    protected function runAcquiredJobs($initProcess)
     {
         $result = '';
         $jobFired = $this->triggerJob();
         if (empty($jobFired)) {
             return false;
         }
-        $process['process_id'] = $processId;
+        $process['process_id'] = $initProcess['id'];
+        $process['pid'] = $initProcess['pid'];
         $process['start_time'] = $this->getMillisecond();
         $jobInstance = $this->createJobInstance($jobFired);
         try {
@@ -251,7 +252,10 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         $lock = new Lock($this->biz);
         $lockName = 'scheduler.job.trigger';
         try {
-            $lock->get($lockName, 20);
+            $result = $lock->get($lockName, 20);
+            if (!$result) {
+                return;
+            }
             $this->biz['db']->beginTransaction();
 
             $jobFired = $this->getAcquiredJob();
@@ -366,6 +370,8 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
             'status',
             'message',
             'trace',
+            'process_id',
+            'pid',
         ));
 
         if (!empty($jobFired['id'])) {
@@ -450,7 +456,7 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         ), array(), 0, 100);
 
         foreach ($jobFireds as $jobFired) {
-            if ($jobFired['job_detail']['name'] != 'Scheduler_MarkExecutingTimeoutJob') {
+            if ('Scheduler_MarkExecutingTimeoutJob' != $jobFired['job_detail']['name']) {
                 $this->markTimeout($jobFired);
             }
         }
