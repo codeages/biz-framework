@@ -28,7 +28,7 @@ class BizSessionHandler implements \SessionHandlerInterface
 
     public function destroy($session_id)
     {
-        $this->getSessionService()->deleteSessionBySessId($session_id);
+        $this->getSessionService()->deleteSessionBySessId($this->dealWithSessionId($session_id));
 
         return true;
     }
@@ -45,6 +45,7 @@ class BizSessionHandler implements \SessionHandlerInterface
 
     public function read($session_id)
     {
+        $session_id = $this->dealWithSessionId($session_id);
         $this->lockers[] = $this->getLock($session_id);
         if (!in_array($session_id, $this->lockers)) {
             $this->lockers[] = $session_id;
@@ -58,7 +59,7 @@ class BizSessionHandler implements \SessionHandlerInterface
     public function write($session_id, $session_data)
     {
         $unsavedSession = array(
-            'sess_id' => $session_id,
+            'sess_id' => $this->dealWithSessionId($session_id),
             'sess_data' => $session_data,
         );
         $this->getSessionService()->saveSession($unsavedSession);
@@ -83,5 +84,10 @@ class BizSessionHandler implements \SessionHandlerInterface
     private function getSessionService()
     {
         return $this->biz->service('Session:SessionService');
+    }
+
+    private function dealWithSessionId($sessionId)
+    {
+        return md5($sessionId);
     }
 }
