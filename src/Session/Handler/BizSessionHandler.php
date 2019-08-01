@@ -68,7 +68,7 @@ class BizSessionHandler implements \SessionHandlerInterface
 
     public function getLock($lockName, $lockTime = 30)
     {
-        $result = $this->biz['db']->fetchAssoc("SELECT GET_LOCK(?, ?) AS getLock", array('sess_'.$lockName, $lockName));
+        $result = $this->biz['db']->fetchAssoc("SELECT GET_LOCK(?, ?) AS getLock", array('sess_'.$lockName, $lockTime));
 
         return $result['getLock'];
     }
