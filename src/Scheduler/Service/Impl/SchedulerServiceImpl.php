@@ -154,6 +154,11 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         }
     }
 
+    public function getJob($id)
+    {
+        return $this->getJobDao()->get($id);
+    }
+
     public function getJobByName($name)
     {
         return $this->getJobDao()->getByName($name);
@@ -292,7 +297,7 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         return $this->getAcquiredJob();
     }
 
-    protected function updateNextFireTime($job)
+    public function updateNextFireTime($job)
     {
         if ($job['next_fire_time'] > time()) {
             return $job;

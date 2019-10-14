@@ -41,4 +41,10 @@ interface SchedulerService
     public function updateJobProcess($id, $process);
 
     public function updateJob($id, $fields);
+
+    public function getJobByName($name);
+
+    public function getJob($id);
+
+    public function updateNextFireTime($job);
 }
