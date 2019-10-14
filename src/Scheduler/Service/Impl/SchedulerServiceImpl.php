@@ -297,7 +297,7 @@ class SchedulerServiceImpl extends BaseService implements SchedulerService
         return $this->getAcquiredJob();
     }
 
-    public function updateNextFireTime($job)
+    protected function updateNextFireTime($job)
     {
         if ($job['next_fire_time'] > time()) {
             return $job;

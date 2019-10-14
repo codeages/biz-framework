@@ -45,6 +45,4 @@ interface SchedulerService
     public function getJobByName($name);
 
     public function getJob($id);
-
-    public function updateNextFireTime($job);
 }
