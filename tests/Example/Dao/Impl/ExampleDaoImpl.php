@@ -2,9 +2,13 @@
 
 namespace Tests\Example\Dao\Impl;
 
+use Codeages\Biz\Framework\Dao\Annotation\CacheStrategy;
 use Codeages\Biz\Framework\Dao\GeneralDaoImpl;
 use Tests\Example\Dao\ExampleDao;
 
+/**
+ * @CacheStrategy("Row")
+ */
 class ExampleDaoImpl extends GeneralDaoImpl implements ExampleDao
 {
     protected $table = 'example';
@@ -44,7 +48,7 @@ class ExampleDaoImpl extends GeneralDaoImpl implements ExampleDao
                 'json_serialize_value' => 'json',
                 'delimiter_serialize_value' => 'delimiter',
             ),
-            'orderbys' => array('name', 'created_time'),
+            'orderbys' => array('name', 'created_time', 'updated_time'),
             'conditions' => array(
                 'name = :name',
                 'name pre_LIKE :pre_like',
