@@ -19,15 +19,15 @@ class ClearExpireCache
     }
 
     /**
-     * @param $clearDao [ ['class' => daoImpl::class, 'isMillisecond' => boolean], ... ]
+     * @param $clearDaos [ ['class' => daoImpl::class, 'isMillisecond' => boolean, 'updatedTimeColumn' => 'updatedTime'], ... ]
      * @return array
      */
-    public function clear($clearDao)
+    public function clear($clearDaos)
     {
         $clearedCount = array();
 
-        foreach ($clearDao as $dao) {
-            $clearedCount[$dao['class']] = $this->clearDaoCache($dao['class'], $dao['isMillisecond'], isset($dao['updatedTimeColumn']) ? $dao['updatedTimeColumn'] : 'updatedTime');
+        foreach ($clearDaos as $dao) {
+            $clearedCount[$dao['class']] = $this->clearDaoCache($dao['class'], $dao['isMillisecond'], $dao['updatedTimeColumn']);
         }
 
         return $clearedCount;
