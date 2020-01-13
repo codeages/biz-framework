@@ -429,4 +429,16 @@ class GeneralDaoImplTest extends IntegrationTestCase
 
         $dao->search(array('name' => 'test2'), array(), 0, 10, array('* from example;#'));
     }
+
+    public function testPickIdAndUpdatedTimesByUpdatedTimeGT()
+    {
+        $dao = $this->biz->dao('Example:ExampleDao');
+
+        $dao->create(array('name' => 'test1', 'ids1' => array('1111'), 'ids2' => array('1111')));
+        $results = $dao->pickIdAndUpdatedTimesByUpdatedTimeGT(time() - 60*60, 0, 1000, 'updated_time');
+        $this->assertCount(1, $results);
+        $dao->create(array('name' => 'test2', 'ids1' => array('2222'), 'ids2' => array('2222')));
+        $results = $dao->pickIdAndUpdatedTimesByUpdatedTimeGT(time() - 60*60, 0, 1000, 'updated_time');
+        $this->assertCount(2, $results);
+    }
 }

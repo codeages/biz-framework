@@ -299,4 +299,12 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
             throw $this->createDaoException("SQL order by direction is only allowed `ASC`, `DESC`, but you give `{$sort}`.");
         }
     }
+
+    public function pickIdAndUpdatedTimesByUpdatedTimeGT($timestamp, $start, $limit, $updatedTimeColumn = 'updatedTime')
+    {
+        return $this->db()->fetchAll(
+            $this->sql("SELECT id, {$updatedTimeColumn} FROM {$this->table()} WHERE {$updatedTimeColumn} > ?", array($updatedTimeColumn => 'ASC'), $start, $limit),
+            array($timestamp)
+        );
+    }
 }
