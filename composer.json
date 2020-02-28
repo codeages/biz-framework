@@ -31,7 +31,8 @@
         "monolog/monolog": "^1.20",
         "codeages/symfony-lock-lite": "^1.0",
         "symfony/polyfill-php55": "^1.4",
-        "vlucas/valitron": "^1.4"
+        "vlucas/valitron": "^1.4",
+        "ramsey/uuid": "^2.9|^3.9"
     },
     "require-dev": {
         "mockery/mockery": "^0.9.9",
