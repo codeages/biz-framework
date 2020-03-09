@@ -2,6 +2,7 @@
 
 namespace Tests\Example\Dao\Impl;
 
+use Codeages\Biz\Framework\Dao\Annotation\RowCache;
 use Codeages\Biz\Framework\Dao\GeneralDaoImpl;
 
 class Example4DaoImpl extends GeneralDaoImpl
@@ -13,6 +14,12 @@ class Example4DaoImpl extends GeneralDaoImpl
         return $this->search(array('name' => $name), array('created' => 'DESC'), $start, $limit);
     }
 
+    /**
+     * @param $name
+     * @param $id
+     * @return mixed[]
+     * @RowCache()
+     */
     public function findByNameAndId($name, $id)
     {
         return $this->findByFields(array('name' => $name, 'id' => $id));

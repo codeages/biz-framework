@@ -43,9 +43,20 @@ class DaoProxy
     public function __call($method, $arguments)
     {
         $proxyMethod = $this->getProxyMethod($method);
+
         if ($proxyMethod) {
             return $this->$proxyMethod($method, $arguments);
         } else {
+            //除了默认内置函数，其余缓存策略如果有标记则手动命中缓存
+            $metadata = $this->metadataReader->read($this->dao);
+            $annoData = $metadata['cache_key_of_arg_index'];
+            if (!empty($annoData) && isset($annoData[$method])) {
+                $strategy = $this->getCacheStrategyFromAnnotation($this->dao);
+                $cache = $strategy->beforeQuery($this->dao, $method, $arguments);
+                if (false !== $cache) {
+                    return $cache;
+                }
+            }
             return $this->callRealDao($method, $arguments);
         }
     }
@@ -72,7 +83,7 @@ class DaoProxy
     {
         $lastArgument = end($arguments);
         reset($arguments);
-        
+
         // lock模式下，因为需要借助mysql的锁，不走cache
         if (is_array($lastArgument) && isset($lastArgument['lock']) && true === $lastArgument['lock']) {
             $row = $this->callRealDao($method, $arguments);
@@ -417,9 +428,10 @@ class DaoProxy
 
         $declares = $this->dao->declares();
 
-        // 未指定 cache 策略，则使用默认策略
+        // 未指定cache策略，则不使用策略，这个和以前不一致
         if (!isset($declares['cache'])) {
-            return $this->container['dao.cache.strategy.default'];
+            return null;
+//            return $this->container['dao.cache.strategy.default'];
         }
 
         // 针对某个 Dao 关闭 Cache
