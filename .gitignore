@@ -9,3 +9,6 @@
 .sonar/
 .idea/
 /var
+/bin
+!/bin/biz
+!/bin/fix
