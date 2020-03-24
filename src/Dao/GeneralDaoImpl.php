@@ -80,14 +80,20 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
             ->setMaxResults($limit);
 
         $this->addSelect($builder, $columns);
+        $builder = $this->checkAndAddOrders($builder, $orderBys);
 
+        return $builder->execute()->fetchAll();
+    }
+
+    protected function checkAndAddOrders($builder, $orderBys)
+    {
         $declares = $this->declares();
         foreach ($orderBys ?: array() as $order => $sort) {
             $this->checkOrderBy($order, $sort, $declares['orderbys']);
             $builder->addOrderBy($order, $sort);
         }
 
-        return $builder->execute()->fetchAll();
+        return $builder;
     }
 
     private function addSelect(DynamicQueryBuilder $builder, $columns)
