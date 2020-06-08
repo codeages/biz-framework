@@ -2,9 +2,9 @@
 
 namespace Codeages\Biz\Framework\Dao;
 
-use Doctrine\DBAL\Connection as DoctrineConnection;
+use Doctrine\DBAL\Connections\MasterSlaveConnection as DoctrineMasterSlaveConnection;
 
-class Connection extends DoctrineConnection
+class MasterSlaveConnection extends DoctrineMasterSlaveConnection
 {
     public function update($tableExpression, array $data, array $identifier, array $types = array())
     {
@@ -31,15 +31,18 @@ class Connection extends DoctrineConnection
         return true;
     }
 
-    public function getLock($statement, array $params = [], array $types = [])
+    public function getLock($statement, array $params = array(), array $types = array())
     {
-        $result = parent::fetchAssoc($statement, $params, $types);
+        $this->connect('master');
 
+        $result = parent::fetchAssoc($statement, $params, $types);
         return $result['getLock'];
     }
 
     public function releaseLock($statement, array $params = array(), array $types = array())
     {
+        $this->connect('master');
+
         $result = parent::fetchAssoc($statement, $params, $types);
         return $result['releaseLock'];
     }

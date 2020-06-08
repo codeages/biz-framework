@@ -16,16 +16,12 @@ class Lock
 
     public function get($lockName, $lockTime = 30)
     {
-        $result = $this->getConnection()->fetchAssoc("SELECT GET_LOCK(?,?) AS getLock", array('locker_'.$lockName, $lockTime));
-
-        return $result['getLock'];
+        return $this->getConnection()->getLock("SELECT GET_LOCK(?,?) AS getLock", array('locker_' . $lockName, $lockTime));
     }
 
     public function release($lockName)
     {
-        $result = $this->getConnection()->fetchAssoc("SELECT RELEASE_LOCK(?) AS releaseLock", array('locker_'.$lockName));
-
-        return $result['releaseLock'];
+        return $this->getConnection()->releaseLock("SELECT RELEASE_LOCK(?) AS releaseLock", array('locker_' . $lockName));
     }
 
     protected function getConnection()
