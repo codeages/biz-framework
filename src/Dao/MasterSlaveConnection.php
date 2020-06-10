@@ -3,6 +3,8 @@
 namespace Codeages\Biz\Framework\Dao;
 
 use Doctrine\DBAL\Connections\MasterSlaveConnection as DoctrineMasterSlaveConnection;
+use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Driver\Connection as DriverConnection;
 
 class MasterSlaveConnection extends DoctrineMasterSlaveConnection
 {
@@ -29,6 +31,36 @@ class MasterSlaveConnection extends DoctrineMasterSlaveConnection
         }
 
         return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function query()
+    {
+        $this->connect('master');
+        assert($this->_conn instanceof DriverConnection);
+
+        $args = func_get_args();
+
+        $logger = $this->getConfiguration()->getSQLLogger();
+        if ($logger) {
+            $logger->startQuery($args[0]);
+        }
+
+        try {
+            $statement = $this->_conn->query(array($this->_conn, 'query'), $args);
+        } catch (Throwable $ex) {
+            throw DBALException::driverExceptionDuringQuery($this->_driver, $ex, $args[0]);
+        }
+
+        $statement->setFetchMode($this->defaultFetchMode);
+
+        if ($logger) {
+            $logger->stopQuery();
+        }
+
+        return $statement;
     }
 
     public function getLock($statement, array $params = array(), array $types = array())
