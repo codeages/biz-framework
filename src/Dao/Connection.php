@@ -31,6 +31,11 @@ class Connection extends DoctrineConnection
         return true;
     }
 
+    public function fetchLockAssoc($statement, array $params = [], array $types = [])
+    {
+        return parent::fetchAssoc($statement, $params, $types);
+    }
+
     public function getLock($statement, array $params = [], array $types = [])
     {
         $result = parent::fetchAssoc($statement, $params, $types);

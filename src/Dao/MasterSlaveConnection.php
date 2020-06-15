@@ -5,6 +5,7 @@ namespace Codeages\Biz\Framework\Dao;
 use Doctrine\DBAL\Connections\MasterSlaveConnection as DoctrineMasterSlaveConnection;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Driver\Connection as DriverConnection;
+use Throwable;
 
 class MasterSlaveConnection extends DoctrineMasterSlaveConnection
 {
@@ -49,7 +50,7 @@ class MasterSlaveConnection extends DoctrineMasterSlaveConnection
         }
 
         try {
-            $statement = $this->_conn->query(array($this->_conn, 'query'), $args);
+            $statement = call_user_func_array(array($this->_conn, 'query'), $args);
         } catch (Throwable $ex) {
             throw DBALException::driverExceptionDuringQuery($this->_driver, $ex, $args[0]);
         }
@@ -62,6 +63,14 @@ class MasterSlaveConnection extends DoctrineMasterSlaveConnection
 
         return $statement;
     }
+
+    public function fetchLockAssoc($statement, array $params = [], array $types = [])
+    {
+        $this->connect('master');
+
+        return parent::fetchAssoc($statement, $params, $types);
+    }
+
 
     public function getLock($statement, array $params = array(), array $types = array())
     {
