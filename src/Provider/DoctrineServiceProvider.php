@@ -38,6 +38,10 @@ class DoctrineServiceProvider implements ServiceProviderInterface
             'wrapperClass' => 'Codeages\Biz\Framework\Dao\Connection',
         );
 
+        if (!empty($app['db.options']['slaves'])) {
+            $app['db.default_options'] = array_merge($app['db.default_options'], array('wrapperClass' => 'Codeages\Biz\Framework\Dao\MasterSlaveConnection'));
+        }
+
         $app['dbs.options.initializer'] = $app->protect(function () use ($app) {
             static $initialized = false;
 

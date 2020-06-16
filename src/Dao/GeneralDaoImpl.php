@@ -70,6 +70,10 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
         $lock = isset($options['lock']) && true === $options['lock'];
         $sql = "SELECT * FROM {$this->table()} WHERE id = ?".($lock ? ' FOR UPDATE' : '');
 
+        if ($lock){
+            $this->db()->connect('master');
+        }
+
         return $this->db()->fetchAssoc($sql, array($id)) ?: null;
     }
 
@@ -200,9 +204,6 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
         return $this->table;
     }
 
-    /**
-     * @return Connection
-     */
     public function db()
     {
         return $this->biz['db'];
