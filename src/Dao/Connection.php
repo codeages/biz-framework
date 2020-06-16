@@ -31,24 +31,6 @@ class Connection extends DoctrineConnection
         return true;
     }
 
-    public function fetchLockAssoc($statement, array $params = [], array $types = [])
-    {
-        return parent::fetchAssoc($statement, $params, $types);
-    }
-
-    public function getLock($statement, array $params = [], array $types = [])
-    {
-        $result = parent::fetchAssoc($statement, $params, $types);
-
-        return $result['getLock'];
-    }
-
-    public function releaseLock($statement, array $params = array(), array $types = array())
-    {
-        $result = parent::fetchAssoc($statement, $params, $types);
-        return $result['releaseLock'];
-    }
-
     public function transactional(\Closure $func, \Closure $exceptionFunc = null)
     {
         $this->beginTransaction();
