@@ -43,7 +43,10 @@ class BizTest extends TestCase
     public function testBoot()
     {
         $biz = new Biz();
-        $biz->boot();
+        // firstBoot no return
+        $this->assertEquals(null, $biz->boot());
+
+        // reBoot no error no return
         $biz->boot();
     }
 
