@@ -32,7 +32,7 @@ class OnlineDaoImpl extends GeneralDaoImpl implements OnlineDao
                 'active_time > :active_time_GT',
                 'is_login = :is_login',
                 'user_id = :user_id',
-                'user_id IN ( :userIds )'
+                'user_id IN ( :user_ids )'
             ),
         );
     }
