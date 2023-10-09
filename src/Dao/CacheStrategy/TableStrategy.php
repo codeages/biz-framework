@@ -7,6 +7,7 @@ use Codeages\Biz\Framework\Dao\GeneralDaoInterface;
 
 /**
  * 表级别缓存策略.
+ * @deprecated
  */
 class TableStrategy implements CacheStrategy
 {
