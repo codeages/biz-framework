@@ -2,6 +2,7 @@
 
 namespace Tests\Cache;
 
+use Codeages\Biz\Framework\Cache\NamespacedCacheManager;
 use Codeages\Biz\Framework\Context\Biz;
 use Codeages\Biz\Framework\Service\Exception\ServiceException;
 
@@ -12,8 +13,6 @@ class ExampleUserServiceImpl
      */
     private $biz;
 
-    private const CACHE_NS = 'user';
-
     private $users = [
         ['id' => 1, 'username' => 'user_1', 'lastLoginIp' => '192.168.1.1', ],
         ['id' => 2, 'username' => 'user_2', 'lastLoginIp' => '192.168.1.2', ],
@@ -21,11 +20,17 @@ class ExampleUserServiceImpl
     ];
 
     /**
+     * @var NamespacedCacheManager
+     */
+    private $cache;
+
+    /**
      * @param Biz $biz
      */
     public function __construct(Biz $biz)
     {
         $this->biz = $biz;
+        $this->cache = new NamespacedCacheManager($biz['cache'], 'user');
     }
 
     public function getById($id)
@@ -50,7 +55,7 @@ class ExampleUserServiceImpl
 
     public function getByIdCached($id)
     {
-        return $this->biz['cache']->getById(self::CACHE_NS, $id, function () use ($id) {
+        return $this->cache->getById($id, function () use ($id) {
             $user = $this->getById($id);
             return array_filter_keys($user, [ 'id', 'username',]);
         });
@@ -58,7 +63,7 @@ class ExampleUserServiceImpl
 
     public function getByUsernameCached($username)
     {
-        return $this->biz['cache']->getByRef(self::CACHE_NS, "username_$username", function () use ($username) {
+        return $this->cache->getByRef("username_$username", function () use ($username) {
             $user = $this->getByUsername($username);
             return array_filter_keys($user, [ 'id', 'username',]);
         });
@@ -82,7 +87,7 @@ class ExampleUserServiceImpl
 
         $this->users[] = $registered;
 
-        $this->biz['cache']->del(self::CACHE_NS, [
+        $this->cache->del([
             // 因为 CacheManager会缓存 null 值，所以我们这里新用户的 id 也需要清除缓存
             'id' => [$registered['id'],],
             'key' => [
@@ -130,7 +135,7 @@ class ExampleUserServiceImpl
             }
         }
 
-        $this->biz['cache']->del(self::CACHE_NS, [
+        $this->cache->del([
             'id' => $id,
             'key' => [
                 // 删除老的用户名的Cache
@@ -148,7 +153,7 @@ class ExampleUserServiceImpl
      */
     public function getTop10LatestLoginUsers()
     {
-        return $this->biz['cache']->get(self::CACHE_NS, 'top10LatestLoginUsers', function () {
+        return $this->cache->get('top10LatestLoginUsers', function () {
             $users = $this->users;
             return array_walk_transform($users, function ($user) {
                 return array_filter_keys($user, [ 'id', 'username',]);
