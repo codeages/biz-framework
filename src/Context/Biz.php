@@ -2,6 +2,7 @@
 
 namespace Codeages\Biz\Framework\Context;
 
+use Codeages\Biz\Framework\Cache\CacheManager;
 use Codeages\Biz\Framework\Dao\Annotation\MetadataReader;
 use Codeages\Biz\Framework\Dao\DaoProxy;
 use Codeages\Biz\Framework\Dao\FieldSerializer;
@@ -121,6 +122,19 @@ class Biz extends Container
 
         $biz['lock.factory'] = function ($biz) {
             return new \Symfony\Component\Lock\Factory($biz['lock.store']);
+        };
+
+        $biz['cache.enabled'] = true;
+        $biz['cache.default_ttl'] = 3600 * 2; // 2 小时
+        $biz['cache'] = function ($biz) {
+            if (isset($biz['redis'])) {
+                return new CacheManager($biz['redis'], [
+                    'enabled' =>$biz['cache.enabled'],
+                    'ttl' =>$biz['cache.default_ttl'],
+                ]);
+            } else {
+                return new CacheManager(null, ['enabled' => false]);
+            }
         };
 
         foreach ($values as $key => $value) {
