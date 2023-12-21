@@ -102,6 +102,7 @@ class Worker
     {
         $this->registerTimeoutHandler($job);
 
+        $result = null;
         try {
             $result = $job->execute();
         } catch (\Exception $e) {
