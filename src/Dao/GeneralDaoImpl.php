@@ -149,6 +149,12 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
                 ->setParameter($key, $value);
         }
 
+        $queryParts = $builder->getQueryParts();
+
+        if (empty($queryParts['where'])) {
+            throw $this->createDaoException('Update Where Cannot be null');
+        }
+
         return $builder->execute();
     }
 
