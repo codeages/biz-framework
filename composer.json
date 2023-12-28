@@ -42,7 +42,7 @@
       "bin-dir": "bin"
     },
     "suggest": {
-      "ext-redis": "*",
+      "ext-redis": "*"
     },
     "bin": ["bin/biz"]
 }
