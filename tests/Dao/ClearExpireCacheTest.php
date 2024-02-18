@@ -8,7 +8,7 @@ use Tests\Example\Dao\Impl\ExampleDaoImpl;
 
 class ClearExpireCacheTest extends IntegrationTestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
     }

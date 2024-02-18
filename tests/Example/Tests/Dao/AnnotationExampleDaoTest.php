@@ -18,7 +18,7 @@ class AnnotationExampleDaoTest extends IntegrationTestCase
      */
     protected $rows;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->biz['dao.cache.enabled'] = true;

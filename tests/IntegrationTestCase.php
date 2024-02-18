@@ -42,7 +42,7 @@ class IntegrationTestCase extends TestCase
      */
     protected $redis;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->biz = $this->createBiz();
         $this->db = $this->biz['db'];
@@ -53,7 +53,7 @@ class IntegrationTestCase extends TestCase
         $this->redis->flushDB();
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         $this->db->rollBack();
         $this->redis->close();

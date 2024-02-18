@@ -2,11 +2,16 @@
 
 namespace Tests;
 
+use Codeages\Biz\Framework\Dao\DaoException;
+use Codeages\Biz\Framework\Dao\GeneralDaoImpl;
+use Codeages\Biz\Framework\Dao\GeneralDaoInterface;
+use Tests\Example\Dao\ExampleDao;
+
 class GeneralDaoImplTest extends IntegrationTestCase
 {
     const NOT_EXIST_ID = 9999;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
     }
@@ -24,7 +29,7 @@ class GeneralDaoImplTest extends IntegrationTestCase
     public function testUpdateByNameAndCode()
     {
         foreach ($this->getTestDao() as $dao) {
-            $dao = $this->biz->dao($dao);
+            $dao = $this->getDao($dao);
             $row = $dao->create([
                 'name' => 'test1',
                 'code' => 'test1',
@@ -47,7 +52,7 @@ class GeneralDaoImplTest extends IntegrationTestCase
 
     private function get($dao)
     {
-        $dao = $this->biz->dao($dao);
+        $dao = $this->getDao($dao);
         $row = $dao->create([
             'name' => 'test1',
         ]);
@@ -68,7 +73,7 @@ class GeneralDaoImplTest extends IntegrationTestCase
 
     private function create($dao)
     {
-        $dao = $this->biz->dao($dao);
+        $dao = $this->getDao($dao);
 
         $fields = [
             'name' => 'test1',
@@ -98,7 +103,7 @@ class GeneralDaoImplTest extends IntegrationTestCase
 
     private function update($dao)
     {
-        $dao = $this->biz->dao($dao);
+        $dao = $this->getDao($dao);
 
         $row = $dao->create([
             'name' => 'test1',
@@ -130,7 +135,7 @@ class GeneralDaoImplTest extends IntegrationTestCase
 
     private function delete($dao)
     {
-        $dao = $this->biz->dao($dao);
+        $dao = $this->getDao($dao);
 
         $row = $dao->create([
             'name' => 'test1',
@@ -150,7 +155,7 @@ class GeneralDaoImplTest extends IntegrationTestCase
 
     public function wave($dao)
     {
-        $dao = $this->biz->dao($dao);
+        $dao = $this->getDao($dao);
 
         $row = $dao->create([
             'name' => 'test1',
@@ -176,29 +181,21 @@ class GeneralDaoImplTest extends IntegrationTestCase
     public function testLikeSearch()
     {
         foreach ($this->getTestDao() as $dao) {
-            $this->search($dao);
+            $this->search($this->getDao($dao));
         }
     }
 
     private function search($dao)
     {
-        $dao = $this->biz->dao($dao);
-
         $dao->create(['name' => 'pre_test1']);
-        sleep(1);
         $dao->create(['name' => 'pre_test2']);
-        sleep(1);
-        $dao->create(['name' => 'test3_suf']);
-        sleep(1);
+        $dao->create(['name' => 'test3_suf' ]);
         $dao->create(['name' => 'test4_suf']);
-        sleep(1);
         $dao->create(['name' => 'test5']);
 
-        $preNames = $dao->search(['pre_like' => 'pre_'], ['created_time' => 'desc'], 0, 100);
-
-        $sufNames = $dao->search(['suf_name' => '_suf'], ['created_time' => 'desc'], 0, 100);
-
-        $likeNames = $dao->search(['like_name' => 'test'], ['created_time' => 'desc'], 0, 100);
+        $preNames = $dao->search(['pre_like' => 'pre_'], ['name'=>'desc'], 0, 100);
+        $sufNames = $dao->search(['suf_name' => '_suf'], ['name'=>'desc'], 0, 100);
+        $likeNames = $dao->search(['like_name' => 'test'], ['name'=>'desc'], 0, 100);
 
         $this->assertCount(2, $preNames);
         $this->assertCount(2, $sufNames);
@@ -210,7 +207,7 @@ class GeneralDaoImplTest extends IntegrationTestCase
 
     public function testInSearch()
     {
-        $dao = $this->biz->dao('Example:ExampleDao');
+        $dao = $this->getExampleDao();
 
         $tmp1 = $dao->create(['name' => 'pre_test1']);
         $dao->create(['name' => 'pre_test2']);
@@ -235,7 +232,8 @@ class GeneralDaoImplTest extends IntegrationTestCase
 
     private function daoCount($dao)
     {
-        $dao = $this->biz->dao($dao);
+        $alias = $dao;
+        $dao = $this->getDao($alias);
 
         $dao->create(['name' => 'test1']);
         $dao->create(['name' => 'test2']);
@@ -248,7 +246,7 @@ class GeneralDaoImplTest extends IntegrationTestCase
 
     public function testFindInFields()
     {
-        $dao = $this->biz->dao('Example:ExampleDao');
+        $dao = $this->getExampleDao();
 
         $dao->create(['name' => 'test1', 'ids1' => ['1111'], 'ids2' => ['1111']]);
         $dao->create(['name' => 'test1', 'ids1' => ['1111'], 'ids2' => ['2222']]);
@@ -267,7 +265,7 @@ class GeneralDaoImplTest extends IntegrationTestCase
 
     public function transactional($dao)
     {
-        $dao = $this->biz->dao($dao);
+        $dao = $this->getDao($dao);
 
         $result = $dao->db()->transactional(function () {
             return 1;
@@ -278,40 +276,32 @@ class GeneralDaoImplTest extends IntegrationTestCase
 
     public function testNullValueUnserializer()
     {
-        $dao = $this->biz->dao('Example:ExampleDao');
+        $dao = $this->getExampleDao();
 
         $row = $dao->create(['name' => 'test1']);
 
         $result = $dao->get($row['id']);
-        $this->assertInternalType('array', $result['null_value']);
+        $this->assertIsArray($result['null_value']);
     }
 
-    /**
-     * @expectedException \Codeages\Biz\Framework\Dao\DaoException
-     */
     public function testOrderBysInject()
     {
-        /**
-         * @var ExampleDao
-         */
-        $dao = $this->biz->dao('Example:ExampleDao');
+        $dao = $this->getExampleDao();
 
+        $this->expectException(DaoException::class);
         $row = $dao->create(['name' => 'test1']);
 
+        $this->expectException(DaoException::class);
         $dao->findByIds([1], ['; SELECT * FROM example'], 0, 10);
 
-        $dao->findByIds([1], ['id' => '; SELECT * FROM example']);
+        $this->expectException(DaoException::class);
+        $dao->findByIds([1], ['id' => '; SELECT * FROM example'], 0, 10);
     }
 
-    /**
-     * @expectedException \Codeages\Biz\Framework\Dao\DaoException
-     */
     public function testStartInject()
     {
-        /**
-         * @var ExampleDao
-         */
-        $dao = $this->biz->dao('Example:ExampleDao');
+        $this->expectException(DaoException::class);
+        $dao = $this->getExampleDao();
 
         $row = $dao->create(['name' => 'test1']);
 
@@ -319,15 +309,10 @@ class GeneralDaoImplTest extends IntegrationTestCase
         $dao->findByIds([1], ['created_time' => 'desc'], 0, "; UPDATE example SET name = 'inject' WHERE id = 1");
     }
 
-    /**
-     * @expectedException \Codeages\Biz\Framework\Dao\DaoException
-     */
     public function testLimitInject()
     {
-        /**
-         * @var ExampleDao
-         */
-        $dao = $this->biz->dao('Example:ExampleDao');
+        $this->expectException(DaoException::class);
+        $dao = $this->getExampleDao();
 
         $row = $dao->create(['name' => 'test1']);
         $dao->findByIds([1], ['created_time' => 'desc'], 0, "; UPDATE example SET name = 'inject' WHERE id = 1");
@@ -335,10 +320,7 @@ class GeneralDaoImplTest extends IntegrationTestCase
 
     public function testNonInject()
     {
-        /**
-         * @var ExampleDao
-         */
-        $dao = $this->biz->dao('Example:ExampleDao');
+        $dao = $this->getExampleDao();
 
         $row1 = $dao->create(['name' => 'testNonInject_1']);
 
@@ -353,29 +335,19 @@ class GeneralDaoImplTest extends IntegrationTestCase
         $this->assertCount(2, $result);
     }
 
-    /**
-     * @expectedException \Codeages\Biz\Framework\Dao\DaoException
-     */
     public function testOnlySetStart()
     {
-        /**
-         * @var ExampleDao
-         */
-        $dao = $this->biz->dao('Example:ExampleDao');
+        $this->expectException(DaoException::class);
+        $dao = $this->getExampleDao();
 
         $row = $dao->create(['name' => 'test1']);
         $result = $dao->findByIds([1, 2], ['created_time' => 'desc'], '0', null);
     }
 
-    /**
-     * @expectedException \Codeages\Biz\Framework\Dao\DaoException
-     */
     public function testOnlySetLimit()
     {
-        /**
-         * @var ExampleDao
-         */
-        $dao = $this->biz->dao('Example:ExampleDao');
+        $this->expectException(DaoException::class);
+        $dao = $this->getExampleDao();
 
         $row = $dao->create(['name' => 'test1']);
         $result = $dao->findByIds([1, 2], ['created_time' => 'desc'], null, 10);
@@ -383,10 +355,7 @@ class GeneralDaoImplTest extends IntegrationTestCase
 
     public function testSerializes()
     {
-        /**
-         * @var ExampleDao
-         */
-        $dao = $this->biz->dao('Example:ExampleDao');
+        $dao = $this->getExampleDao();
 
         $row = $dao->create([
             'name' => 'test1',
@@ -396,7 +365,7 @@ class GeneralDaoImplTest extends IntegrationTestCase
         ]);
 
         foreach (['php', 'json'] as $key) {
-            $this->assertEquals($row[$key.'_serialize_value']['value'], "i_am_{$key}_serialized_value");
+            $this->assertEquals($row[$key . '_serialize_value']['value'], "i_am_{$key}_serialized_value");
         }
 
         $this->assertEquals($row['delimiter_serialize_value'], ['i_am_delimiter_serialized_value']);
@@ -404,14 +373,11 @@ class GeneralDaoImplTest extends IntegrationTestCase
 
     public function testSearchWithColumns()
     {
-        /** @var \Tests\Example\Dao\ExampleDao $dao */
-        $dao = $this->biz->dao('Example:ExampleDao');
+        $this->getExampleDao()->create(['name' => 'test1', 'ids1' => ['1111'], 'ids2' => ['1111']]);
+        $this->getExampleDao()->create(['name' => 'test1', 'ids1' => ['2222'], 'ids2' => ['2222']]);
+        $this->getExampleDao()->create(['name' => 'test2', 'ids1' => ['3333'], 'ids2' => ['3333']]);
 
-        $dao->create(['name' => 'test1', 'ids1' => ['1111'], 'ids2' => ['1111']]);
-        $dao->create(['name' => 'test1', 'ids1' => ['2222'], 'ids2' => ['2222']]);
-        $dao->create(['name' => 'test2', 'ids1' => ['3333'], 'ids2' => ['3333']]);
-
-        $results = $dao->search(['name' => 'test2'], [], 0, 10, ['name', 'ids1']);
+        $results = $this->getExampleDao()->search(['name' => 'test2'], [], 0, 10, ['name', 'ids1']);
         $this->assertCount(1, $results);
         $this->assertEquals(
             ['name' => 'test2', 'ids1' => ['3333']],
@@ -419,20 +385,15 @@ class GeneralDaoImplTest extends IntegrationTestCase
         );
     }
 
-    /**
-     * @expectedException \Codeages\Biz\Framework\Dao\DaoException
-     */
     public function testSearchWithErrorColumns()
     {
-        /** @var \Tests\Example\Dao\ExampleDao $dao */
-        $dao = $this->biz->dao('Example:ExampleDao');
-
-        $dao->search(['name' => 'test2'], [], 0, 10, ['* from example;#']);
+        $this->expectException(DaoException::class);
+        $this->getExampleDao()->search(['name' => 'test2'], [], 0, 10, ['* from example;#']);
     }
 
     public function testPickIdAndUpdatedTimesByUpdatedTimeGT()
     {
-        $dao = $this->biz->dao('Example:ExampleDao');
+        $dao = $this->getExampleDao();
 
         $dao->create(['name' => 'test1', 'ids1' => ['1111'], 'ids2' => ['1111']]);
         $results = $dao->pickIdAndUpdatedTimesByUpdatedTimeGT(time() - 60 * 60, 0, 1000, 'updated_time');
@@ -440,5 +401,22 @@ class GeneralDaoImplTest extends IntegrationTestCase
         $dao->create(['name' => 'test2', 'ids1' => ['2222'], 'ids2' => ['2222']]);
         $results = $dao->pickIdAndUpdatedTimesByUpdatedTimeGT(time() - 60 * 60, 0, 1000, 'updated_time');
         $this->assertCount(2, $results);
+    }
+
+    /**
+     * @param $alias
+     * @return mixed
+     */
+    public function getDao($alias)
+    {
+        return $this->biz->dao($alias);
+    }
+
+    /**
+     * @return ExampleDao
+     */
+    public function getExampleDao()
+    {
+        return $this->getDao('Example:ExampleDao');
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use Codeages\Biz\Framework\Dao\DaoException;
 use Codeages\Biz\Framework\Util\ArrayToolkit;
 use Tests\Example\Dao\AdvancedExampleDao;
 
@@ -53,30 +54,24 @@ class AdvancedDaoImplTest extends IntegrationTestCase
         $this->assertEquals(3, $deleted);
     }
 
-    /**
-     * @expectedException \Codeages\Biz\Framework\Dao\DaoException
-     */
     public function testDeleteWithEmpty()
     {
+        $this->expectException(DaoException::class);
         $dao = $this->getAdvancedExampleDao();
 
         $dao->batchDelete(['ids' => []]);
     }
 
-    /**
-     * @expectedException \Codeages\Biz\Framework\Dao\DaoException
-     */
     public function testDeleteWithNotInDeclare()
     {
+        $this->expectException(DaoException::class);
         $dao = $this->getAdvancedExampleDao();
         $dao->batchDelete(['not-exist-column' => [1, 2, 3, 4]]);
     }
 
-    /**
-     * @expectedException \Codeages\Biz\Framework\Dao\DaoException
-     */
     public function testDeleteWithNoDeclare()
     {
+        $this->expectException(DaoException::class);
         $dao = $this->getAdvancedExample2Dao();
         $dao->batchDelete(['not-exist-column' => [1, 2, 3, 4]]);
     }

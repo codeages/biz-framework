@@ -1,10 +1,12 @@
 <?php
 
-namespace Tests;
+namespace Tests\Session;
+
+use Tests\IntegrationTestCase;
 
 class OnlineServiceTest extends IntegrationTestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->biz['user'] = [

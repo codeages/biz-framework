@@ -45,6 +45,7 @@ class BizTest extends TestCase
         $biz = new Biz();
         $biz->boot();
         $biz->boot();
+        $this->assertTrue(true);
     }
 
     public function testRegisterAutoloadAlias()

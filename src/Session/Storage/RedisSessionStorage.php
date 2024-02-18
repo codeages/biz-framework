@@ -36,7 +36,8 @@ class RedisSessionStorage implements SessionStorage
     public function save($session)
     {
         $session['sess_time'] = time();
-        $this->getRedis()->setex($this->getSessionPrefix().':'.$session['sess_id'], $this->getMaxLifeTime(), $session);
+        $ttl = isset($session['sess_deadline']) ? $session['sess_deadline'] - $session['sess_time'] : $this->getMaxLifeTime();
+        $this->getRedis()->setex($this->getSessionPrefix() . ':' . $session['sess_id'], $ttl, $session);
 
         return $session;
     }

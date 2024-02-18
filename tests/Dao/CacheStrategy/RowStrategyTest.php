@@ -15,7 +15,7 @@ class RowStrategyTest extends IntegrationTestCase
      */
     protected $redis;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->redis = $this->biz['redis'];

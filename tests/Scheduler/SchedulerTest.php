@@ -6,56 +6,50 @@ use Codeages\Biz\Framework\Util\TimeMachine;
 
 class SchedulerTest extends IntegrationTestCase
 {
-    /**
-     * @expectedException \Exception
-     */
     public function testCreateJobWithoutName()
     {
-        $job = [
+        $this->expectException(\Exception::class);
+        $job = array(
             'source' => 'MAIN',
             'class' => 'Tests\\Example\\Job\\ExampleJob',
             'expression' => '0 17 * * *',
-            'args' => ['courseId' => 1],
+            'args' => array('courseId' => 1),
             'priority' => 100,
             'misfire_threshold' => 3000,
             'misfire_policy' => 'missed',
-        ];
+        );
 
         $this->getSchedulerService()->register($job);
     }
 
-    /**
-     * @expectedException \Exception
-     */
     public function testCreateJobWithoutExpression()
     {
-        $job = [
+        $this->expectException(\Exception::class);
+        $job = array(
             'name' => 'test',
             'source' => 'MAIN',
             'class' => 'Tests\\Example\\Job\\ExampleJob',
-            'args' => ['courseId' => 1],
+            'args' => array('courseId' => 1),
             'priority' => 100,
             'misfire_threshold' => 3000,
             'misfire_policy' => 'missed',
-        ];
+        );
 
         $this->getSchedulerService()->register($job);
     }
 
-    /**
-     * @expectedException \Exception
-     */
     public function testCreateJobWithoutClass()
     {
-        $job = [
+        $this->expectException(\Exception::class);
+        $job = array(
             'name' => 'test',
             'expression' => '0 17 * * *',
             'source' => 'MAIN',
-            'args' => ['courseId' => 1],
+            'args' => array('courseId' => 1),
             'priority' => 100,
             'misfire_threshold' => 3000,
             'misfire_policy' => 'missed',
-        ];
+        );
 
         $this->getSchedulerService()->register($job);
     }
@@ -65,13 +59,13 @@ class SchedulerTest extends IntegrationTestCase
         TimeMachine::setMockedTime(1521598571);
         $jobFiredDao = $this->mockObjectIntoBiz(
             'Scheduler:JobFiredDao',
-            [
-                [
+            array(
+                array(
                     'functionName' => 'deleteUnacquiredBeforeCreatedTime',
-                    'withParams' => [1521512171], //1521598571-60*60*24, 1天前
+                    'withParams' => array(1521512171), //1521598571-60*60*24, 1天前
                     'returnValue' => 1,
-                ],
-            ]
+                ),
+            )
         );
 
         $result = $this->getSchedulerService()->deleteUnacquiredJobFired(1);
@@ -81,32 +75,32 @@ class SchedulerTest extends IntegrationTestCase
 
     public function testCreateJob()
     {
-        $job = [
+        $job = array(
             'name' => 'test',
             'source' => 'MAIN',
             'expression' => '0 17 * * *',
 //            'nextFireTime' => time()-1,
             'class' => 'Tests\\Example\\Job\\ExampleJob',
-            'args' => ['courseId' => 1],
+            'args' => array('courseId' => 1),
             'priority' => 100,
             'misfire_threshold' => 3000,
             'misfire_policy' => 'missed',
-        ];
+        );
 
         $savedJob = $this->getSchedulerService()->register($job);
 
         $this->asserts($job, $savedJob);
         $this->assertNotEmpty($savedJob['next_fire_time']);
 
-        $logs = $this->getSchedulerService()->searchJobLogs([], [], 0, 1);
+        $logs = $this->getSchedulerService()->searchJobLogs(array(), array(), 0, 1);
 
-        $excepted = [
+        $excepted = array(
             'name' => 'test',
             'source' => 'MAIN',
             'class' => 'Tests\\Example\\Job\\ExampleJob',
-            'args' => ['courseId' => 1],
+            'args' => array('courseId' => 1),
             'status' => 'created',
-        ];
+        );
         foreach ($logs as $log) {
             $this->asserts($excepted, $log);
         }
@@ -124,16 +118,16 @@ class SchedulerTest extends IntegrationTestCase
 
         $time = time() + 2;
 
-        $job = [
+        $job = array(
             'name' => 'test2',
             'source' => 'MAIN',
             'expression' => $time,
             'class' => 'Tests\\Example\\Job\\ExampleJob',
-            'args' => ['courseId' => 1],
+            'args' => array('courseId' => 1),
             'priority' => 100,
             'misfire_threshold' => 3000,
             'misfire_policy' => 'executing',
-        ];
+        );
 
         $savedJob = $this->getSchedulerService()->register($job);
         $this->getSchedulerService()->execute();
@@ -155,16 +149,16 @@ class SchedulerTest extends IntegrationTestCase
     {
         $time = time() - 50000;
 
-        $job = [
+        $job = array(
             'name' => 'test2',
             'source' => 'MAIN',
             'expression' => $time,
             'class' => 'Tests\\Example\\Job\\ExampleJob',
-            'args' => ['courseId' => 1],
+            'args' => array('courseId' => 1),
             'priority' => 100,
             'misfire_threshold' => 3000,
             'misfire_policy' => 'executing',
-        ];
+        );
 
         $savedJob = $this->getSchedulerService()->register($job);
         $this->getSchedulerService()->execute();
@@ -184,17 +178,17 @@ class SchedulerTest extends IntegrationTestCase
 
     public function testDeleteJobByName()
     {
-        $job = [
+        $job = array(
             'name' => 'test',
             'source' => 'MAIN',
             'expression' => '0 17 * * *',
 //            'nextFireTime' => time()-1,
             'class' => 'Tests\\Example\\Job\\ExampleJob',
-            'args' => ['courseId' => 1],
+            'args' => array('courseId' => 1),
             'priority' => 100,
             'misfire_threshold' => 3000,
             'misfire_policy' => 'missed',
-        ];
+        );
 
         $savedJob = $this->getSchedulerService()->register($job);
         $this->getSchedulerService()->deleteJobByName('test');
@@ -205,17 +199,17 @@ class SchedulerTest extends IntegrationTestCase
 
     public function testFailJobResult()
     {
-        $job = [
+        $job = array(
             'name' => 'test',
             'source' => 'MAIN',
             'expression' => time() - 2,
 //            'nextFireTime' => time()-1,
             'class' => 'Tests\\Example\\Job\\ExampleFailJob',
-            'args' => ['courseId' => 1],
+            'args' => array('courseId' => 1),
             'priority' => 100,
             'misfire_threshold' => 3000,
             'misfire_policy' => 'missed',
-        ];
+        );
 
         $job = $this->getSchedulerService()->register($job);
         $this->getSchedulerService()->execute();
@@ -228,17 +222,17 @@ class SchedulerTest extends IntegrationTestCase
 
     public function testAcquiredJobResult()
     {
-        $job = [
+        $job = array(
             'name' => 'test',
             'source' => 'MAIN',
             'expression' => time() - 2,
 //            'nextFireTime' => time()-1,
             'class' => 'Tests\\Example\\Job\\ExampleAcquiredJob',
-            'args' => ['courseId' => 1],
+            'args' => array('courseId' => 1),
             'priority' => 100,
             'misfire_threshold' => 3000,
             'misfire_policy' => 'missed',
-        ];
+        );
         $job = $this->getSchedulerService()->register($job);
         $this->getSchedulerService()->execute();
 
@@ -251,17 +245,17 @@ class SchedulerTest extends IntegrationTestCase
 
     public function testTimeoutJobs()
     {
-        $job = [
+        $job = array(
             'name' => 'test',
             'source' => 'MAIN',
             'expression' => time() - 2,
 //            'nextFireTime' => time()-1,
             'class' => 'Tests\\Example\\Job\\ExampleAcquiredJob',
-            'args' => ['courseId' => 1],
+            'args' => array('courseId' => 1),
             'priority' => 100,
             'misfire_threshold' => 3000,
             'misfire_policy' => 'missed',
-        ];
+        );
         $job = $this->getSchedulerService()->register($job);
         $this->getSchedulerService()->execute();
         $this->mockUnReleasePool($job);
@@ -280,26 +274,26 @@ class SchedulerTest extends IntegrationTestCase
 
     public function testCreateErrorLog()
     {
-        $job = [
+        $job = array(
             'id' => 22,
             'name' => 'test',
             'source' => 'MAIN',
             'expression' => '0 17 * * *',
             'class' => 'Tests\\Example\\Job\\ExampleJob',
-            'args' => ['courseId' => 1],
+            'args' => array('courseId' => 1),
             'priority' => 100,
             'misfire_threshold' => 3000,
             'misfire_policy' => 'missed',
-        ];
-        $this->getSchedulerService()->createErrorLog(['job_detail' => $job], 'error', 'error');
-        $result = $this->getJobLogDao()->search(['job_fired_id' => 0], ['created_time' => 'DESC'], 0, PHP_INT_MAX);
+        );
+        $this->getSchedulerService()->createErrorLog(array('job_detail' => $job), 'error', 'error');
+        $result = $this->getJobLogDao()->search(array('job_fired_id' => 0), array('created_time' => 'DESC'), 0, PHP_INT_MAX);
         $this->assertEquals('error', $result[0]['message']);
     }
 
     protected function wavePoolNum($id, $diff)
     {
-        $ids = [$id];
-        $diff = ['num' => $diff];
+        $ids = array($id);
+        $diff = array('num' => $diff);
         $this->getJobPoolDao()->wave($ids, $diff);
     }
 
@@ -344,10 +338,10 @@ class SchedulerTest extends IntegrationTestCase
      */
     protected function mockUnReleasePool($job)
     {
-        $this->getJobFiredDao()->update(['job_id' => $job['id']], [
+        $this->getJobFiredDao()->update(array('job_id' => $job['id']), array(
             'status' => 'executing',
             'fired_time' => time() - 2,
-        ]);
+        ));
 
         $jobPool = $this->getJobPoolDao()->getByName($job['pool']);
         $this->wavePoolNum($jobPool['id'], 1);

@@ -66,7 +66,7 @@ class ExampleUserServiceTest extends TestCase
         $this->assertCount(3, $users);
     }
 
-    public function setUp()
+    public function setUp(): void
     {
         $options = [
             'redis.options' => [
@@ -82,7 +82,7 @@ class ExampleUserServiceTest extends TestCase
         $this->exampleUserService = new ExampleUserServiceImpl($biz);
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->biz['redis']->close();
         unset($this->biz);

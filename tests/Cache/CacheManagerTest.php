@@ -5,10 +5,13 @@ namespace Tests\Cache;
 use Codeages\Biz\Framework\Cache\CacheManager;
 use Codeages\Biz\Framework\Context\Biz;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Redis;
 
 class CacheManagerTest extends TestCase
 {
+    use ProphecyTrait;
+
     /**
      * @var Biz
      */
@@ -88,9 +91,10 @@ class CacheManagerTest extends TestCase
 
         $cache = new CacheManager($redis->reveal(), ['ttl' => 1000]);
 
-        $cache->get('obj', 'testObj', function () use ($obj) {
+        $result = $cache->get('obj', 'testObj', function () use ($obj) {
             return $obj;
         });
+        $this->assertEquals($obj, $result);
     }
 
     public function testGetNoCacheAndFallbackReturnNULL()

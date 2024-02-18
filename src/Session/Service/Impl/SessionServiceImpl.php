@@ -5,6 +5,7 @@ namespace Codeages\Biz\Framework\Session\Service\Impl;
 use Codeages\Biz\Framework\Service\BaseService;
 use Codeages\Biz\Framework\Service\Exception\InvalidArgumentException;
 use Codeages\Biz\Framework\Session\Service\SessionService;
+use Codeages\Biz\Framework\Session\Storage\SessionStorage;
 use Codeages\Biz\Framework\Util\ArrayToolkit;
 
 class SessionServiceImpl extends BaseService implements SessionService
@@ -40,6 +41,9 @@ class SessionServiceImpl extends BaseService implements SessionService
         return $this->biz['session.options']['max_life_time'];
     }
 
+    /**
+     * @return SessionStorage
+     */
     protected function getSessionStorage()
     {
         return $this->biz['session.storage.'.$this->biz['session.options']['session_storage']];
