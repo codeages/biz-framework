@@ -57,6 +57,7 @@ class IntegrationTestCase extends TestCase
     {
         $this->db->rollBack();
         $this->redis->close();
+        $this->db->close();
 
         unset($this->db);
         unset($this->redis);
