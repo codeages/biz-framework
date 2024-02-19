@@ -121,7 +121,7 @@ class Biz extends Container
         };
 
         $biz['lock.factory'] = function ($biz) {
-            return new \Symfony\Component\Lock\Factory($biz['lock.store']);
+            return new \Symfony\Component\Lock\LockFactory($biz['lock.store']);
         };
 
         $biz['cache.enabled'] = true;
