@@ -6,6 +6,7 @@
 /phpunit.xml
 .DS_Store
 .php_cs.cache
+.phpunit.result.cache
 .sonar/
 .idea/
 /var

@@ -1,7 +1,9 @@
 <?php
 
-use PHPUnit\Framework\TestCase;
+namespace Tests\Context;
+
 use Codeages\Biz\Framework\Context\CurrentUser;
+use PHPUnit\Framework\TestCase;
 
 class CurrentUserTest extends TestCase
 {
@@ -13,12 +15,10 @@ class CurrentUserTest extends TestCase
         $this->assertInstanceOf('\Codeages\Biz\Framework\Context\CurrentUser', $user);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testNewInstance_MissArguments_ThrowException()
+    public function testNewInstanceMissArgumentsThrowException()
     {
-        $user = new CurrentUser(array('id' => 1));
+        $this->expectException(\InvalidArgumentException::class);
+        $user = new CurrentUser(['id' => 1]);
     }
 
     public function testGet()
@@ -31,7 +31,7 @@ class CurrentUserTest extends TestCase
         $this->assertEquals($rawUser['login_ip'], $user['login_ip']);
     }
 
-    public function testSet_NewKey()
+    public function testSetNewKey()
     {
         $rawUser = $this->fakeUser();
         $user = new CurrentUser($rawUser);
@@ -40,23 +40,21 @@ class CurrentUserTest extends TestCase
         $this->assertEquals($user['new_key'], 'new_value');
     }
 
-    /**
-     * @expectedException \LogicException
-     */
-    public function testSet_ResetOldKey_ThrowException()
+    public function testSetResetOldKeyThrowException()
     {
+        $this->expectException(\LogicException::class);
         $rawUser = $this->fakeUser();
         $user = new CurrentUser($rawUser);
         $user['id'] = 2;
     }
 
-    protected function fakeUser($fields = array())
+    protected function fakeUser($fields = [])
     {
-        return array_merge(array(
+        return array_merge([
             'id' => 1,
             'username' => 'test_user',
             'login_client' => 'chrome',
             'login_ip' => '127.0.0.1',
-        ), $fields);
+        ], $fields);
     }
 }

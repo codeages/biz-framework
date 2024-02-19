@@ -13,7 +13,7 @@ class ExampleUserServiceTest extends TestCase
      */
     private $exampleUserService;
 
-    public function testGetByIdCached_UserExist()
+    public function testGetByIdCachedUserExist()
     {
         $user = $this->exampleUserService->getByIdCached(1);
         $this->assertEquals(1, $user['id']);
@@ -22,7 +22,7 @@ class ExampleUserServiceTest extends TestCase
         $this->assertEquals(1, $user['id']);
     }
 
-    public function testGetByIdCached_UserNotFound()
+    public function testGetByIdCachedUserNotFound()
     {
         $user = $this->exampleUserService->getByIdCached(999);
         $this->assertNull($user);
@@ -31,12 +31,12 @@ class ExampleUserServiceTest extends TestCase
         $this->assertNull($user);
     }
 
-    public function testGetByUsernameCached_UserExist()
+    public function testGetByUsernameCachedUserExist()
     {
-        $user = $this->exampleUserService->getByUsernameCached("user_1");
+        $user = $this->exampleUserService->getByUsernameCached('user_1');
         $this->assertEquals('user_1', $user['username']);
 
-        $user = $this->exampleUserService->getByUsernameCached("user_1");
+        $user = $this->exampleUserService->getByUsernameCached('user_1');
         $this->assertEquals('user_1', $user['username']);
     }
 
@@ -66,7 +66,7 @@ class ExampleUserServiceTest extends TestCase
         $this->assertCount(3, $users);
     }
 
-    public function setUp()
+    public function setUp(): void
     {
         $options = [
             'redis.options' => [
@@ -82,7 +82,7 @@ class ExampleUserServiceTest extends TestCase
         $this->exampleUserService = new ExampleUserServiceImpl($biz);
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->biz['redis']->close();
         unset($this->biz);

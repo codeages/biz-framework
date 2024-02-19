@@ -8,7 +8,7 @@ interface TokenService
      * 生成令牌
      *
      * @param string $place    令牌使用场景
-     * @param array  $lifetime 令牌的有效时长（秒），`0`表示永久有效
+     * @param int    $lifetime 令牌的有效时长（秒），`0`表示永久有效
      * @param int    $times    令牌可被校验的次数，超过该次数则校验失败
      * @param mixed  $data     令牌所属的业务数据
      *

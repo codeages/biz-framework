@@ -4,12 +4,14 @@ namespace Tests\Cache;
 
 use Codeages\Biz\Framework\Cache\CacheManager;
 use Codeages\Biz\Framework\Context\Biz;
-use Codeages\Biz\Framework\Provider\RedisServiceProvider;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Redis;
 
 class CacheManagerTest extends TestCase
 {
+    use ProphecyTrait;
+
     /**
      * @var Biz
      */
@@ -20,7 +22,7 @@ class CacheManagerTest extends TestCase
      */
     protected $redis;
 
-    public function testGet_NoCache()
+    public function testGetNoCache()
     {
         $obj = [
             'id' => 1,
@@ -28,19 +30,19 @@ class CacheManagerTest extends TestCase
         ];
 
         $redis = $this->prophesize(Redis::class);
-        $redis->get("obj::testObj")->willReturn(false)->shouldBeCalledOnce();
-        $redis->set("obj::testObj", $obj, 3600)->shouldBeCalledOnce();
+        $redis->get('obj::testObj')->willReturn(false)->shouldBeCalledOnce();
+        $redis->set('obj::testObj', $obj, 3600)->shouldBeCalledOnce();
 
         $cache = new CacheManager($redis->reveal());
 
-        $objCached = $cache->get("obj", 'testObj', function () use ($obj) {
+        $objCached = $cache->get('obj', 'testObj', function () use ($obj) {
             return $obj;
         });
 
         $this->assertEquals($obj['id'], $objCached['id']);
     }
 
-    public function testGet_HasCache()
+    public function testGetHasCache()
     {
         $obj = [
             'id' => 1,
@@ -48,17 +50,17 @@ class CacheManagerTest extends TestCase
         ];
 
         $redis = $this->prophesize(Redis::class);
-        $redis->get("obj::testObj")->willReturn($obj)->shouldBeCalledOnce();
+        $redis->get('obj::testObj')->willReturn($obj)->shouldBeCalledOnce();
 
         $cache = new CacheManager($redis->reveal());
 
-        $objCached = $cache->get("obj", 'testObj', function () use ($obj) {
+        $objCached = $cache->get('obj', 'testObj', function () use ($obj) {
             return $obj;
         });
         $this->assertEquals($obj['id'], $objCached['id']);
     }
 
-    public function testGet_HasNullCache()
+    public function testGetHasNullCache()
     {
         $obj = [
             'id' => 1,
@@ -66,17 +68,17 @@ class CacheManagerTest extends TestCase
         ];
 
         $redis = $this->prophesize(Redis::class);
-        $redis->get("obj::testObj")->willReturn(null)->shouldBeCalledOnce();
+        $redis->get('obj::testObj')->willReturn(null)->shouldBeCalledOnce();
 
         $cache = new CacheManager($redis->reveal());
 
-        $objCached = $cache->get("obj", 'testObj', function () use ($obj) {
+        $objCached = $cache->get('obj', 'testObj', function () use ($obj) {
             return $obj;
         });
         $this->assertNull($objCached);
     }
 
-    public function testGet_UseTtl()
+    public function testGetUseTtl()
     {
         $obj = [
             'id' => 1,
@@ -84,55 +86,56 @@ class CacheManagerTest extends TestCase
         ];
 
         $redis = $this->prophesize(Redis::class);
-        $redis->get("obj::testObj")->willReturn(false)->shouldBeCalledOnce();
-        $redis->set("obj::testObj", $obj, 1000)->shouldBeCalledOnce();
+        $redis->get('obj::testObj')->willReturn(false)->shouldBeCalledOnce();
+        $redis->set('obj::testObj', $obj, 1000)->shouldBeCalledOnce();
 
         $cache = new CacheManager($redis->reveal(), ['ttl' => 1000]);
 
-        $cache->get("obj", 'testObj', function () use ($obj) {
+        $result = $cache->get('obj', 'testObj', function () use ($obj) {
             return $obj;
         });
+        $this->assertEquals($obj, $result);
     }
 
-    public function testGet_NoCacheAndFallbackReturnNULL()
+    public function testGetNoCacheAndFallbackReturnNULL()
     {
         $redis = $this->prophesize(Redis::class);
-        $redis->get("obj::testObj")->willReturn(false)->shouldBeCalledOnce();
-        $redis->set("obj::testObj", null, 3600)->shouldBeCalledOnce();
+        $redis->get('obj::testObj')->willReturn(false)->shouldBeCalledOnce();
+        $redis->set('obj::testObj', null, 3600)->shouldBeCalledOnce();
 
         $cache = new CacheManager($redis->reveal());
 
-        $objCached = $cache->get("obj", 'testObj', function () {
+        $objCached = $cache->get('obj', 'testObj', function () {
             return null;
         });
 
         $this->assertNull($objCached);
     }
 
-    public function testGet_NoCacheAndFallbackReturnZeroInt()
+    public function testGetNoCacheAndFallbackReturnZeroInt()
     {
         $redis = $this->prophesize(Redis::class);
-        $redis->get("obj::test")->willReturn(false)->shouldBeCalledOnce();
-        $redis->set("obj::test", 0, 3600)->shouldBeCalledOnce();
+        $redis->get('obj::test')->willReturn(false)->shouldBeCalledOnce();
+        $redis->set('obj::test', 0, 3600)->shouldBeCalledOnce();
 
         $cache = new CacheManager($redis->reveal());
 
-        $cached = $cache->get("obj", 'test', function () {
+        $cached = $cache->get('obj', 'test', function () {
             return 0;
         });
 
         $this->assertEquals(0, $cached);
     }
 
-    public function testGet_NoCacheAndFallbackReturnEmptyString()
+    public function testGetNoCacheAndFallbackReturnEmptyString()
     {
         $redis = $this->prophesize(Redis::class);
-        $redis->get("obj::test")->willReturn(false)->shouldBeCalledOnce();
-        $redis->set("obj::test", '', 3600)->shouldBeCalledOnce();
+        $redis->get('obj::test')->willReturn(false)->shouldBeCalledOnce();
+        $redis->set('obj::test', '', 3600)->shouldBeCalledOnce();
 
         $cache = new CacheManager($redis->reveal());
 
-        $cached = $cache->get("obj", 'test', function () {
+        $cached = $cache->get('obj', 'test', function () {
             return '';
         });
 
@@ -152,14 +155,14 @@ class CacheManagerTest extends TestCase
 
         $cache = new CacheManager($redis->reveal());
 
-        $objCached = $cache->getById("obj", $obj['id'], function () use ($obj) {
+        $objCached = $cache->getById('obj', $obj['id'], function () use ($obj) {
             return $obj;
         });
 
         $this->assertEquals($obj['id'], $objCached['id']);
     }
 
-    public function testGetByRef_NoCache()
+    public function testGetByRefNoCache()
     {
         $obj = [
             'id' => 1,
@@ -167,20 +170,20 @@ class CacheManagerTest extends TestCase
         ];
 
         $redis = $this->prophesize(Redis::class);
-        $redis->get("obj::name_obj_1")->willReturn(false)->shouldBeCalledOnce();
-        $redis->set("obj::name_obj_1", $obj['id'], 3600)->shouldBeCalledOnce();
+        $redis->get('obj::name_obj_1')->willReturn(false)->shouldBeCalledOnce();
+        $redis->set('obj::name_obj_1', $obj['id'], 3600)->shouldBeCalledOnce();
         $redis->set("obj::id_{$obj['id']}", $obj, 3600)->shouldBeCalledOnce();
 
         $cache = new CacheManager($redis->reveal());
 
-        $objCached = $cache->getByRef("obj", "name_${obj['name']}", function () use ($obj) {
+        $objCached = $cache->getByRef('obj', "name_${obj['name']}", function () use ($obj) {
             return $obj;
         });
 
         $this->assertEquals($obj['id'], $objCached['id']);
     }
 
-    public function testGetByRef_HasRefCacheButNoObjCache()
+    public function testGetByRefHasRefCacheButNoObjCache()
     {
         $obj = [
             'id' => 1,
@@ -188,21 +191,21 @@ class CacheManagerTest extends TestCase
         ];
 
         $redis = $this->prophesize(Redis::class);
-        $redis->get("obj::name_obj_1")->willReturn(1)->shouldBeCalledOnce();
-        $redis->get("obj::id_1")->willReturn(false)->shouldBeCalledOnce();
-        $redis->set("obj::name_obj_1", $obj['id'], 3600)->shouldBeCalledOnce();
+        $redis->get('obj::name_obj_1')->willReturn(1)->shouldBeCalledOnce();
+        $redis->get('obj::id_1')->willReturn(false)->shouldBeCalledOnce();
+        $redis->set('obj::name_obj_1', $obj['id'], 3600)->shouldBeCalledOnce();
         $redis->set("obj::id_{$obj['id']}", $obj, 3600)->shouldBeCalledOnce();
 
         $cache = new CacheManager($redis->reveal());
 
-        $objCached = $cache->getByRef("obj", "name_${obj['name']}", function () use ($obj) {
+        $objCached = $cache->getByRef('obj', "name_${obj['name']}", function () use ($obj) {
             return $obj;
         });
 
         $this->assertEquals($obj['id'], $objCached['id']);
     }
 
-    public function testGetByRef_HasCache()
+    public function testGetByRefHasCache()
     {
         $obj = [
             'id' => 1,
@@ -210,19 +213,19 @@ class CacheManagerTest extends TestCase
         ];
 
         $redis = $this->prophesize(Redis::class);
-        $redis->get("obj::name_obj_1")->willReturn(1)->shouldBeCalledOnce();
-        $redis->get("obj::id_1")->willReturn($obj)->shouldBeCalledOnce();
+        $redis->get('obj::name_obj_1')->willReturn(1)->shouldBeCalledOnce();
+        $redis->get('obj::id_1')->willReturn($obj)->shouldBeCalledOnce();
 
         $cache = new CacheManager($redis->reveal());
 
-        $objCached = $cache->getByRef("obj", "name_${obj['name']}", function () use ($obj) {
+        $objCached = $cache->getByRef('obj', "name_${obj['name']}", function () use ($obj) {
             return $obj;
         });
 
         $this->assertEquals($obj['id'], $objCached['id']);
     }
 
-    public function testGetByRef_HasNullCache()
+    public function testGetByRefHasNullCache()
     {
         $obj = [
             'id' => 1,
@@ -230,98 +233,97 @@ class CacheManagerTest extends TestCase
         ];
 
         $redis = $this->prophesize(Redis::class);
-        $redis->get("obj::name_obj_1")->willReturn(null)->shouldBeCalledOnce();
+        $redis->get('obj::name_obj_1')->willReturn(null)->shouldBeCalledOnce();
 
         $cache = new CacheManager($redis->reveal());
 
-        $objCached = $cache->getByRef("obj", "name_${obj['name']}", function () use ($obj) {
+        $objCached = $cache->getByRef('obj', "name_${obj['name']}", function () use ($obj) {
             return $obj;
         });
 
         $this->assertNull($objCached);
     }
 
-    public function testGetByRef_NoCacheAndFallbackReturnNULL()
+    public function testGetByRefNoCacheAndFallbackReturnNULL()
     {
-
         $redis = $this->prophesize(Redis::class);
-        $redis->get("obj::name_obj_1")->willReturn(false)->shouldBeCalledOnce();
-        $redis->set("obj::name_obj_1", null, 3600)->shouldBeCalledOnce();
+        $redis->get('obj::name_obj_1')->willReturn(false)->shouldBeCalledOnce();
+        $redis->set('obj::name_obj_1', null, 3600)->shouldBeCalledOnce();
 
         $cache = new CacheManager($redis->reveal());
 
-        $objCached = $cache->getByRef("obj", "name_obj_1", function () {
+        $objCached = $cache->getByRef('obj', 'name_obj_1', function () {
             return null;
         });
 
         $this->assertNull($objCached);
     }
 
-    public function testDel_OneStringKey()
+    public function testDelOneStringKey()
     {
-        $key = "testObj";
+        $key = 'testObj';
         $redis = $this->prophesize(Redis::class);
-        $redis->del(["obj::testObj"])->shouldBeCalledOnce();
+        $redis->del(['obj::testObj'])->shouldBeCalledOnce();
 
         $cache = new CacheManager($redis->reveal());
-        $cache->del('obj',  'testObj');
+        $cache->del('obj', 'testObj');
     }
 
-    public function testDel_StringKeyArray()
+    public function testDelStringKeyArray()
     {
-        $key = "testObj";
+        $key = 'testObj';
         $redis = $this->prophesize(Redis::class);
-        $redis->del(["obj::testObj1", "obj::testObj2"])->shouldBeCalledOnce();
+        $redis->del(['obj::testObj1', 'obj::testObj2'])->shouldBeCalledOnce();
 
         $cache = new CacheManager($redis->reveal());
-        $cache->del('obj',  ['testObj1', 'testObj2']);
+        $cache->del('obj', ['testObj1', 'testObj2']);
     }
 
-    public function testDel_MapWithOneIdKey()
+    public function testDelMapWithOneIdKey()
     {
-        $key = "testObj";
+        $key = 'testObj';
         $redis = $this->prophesize(Redis::class);
-        $redis->del(["obj::id_1"])->shouldBeCalledOnce();
+        $redis->del(['obj::id_1'])->shouldBeCalledOnce();
 
         $cache = new CacheManager($redis->reveal());
-        $cache->del('obj',  ['id' => 1]);
+        $cache->del('obj', ['id' => 1]);
     }
 
-    public function testDel_MapWithIdKeyArray()
+    public function testDelMapWithIdKeyArray()
     {
-        $key = "testObj";
+        $key = 'testObj';
         $redis = $this->prophesize(Redis::class);
-        $redis->del(["obj::id_1", "obj::id_2"])->shouldBeCalledOnce();
+        $redis->del(['obj::id_1', 'obj::id_2'])->shouldBeCalledOnce();
 
         $cache = new CacheManager($redis->reveal());
-        $cache->del('obj',  ['id' => [1, 2]]);
+        $cache->del('obj', ['id' => [1, 2]]);
     }
 
-    public function testDel_MapWithOneStringKey()
+    public function testDelMapWithOneStringKey()
     {
-        $key = "testObj";
+        $key = 'testObj';
         $redis = $this->prophesize(Redis::class);
-        $redis->del(["obj::testObj1"])->shouldBeCalledOnce();
+        $redis->del(['obj::testObj1'])->shouldBeCalledOnce();
 
         $cache = new CacheManager($redis->reveal());
-        $cache->del('obj',  ['key' => 'testObj1']);
+        $cache->del('obj', ['key' => 'testObj1']);
     }
 
-    public function testDel_MapWithStringKeyArray()
+    public function testDelMapWithStringKeyArray()
     {
-        $key = "testObj";
+        $key = 'testObj';
         $redis = $this->prophesize(Redis::class);
-        $redis->del(["obj::testObj1", "obj::testObj2"])->shouldBeCalledOnce();
+        $redis->del(['obj::testObj1', 'obj::testObj2'])->shouldBeCalledOnce();
 
         $cache = new CacheManager($redis->reveal());
-        $cache->del('obj',  ['key' => ['testObj1', 'testObj2']]);
+        $cache->del('obj', ['key' => ['testObj1', 'testObj2']]);
     }
 
-    public function testDel_MapWithIdAndKey()
+    public function testDelMapWithIdAndKey()
     {
-        $key = "testObj";
+        $key = 'testObj';
         $redis = $this->prophesize(Redis::class);
-        $redis->del(["obj::id_1",  "obj::testObj1", "obj::testObj2"])->shouldBeCalledOnce();
+        $redis->del(['obj::id_1',  'obj::testObj1', 'obj::testObj2'])->shouldBeCalledOnce();
 
         $cache = new CacheManager($redis->reveal());
         $cache->del('obj', ['id' => 1, 'key' => ['testObj1', 'testObj2']]);

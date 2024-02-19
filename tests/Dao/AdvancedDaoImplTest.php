@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use Codeages\Biz\Framework\Dao\DaoException;
 use Codeages\Biz\Framework\Util\ArrayToolkit;
 use Tests\Example\Dao\AdvancedExampleDao;
 
@@ -11,19 +12,19 @@ class AdvancedDaoImplTest extends IntegrationTestCase
     {
         $dao = $this->getAdvancedExampleDao();
 
-        $dao->create(array(
+        $dao->create([
             'name' => 'test1',
-        ));
+        ]);
 
-        $dao->create(array(
+        $dao->create([
             'name' => 'test1',
-        ));
+        ]);
 
-        $dao->create(array(
+        $dao->create([
             'name' => 'test1',
-        ));
+        ]);
 
-        $deleted = $dao->batchDelete(array('name' => 'test1'));
+        $deleted = $dao->batchDelete(['name' => 'test1']);
 
         $this->assertEquals(3, $deleted);
     }
@@ -32,53 +33,47 @@ class AdvancedDaoImplTest extends IntegrationTestCase
     {
         $dao = $this->getAdvancedExampleDao();
 
-        $row1 = $dao->create(array(
+        $row1 = $dao->create([
             'name' => 'test1',
-        ));
+        ]);
 
-        $row2 = $dao->create(array(
+        $row2 = $dao->create([
             'name' => 'test1',
-        ));
+        ]);
 
-        $row3 = $dao->create(array(
+        $row3 = $dao->create([
             'name' => 'test1',
-        ));
+        ]);
 
-        $row4 = $dao->create(array(
+        $row4 = $dao->create([
             'name' => 'test1',
-        ));
+        ]);
 
-        $deleted = $dao->batchDelete(array('ids' => array($row1['id'], $row2['id'], $row3['id'])));
+        $deleted = $dao->batchDelete(['ids' => [$row1['id'], $row2['id'], $row3['id']]]);
 
         $this->assertEquals(3, $deleted);
     }
 
-    /**
-     * @expectedException \Codeages\Biz\Framework\Dao\DaoException
-     */
     public function testDeleteWithEmpty()
     {
+        $this->expectException(DaoException::class);
         $dao = $this->getAdvancedExampleDao();
 
-        $dao->batchDelete(array('ids' => array()));
+        $dao->batchDelete(['ids' => []]);
     }
 
-    /**
-     * @expectedException \Codeages\Biz\Framework\Dao\DaoException
-     */
     public function testDeleteWithNotInDeclare()
     {
+        $this->expectException(DaoException::class);
         $dao = $this->getAdvancedExampleDao();
-        $dao->batchDelete(array('not-exist-column' => array(1, 2, 3, 4)));
+        $dao->batchDelete(['not-exist-column' => [1, 2, 3, 4]]);
     }
 
-    /**
-     * @expectedException \Codeages\Biz\Framework\Dao\DaoException
-     */
     public function testDeleteWithNoDeclare()
     {
+        $this->expectException(DaoException::class);
         $dao = $this->getAdvancedExample2Dao();
-        $dao->batchDelete(array('not-exist-column' => array(1, 2, 3, 4)));
+        $dao->batchDelete(['not-exist-column' => [1, 2, 3, 4]]);
     }
 
     public function testDeleteWithCache()
@@ -87,25 +82,25 @@ class AdvancedDaoImplTest extends IntegrationTestCase
 
         $dao = $this->getAdvancedExampleDao();
 
-        $row1 = $dao->create(array(
+        $row1 = $dao->create([
             'name' => 'test1',
-        ));
+        ]);
 
-        $row2 = $dao->create(array(
+        $row2 = $dao->create([
             'name' => 'test2',
-        ));
+        ]);
 
-        $row3 = $dao->create(array(
+        $row3 = $dao->create([
             'name' => '3test',
-        ));
+        ]);
 
-        $row4 = $dao->create(array(
+        $row4 = $dao->create([
             'name' => '4test1',
-        ));
+        ]);
 
         $this->getAdvancedExampleDao()->get($row1['id']);
 
-        $dao->batchDelete(array('pre_like' => 'test'));
+        $dao->batchDelete(['pre_like' => 'test']);
 
         $newRow1 = $this->getAdvancedExampleDao()->get($row1['id']);
 
@@ -116,23 +111,23 @@ class AdvancedDaoImplTest extends IntegrationTestCase
     {
         $dao = $this->getAdvancedExampleDao();
 
-        $row1 = $dao->create(array(
+        $row1 = $dao->create([
             'name' => 'test1',
-        ));
+        ]);
 
-        $row2 = $dao->create(array(
+        $row2 = $dao->create([
             'name' => 'test2',
-        ));
+        ]);
 
-        $row3 = $dao->create(array(
+        $row3 = $dao->create([
             'name' => '3test',
-        ));
+        ]);
 
-        $row4 = $dao->create(array(
+        $row4 = $dao->create([
             'name' => '4test1',
-        ));
+        ]);
 
-        $deleted = $dao->batchDelete(array('pre_like' => 'test'));
+        $deleted = $dao->batchDelete(['pre_like' => 'test']);
 
         $this->assertEquals(2, $deleted);
     }
@@ -142,7 +137,7 @@ class AdvancedDaoImplTest extends IntegrationTestCase
         $count = 10000;
         $this->createBatchRecord(10000);
 
-        $total = $this->getAdvancedExampleDao()->count(array());
+        $total = $this->getAdvancedExampleDao()->count([]);
 
         $this->assertEquals($count, $total);
     }
@@ -154,14 +149,14 @@ class AdvancedDaoImplTest extends IntegrationTestCase
 
         $this->createBatchRecord($count);
 
-        $examples = $this->getAdvancedExampleDao()->search(array(), array(), 0, $count);
+        $examples = $this->getAdvancedExampleDao()->search([], [], 0, $count);
 
-        $batchUpdates = array();
+        $batchUpdates = [];
         foreach ($examples as $example) {
             $update['name'] = 'change_name_'.$example['id'];
             $update['content'] = 'change_content_'.$example['id'];
-            $update['ids1'] = array(4, 5, 6);
-            $update['ids2'] = array(4, 5, 6);
+            $update['ids1'] = [4, 5, 6];
+            $update['ids2'] = [4, 5, 6];
             $batchUpdates[] = $update;
         }
 
@@ -172,15 +167,15 @@ class AdvancedDaoImplTest extends IntegrationTestCase
 
         $this->getAdvancedExampleDao()->batchUpdate(ArrayToolkit::column($examples, 'id'), $batchUpdates);
 
-        $examples = $this->getAdvancedExampleDao()->search(array(), array(), 0, $count);
+        $examples = $this->getAdvancedExampleDao()->search([], [], 0, $count);
 
         $this->assertEquals('change_name_'.$examples[0]['id'], $examples[0]['name']);
         $this->assertEquals('change_content_'.$examples[0]['id'], $examples[0]['content']);
         $this->assertEquals('change_name_'.$examples[400]['id'], $examples[400]['name']);
         $this->assertEquals('change_content_'.$examples[400]['id'], $examples[400]['content']);
 
-        $this->assertEquals(array(4, 5, 6), $examples[0]['ids1']);
-        $this->assertEquals(array(4, 5, 6), $examples[0]['ids2']);
+        $this->assertEquals([4, 5, 6], $examples[0]['ids1']);
+        $this->assertEquals([4, 5, 6], $examples[0]['ids2']);
 
         $this->assertGreaterThanOrEqual($beforeUpdateTime, $examples[0]['updated_time']);
 
@@ -191,14 +186,14 @@ class AdvancedDaoImplTest extends IntegrationTestCase
 
     private function createBatchRecord($count)
     {
-        $news = array();
+        $news = [];
         for ($i = 1; $i <= $count; ++$i) {
-            $fields = array(
+            $fields = [
                 'name' => 'test'.$i,
                 'content' => 'content',
-                'ids1' => array(1, 2, 3),
-                'ids2' => array(1, 2, 3),
-            );
+                'ids1' => [1, 2, 3],
+                'ids2' => [1, 2, 3],
+            ];
             $news[] = $fields;
         }
 

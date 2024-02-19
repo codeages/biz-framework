@@ -2,9 +2,9 @@
 
 namespace Tests\Queue;
 
-use Tests\IntegrationTestCase;
-use Tests\Fixtures\QueueJob\ExampleFinishedJob;
 use Tests\Fixtures\QueueJob\ExampleFailedJob;
+use Tests\Fixtures\QueueJob\ExampleFinishedJob;
+use Tests\IntegrationTestCase;
 
 class QueueBaseTestCase extends IntegrationTestCase
 {
@@ -12,21 +12,21 @@ class QueueBaseTestCase extends IntegrationTestCase
 
     protected function getQueueOptions()
     {
-        return  array(
+        return [
             'table' => 'biz_queue_job',
-        );
+        ];
     }
 
-    protected function createExampleFinishedJob(array $metadata = array())
+    protected function createExampleFinishedJob(array $metadata = [])
     {
-        $body = array('name' => 'example job');
+        $body = ['name' => 'example job'];
 
         return new ExampleFinishedJob($body, $metadata);
     }
 
-    protected function createExampleFailedJob(array $metadata = array())
+    protected function createExampleFailedJob(array $metadata = [])
     {
-        $body = array('name' => 'example job');
+        $body = ['name' => 'example job'];
 
         return new ExampleFailedJob($body, $metadata);
     }

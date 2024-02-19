@@ -18,7 +18,7 @@ class AnnotationExampleDaoTest extends IntegrationTestCase
      */
     protected $rows;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->biz['dao.cache.enabled'] = true;
@@ -26,7 +26,7 @@ class AnnotationExampleDaoTest extends IntegrationTestCase
         $this->dao = $this->biz->dao('Example:AnnotationExampleDao');
     }
 
-    public function testGet_HitCache()
+    public function testGetHitCache()
     {
         // no data insert into database.
         $row = $this->seed('Tests\\Example\\Tests\\Seeder\\ExampleSeeder', false)->first();
@@ -38,7 +38,7 @@ class AnnotationExampleDaoTest extends IntegrationTestCase
         $this->assertEquals($row['name'], $geted['name']);
     }
 
-    public function testGet_MissCache()
+    public function testGetMissCache()
     {
         $row = $this->seed('Tests\\Example\\Tests\\Seeder\\ExampleSeeder')->first();
 
@@ -53,7 +53,7 @@ class AnnotationExampleDaoTest extends IntegrationTestCase
         $this->assertEquals($row['name'], $cache['name']);
     }
 
-    public function testGet_NotFound()
+    public function testGetNotFound()
     {
         $this->seed('Tests\\Example\\Tests\\Seeder\\ExampleSeeder');
 
@@ -67,7 +67,7 @@ class AnnotationExampleDaoTest extends IntegrationTestCase
         $this->assertFalse($cache);
     }
 
-    public function testGetByName_HitCache()
+    public function testGetByNameHitCache()
     {
         // no data insert into database.
         $row = $this->seed('Tests\\Example\\Tests\\Seeder\\ExampleSeeder', false)->first();
@@ -80,7 +80,7 @@ class AnnotationExampleDaoTest extends IntegrationTestCase
         $this->assertEquals($row['name'], $geted['name']);
     }
 
-    public function testGetByName_MissCache()
+    public function testGetByNameMissCache()
     {
         $row = $this->seed('Tests\\Example\\Tests\\Seeder\\ExampleSeeder')->first();
 
@@ -101,7 +101,7 @@ class AnnotationExampleDaoTest extends IntegrationTestCase
         $row = $this->seed('Tests\\Example\\Tests\\Seeder\\ExampleSeeder')->first();
         $this->redis->set($this->getPrimaryCacheKey($row['id']), $row);
 
-        $this->dao->update($row['id'], array('content' => 'updated_content'));
+        $this->dao->update($row['id'], ['content' => 'updated_content']);
 
         $this->assertFalse($this->redis->get($this->getPrimaryCacheKey($row['id'])));
         $updated = $this->db->query("SELECT * FROM {$this->dao->table()} WHERE id = {$row['id']}")->fetch(\PDO::FETCH_ASSOC);
@@ -124,9 +124,9 @@ class AnnotationExampleDaoTest extends IntegrationTestCase
 
     public function testCreate()
     {
-        $row = array(
+        $row = [
             'name' => 'test_create',
-        );
+        ];
 
         $row = $this->dao->create($row);
 
