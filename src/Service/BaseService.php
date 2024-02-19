@@ -9,6 +9,7 @@ use Codeages\Biz\Framework\Service\Exception\InvalidArgumentException;
 use Codeages\Biz\Framework\Service\Exception\NotFoundException;
 use Codeages\Biz\Framework\Service\Exception\ServiceException;
 use Codeages\Biz\Framework\Validation\Validator;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 abstract class BaseService
 {
@@ -19,6 +20,9 @@ abstract class BaseService
         $this->biz = $biz;
     }
 
+    /**
+     * @return EventDispatcher
+     */
     protected function dispatcher()
     {
         return $this->biz['dispatcher'];
@@ -47,7 +51,7 @@ abstract class BaseService
             $event = new Event($subject, $arguments);
         }
 
-        return $this->dispatcher()->dispatch($eventName, $event);
+        return $this->dispatcher()->dispatch($event, $eventName);
     }
 
     /**
