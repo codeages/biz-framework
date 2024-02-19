@@ -8,7 +8,7 @@ define('ROOT_DIR', dirname(__DIR__));
 date_default_timezone_set('Asia/Shanghai');
 $loader = require ROOT_DIR.'/vendor/autoload.php';
 
-AnnotationRegistry::registerLoader(array($loader, 'loadClass'));
+AnnotationRegistry::registerLoader([$loader, 'loadClass']);
 IntegrationTestCase::$classLoader = $loader;
 
 $dns = sprintf('mysql:dbname=%s;host=%s', getenv('DB_NAME'), getenv('DB_HOST'));

@@ -10,12 +10,12 @@ class TargetloggerTestCase extends IntegrationTestCase
     public function testDebug()
     {
         $logger = $this->createLogger('example', 1);
-        $logger->debug('hello world.', array(
+        $logger->debug('hello world.', [
             '@action' => 'test',
             '@user_id' => 1,
             '@ip' => '127.0.0.1',
             'test_key' => 'test_value',
-        ));
+        ]);
     }
 
     protected function createLogger($targetType, $targetId)

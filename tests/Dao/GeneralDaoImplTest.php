@@ -25,12 +25,12 @@ class GeneralDaoImplTest extends IntegrationTestCase
     {
         foreach ($this->getTestDao() as $dao) {
             $dao = $this->biz->dao($dao);
-            $row = $dao->create(array(
+            $row = $dao->create([
                 'name' => 'test1',
                 'code' => 'test1',
-            ));
+            ]);
 
-            $affected = $dao->updateByNameAndCode('test1', 'test1', array('content' => 'test'));
+            $affected = $dao->updateByNameAndCode('test1', 'test1', ['content' => 'test']);
 
             $this->assertEquals(1, $affected);
         }
@@ -38,19 +38,19 @@ class GeneralDaoImplTest extends IntegrationTestCase
 
     private function getTestDao()
     {
-        return array(
+        return [
             'Example:ExampleDao',
             'Example:Example2Dao',
             'Example:Example3Dao',
-        );
+        ];
     }
 
     private function get($dao)
     {
         $dao = $this->biz->dao($dao);
-        $row = $dao->create(array(
+        $row = $dao->create([
             'name' => 'test1',
-        ));
+        ]);
 
         $found = $dao->get($row['id']);
         $this->assertEquals($row['id'], $found['id']);
@@ -70,11 +70,11 @@ class GeneralDaoImplTest extends IntegrationTestCase
     {
         $dao = $this->biz->dao($dao);
 
-        $fields = array(
+        $fields = [
             'name' => 'test1',
-            'ids1' => array(1, 2, 3),
-            'ids2' => array(1, 2, 3),
-        );
+            'ids1' => [1, 2, 3],
+            'ids2' => [1, 2, 3],
+        ];
 
         $before = time();
 
@@ -100,15 +100,15 @@ class GeneralDaoImplTest extends IntegrationTestCase
     {
         $dao = $this->biz->dao($dao);
 
-        $row = $dao->create(array(
+        $row = $dao->create([
             'name' => 'test1',
-        ));
+        ]);
 
-        $fields = array(
+        $fields = [
             'name' => 'test2',
-            'ids1' => array(1, 2),
-            'ids2' => array(1, 2),
-        );
+            'ids1' => [1, 2],
+            'ids2' => [1, 2],
+        ];
 
         $before = time();
         $saved = $dao->update($row['id'], $fields);
@@ -132,9 +132,9 @@ class GeneralDaoImplTest extends IntegrationTestCase
     {
         $dao = $this->biz->dao($dao);
 
-        $row = $dao->create(array(
+        $row = $dao->create([
             'name' => 'test1',
-        ));
+        ]);
 
         $deleted = $dao->delete($row['id']);
 
@@ -152,20 +152,20 @@ class GeneralDaoImplTest extends IntegrationTestCase
     {
         $dao = $this->biz->dao($dao);
 
-        $row = $dao->create(array(
+        $row = $dao->create([
             'name' => 'test1',
-        ));
+        ]);
 
-        $diff = array('counter1' => 1, 'counter2' => 2);
-        $waved = $dao->wave(array($row['id']), $diff);
+        $diff = ['counter1' => 1, 'counter2' => 2];
+        $waved = $dao->wave([$row['id']], $diff);
         $row = $dao->get($row['id']);
 
         $this->assertEquals(1, $waved);
         $this->assertEquals(1, $row['counter1']);
         $this->assertEquals(2, $row['counter2']);
 
-        $diff = array('counter1' => -1, 'counter2' => -1);
-        $waved = $dao->wave(array($row['id']), $diff);
+        $diff = ['counter1' => -1, 'counter2' => -1];
+        $waved = $dao->wave([$row['id']], $diff);
         $row = $dao->get($row['id']);
 
         $this->assertEquals(1, $waved);
@@ -184,21 +184,21 @@ class GeneralDaoImplTest extends IntegrationTestCase
     {
         $dao = $this->biz->dao($dao);
 
-        $dao->create(array('name' => 'pre_test1'));
+        $dao->create(['name' => 'pre_test1']);
         sleep(1);
-        $dao->create(array('name' => 'pre_test2'));
+        $dao->create(['name' => 'pre_test2']);
         sleep(1);
-        $dao->create(array('name' => 'test3_suf'));
+        $dao->create(['name' => 'test3_suf']);
         sleep(1);
-        $dao->create(array('name' => 'test4_suf'));
+        $dao->create(['name' => 'test4_suf']);
         sleep(1);
-        $dao->create(array('name' => 'test5'));
+        $dao->create(['name' => 'test5']);
 
-        $preNames = $dao->search(array('pre_like' => 'pre_'), array('created_time' => 'desc'), 0, 100);
+        $preNames = $dao->search(['pre_like' => 'pre_'], ['created_time' => 'desc'], 0, 100);
 
-        $sufNames = $dao->search(array('suf_name' => '_suf'), array('created_time' => 'desc'), 0, 100);
+        $sufNames = $dao->search(['suf_name' => '_suf'], ['created_time' => 'desc'], 0, 100);
 
-        $likeNames = $dao->search(array('like_name' => 'test'), array('created_time' => 'desc'), 0, 100);
+        $likeNames = $dao->search(['like_name' => 'test'], ['created_time' => 'desc'], 0, 100);
 
         $this->assertCount(2, $preNames);
         $this->assertCount(2, $sufNames);
@@ -212,16 +212,16 @@ class GeneralDaoImplTest extends IntegrationTestCase
     {
         $dao = $this->biz->dao('Example:ExampleDao');
 
-        $tmp1 = $dao->create(array('name' => 'pre_test1'));
-        $dao->create(array('name' => 'pre_test2'));
-        $tmp2 = $dao->create(array('name' => 'test3_suf'));
-        $dao->create(array('name' => 'test4_suf'));
+        $tmp1 = $dao->create(['name' => 'pre_test1']);
+        $dao->create(['name' => 'pre_test2']);
+        $tmp2 = $dao->create(['name' => 'test3_suf']);
+        $dao->create(['name' => 'test4_suf']);
 
-        $results = $dao->search(array('ids' => array($tmp1['id'], $tmp2['id'])), array('created_time' => 'desc'), 0, 100);
+        $results = $dao->search(['ids' => [$tmp1['id'], $tmp2['id']]], ['created_time' => 'desc'], 0, 100);
 
         $this->assertCount(2, $results);
 
-        $results = $dao->search(array('ids' => array()), array('created_time' => 'desc'), 0, 100);
+        $results = $dao->search(['ids' => []], ['created_time' => 'desc'], 0, 100);
 
         $this->assertCount(4, $results);
     }
@@ -237,11 +237,11 @@ class GeneralDaoImplTest extends IntegrationTestCase
     {
         $dao = $this->biz->dao($dao);
 
-        $dao->create(array('name' => 'test1'));
-        $dao->create(array('name' => 'test2'));
-        $dao->create(array('name' => 'test3'));
+        $dao->create(['name' => 'test1']);
+        $dao->create(['name' => 'test2']);
+        $dao->create(['name' => 'test3']);
 
-        $count = $dao->count(array('name' => 'test2'));
+        $count = $dao->count(['name' => 'test2']);
 
         $this->assertEquals(1, $count);
     }
@@ -250,9 +250,9 @@ class GeneralDaoImplTest extends IntegrationTestCase
     {
         $dao = $this->biz->dao('Example:ExampleDao');
 
-        $dao->create(array('name' => 'test1', 'ids1' => array('1111'), 'ids2' => array('1111')));
-        $dao->create(array('name' => 'test1', 'ids1' => array('1111'), 'ids2' => array('2222')));
-        $dao->create(array('name' => 'test2', 'ids1' => array('1111'), 'ids2' => array('3333')));
+        $dao->create(['name' => 'test1', 'ids1' => ['1111'], 'ids2' => ['1111']]);
+        $dao->create(['name' => 'test1', 'ids1' => ['1111'], 'ids2' => ['2222']]);
+        $dao->create(['name' => 'test2', 'ids1' => ['1111'], 'ids2' => ['3333']]);
         $result = $dao->findByNameAndId('test1', '["1111"]');
 
         $this->assertEquals(count($result), 2);
@@ -280,7 +280,7 @@ class GeneralDaoImplTest extends IntegrationTestCase
     {
         $dao = $this->biz->dao('Example:ExampleDao');
 
-        $row = $dao->create(array('name' => 'test1'));
+        $row = $dao->create(['name' => 'test1']);
 
         $result = $dao->get($row['id']);
         $this->assertInternalType('array', $result['null_value']);
@@ -296,11 +296,11 @@ class GeneralDaoImplTest extends IntegrationTestCase
          */
         $dao = $this->biz->dao('Example:ExampleDao');
 
-        $row = $dao->create(array('name' => 'test1'));
+        $row = $dao->create(['name' => 'test1']);
 
-        $dao->findByIds(array(1), array('; SELECT * FROM example'), 0, 10);
+        $dao->findByIds([1], ['; SELECT * FROM example'], 0, 10);
 
-        $dao->findByIds(array(1), array('id' => '; SELECT * FROM example'));
+        $dao->findByIds([1], ['id' => '; SELECT * FROM example']);
     }
 
     /**
@@ -313,10 +313,10 @@ class GeneralDaoImplTest extends IntegrationTestCase
          */
         $dao = $this->biz->dao('Example:ExampleDao');
 
-        $row = $dao->create(array('name' => 'test1'));
+        $row = $dao->create(['name' => 'test1']);
 
-        $dao->findByIds(array(1), array('created_time' => 'desc'), '; SELECT * FROM example', 10);
-        $dao->findByIds(array(1), array('created_time' => 'desc'), 0, "; UPDATE example SET name = 'inject' WHERE id = 1");
+        $dao->findByIds([1], ['created_time' => 'desc'], '; SELECT * FROM example', 10);
+        $dao->findByIds([1], ['created_time' => 'desc'], 0, "; UPDATE example SET name = 'inject' WHERE id = 1");
     }
 
     /**
@@ -329,8 +329,8 @@ class GeneralDaoImplTest extends IntegrationTestCase
          */
         $dao = $this->biz->dao('Example:ExampleDao');
 
-        $row = $dao->create(array('name' => 'test1'));
-        $dao->findByIds(array(1), array('created_time' => 'desc'), 0, "; UPDATE example SET name = 'inject' WHERE id = 1");
+        $row = $dao->create(['name' => 'test1']);
+        $dao->findByIds([1], ['created_time' => 'desc'], 0, "; UPDATE example SET name = 'inject' WHERE id = 1");
     }
 
     public function testNonInject()
@@ -340,16 +340,16 @@ class GeneralDaoImplTest extends IntegrationTestCase
          */
         $dao = $this->biz->dao('Example:ExampleDao');
 
-        $row1 = $dao->create(array('name' => 'testNonInject_1'));
+        $row1 = $dao->create(['name' => 'testNonInject_1']);
 
-        $result = $dao->findByIds(array($row1['id']), array('created_time' => 'desc'), '0', '2');
+        $result = $dao->findByIds([$row1['id']], ['created_time' => 'desc'], '0', '2');
         $this->assertCount(1, $result);
 
-        $row2 = $dao->create(array('name' => 'testNonInject_2'));
-        $result = $dao->findByIds(array($row1['id'], $row2['id']), array('created_time' => 'desc'), '0', 1);
+        $row2 = $dao->create(['name' => 'testNonInject_2']);
+        $result = $dao->findByIds([$row1['id'], $row2['id']], ['created_time' => 'desc'], '0', 1);
         $this->assertCount(1, $result);
 
-        $result = $dao->findByIds(array($row1['id'], $row2['id']), array('created_time' => 'desc'), '0', 10);
+        $result = $dao->findByIds([$row1['id'], $row2['id']], ['created_time' => 'desc'], '0', 10);
         $this->assertCount(2, $result);
     }
 
@@ -363,8 +363,8 @@ class GeneralDaoImplTest extends IntegrationTestCase
          */
         $dao = $this->biz->dao('Example:ExampleDao');
 
-        $row = $dao->create(array('name' => 'test1'));
-        $result = $dao->findByIds(array(1, 2), array('created_time' => 'desc'), '0', null);
+        $row = $dao->create(['name' => 'test1']);
+        $result = $dao->findByIds([1, 2], ['created_time' => 'desc'], '0', null);
     }
 
     /**
@@ -377,8 +377,8 @@ class GeneralDaoImplTest extends IntegrationTestCase
          */
         $dao = $this->biz->dao('Example:ExampleDao');
 
-        $row = $dao->create(array('name' => 'test1'));
-        $result = $dao->findByIds(array(1, 2), array('created_time' => 'desc'), null, 10);
+        $row = $dao->create(['name' => 'test1']);
+        $result = $dao->findByIds([1, 2], ['created_time' => 'desc'], null, 10);
     }
 
     public function testSerializes()
@@ -388,18 +388,18 @@ class GeneralDaoImplTest extends IntegrationTestCase
          */
         $dao = $this->biz->dao('Example:ExampleDao');
 
-        $row = $dao->create(array(
+        $row = $dao->create([
             'name' => 'test1',
-            'php_serialize_value' => array('value' => 'i_am_php_serialized_value'),
-            'json_serialize_value' => array('value' => 'i_am_json_serialized_value'),
-            'delimiter_serialize_value' => array('i_am_delimiter_serialized_value'),
-        ));
+            'php_serialize_value' => ['value' => 'i_am_php_serialized_value'],
+            'json_serialize_value' => ['value' => 'i_am_json_serialized_value'],
+            'delimiter_serialize_value' => ['i_am_delimiter_serialized_value'],
+        ]);
 
-        foreach (array('php', 'json') as $key) {
+        foreach (['php', 'json'] as $key) {
             $this->assertEquals($row[$key.'_serialize_value']['value'], "i_am_{$key}_serialized_value");
         }
 
-        $this->assertEquals($row['delimiter_serialize_value'], array('i_am_delimiter_serialized_value'));
+        $this->assertEquals($row['delimiter_serialize_value'], ['i_am_delimiter_serialized_value']);
     }
 
     public function testSearchWithColumns()
@@ -407,14 +407,14 @@ class GeneralDaoImplTest extends IntegrationTestCase
         /** @var \Tests\Example\Dao\ExampleDao $dao */
         $dao = $this->biz->dao('Example:ExampleDao');
 
-        $dao->create(array('name' => 'test1', 'ids1' => array('1111'), 'ids2' => array('1111')));
-        $dao->create(array('name' => 'test1', 'ids1' => array('2222'), 'ids2' => array('2222')));
-        $dao->create(array('name' => 'test2', 'ids1' => array('3333'), 'ids2' => array('3333')));
+        $dao->create(['name' => 'test1', 'ids1' => ['1111'], 'ids2' => ['1111']]);
+        $dao->create(['name' => 'test1', 'ids1' => ['2222'], 'ids2' => ['2222']]);
+        $dao->create(['name' => 'test2', 'ids1' => ['3333'], 'ids2' => ['3333']]);
 
-        $results = $dao->search(array('name' => 'test2'), array(), 0, 10, array('name', 'ids1'));
+        $results = $dao->search(['name' => 'test2'], [], 0, 10, ['name', 'ids1']);
         $this->assertCount(1, $results);
         $this->assertEquals(
-            array('name' => 'test2', 'ids1' => array('3333')),
+            ['name' => 'test2', 'ids1' => ['3333']],
             $results[0]
         );
     }
@@ -427,18 +427,18 @@ class GeneralDaoImplTest extends IntegrationTestCase
         /** @var \Tests\Example\Dao\ExampleDao $dao */
         $dao = $this->biz->dao('Example:ExampleDao');
 
-        $dao->search(array('name' => 'test2'), array(), 0, 10, array('* from example;#'));
+        $dao->search(['name' => 'test2'], [], 0, 10, ['* from example;#']);
     }
 
     public function testPickIdAndUpdatedTimesByUpdatedTimeGT()
     {
         $dao = $this->biz->dao('Example:ExampleDao');
 
-        $dao->create(array('name' => 'test1', 'ids1' => array('1111'), 'ids2' => array('1111')));
-        $results = $dao->pickIdAndUpdatedTimesByUpdatedTimeGT(time() - 60*60, 0, 1000, 'updated_time');
+        $dao->create(['name' => 'test1', 'ids1' => ['1111'], 'ids2' => ['1111']]);
+        $results = $dao->pickIdAndUpdatedTimesByUpdatedTimeGT(time() - 60 * 60, 0, 1000, 'updated_time');
         $this->assertCount(1, $results);
-        $dao->create(array('name' => 'test2', 'ids1' => array('2222'), 'ids2' => array('2222')));
-        $results = $dao->pickIdAndUpdatedTimesByUpdatedTimeGT(time() - 60*60, 0, 1000, 'updated_time');
+        $dao->create(['name' => 'test2', 'ids1' => ['2222'], 'ids2' => ['2222']]);
+        $results = $dao->pickIdAndUpdatedTimesByUpdatedTimeGT(time() - 60 * 60, 0, 1000, 'updated_time');
         $this->assertCount(2, $results);
     }
 }

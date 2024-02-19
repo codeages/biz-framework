@@ -11,7 +11,7 @@ class SessionServiceImpl extends BaseService implements SessionService
 {
     public function saveSession($session)
     {
-        if (!ArrayToolkit::requireds($session, array('sess_id', 'sess_data'))) {
+        if (!ArrayToolkit::requireds($session, ['sess_id', 'sess_data'])) {
             throw new InvalidArgumentException('args is invalid.');
         }
 

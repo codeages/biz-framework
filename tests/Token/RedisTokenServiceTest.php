@@ -7,7 +7,7 @@ use Tests\IntegrationTestCase;
 
 class RedisTokenServiceTest extends IntegrationTestCase
 {
-    public function testGenerate_Default()
+    public function testGenerateDefault()
     {
         $token = $this->getTokenService()->generate('unit_test', 0);
 
@@ -20,7 +20,7 @@ class RedisTokenServiceTest extends IntegrationTestCase
         $this->assertEquals(-1, $this->redis->ttl($key));
     }
 
-    public function testGenerate_Limited()
+    public function testGenerateLimited()
     {
         $token = $this->getTokenService()->generate('unit_test', 3600, 2);
         $this->assertEquals('unit_test', $token['place']);
@@ -33,7 +33,7 @@ class RedisTokenServiceTest extends IntegrationTestCase
         $this->assertLessThan(3601, $this->redis->ttl($key));
     }
 
-    public function testGenerate_Expired()
+    public function testGenerateExpired()
     {
         $token = $this->getTokenService()->generate('unit_test', 2);
 
@@ -46,7 +46,7 @@ class RedisTokenServiceTest extends IntegrationTestCase
         $this->assertEquals(-2, $this->redis->ttl($key));
     }
 
-    public function testVerify_TimesLimit_NoneExpired()
+    public function testVerifyTimesLimitNoneExpired()
     {
         $token = $this->getTokenService()->generate('unit_test', 0, 2);
 
@@ -67,7 +67,7 @@ class RedisTokenServiceTest extends IntegrationTestCase
         $this->assertEquals(-2, $this->redis->ttl($key));
     }
 
-    public function testVerify_TimesLimit_HaveExpired()
+    public function testVerifyTimesLimitHaveExpired()
     {
         $token = $this->getTokenService()->generate('unit_test', 3600, 2);
 
@@ -89,7 +89,7 @@ class RedisTokenServiceTest extends IntegrationTestCase
         $this->assertEquals(-2, $this->redis->ttl($key));
     }
 
-    public function testVerify_NoTimesLimit()
+    public function testVerifyNoTimesLimit()
     {
         $token = $this->getTokenService()->generate('unit_test', 0);
 
@@ -100,7 +100,7 @@ class RedisTokenServiceTest extends IntegrationTestCase
         }
     }
 
-    public function testGenerate_HaveData()
+    public function testGenerateHaveData()
     {
         $data = 1;
         $token = $this->getTokenService()->generate('unit_test', 0, 0, $data);
@@ -110,12 +110,12 @@ class RedisTokenServiceTest extends IntegrationTestCase
         $token = $this->getTokenService()->generate('unit_test', 0, 0, $data);
         $this->assertEquals($data, $token['data']);
 
-        $data = array('id' => 1);
+        $data = ['id' => 1];
         $token = $this->getTokenService()->generate('unit_test', 0, 0, $data);
         $this->assertEquals($data, $token['data']);
     }
 
-    public function testGenerate_DifferentPlace()
+    public function testGenerateDifferentPlace()
     {
         $token = $this->getTokenService()->generate('unit_test', 3600);
 

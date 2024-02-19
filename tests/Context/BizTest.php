@@ -3,10 +3,10 @@
 namespace Tests;
 
 use Codeages\Biz\Framework\Context\Biz;
-use Pimple\Container;
-use Pimple\ServiceProviderInterface;
 use Codeages\Biz\Framework\Provider\MonologServiceProvider;
 use PHPUnit\Framework\TestCase;
+use Pimple\Container;
+use Pimple\ServiceProviderInterface;
 
 class BizTest extends TestCase
 {
@@ -15,10 +15,10 @@ class BizTest extends TestCase
         $biz = new Biz();
         $this->assertInstanceOf('Codeages\Biz\Framework\Context\Biz', $biz);
 
-        $config = array(
+        $config = [
             'debug' => true,
-            'migration.directories' => array('migrations'),
-        );
+            'migration.directories' => ['migrations'],
+        ];
         $biz = new Biz($config);
         $this->assertEquals($config['debug'], $biz['debug']);
         $this->assertEquals($config['migration.directories'], $biz['migration.directories']);
@@ -27,12 +27,12 @@ class BizTest extends TestCase
     public function testRegister()
     {
         $biz = new Biz();
-        $biz->register(new BizTestServiceProvider1(), array(
-            'test_1.options' => array(
+        $biz->register(new BizTestServiceProvider1(), [
+            'test_1.options' => [
                 'option1' => 'option1_value',
                 'option2' => 'option2',
-            ),
-        ));
+            ],
+        ]);
 
         $this->assertEquals('test_1', $biz['test_1']);
         $this->assertEquals('option1_value', $biz['test_1.options']['option1']);
@@ -57,9 +57,9 @@ class BizTest extends TestCase
 
     public function testServiceWithProxy()
     {
-        $biz = new Biz(array(
+        $biz = new Biz([
             'service_proxy_enabled' => true,
-        ));
+        ]);
         $biz['autoload.aliases']['Example'] = 'Tests\Example';
         $service = $biz->service('Example:ExampleService');
         $this->assertInstanceOf('Tests\Example\Service\ExampleService', $service->getClass());
@@ -89,16 +89,16 @@ class BizTest extends TestCase
 
     public function testDao()
     {
-        $biz = new Biz(array(
+        $biz = new Biz([
             'debug' => true,
-        ));
+        ]);
         $biz['autoload.aliases']['Example'] = 'Tests\\Example';
         $dao = $biz->dao('Example:ExampleDao');
         $this->assertEquals($dao, $biz['@Example:ExampleDao']);
 
-        $biz = new Biz(array(
+        $biz = new Biz([
             'debug' => true,
-        ));
+        ]);
         $biz['autoload.aliases']['Example'] = 'Tests\\Example';
         $dao1 = $biz->dao('Example:ExampleDao');
         $dao2 = $biz->dao('Example:ExampleDao');

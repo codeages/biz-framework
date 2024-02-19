@@ -3,32 +3,31 @@
 namespace Tests\Validator;
 
 use Codeages\Biz\Framework\Validator\Validator;
-use Codeages\Biz\Framework\Validator\ValidatorException;
 use PHPUnit\Framework\TestCase;
 
 class ValidatorTest extends TestCase
 {
-    public function testValidate_whenValidData_thenPass()
+    public function testValidateWhenValidDataThenPass()
     {
         $v = new Validator();
 
-        $data = array (
+        $data = [
             'username' => 'guest',
             'email' => 'guest@example.com',
             'age' => 18,
-        );
+        ];
 
-        $rules = array (
-            'username' => array('required', array('lengthBetween', 4, 16)),
-            'email' => array('required', 'email'),
-            'age' => array('required', 'integer', array('min', 18), array('max', 100)),
-        );
+        $rules = [
+            'username' => ['required', ['lengthBetween', 4, 16]],
+            'email' => ['required', 'email'],
+            'age' => ['required', 'integer', ['min', 18], ['max', 100]],
+        ];
 
-        $rules = array(
-            'username' => array('required', array('lengthBetween', 4, 16)),
-            'email' => array('required', 'email'),
-            'age' => array('required', 'integer', array('min', 18), array('max', 100)),
-        );
+        $rules = [
+            'username' => ['required', ['lengthBetween', 4, 16]],
+            'email' => ['required', 'email'],
+            'age' => ['required', 'integer', ['min', 18], ['max', 100]],
+        ];
 
         $validatedData = $v->validate($data, $rules);
 
@@ -37,41 +36,41 @@ class ValidatorTest extends TestCase
         $this->assertEquals($data['age'], $validatedData['age']);
     }
 
-    public function testValidate_whenInvalidData_thenThrowException()
+    public function testValidateWhenInvalidDataThenThrowException()
     {
         $this->expectException('Codeages\Biz\Framework\Validator\ValidatorException');
 
         $v = new Validator();
 
-        $data = array(
+        $data = [
             'username' => 'guest',
             'email' => 'guest@example.com',
             'age' => 12,
-        );
+        ];
 
-        $rules = array(
-            'username' => array('required', array('lengthBetween', 4, 16)),
-            'email' => array('required', 'email'),
-            'age' => array('required', 'integer', array('min', 18), array('max', 100)),
-        );
+        $rules = [
+            'username' => ['required', ['lengthBetween', 4, 16]],
+            'email' => ['required', 'email'],
+            'age' => ['required', 'integer', ['min', 18], ['max', 100]],
+        ];
 
         $v->validate($data, $rules);
     }
 
-    public function testValidate_whenLessRules_thenFilterData()
+    public function testValidateWhenLessRulesThenFilterData()
     {
         $v = new Validator();
 
-        $data = array(
+        $data = [
             'username' => 'guest',
             'email' => 'guest@example.com',
             'age' => 18,
-        );
+        ];
 
-        $rules = array(
-            'username' => array('required', array('lengthBetween', 4, 16)),
-            'email' => array('required', 'email'),
-        );
+        $rules = [
+            'username' => ['required', ['lengthBetween', 4, 16]],
+            'email' => ['required', 'email'],
+        ];
 
         $validatedData = $v->validate($data, $rules);
 

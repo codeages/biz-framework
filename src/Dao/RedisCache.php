@@ -47,6 +47,6 @@ class RedisCache
 
     public function __call($name, $arguments)
     {
-        return call_user_func_array(array($this->redis, $name), $arguments);
+        return call_user_func_array([$this->redis, $name], $arguments);
     }
 }

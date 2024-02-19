@@ -39,7 +39,7 @@ abstract class BaseService
         $this->biz['db']->rollback();
     }
 
-    protected function dispatch($eventName, $subject, $arguments = array())
+    protected function dispatch($eventName, $subject, $arguments = [])
     {
         if ($subject instanceof Event) {
             $event = $subject;

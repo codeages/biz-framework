@@ -26,7 +26,7 @@ class SettingServiceTest extends IntegrationTestCase
         $this->assertEquals('default value', $value);
     }
 
-    public function testGet_WithDot()
+    public function testGetWithDot()
     {
         $this->seed('Tests\\Setting\\SettingSeeder');
 
@@ -46,26 +46,26 @@ class SettingServiceTest extends IntegrationTestCase
         $this->assertEquals('default value', $value);
     }
 
-    public function testSet_NoDot()
+    public function testSetNoDot()
     {
         $this->seed('Tests\\Setting\\SettingSeeder');
 
-        $this->getSettingService()->set('with_array_value', array(
+        $this->getSettingService()->set('with_array_value', [
             'new_key' => 'new_value',
-        ));
+        ]);
 
         $value = $this->getSettingService()->get('with_array_value');
         $this->assertEquals('new_value', $value['new_key']);
 
-        $this->getSettingService()->set('with_array_value2', array(
+        $this->getSettingService()->set('with_array_value2', [
             'new_key' => 'new_value',
-        ));
+        ]);
 
         $value = $this->getSettingService()->get('with_array_value2');
         $this->assertEquals('new_value', $value['new_key']);
     }
 
-    public function testSet_WithDot()
+    public function testSetWithDot()
     {
         $this->seed('Tests\\Setting\\SettingSeeder');
 
@@ -85,7 +85,7 @@ class SettingServiceTest extends IntegrationTestCase
     /**
      * @expectedException \Codeages\Biz\Framework\Service\Exception\ServiceException
      */
-    public function testSet_WithDot_InvalidKey()
+    public function testSetWithDotInvalidKey()
     {
         $this->seed('Tests\\Setting\\SettingSeeder');
 
@@ -104,14 +104,14 @@ class SettingServiceTest extends IntegrationTestCase
     /**
      * @expectedException \Codeages\Biz\Framework\Service\Exception\ServiceException
      */
-    public function testRemove_ErrorKey()
+    public function testRemoveErrorKey()
     {
         $this->seed('Tests\\Setting\\SettingSeeder');
 
         $this->getSettingService()->remove('error_key');
     }
 
-    public function testRemove_WithDot()
+    public function testRemoveWithDot()
     {
         $this->seed('Tests\\Setting\\SettingSeeder');
 
@@ -124,7 +124,7 @@ class SettingServiceTest extends IntegrationTestCase
     /**
      * @expectedException \Codeages\Biz\Framework\Service\Exception\ServiceException
      */
-    public function testRemove_WithDot_ErrorSubKey()
+    public function testRemoveWithDotErrorSubKey()
     {
         $this->seed('Tests\\Setting\\SettingSeeder');
 
@@ -134,7 +134,7 @@ class SettingServiceTest extends IntegrationTestCase
     /**
      * @expectedException \Codeages\Biz\Framework\Service\Exception\ServiceException
      */
-    public function testRemove_WithDot_InvalidKeyValueType()
+    public function testRemoveWithDotInvalidKeyValueType()
     {
         $this->seed('Tests\\Setting\\SettingSeeder');
 

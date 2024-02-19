@@ -21,7 +21,7 @@ class RowStrategyTest extends IntegrationTestCase
         $this->redis = $this->biz['redis'];
     }
 
-    public function testBeforeQuery_HitCache()
+    public function testBeforeQueryHitCache()
     {
         $metadataReader = new MetadataReader();
         $strategy = new RowStrategy($this->redis, $metadataReader);
@@ -32,13 +32,13 @@ class RowStrategyTest extends IntegrationTestCase
         $this->redis->set("dao:{$dao->table()}:getByName:{$row['name']}", "dao:{$dao->table()}:get:{$row['id']}");
         $this->redis->set("dao:{$dao->table()}:get:{$row['id']}", $row);
 
-        $cache = $strategy->beforeQuery($dao, 'getByName', array($row['name']));
+        $cache = $strategy->beforeQuery($dao, 'getByName', [$row['name']]);
 
         $this->assertEquals($row['id'], $cache['id']);
         $this->assertEquals($row['name'], $cache['name']);
     }
 
-    public function testBeforeQuery_MissCache_RefKeyAndPrimaryKeyNotExist()
+    public function testBeforeQueryMissCacheRefKeyAndPrimaryKeyNotExist()
     {
         $metadataReader = new MetadataReader();
         $strategy = new RowStrategy($this->redis, $metadataReader);
@@ -48,12 +48,12 @@ class RowStrategyTest extends IntegrationTestCase
 
         $this->redis->set("dao:{$dao->table()}:getByName:{$row['name']}", "dao:{$dao->table()}:get:{$row['id']}");
 
-        $cache = $strategy->beforeQuery($dao, 'getByName', array($row['name']));
+        $cache = $strategy->beforeQuery($dao, 'getByName', [$row['name']]);
 
         $this->assertFalse($cache);
     }
 
-    public function testBeforeQuery_MissCache_PrimaryKeyNotExist()
+    public function testBeforeQueryMissCachePrimaryKeyNotExist()
     {
         $metadataReader = new MetadataReader();
         $strategy = new RowStrategy($this->redis, $metadataReader);
@@ -61,23 +61,23 @@ class RowStrategyTest extends IntegrationTestCase
 
         $row = $this->fakeRow();
 
-        $cache = $strategy->beforeQuery($dao, 'getByName', array($row['name']));
+        $cache = $strategy->beforeQuery($dao, 'getByName', [$row['name']]);
 
         $this->assertFalse($cache);
     }
 
-    public function testBeforeQuery_NoCache()
+    public function testBeforeQueryNoCache()
     {
         $metadataReader = new MetadataReader();
         $strategy = new RowStrategy($this->redis, $metadataReader);
         $dao = new AnnotationExampleDaoImpl($this->biz);
 
-        $cache = $strategy->beforeQuery($dao, 'getNoCache', array(1));
+        $cache = $strategy->beforeQuery($dao, 'getNoCache', [1]);
 
         $this->assertFalse($cache);
     }
 
-    public function testBeforeQuery_OnlyForGetMethod()
+    public function testBeforeQueryOnlyForGetMethod()
     {
         $metadataReader = new MetadataReader();
         $strategy = new RowStrategy($this->redis, $metadataReader);
@@ -88,19 +88,19 @@ class RowStrategyTest extends IntegrationTestCase
         $this->redis->set("dao:{$dao->table()}:findByName:{$row['name']}", "dao:{$dao->table()}:get:{$row['id']}");
         $this->redis->set("dao:{$dao->table()}:get:{$row['id']}", $row);
 
-        $cache = $strategy->beforeQuery($dao, 'findByName', array($row['name']));
+        $cache = $strategy->beforeQuery($dao, 'findByName', [$row['name']]);
 
         $this->assertFalse($cache);
     }
 
-    public function testAfterQuery_WithCache()
+    public function testAfterQueryWithCache()
     {
         $metadataReader = new MetadataReader();
         $strategy = new RowStrategy($this->redis, $metadataReader);
         $dao = new AnnotationExampleDaoImpl($this->biz);
 
         $row = $this->fakeRow();
-        $strategy->afterQuery($dao, 'getByName', array($row['name']), $row);
+        $strategy->afterQuery($dao, 'getByName', [$row['name']], $row);
 
         $primaryKey = $this->redis->get("dao:{$dao->table()}:getByName:{$row['name']}");
         $this->assertEquals("dao:{$dao->table()}:get:{$row['id']}", $primaryKey);
@@ -114,15 +114,15 @@ class RowStrategyTest extends IntegrationTestCase
         $this->assertEquals("dao:{$dao->table()}:getByName:{$row['name']}", $relKeys[0]);
     }
 
-    public function testAfterQuery_WithCache_MultMethodCall()
+    public function testAfterQueryWithCacheMultMethodCall()
     {
         $metadataReader = new MetadataReader();
         $strategy = new RowStrategy($this->redis, $metadataReader);
         $dao = new AnnotationExampleDaoImpl($this->biz);
 
         $row = $this->fakeRow();
-        $strategy->afterQuery($dao, 'getByName', array($row['name']), $row);
-        $strategy->afterQuery($dao, 'getByCode', array($row['code']), $row);
+        $strategy->afterQuery($dao, 'getByName', [$row['name']], $row);
+        $strategy->afterQuery($dao, 'getByCode', [$row['code']], $row);
 
         $relKeys = $this->redis->get("dao:{$dao->table()}:get:{$row['id']}:rel_keys");
         $this->assertCount(2, $relKeys);
@@ -130,27 +130,27 @@ class RowStrategyTest extends IntegrationTestCase
         $this->assertEquals("dao:{$dao->table()}:getByCode:{$row['code']}", $relKeys[1]);
     }
 
-    public function testAfterQuery_NoCache()
+    public function testAfterQueryNoCache()
     {
         $metadataReader = new MetadataReader();
         $strategy = new RowStrategy($this->redis, $metadataReader);
         $dao = new AnnotationExampleDaoImpl($this->biz);
 
         $row = $this->fakeRow();
-        $strategy->afterQuery($dao, 'getNoCache', array(1), $row);
+        $strategy->afterQuery($dao, 'getNoCache', [1], $row);
 
         $cache = $this->redis->get("dao:{$dao->table()}:getNoCache:1");
         $this->assertFalse($cache);
     }
 
-    public function testAfterQuery_OnlyForGetMethod()
+    public function testAfterQueryOnlyForGetMethod()
     {
         $metadataReader = new MetadataReader();
         $strategy = new RowStrategy($this->redis, $metadataReader);
         $dao = new AnnotationExampleDaoImpl($this->biz);
 
         $row = $this->fakeRow();
-        $strategy->afterQuery($dao, 'findByName', array($row['name']), $row);
+        $strategy->afterQuery($dao, 'findByName', [$row['name']], $row);
 
         $primaryKey = $this->redis->get("dao:{$dao->table()}:findByName:{$row['name']}");
 
@@ -164,10 +164,10 @@ class RowStrategyTest extends IntegrationTestCase
         $dao = new AnnotationExampleDaoImpl($this->biz);
 
         $row = $this->fakeRow();
-        $strategy->afterQuery($dao, 'getByName', array($row['name']), $row);
-        $strategy->afterQuery($dao, 'getByCode', array($row['code']), $row);
+        $strategy->afterQuery($dao, 'getByName', [$row['name']], $row);
+        $strategy->afterQuery($dao, 'getByCode', [$row['code']], $row);
 
-        $strategy->afterUpdate($dao, 'update', array($row['id']), $row);
+        $strategy->afterUpdate($dao, 'update', [$row['id']], $row);
 
         $cache = $this->redis->get("dao:{$dao->table()}:get:{$row['id']}");
         $this->assertFalse($cache);
@@ -191,7 +191,7 @@ class RowStrategyTest extends IntegrationTestCase
         $row = $this->fakeRow();
         $primaryKey = $this->getPrimaryCacheKey($dao, $row['id']);
         $this->redis->set($primaryKey, $row);
-        $strategy->afterDelete($dao, 'delete', array($row['id']));
+        $strategy->afterDelete($dao, 'delete', [$row['id']]);
 
         $this->assertFalse($this->redis->get($primaryKey));
     }
@@ -205,7 +205,7 @@ class RowStrategyTest extends IntegrationTestCase
         $row = $this->fakeRow();
         $primaryKey = $this->getPrimaryCacheKey($dao, $row['id']);
         $this->redis->set($primaryKey, $row);
-        $strategy->afterWave($dao, 'wave', array(array($row['id'])), 1);
+        $strategy->afterWave($dao, 'wave', [[$row['id']]], 1);
 
         $this->assertFalse($this->redis->get($primaryKey));
     }
@@ -231,10 +231,10 @@ class RowStrategyTest extends IntegrationTestCase
 
     protected function fakeRow()
     {
-        return array(
+        return [
             'id' => 1,
             'name' => 'biz_framework_name',
             'code' => 'biz_framework_code',
-        );
+        ];
     }
 }

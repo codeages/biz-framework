@@ -2,8 +2,8 @@
 
 namespace Tests\Utility;
 
-use PHPUnit\Framework\TestCase;
 use Codeages\Biz\Framework\Utility\Env;
+use PHPUnit\Framework\TestCase;
 
 class EnvTest extends TestCase
 {
@@ -22,13 +22,13 @@ class EnvTest extends TestCase
 
     public function testLoad()
     {
-        $env = array(
+        $env = [
             'foo1' => 'bar',
             'foo2' => true,
             'foo3' => false,
             'foo4' => 'true',
             'foo5' => 'false',
-        );
+        ];
 
         Env::load($env);
 

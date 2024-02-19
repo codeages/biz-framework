@@ -8,10 +8,10 @@ class RedisSessionStorageTest extends IntegrationTestCase
     {
         parent::setUp();
 
-        $this->biz['session.options'] = array(
+        $this->biz['session.options'] = [
             'max_life_time' => 1,
             'session_storage' => 'redis',
-        );
+        ];
     }
 
     public function testCreate()
@@ -47,7 +47,7 @@ class RedisSessionStorageTest extends IntegrationTestCase
         $updatedSession = $this->getSessionService()->saveSession($session);
         $keys = array_keys($mockedSession);
         foreach ($keys as $key) {
-            if (in_array($key, array('sess_data', 'sess_time'))) {
+            if (in_array($key, ['sess_data', 'sess_time'])) {
                 continue;
             }
             $this->assertEquals($mockedSession[$key], $session[$key]);
@@ -68,7 +68,7 @@ class RedisSessionStorageTest extends IntegrationTestCase
         $updatedSession = $this->getSessionService()->saveSession($session);
         $keys = array_keys($mockedSession);
         foreach ($keys as $key) {
-            if (in_array($key, array('sess_data', 'sess_time'))) {
+            if (in_array($key, ['sess_data', 'sess_time'])) {
                 continue;
             }
             $this->assertEquals($mockedSession[$key], $session[$key]);
@@ -124,18 +124,18 @@ class RedisSessionStorageTest extends IntegrationTestCase
 
     protected function mockSession()
     {
-        return array(
+        return [
             'sess_id' => 'sess'.rand(1000000, 9000000),
             'sess_data' => 'ababa',
-        );
+        ];
     }
 
     protected function mockSessionWithSql()
     {
-        return array(
+        return [
             'sess_id' => 'sess_'.rand(1000000, 9000000).'"1\' OR \'1\'=\'1"',
             'sess_data' => 'sql',
-        );
+        ];
     }
 
     protected function getSessionService()

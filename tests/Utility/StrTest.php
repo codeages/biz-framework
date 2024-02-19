@@ -2,8 +2,8 @@
 
 namespace Tests\Utility;
 
-use PHPUnit\Framework\TestCase;
 use Codeages\Biz\Framework\Utility\Str;
+use PHPUnit\Framework\TestCase;
 
 /**
  * 此单元测试来自：https://github.com/laravel/framework/blob/5.5/tests/Support/SupportStrTest.php

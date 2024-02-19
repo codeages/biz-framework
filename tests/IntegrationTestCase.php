@@ -2,23 +2,23 @@
 
 namespace Tests;
 
+use Codeages\Biz\Framework\Context\Biz;
 use Codeages\Biz\Framework\Dao\ArrayStorage;
 use Codeages\Biz\Framework\Dao\Connection;
 use Codeages\Biz\Framework\Dao\IdGenerator\OrderedTimeUUIDGenerator;
 use Codeages\Biz\Framework\Provider\DoctrineServiceProvider;
+use Codeages\Biz\Framework\Provider\QueueServiceProvider;
 use Codeages\Biz\Framework\Provider\RedisServiceProvider;
 use Codeages\Biz\Framework\Provider\SchedulerServiceProvider;
 use Codeages\Biz\Framework\Provider\SessionServiceProvider;
+use Codeages\Biz\Framework\Provider\SettingServiceProvider;
 use Codeages\Biz\Framework\Provider\TargetlogServiceProvider;
 use Codeages\Biz\Framework\Provider\TokenServiceProvider;
-use Codeages\Biz\Framework\Provider\SettingServiceProvider;
-use Codeages\Biz\Framework\Provider\QueueServiceProvider;
-use Codeages\Biz\Framework\Context\Biz;
 use Doctrine\Common\Collections\ArrayCollection;
-use PHPUnit\Framework\TestCase;
-use Monolog\Logger;
-use Monolog\Handler\TestHandler;
 use Mockery;
+use Monolog\Handler\TestHandler;
+use Monolog\Logger;
+use PHPUnit\Framework\TestCase;
 
 class IntegrationTestCase extends TestCase
 {
@@ -81,7 +81,7 @@ class IntegrationTestCase extends TestCase
      *          'functionName' => 'tryManageCourse',　//必填
      *          'returnValue' => array('id' => 1),　// 非必填，填了表示有相应的返回结果
      *          'throwException' => new \Exception(), //object Exception or string Exception ，和returnValue 只能二选一，否则throwException优先
-     *          'withParams' => array('param1', array('arrayParamKey1' => '123')),　
+     *          'withParams' => array('param1', array('arrayParamKey1' => '123')),
      *                          //非必填，表示填了相应参数才会有相应返回结果
      *                          //参数必须要用一个数组包含
      *          'runTimes' => 1 //非必填，表示跑第几次会出相应结果, 不填表示无论跑多少此，结果都一样
@@ -90,7 +90,7 @@ class IntegrationTestCase extends TestCase
      *
      * @return \Mockery\MockInterface
      */
-    protected function mockObjectIntoBiz($alias, $params = array())
+    protected function mockObjectIntoBiz($alias, $params = [])
     {
         $aliasList = explode(':', $alias);
         $className = end($aliasList);
@@ -127,10 +127,10 @@ class IntegrationTestCase extends TestCase
         return $mockObj;
     }
 
-    protected function createBiz(array $options = array())
+    protected function createBiz(array $options = [])
     {
-        $defaultOptions = array(
-            'db.options' => array(
+        $defaultOptions = [
+            'db.options' => [
                 'dbname' => getenv('DB_NAME') ?: 'biz-framework-test',
                 'user' => getenv('DB_USER') ?: 'root',
                 'password' => getenv('DB_PASSWORD') ?: '',
@@ -138,12 +138,12 @@ class IntegrationTestCase extends TestCase
                 'port' => getenv('DB_PORT') ?: 3306,
                 'driver' => 'pdo_mysql',
                 'charset' => 'utf8',
-            ),
-            'redis.options' => array(
+            ],
+            'redis.options' => [
                 'host' => getenv('REDIS_HOST'),
-            ),
+            ],
             'debug' => true,
-        );
+        ];
         $options = array_merge($defaultOptions, $options);
 
         $biz = new Biz($options);
@@ -213,15 +213,15 @@ class IntegrationTestCase extends TestCase
         return $seeder->run($isRun);
     }
 
-    protected function grabAllFromDatabase($table, $column, array $criteria = array())
+    protected function grabAllFromDatabase($table, $column, array $criteria = [])
     {
     }
 
-    protected function grabFromDatabase($table, $column, array $criteria = array())
+    protected function grabFromDatabase($table, $column, array $criteria = [])
     {
     }
 
-    protected function fetchFromDatabase($table, array $criteria = array())
+    protected function fetchFromDatabase($table, array $criteria = [])
     {
         $builder = $this->biz['db']->createQueryBuilder();
         $builder->select('*')->from($table);
@@ -236,7 +236,7 @@ class IntegrationTestCase extends TestCase
         return $builder->execute()->fetch(\PDO::FETCH_ASSOC);
     }
 
-    protected function fetchAllFromDatabase($table, array $criteria = array())
+    protected function fetchAllFromDatabase($table, array $criteria = [])
     {
         $builder = $this->biz['db']->createQueryBuilder();
         $builder->select('*')->from($table);
