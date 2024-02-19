@@ -2,8 +2,8 @@
 
 namespace Tests\Example\Dao\Impl;
 
-use Tests\Example\Dao\UuidExampleDao;
 use Codeages\Biz\Framework\Dao\AdvancedDaoImpl;
+use Tests\Example\Dao\UuidExampleDao;
 
 class UuidAdvancedExampleDaoImpl extends AdvancedDaoImpl implements UuidExampleDao
 {
@@ -11,13 +11,13 @@ class UuidAdvancedExampleDaoImpl extends AdvancedDaoImpl implements UuidExampleD
 
     public function declares()
     {
-        return array(
+        return [
             'id_generator' => 'uuid',
-            'orderbys' => array('id'),
-            'timestamps' => array('created_time', 'updated_time'),
-            'conditions' => array(
+            'orderbys' => ['id'],
+            'timestamps' => ['created_time', 'updated_time'],
+            'conditions' => [
                 'name = :name',
-            ),
-        );
+            ],
+        ];
     }
 }

@@ -2,8 +2,8 @@
 
 namespace Tests\Queue;
 
-use Tests\IntegrationTestCase;
 use Tests\Fixtures\QueueJob\ExampleFinishedJob;
+use Tests\IntegrationTestCase;
 
 class QueueServiceTest extends IntegrationTestCase
 {
@@ -22,13 +22,13 @@ class QueueServiceTest extends IntegrationTestCase
 
     public function testCountFailedJobs()
     {
-        $count = $this->getQueueService()->countFailedJobs(array());
+        $count = $this->getQueueService()->countFailedJobs([]);
         $this->assertEquals(0, $count);
     }
 
     public function testSearchFailedJobs()
     {
-        $failedJobs = $this->getQueueService()->searchFailedJobs(array(), array('failed_time' => 'desc'), 0, 10);
+        $failedJobs = $this->getQueueService()->searchFailedJobs([], ['failed_time' => 'desc'], 0, 10);
         $this->assertEquals(0, count($failedJobs));
     }
 

@@ -2,7 +2,7 @@
 
 namespace Codeages\Biz\Framework\Dao;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class CacheEvent extends Event
 {

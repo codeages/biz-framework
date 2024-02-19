@@ -1,15 +1,17 @@
 <?php
 
-namespace Tests;
+namespace Tests\Session;
+
+use Tests\IntegrationTestCase;
 
 class OnlineServiceTest extends IntegrationTestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
-        $this->biz['user'] = array(
+        $this->biz['user'] = [
             'id' => 1,
-        );
+        ];
     }
 
     public function testCountLogin()
@@ -24,9 +26,9 @@ class OnlineServiceTest extends IntegrationTestCase
     public function testCountTotal()
     {
         $mockedSession = $this->mockOnline();
-        $this->biz['user'] = array(
+        $this->biz['user'] = [
             'id' => 0,
-        );
+        ];
         $this->getOnlineService()->saveOnline($mockedSession);
 
         $count = $this->getOnlineService()->countLogined(time() - 400);
@@ -38,13 +40,13 @@ class OnlineServiceTest extends IntegrationTestCase
 
     protected function mockOnline()
     {
-        return array(
+        return [
             'sess_id' => rand(1000000, 9000000),
             'user_id' => 1,
             'user_agent' => 'xxfafaafasfasf',
             'source' => 'web',
             'ip' => '192.178.191.12',
-        );
+        ];
     }
 
     protected function getOnlineService()

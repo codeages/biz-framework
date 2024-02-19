@@ -13,9 +13,10 @@ class RedisSessionStorage implements SessionStorage
 
     /**
      * @param $sessId
+     *
      * @return mixed
-     * For php-redis 5.0.0+ function Redis::delete() is deprecated , replaced with Redis::del() compatible.
-     * doc https://pecl.php.net/package-changelog.php?package=redis&release=2.2.3
+     *               For php-redis 5.0.0+ function Redis::delete() is deprecated , replaced with Redis::del() compatible.
+     *               doc https://pecl.php.net/package-changelog.php?package=redis&release=2.2.3
      */
     public function delete($sessId)
     {
@@ -35,7 +36,8 @@ class RedisSessionStorage implements SessionStorage
     public function save($session)
     {
         $session['sess_time'] = time();
-        $this->getRedis()->setex($this->getSessionPrefix().':'.$session['sess_id'], $this->getMaxLifeTime(), $session);
+        $ttl = isset($session['sess_deadline']) ? $session['sess_deadline'] - $session['sess_time'] : $this->getMaxLifeTime();
+        $this->getRedis()->setex($this->getSessionPrefix().':'.$session['sess_id'], $ttl, $session);
 
         return $session;
     }

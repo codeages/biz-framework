@@ -4,23 +4,23 @@ namespace Codeages\Biz\Framework\Context;
 
 use Codeages\Biz\Framework\Cache\CacheManager;
 use Codeages\Biz\Framework\Dao\Annotation\MetadataReader;
+use Codeages\Biz\Framework\Dao\ArrayStorage;
+use Codeages\Biz\Framework\Dao\CacheStrategy;
 use Codeages\Biz\Framework\Dao\DaoProxy;
 use Codeages\Biz\Framework\Dao\FieldSerializer;
 use Codeages\Biz\Framework\Dao\RedisCache;
+use Codeages\Biz\Framework\Service\ServiceProxy;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Codeages\Biz\Framework\Dao\CacheStrategy;
-use Codeages\Biz\Framework\Dao\ArrayStorage;
-use Codeages\Biz\Framework\Service\ServiceProxy;
 
 class Biz extends Container
 {
-    protected $providers = array();
+    protected $providers = [];
     protected $booted = false;
 
-    public function __construct(array $values = array())
+    public function __construct(array $values = [])
     {
         parent::__construct();
 
@@ -36,7 +36,7 @@ class Biz extends Container
             return new \Codeages\Biz\Framework\Command\EnvWriteCommand();
         };
 
-        $biz['autoload.aliases'] = new \ArrayObject(array('' => 'Biz'));
+        $biz['autoload.aliases'] = new \ArrayObject(['' => 'Biz']);
 
         $biz['dispatcher'] = function () {
             return new EventDispatcher();
@@ -50,10 +50,10 @@ class Biz extends Container
             return new ContainerAutoloader(
                 $biz,
                 $biz['autoload.aliases'],
-                array(
+                [
                     'service' => $biz['autoload.object_maker.service'],
                     'dao' => $biz['autoload.object_maker.dao'],
-                )
+                ]
             );
         };
 
@@ -121,7 +121,7 @@ class Biz extends Container
         };
 
         $biz['lock.factory'] = function ($biz) {
-            return new \Symfony\Component\Lock\Factory($biz['lock.store']);
+            return new \Symfony\Component\Lock\LockFactory($biz['lock.store']);
         };
 
         $biz['cache.enabled'] = true;
@@ -129,8 +129,8 @@ class Biz extends Container
         $biz['cache'] = function ($biz) {
             if (isset($biz['redis'])) {
                 return new CacheManager($biz['redis'], [
-                    'enabled' =>$biz['cache.enabled'],
-                    'ttl' =>$biz['cache.default_ttl'],
+                    'enabled' => $biz['cache.enabled'],
+                    'ttl' => $biz['cache.default_ttl'],
                 ]);
             } else {
                 return new CacheManager(null, ['enabled' => false]);
@@ -142,7 +142,7 @@ class Biz extends Container
         }
     }
 
-    public function register(ServiceProviderInterface $provider, array $values = array())
+    public function register(ServiceProviderInterface $provider, array $values = [])
     {
         $this->providers[] = $provider;
         parent::register($provider, $values);

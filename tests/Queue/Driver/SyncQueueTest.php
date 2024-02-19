@@ -2,12 +2,12 @@
 
 namespace Tests\Queue\Driver;
 
-use Tests\Queue\QueueBaseTestCase;
 use Codeages\Biz\Framework\Queue\Driver\SyncQueue;
+use Tests\Queue\QueueBaseTestCase;
 
 class SyncQueueTest extends QueueBaseTestCase
 {
-    public function testPush_FinishedJob()
+    public function testPushFinishedJob()
     {
         $queue = new SyncQueue(self::TEST_QUEUE, $this->biz, $this->biz['queue.failer']);
 
@@ -18,7 +18,7 @@ class SyncQueueTest extends QueueBaseTestCase
         $this->assertTrue($this->biz['logger.test_handler']->hasInfo('ExampleFinishedJob executed.'));
     }
 
-    public function testPush_FailedJob()
+    public function testPushFailedJob()
     {
         $queue = new SyncQueue(self::TEST_QUEUE, $this->biz, $this->biz['queue.failer']);
 
@@ -28,9 +28,9 @@ class SyncQueueTest extends QueueBaseTestCase
         $this->assertGreaterThan(0, $job->getId());
         $this->assertTrue($this->biz['logger.test_handler']->hasInfo('ExampleFailedJob executed.'));
 
-        $this->assertCount(1, $this->fetchAllFromDatabase('biz_queue_failed_job', array(
+        $this->assertCount(1, $this->fetchAllFromDatabase('biz_queue_failed_job', [
             'queue' => self::TEST_QUEUE,
             'reason' => 'ExampleFailedJob execute failed.',
-        )));
+        ]));
     }
 }

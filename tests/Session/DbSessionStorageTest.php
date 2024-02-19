@@ -1,23 +1,26 @@
 <?php
 
-namespace Tests;
+namespace Tests\Session;
+
+use Codeages\Biz\Framework\Session\Storage\SessionStorage;
+use Tests\IntegrationTestCase;
 
 class DbSessionStorageTest extends IntegrationTestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
-        $this->biz['session.options'] = array(
+        $this->biz['session.options'] = [
             'max_life_time' => 1,
             'session_storage' => 'db',
-        );
+        ];
     }
 
     public function testCreate()
     {
         $mockedSession = $this->mockSession();
-        $session = $this->getSessionService()->saveSession($mockedSession);
+        $session = $this->getSessionStorage()->save($mockedSession);
 
         $keys = array_keys($mockedSession);
         foreach ($keys as $key) {
@@ -28,7 +31,7 @@ class DbSessionStorageTest extends IntegrationTestCase
     public function testCreateWithSql()
     {
         $mockedSessionWithSql = $this->mockSessionWithSql();
-        $session = $this->getSessionService()->saveSession($mockedSessionWithSql);
+        $session = $this->getSessionStorage()->save($mockedSessionWithSql);
 
         $keys = array_keys($mockedSessionWithSql);
         foreach ($keys as $key) {
@@ -39,15 +42,13 @@ class DbSessionStorageTest extends IntegrationTestCase
     public function testUpdateSessionBySessId()
     {
         $mockedSession = $this->mockSession();
-        $session = $this->getSessionService()->saveSession($mockedSession);
-
-        sleep(1);
+        $session = $this->getSessionStorage()->save($mockedSession);
 
         $session['sess_data'] = 'test';
-        $updatedSession = $this->getSessionService()->saveSession($session);
+        $updatedSession = $this->getSessionStorage()->save($session);
         $keys = array_keys($mockedSession);
         foreach ($keys as $key) {
-            if (in_array($key, array('sess_data', 'sess_time'))) {
+            if (in_array($key, ['sess_data', 'sess_time'])) {
                 continue;
             }
             $this->assertEquals($mockedSession[$key], $session[$key]);
@@ -60,15 +61,13 @@ class DbSessionStorageTest extends IntegrationTestCase
     public function testUpdateSessionBySessIdWithSql()
     {
         $mockedSession = $this->mockSessionWithSql();
-        $session = $this->getSessionService()->saveSession($mockedSession);
-
-        sleep(1);
+        $session = $this->getSessionStorage()->save($mockedSession);
 
         $session['sess_data'] = 'test';
-        $updatedSession = $this->getSessionService()->saveSession($session);
+        $updatedSession = $this->getSessionStorage()->save($session);
         $keys = array_keys($mockedSession);
         foreach ($keys as $key) {
-            if (in_array($key, array('sess_data', 'sess_time'))) {
+            if (in_array($key, ['sess_data', 'sess_time'])) {
                 continue;
             }
             $this->assertEquals($mockedSession[$key], $session[$key]);
@@ -81,65 +80,65 @@ class DbSessionStorageTest extends IntegrationTestCase
     public function testDeleteSession()
     {
         $mockedSession = $this->mockSession();
-        $session = $this->getSessionService()->saveSession($mockedSession);
-        $this->getSessionService()->deleteSessionBySessId($session['sess_id']);
+        $session = $this->getSessionStorage()->save($mockedSession);
+        $this->getSessionStorage()->delete($session['sess_id']);
 
-        $deleteSession = $this->getSessionService()->getSessionBySessId($session['sess_id']);
+        $deleteSession = $this->getSessionStorage()->get($session['sess_id']);
         $this->assertEmpty($deleteSession);
     }
 
     public function testDeleteSessionWithSql()
     {
         $mockedSession = $this->mockSessionWithSql();
-        $session = $this->getSessionService()->saveSession($mockedSession);
-        $this->getSessionService()->deleteSessionBySessId($session['sess_id']);
+        $session = $this->getSessionStorage()->save($mockedSession);
+        $this->getSessionStorage()->delete($session['sess_id']);
 
-        $deleteSession = $this->getSessionService()->getSessionBySessId($session['sess_id']);
+        $deleteSession = $this->getSessionStorage()->get($session['sess_id']);
         $this->assertEmpty($deleteSession);
     }
 
     public function testGc()
     {
         $mockedSession = $this->mockSession();
-        $this->getSessionService()->saveSession($mockedSession);
+        $mockedSession['sess_deadline'] = time() - 1;
+        $this->getSessionStorage()->save($mockedSession);
 
-        sleep(2);
-
-        $this->getSessionService()->gc();
-        $deleteSession = $this->getSessionService()->getSessionBySessId($mockedSession['sess_id']);
+        $this->getSessionStorage()->gc();
+        $deleteSession = $this->getSessionStorage()->get($mockedSession['sess_id']);
         $this->assertEmpty($deleteSession);
     }
 
     public function testGcWithSql()
     {
         $mockedSession = $this->mockSessionWithSql();
-        $this->getSessionService()->saveSession($mockedSession);
+        $mockedSession['sess_deadline'] = time() - 1;
+        $this->getSessionStorage()->save($mockedSession);
 
-        sleep(2);
-
-        $this->getSessionService()->gc();
-        $deleteSession = $this->getSessionService()->getSessionBySessId($mockedSession['sess_id']);
+        $this->getSessionStorage()->gc();
+        $deleteSession = $this->getSessionStorage()->get($mockedSession['sess_id']);
         $this->assertEmpty($deleteSession);
     }
 
     protected function mockSession()
     {
-        return array(
+        return [
             'sess_id' => 'sess'.rand(1000000, 9000000),
             'sess_data' => 'ababa',
-        );
+            'sess_deadline' => time() + $this->biz['session.options']['max_life_time'],
+        ];
     }
 
     protected function mockSessionWithSql()
     {
-        return array(
+        return [
             'sess_id' => 'sess_'.rand(1000000, 9000000).'"1\' OR \'1\'=\'1"',
             'sess_data' => 'sql',
-        );
+            'sess_deadline' => time() + $this->biz['session.options']['max_life_time'],
+        ];
     }
 
-    protected function getSessionService()
+    protected function getSessionStorage(): SessionStorage
     {
-        return $this->biz->service('Session:SessionService');
+        return $this->biz['session.storage.db'];
     }
 }
