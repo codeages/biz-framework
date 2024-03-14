@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests;
+namespace Tests\Provider;
 
 use Codeages\Biz\Framework\Provider\RedisServiceProvider;
 use PHPUnit\Framework\TestCase;
