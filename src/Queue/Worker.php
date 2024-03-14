@@ -1,12 +1,12 @@
-<?php
+<?php /** @noinspection ALL */
 
 namespace Codeages\Biz\Framework\Queue;
 
 use Codeages\Biz\Framework\Queue\Driver\Queue;
-use Symfony\Component\Lock\LockInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
+use Symfony\Component\Lock\LockInterface;
 
 class Worker
 {
@@ -30,28 +30,26 @@ class Worker
 
     protected $logger;
 
-    public function __construct(Queue $queue, JobFailer $failer, LockInterface $lock, LoggerInterface $logger, array $options = array())
+    public function __construct(Queue $queue, JobFailer $failer, LockInterface $lock, LoggerInterface $logger, array $options = [])
     {
         $this->queue = $queue;
         $this->failer = $failer;
         $this->lock = $lock;
         $this->logger = $logger;
-        $this->options = array_merge(array(
+        $this->options = array_merge([
             'memory_limit' => 256,
             'sleep' => 2,
             'tries' => 0,
             'once' => false,
             'stop_when_idle' => false,
-        ), $options);
+        ], $options);
     }
 
     public function run()
     {
         try {
             $acquired = $this->lock->acquire();
-        } catch (LockConflictedException $e) {
-            $this->logger->error($this->createMessage("Acquire lock error: {$e->getMessage()}"));
-        } catch (LockAcquiringException $e) {
+        } catch (LockConflictedException|LockAcquiringException $e) {
             $this->logger->error($this->createMessage("Acquire lock error: {$e->getMessage()}"));
         }
 
@@ -67,8 +65,6 @@ class Worker
             }
             $this->stopIfNecessary($job);
         }
-
-        $this->lock->release();
     }
 
     public function runNextJob()
@@ -82,43 +78,40 @@ class Worker
             return $job;
         } else {
             $this->logger->info($this->createMessage('No job.'));
+
+            return null;
         }
     }
 
     protected function getNextJob()
     {
         try {
-            return $job = $this->queue->pop();
-        } catch (\Exception $e) {
-            $this->logger->error($this->createMessage("Pop job #{$job->getId()} error: {$e->getMessage()}"));
-            $this->shouldQuit = true;
+            return $this->queue->pop();
         } catch (\Throwable $e) {
-            $this->logger->error($this->createMessage("Pop job #{$job->getId()} error: {$e->getMessage()}"));
+            $this->logger->error($this->createMessage("Pop job error: {$e->getMessage()}"));
             $this->shouldQuit = true;
         }
+
+        return null;
     }
 
     protected function executeJob($job)
     {
         $this->registerTimeoutHandler($job);
-
         $result = null;
         try {
             $result = $job->execute();
-        } catch (\Exception $e) {
-            $this->logger->error($this->createMessage("Execute job #{$job->getId()} error: {$e->getMessage()}"));
-            $this->shouldQuit = true;
         } catch (\Throwable $e) {
-            $this->logger->error($this->createMessage("Execute job #{$job->getId()} error: {$e->getMessage()}"));
+            $this->logger->error($this->createMessage("Execute job #{$job->getId()}"), ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             $this->shouldQuit = true;
         }
 
         if (is_array($result)) {
             $result = array_values($result);
-            $code = isset($result[0]) ? $result[0] : null;
-            $message = isset($result[1]) ? $result[1] : '';
+            $code = $result[0] ?? null;
+            $message = $result[1] ?? '';
         } else {
-            $code = $result;
+            $code = (string) $result;
             $message = '';
         }
 
@@ -163,8 +156,7 @@ class Worker
 
     protected function isSupportAsyncSignal()
     {
-        return version_compare(PHP_VERSION, '7.1.0') >= 0 &&
-               extension_loaded('pcntl');
+        return extension_loaded('pcntl');
     }
 
     public function kill($status = 0)
@@ -197,7 +189,7 @@ class Worker
             $this->stop();
         }
 
-        if (true == $this->options['once']) {
+        if ($this->options['once']) {
             $this->stop();
         }
 

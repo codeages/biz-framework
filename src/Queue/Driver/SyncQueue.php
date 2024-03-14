@@ -33,10 +33,10 @@ class SyncQueue extends AbstractQueue implements Queue
 
         if (is_array($result)) {
             $result = array_values($result);
-            $code = isset($result[0]) ? $result[0] : null;
-            $message = isset($result[1]) ? $result[1] : '';
+            $code = $result[0] ?? null;
+            $message = $result[1] ?? '';
         } else {
-            $code = $result;
+            $code = (string) $result;
             $message = '';
         }
 
