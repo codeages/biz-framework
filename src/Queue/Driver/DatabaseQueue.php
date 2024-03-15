@@ -5,7 +5,7 @@ namespace Codeages\Biz\Framework\Queue\Driver;
 use Codeages\Biz\Framework\Queue\Job;
 use Codeages\Biz\Framework\Context\Biz;
 use Codeages\Biz\Framework\Queue\QueueException;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 
 class DatabaseQueue extends AbstractQueue implements Queue
 {
@@ -33,12 +33,12 @@ class DatabaseQueue extends AbstractQueue implements Queue
             );
 
             $this->biz['db']->insert($this->options['table'], $jobRecord, array(
-                Type::STRING,
-                Type::TEXT,
-                Type::STRING,
-                Type::INTEGER,
-                Type::INTEGER,
-                Type::INTEGER,
+                Types::STRING,
+                Types::TEXT,
+                Types::STRING,
+                Types::INTEGER,
+                Types::INTEGER,
+                Types::INTEGER,
             ));
             $id = $this->biz['db']->lastInsertId();
             $job->setId($id);
@@ -59,9 +59,9 @@ class DatabaseQueue extends AbstractQueue implements Queue
             $now,
             $now,
         ), array(
-            Type::STRING,
-            Type::INTEGER,
-            Type::INTEGER,
+            Types::STRING,
+            Types::INTEGER,
+            Types::INTEGER,
         ));
         if (empty($record)) {
             $this->biz['db']->commit();
@@ -76,9 +76,9 @@ class DatabaseQueue extends AbstractQueue implements Queue
         ), array(
             'id' => $record['id'],
         ), array(
-            Type::INTEGER,
-            Type::INTEGER,
-            Type::INTEGER,
+            Types::INTEGER,
+            Types::INTEGER,
+            Types::INTEGER,
         ));
 
         $this->biz['db']->commit();
@@ -103,7 +103,7 @@ class DatabaseQueue extends AbstractQueue implements Queue
         $this->biz['db']->delete($this->options['table'], array(
             'id' => $job->getId(),
         ), array(
-            Type::INTEGER,
+            Types::INTEGER,
         ));
     }
 
@@ -115,9 +115,9 @@ class DatabaseQueue extends AbstractQueue implements Queue
         ), array(
             'id' => $job->getId(),
         ), array(
-            Type::INTEGER,
-            Type::INTEGER,
-            Type::INTEGER,
+            Types::INTEGER,
+            Types::INTEGER,
+            Types::INTEGER,
         ));
     }
 }

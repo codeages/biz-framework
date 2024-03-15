@@ -70,17 +70,17 @@ class Worker
     public function runNextJob()
     {
         $job = $this->getNextJob();
-        if ($job) {
-            $this->logger->info($this->createMessage("Start execute job #{$job->getId()}."));
-            $this->executeJob($job);
-            $this->logger->info($this->createMessage("End execute job #{$job->getId()}."));
-
-            return $job;
-        } else {
+        if (!$job) {
             $this->logger->info($this->createMessage('No job.'));
 
             return null;
         }
+
+        $this->logger->info($this->createMessage("Start execute job #{$job->getId()}."));
+        $this->executeJob($job);
+        $this->logger->info($this->createMessage("End execute job #{$job->getId()}."));
+
+        return $job;
     }
 
     protected function getNextJob()
@@ -111,7 +111,7 @@ class Worker
             $code = $result[0] ?? null;
             $message = $result[1] ?? '';
         } else {
-            $code = (string) $result;
+            $code = (string)$result;
             $message = '';
         }
 
