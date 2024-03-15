@@ -2,8 +2,8 @@
 
 namespace Codeages\Biz\Framework\Queue\Driver;
 
-use Codeages\Biz\Framework\Queue\Job;
 use Codeages\Biz\Framework\Context\Biz;
+use Codeages\Biz\Framework\Queue\Job;
 use Codeages\Biz\Framework\Queue\QueueException;
 use Doctrine\DBAL\Types\Types;
 
@@ -83,17 +83,22 @@ class DatabaseQueue extends AbstractQueue implements Queue
 
         $this->biz['db']->commit();
 
-        $class = $record['class'];
-        $job = new $class();
-        $job->setId($record['id']);
-        $job->setBody(unserialize($record['body']));
-        $job->setMetadata(array(
-            'class' => $class,
-            'timeout' => $record['timeout'],
-            'priority' => $record['priority'],
-            'executions' => $record['executions'] + 1,
-        ));
-        $job->setBiz($this->biz);
+        try {
+            $class = $record['class'];
+            $job = new $class();
+            $job->setId($record['id']);
+            $job->setBody(unserialize($record['body']));
+            $job->setMetadata(array(
+                'class' => $class,
+                'timeout' => $record['timeout'],
+                'priority' => $record['priority'],
+                'executions' => $record['executions'] + 1,
+            ));
+            $job->setBiz($this->biz);
+        } catch (\Exception $e) {
+            $this->biz['db']->delete($this->options['table'], array('id' => $record['id'],), array(Types::INTEGER,));
+            throw new QueueException('Pop job failed', 0, $e);
+        }
 
         return $job;
     }
