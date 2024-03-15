@@ -95,7 +95,7 @@ class DatabaseQueue extends AbstractQueue implements Queue
                 'executions' => $record['executions'] + 1,
             ));
             $job->setBiz($this->biz);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $this->biz['db']->delete($this->options['table'], array('id' => $record['id'],), array(Types::INTEGER,));
             throw new QueueException('Pop job failed', 0, $e);
         }

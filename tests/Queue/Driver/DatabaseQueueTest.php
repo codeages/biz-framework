@@ -3,6 +3,9 @@
 namespace Tests\Queue\Driver;
 
 use Codeages\Biz\Framework\Queue\Driver\DatabaseQueue;
+use Codeages\Biz\Framework\Queue\Job;
+use Codeages\Biz\Framework\Queue\QueueException;
+use Doctrine\DBAL\Types\Types;
 use Tests\Fixtures\QueueJob\ExampleFinishedJob;
 use Tests\Queue\QueueBaseTestCase;
 
@@ -124,6 +127,39 @@ class DatabaseQueueTest extends QueueBaseTestCase
 
         $this->assertEquals($job->getBody(), $popedJob->getBody());
         $this->assertEquals($job->getId(), $popedJob->getId());
+    }
+
+    public function testPopOnJobNotFound()
+    {
+        $queueOptions = $this->getQueueOptions();
+        $queue = new DatabaseQueue(self::TEST_QUEUE, $this->biz, $queueOptions);
+
+        $jobRecord = array(
+            'queue' => self::TEST_QUEUE,
+            'body' => serialize([]),
+            'class' => ExampleFinishedJob::class. 'NotFound',
+            'timeout' => Job::DEFAULT_TIMEOUT,
+            'priority' => Job::DEFAULT_PRIORITY,
+            'available_time' => time(),
+        );
+
+        $this->biz['db']->insert($queueOptions['table'], $jobRecord, array(
+            Types::STRING,
+            Types::TEXT,
+            Types::STRING,
+            Types::INTEGER,
+            Types::INTEGER,
+            Types::INTEGER,
+        ));
+
+        $this->expectException(QueueException::class);
+        $this->expectExceptionMessage('Pop job failed');
+
+        $queue->pop();
+
+        $this->assertEmpty(
+            $this->fetchAllFromDatabase($queueOptions['table'], array('queue' => self::TEST_QUEUE))
+        );
     }
 
     public function testDelete()
