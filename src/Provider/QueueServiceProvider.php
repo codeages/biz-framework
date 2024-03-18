@@ -2,6 +2,7 @@
 
 namespace Codeages\Biz\Framework\Provider;
 
+use Codeages\Biz\Framework\Queue\Driver\DatabaseQueue;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
 use Codeages\Biz\Framework\Queue\Driver\SyncQueue;
@@ -27,6 +28,10 @@ class QueueServiceProvider implements ServiceProviderInterface
 
         $biz['queue.connection.default'] = function ($biz) {
             return new SyncQueue('default', $biz, $biz['queue.failer']);
+        };
+
+        $biz['queue.connection.database'] = function ($biz) {
+            return new DatabaseQueue('database', $biz);
         };
     }
 }
