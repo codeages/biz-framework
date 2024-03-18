@@ -13,4 +13,10 @@ interface QueueService
     public function countFailedJobs($conditions);
 
     public function searchFailedJobs($conditions, $orderBys, $start, $limit);
+
+    public function countJobs($conditions);
+
+    public function searchJobs($conditions, $orderBys, $start, $limit);
+
+    public function deleteJob($id);
 }

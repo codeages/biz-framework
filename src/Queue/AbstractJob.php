@@ -13,6 +13,9 @@ abstract class AbstractJob implements Job
 
     protected $metadata = array();
 
+    /**
+     * @var Biz
+     */
     protected $biz;
 
     public function __construct($body = null, array $metadata = array())

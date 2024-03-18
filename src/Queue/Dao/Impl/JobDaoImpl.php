@@ -14,7 +14,7 @@ class JobDaoImpl extends GeneralDaoImpl implements JobDao
         return array(
             'timestamps' => array('created_time'),
             'serializes' => array('body' => 'php'),
-            'orderbys' => array('created_time'),
+            'orderbys' => array('created_time', 'id'),
             'conditions' => array(
             ),
         );
