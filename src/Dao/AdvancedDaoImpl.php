@@ -44,7 +44,7 @@ abstract class AdvancedDaoImpl extends GeneralDaoImpl implements AdvancedDaoInte
         $columnStr = implode(',', $columns);
 
         $count = count($rows);
-        $pageSize = 1000;
+        $pageSize = floor(2000 / count($columns));
         $pageCount = ceil($count / $pageSize);
 
         for ($i = 1; $i <= $pageCount; ++$i) {
@@ -79,7 +79,7 @@ abstract class AdvancedDaoImpl extends GeneralDaoImpl implements AdvancedDaoInte
         $this->db()->checkFieldNames(array($identifyColumn));
 
         $count = count($identifies);
-        $pageSize = 500;
+        $pageSize = floor(1000 / count($updateColumns));
         $pageCount = ceil($count / $pageSize);
 
         for ($i = 1; $i <= $pageCount; ++$i) {
