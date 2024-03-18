@@ -114,7 +114,9 @@ class Biz extends Container
             return new CacheStrategy\RowStrategy($biz['dao.cache.redis_wrapper'], $biz['dao.metadata_reader']);
         };
 
-        $biz['lock.flock.directory'] = null;
+        $biz['lock.flock.directory'] = function ($biz) {
+            return $biz['run_dir'];
+        };
 
         $biz['lock.store'] = function ($biz) {
             return new \Symfony\Component\Lock\Store\FlockStore($biz['lock.flock.directory']);

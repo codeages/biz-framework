@@ -238,7 +238,7 @@ abstract class GeneralDaoImpl implements GeneralDaoInterface
         $marks = str_repeat('?,', count($values) - 1).'?';
         $sql = "SELECT * FROM {$this->table} WHERE {$field} IN ({$marks});";
 
-        return $this->db()->fetchAll($sql, $values);
+        return $this->db()->fetchAll($sql, array_values($values));
     }
 
     protected function findByFields($fields)
