@@ -16,7 +16,6 @@ use Monolog\Formatter\LineFormatter;
 use Monolog\Logger;
 use Monolog\Handler;
 use Monolog\ErrorHandler;
-use Symfony\Bridge\Monolog\Handler\DebugHandler;
 
 /**
  * Monolog Provider.
@@ -33,11 +32,9 @@ class MonologServiceProvider implements ServiceProviderInterface, BootableProvid
             return $app['monolog'];
         };
 
-        if ($bridge = class_exists('Symfony\Bridge\Monolog\Logger')) {
-            $app['monolog.handler.debug'] = function () use ($app) {
-                $level = MonologServiceProvider::translateLevel($app['monolog.level']);
-
-                return new DebugHandler($level);
+        if ($bridge = class_exists('Symfony\Bridge\Monolog\Processor\DebugProcessor')) {
+            $app['monolog.processor.debug'] = function () use ($app) {
+                return new \Symfony\Bridge\Monolog\Processor\DebugProcessor();
             };
         }
 
@@ -53,8 +50,8 @@ class MonologServiceProvider implements ServiceProviderInterface, BootableProvid
 
             $log->pushHandler($handler);
 
-            if ($app['debug'] && isset($app['monolog.handler.debug'])) {
-                $log->pushHandler($app['monolog.handler.debug']);
+            if ($app['debug'] && isset($app['monolog.processor.debug'])) {
+                $log->pushProcessor($app['monolog.processor.debug']);
             }
 
             return $log;
