@@ -31,8 +31,7 @@
     "webpatser/laravel-uuid": "~2.0",
     "monolog/monolog": "^1.20",
     "vlucas/valitron": "^1.4",
-    "ext-json": "*",
-    "symfony/monolog-bridge": "^6.0"
+    "ext-json": "*"
   },
   "require-dev": {
     "mockery/mockery": "^0.9.9",
