@@ -339,7 +339,7 @@ class DaoProxy
 
     protected function unserialize(&$row)
     {
-        if (empty($row)) {
+        if (empty($row) || !is_array($row)) {
             return;
         }
 
