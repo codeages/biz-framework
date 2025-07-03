@@ -14,7 +14,7 @@ use Pimple\ServiceProviderInterface;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Configuration;
 use Doctrine\Common\EventManager;
-use Symfony\Bridge\Doctrine\Logger\DbalLogger;
+use Codeages\Biz\Framework\Provider\Logger\TimedDbalLogger;
 
 /**
  * Doctrine DBAL Provider.
@@ -92,11 +92,12 @@ class DoctrineServiceProvider implements ServiceProviderInterface
             $app['dbs.options.initializer']();
 
             $configs = new Container();
-            $addLogger = isset($app['logger']) && null !== $app['logger'] && class_exists('Symfony\Bridge\Doctrine\Logger\DbalLogger');
+            $addLogger = isset($app['logger']) && null !== $app['logger'];
             foreach ($app['dbs.options'] as $name => $options) {
                 $configs[$name] = new Configuration();
                 if ($addLogger) {
-                    $configs[$name]->setSQLLogger(new DbalLogger($app['logger'], isset($app['stopwatch']) ? $app['stopwatch'] : null));
+                    // 使用带时间记录的 TimedDbalLogger
+                    $configs[$name]->setSQLLogger(new TimedDbalLogger($app['logger'], isset($app['stopwatch']) ? $app['stopwatch'] : null));
                 }
             }
 

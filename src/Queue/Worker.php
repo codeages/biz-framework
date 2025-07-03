@@ -60,9 +60,11 @@ class Worker
 
         while (true) {
             $job = $this->runNextJob();
+
             if (empty($job)) {
                 sleep($this->options['sleep']);
             }
+
             $this->stopIfNecessary($job);
         }
     }
@@ -72,12 +74,13 @@ class Worker
         $job = $this->getNextJob();
         if (!$job) {
             $this->logger->info($this->createMessage('No job.'));
-
             return null;
         }
 
         $this->logger->info($this->createMessage("Start execute job #{$job->getId()}."));
+
         $this->executeJob($job);
+
         $this->logger->info($this->createMessage("End execute job #{$job->getId()}."));
 
         return $job;
@@ -104,6 +107,7 @@ class Worker
         } catch (\Throwable $e) {
             $this->logger->error($this->createMessage("Execute job #{$job->getId()}"), ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             $this->shouldQuit = true;
+            $result = [Job::FAILED, $e->getMessage()."\n".$e->getTraceAsString()];
         }
 
         if (is_array($result)) {
@@ -117,7 +121,6 @@ class Worker
 
         if (empty($code) || Job::FINISHED === $code) {
             $this->queue->delete($job);
-
             return;
         }
 
@@ -126,14 +129,12 @@ class Worker
             if ($executions - 1 < $this->options['tries']) {
                 $this->queue->release($job);
                 $this->logger->warning($this->createMessage("Execute job #{$job->getId()} failed, retry {$executions} times."));
-
                 return;
             }
         }
 
         $this->failer->log($job, $this->queue->getName(), $message);
         $this->queue->delete($job);
-
         $this->logger->warning($this->createMessage("Execute job #{$job->getId()} failed, drop it."));
     }
 

@@ -20,6 +20,7 @@ class CurrentUser implements \ArrayAccess
         $this->user = $user;
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetSet($key, $value)
     {
         if (empty($key)) {
@@ -33,16 +34,19 @@ class CurrentUser implements \ArrayAccess
         $this->user[$key] = $value;
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetUnset($key)
     {
         throw new \LogicException('can not unset current user attribute.');
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetExists($key)
     {
         return array_key_exists($key, $this->user);
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetGet($key)
     {
         if (!$this->offsetExists($key)) {
