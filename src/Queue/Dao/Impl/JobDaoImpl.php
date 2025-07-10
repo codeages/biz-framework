@@ -11,12 +11,13 @@ class JobDaoImpl extends GeneralDaoImpl implements JobDao
 
     public function declares()
     {
-        return array(
-            'timestamps' => array('created_time'),
-            'serializes' => array('body' => 'php'),
-            'orderbys' => array('created_time', 'id'),
-            'conditions' => array(
-            ),
-        );
+        return [
+            'timestamps' => ['created_time'],
+            'serializes' => ['body' => 'php'],
+            'orderbys' => ['created_time', 'id'],
+            'conditions' => [
+                'class = :class',
+            ],
+        ];
     }
 }

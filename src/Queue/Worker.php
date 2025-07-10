@@ -104,6 +104,7 @@ class Worker
         } catch (\Throwable $e) {
             $this->logger->error($this->createMessage("Execute job #{$job->getId()}"), ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             $this->shouldQuit = true;
+            $result = [Job::FAILED, $e->getMessage()."\n".$e->getTraceAsString()];
         }
 
         if (is_array($result)) {
