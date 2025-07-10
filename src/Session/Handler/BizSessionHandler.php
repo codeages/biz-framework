@@ -13,7 +13,7 @@ class BizSessionHandler implements \SessionHandlerInterface
         $this->biz = $biz;
     }
 
-    public function close()
+    public function close(): bool
     {
         while ($locker = array_shift($this->lockers)) {
             $this->releaseLock($locker);
@@ -26,24 +26,26 @@ class BizSessionHandler implements \SessionHandlerInterface
         return true;
     }
 
-    public function destroy($session_id)
+    public function destroy($session_id): bool
     {
         $this->getSessionService()->deleteSessionBySessId($session_id);
 
         return true;
     }
 
-    public function gc($maxlifetime)
+    public function gc($max_lifetime): int
     {
         $this->gcCalled = true;
+
+        return true;
     }
 
-    public function open($save_path, $name)
+    public function open($save_path, $name): bool
     {
         return true;
     }
 
-    public function read($session_id)
+    public function read($session_id): string
     {
         $this->lockers[] = $this->getLock($session_id);
         if (!in_array($session_id, $this->lockers)) {
@@ -55,12 +57,12 @@ class BizSessionHandler implements \SessionHandlerInterface
         return empty($session['sess_data']) ? '' : $session['sess_data'];
     }
 
-    public function write($session_id, $session_data)
+    public function write($session_id, $session_data): bool
     {
-        $unsavedSession = array(
+        $unsavedSession = [
             'sess_id' => $session_id,
             'sess_data' => $session_data,
-        );
+        ];
         $this->getSessionService()->saveSession($unsavedSession);
 
         return true;
