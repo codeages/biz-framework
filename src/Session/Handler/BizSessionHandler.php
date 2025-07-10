@@ -37,7 +37,7 @@ class BizSessionHandler implements \SessionHandlerInterface
     {
         $this->gcCalled = true;
 
-        return true;
+        return 1;
     }
 
     public function open($save_path, $name): bool

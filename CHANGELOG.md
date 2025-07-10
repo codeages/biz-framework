@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+## [0.12.7] - 2025-07-10
+
+- 新增 src/Logger/TimedDbalLogger.php，实现 SQL 执行耗时日志记录
+- 修复 src/Queue/Worker.php 的 
+
 ## [0.10.0] - 2019-11-05
 
 * 集成 vlucas/valitron 数据校验组件。
