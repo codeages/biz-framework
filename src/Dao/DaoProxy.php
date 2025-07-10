@@ -7,6 +7,11 @@ use Codeages\Biz\Framework\Dao\Annotation\MetadataReader;
 class DaoProxy
 {
     /**
+     * @var ContainerInterface
+     */
+    protected $container;
+
+    /**
      * @var GeneralDaoInterface
      */
     protected $dao;
@@ -52,7 +57,7 @@ class DaoProxy
 
     protected function getProxyMethod($method)
     {
-        foreach (array('get', 'find', 'search', 'count', 'create', 'batchCreate', 'batchUpdate', 'batchDelete', 'update', 'wave', 'delete') as $prefix) {
+        foreach (['get', 'find', 'search', 'count', 'create', 'batchCreate', 'batchUpdate', 'batchDelete', 'update', 'wave', 'delete'] as $prefix) {
             if (0 === strpos($method, $prefix)) {
                 return $prefix;
             }
@@ -64,15 +69,16 @@ class DaoProxy
     /**
      * 代理 get 开头的方法调用
      *
-     * @param string $method 被调用的 Dao 方法名
-     * @param array $arguments 调用参数
+     * @param string $method    被调用的 Dao 方法名
+     * @param array  $arguments 调用参数
+     *
      * @return array|null
      */
     protected function get($method, $arguments)
     {
         $lastArgument = end($arguments);
         reset($arguments);
-        
+
         // lock模式下，因为需要借助mysql的锁，不走cache
         if (is_array($lastArgument) && isset($lastArgument['lock']) && true === $lastArgument['lock']) {
             $row = $this->callRealDao($method, $arguments);
@@ -334,7 +340,7 @@ class DaoProxy
 
     protected function callRealDao($method, $arguments)
     {
-        return call_user_func_array(array($this->dao, $method), $arguments);
+        return call_user_func_array([$this->dao, $method], $arguments);
     }
 
     protected function unserialize(&$row)
@@ -344,7 +350,7 @@ class DaoProxy
         }
 
         $declares = $this->dao->declares();
-        $serializes = empty($declares['serializes']) ? array() : $declares['serializes'];
+        $serializes = empty($declares['serializes']) ? [] : $declares['serializes'];
 
         foreach ($serializes as $key => $method) {
             if (!array_key_exists($key, $row)) {
@@ -365,7 +371,7 @@ class DaoProxy
     protected function serialize(&$row)
     {
         $declares = $this->dao->declares();
-        $serializes = empty($declares['serializes']) ? array() : $declares['serializes'];
+        $serializes = empty($declares['serializes']) ? [] : $declares['serializes'];
 
         foreach ($serializes as $key => $method) {
             if (!array_key_exists($key, $row)) {
@@ -382,6 +388,7 @@ class DaoProxy
         if (empty($declares['id_generator'])) {
             return null;
         }
+
         return $this->container['dao.id_generator.'.$declares['id_generator']];
     }
 
@@ -430,7 +437,7 @@ class DaoProxy
         // 针对某个 Dao 指定 Cache 策略
         $strategyServiceId = 'dao.cache.strategy.'.strtolower($declares['cache']);
         if (!isset($this->container[$strategyServiceId])) {
-            throw new DaoException("Dao %s cache strategy is not defined, please define first in biz container use %s service id.", get_class($this->dao), $strategyServiceId);
+            throw new DaoException('Dao %s cache strategy is not defined, please define first in biz container use %s service id.', get_class($this->dao), $strategyServiceId);
         }
 
         return $this->container[$strategyServiceId];
@@ -445,7 +452,7 @@ class DaoProxy
 
         $strategyServiceId = 'dao.cache.strategy.'.strtolower($metadata['strategy']);
         if (!isset($this->container[$strategyServiceId])) {
-            throw new DaoException("Dao %s cache strategy is not defined, please define first in biz container use %s service id.", get_class($this->dao), $strategyServiceId);
+            throw new DaoException('Dao %s cache strategy is not defined, please define first in biz container use %s service id.', get_class($this->dao), $strategyServiceId);
         }
 
         return $this->container[$strategyServiceId];
