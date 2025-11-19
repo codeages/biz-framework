@@ -2,21 +2,18 @@
 
 namespace Codeages\Biz\Framework\Dao;
 
+use ReturnTypeWillChange;
+
 class ArrayStorage implements \ArrayAccess
 {
-    private $data;
-
-    public function __construct()
-    {
-        $this->data = array();
-    }
+    private $data = [];
 
     public function flush()
     {
-        $this->data = array();
+        $this->data = [];
     }
 
-    public function offsetSet($offset, $value)
+    #[ReturnTypeWillChange] public function offsetSet($offset, $value)
     {
         if (is_null($offset)) {
             $this->data[] = $value;
@@ -25,18 +22,18 @@ class ArrayStorage implements \ArrayAccess
         }
     }
 
-    public function offsetExists($offset)
+    #[ReturnTypeWillChange] public function offsetExists($offset)
     {
         return isset($this->data[$offset]);
     }
 
-    public function offsetUnset($offset)
+    #[ReturnTypeWillChange] public function offsetUnset($offset)
     {
         unset($this->data[$offset]);
     }
 
-    public function offsetGet($offset)
+    #[ReturnTypeWillChange] public function offsetGet($offset)
     {
-        return isset($this->data[$offset]) ? $this->data[$offset] : null;
+        return $this->data[$offset] ?? null;
     }
 }
