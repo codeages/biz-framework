@@ -52,7 +52,6 @@ class SettingServiceImpl extends BaseService implements SettingService
                 'data' => $data,
             ));
         }
-        $this->clearCache();
     }
 
     public function remove($name)
@@ -80,23 +79,11 @@ class SettingServiceImpl extends BaseService implements SettingService
         } else {
             $this->getSettingDao()->delete($setting['id']);
         }
-        $this->clearCache();
     }
 
     private function getByName($name)
     {
-        $settings = $this->getCache();
-        if (!$settings) {
-            $settings = $this->getSettingDao()->findAll();
-            $settings = array_column($settings, null, 'name');
-            $this->setCache($settings);
-        }
-
-        if (!isset($settings[$name])) {
-            return null;
-        }
-
-        return $settings[$name];
+        return $this->getSettingDao()->getByName($name);
     }
 
     private function splitName($name)
@@ -118,26 +105,5 @@ class SettingServiceImpl extends BaseService implements SettingService
     protected function getSettingDao()
     {
         return $this->biz->dao('Setting:SettingDao');
-    }
-
-    protected function getCache()
-    {
-        $storage = $this->biz['array_storage'];
-        if (!isset($storage['setting_service_cache'])) {
-            return null;
-        }
-
-        return $storage['setting_service_cache'];
-    }
-
-    protected function setCache($data)
-    {
-        $storage = $this->biz['array_storage'];
-        $storage['setting_service_cache'] = $data;
-    }
-
-    protected function clearCache()
-    {
-        $this->biz['array_storage']->flush();
     }
 }

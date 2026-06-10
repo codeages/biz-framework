@@ -141,6 +141,65 @@ class SettingServiceTest extends IntegrationTestCase
         $this->getSettingService()->remove('with_string_value.subkey');
     }
 
+    public function testGetAfterSetReturnsNewValue()
+    {
+        $this->seed('Tests\\Setting\\SettingSeeder');
+
+        $this->getSettingService()->set('with_string_value', 'new_string_value');
+        $value = $this->getSettingService()->get('with_string_value');
+
+        $this->assertEquals('new_string_value', $value);
+    }
+
+    public function testRowCacheHitOnRepeatedGetByName()
+    {
+        if (empty($this->biz['dao.cache.enabled'])) {
+            $this->markTestSkipped('DAO cache is not enabled, skipping RowStrategy cache test.');
+        }
+
+        $this->seed('Tests\\Setting\\SettingSeeder');
+
+        $first = $this->getSettingService()->get('with_array_value');
+        $second = $this->getSettingService()->get('with_array_value');
+
+        $this->assertEquals($first, $second);
+        $this->assertTrue(is_array($second));
+
+        $keys = $this->redis->keys('dao:biz_setting:getByName:*');
+        $this->assertNotEmpty($keys, 'RowStrategy should cache getByName results in Redis');
+    }
+
+    public function testRowCacheInvalidationOnUpdate()
+    {
+        if (empty($this->biz['dao.cache.enabled'])) {
+            $this->markTestSkipped('DAO cache is not enabled, skipping RowStrategy cache test.');
+        }
+
+        $this->seed('Tests\\Setting\\SettingSeeder');
+
+        $this->getSettingService()->set('with_array_value', array(
+            'updated_key' => 'updated_value',
+        ));
+
+        $value = $this->getSettingService()->get('with_array_value');
+        $this->assertEquals('updated_value', $value['updated_key']);
+        $this->assertFalse(isset($value['key1']));
+    }
+
+    public function testRowCacheInvalidationOnRemove()
+    {
+        if (empty($this->biz['dao.cache.enabled'])) {
+            $this->markTestSkipped('DAO cache is not enabled, skipping RowStrategy cache test.');
+        }
+
+        $this->seed('Tests\\Setting\\SettingSeeder');
+
+        $this->getSettingService()->remove('with_string_value');
+        $value = $this->getSettingService()->get('with_string_value');
+
+        $this->assertNull($value);
+    }
+
     protected function getSettingService()
     {
         return $this->biz->service('Setting:SettingService');
